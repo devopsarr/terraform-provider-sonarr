@@ -3,11 +3,16 @@ package provider
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"golift.io/starr"
+	"golift.io/starr/sonarr"
 )
+
+var stderr = os.Stderr
 
 // provider satisfies the tfsdk.Provider interface and usually is included
 // with all Resource and DataSource implementations.
@@ -15,9 +20,7 @@ type provider struct {
 	// client can contain the upstream provider SDK or HTTP client used to
 	// communicate with the upstream service. Resource and DataSource
 	// implementations can then make calls using this client.
-	//
-	// TODO: If appropriate, implement upstream provider SDK or HTTP client.
-	// client vendorsdk.ExampleClient
+	client sonarr.Sonarr
 
 	// configured is set to true at the end of the Configure method.
 	// This can be used in Resource and DataSource implementations to verify
@@ -32,7 +35,8 @@ type provider struct {
 
 // providerData can be used to store data from the Terraform configuration.
 type providerData struct {
-	Example types.String `tfsdk:"example"`
+	APIKey types.String `tfsdk:"api_key"`
+	URL    types.String `tfsdk:"url"`
 }
 
 func (p *provider) Configure(ctx context.Context, req tfsdk.ConfigureProviderRequest, resp *tfsdk.ConfigureProviderResponse) {
@@ -44,34 +48,91 @@ func (p *provider) Configure(ctx context.Context, req tfsdk.ConfigureProviderReq
 		return
 	}
 
-	// Configuration values are now available.
-	// if data.Example.Null { /* ... */ }
+	// User must provide URL to the provider
+	var url string
+	if data.URL.Unknown {
+		// Cannot connect to client with an unknown value
+		resp.Diagnostics.AddWarning(
+			"Unable to create client",
+			"Cannot use unknown value as url",
+		)
+		return
+	}
 
+	if data.URL.Null {
+		url = os.Getenv("SONARR_URL")
+	} else {
+		url = data.URL.Value
+	}
+
+	if url == "" {
+		// Error vs warning - empty value must stop execution
+		resp.Diagnostics.AddError(
+			"Unable to find URL",
+			"URL cannot be an empty string",
+		)
+		return
+	}
+
+	// User must provide API key to the provider
+	var key string
+	if data.APIKey.Unknown {
+		// Cannot connect to client with an unknown value
+		resp.Diagnostics.AddWarning(
+			"Unable to create client",
+			"Cannot use unknown value as api_key",
+		)
+		return
+	}
+
+	if data.APIKey.Null {
+		key = os.Getenv("SONARR_API_KEY")
+	} else {
+		key = data.APIKey.Value
+	}
+
+	if key == "" {
+		// Error vs warning - empty value must stop execution
+		resp.Diagnostics.AddError(
+			"Unable to find API key",
+			"API key cannot be an empty string",
+		)
+		return
+	}
 	// If the upstream provider SDK or HTTP client requires configuration, such
 	// as authentication or logging, this is a great opportunity to do so.
-
+	c := *sonarr.New(starr.New(key, url, 0))
+	p.client = c
 	p.configured = true
 }
 
 func (p *provider) GetResources(ctx context.Context) (map[string]tfsdk.ResourceType, diag.Diagnostics) {
 	return map[string]tfsdk.ResourceType{
-		"scaffolding_example": exampleResourceType{},
+		"sonarr_tag": resourceTagType{},
 	}, nil
 }
 
 func (p *provider) GetDataSources(ctx context.Context) (map[string]tfsdk.DataSourceType, diag.Diagnostics) {
 	return map[string]tfsdk.DataSourceType{
-		"scaffolding_example": exampleDataSourceType{},
+		"sonarr_tags": dataTagsType{},
 	}, nil
 }
 
 func (p *provider) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		Attributes: map[string]tfsdk.Attribute{
-			"example": {
-				MarkdownDescription: "Example provider attribute",
+			"api_key": {
+				MarkdownDescription: "API key for Sonarr authentication",
 				Optional:            true,
 				Type:                types.StringType,
+				Sensitive:           true,
+				//Computed:            true,
+			},
+			"url": {
+				MarkdownDescription: "Full URL of Sonarr installation",
+				Optional:            true,
+				Type:                types.StringType,
+				//Computed:            true,
 			},
 		},
 	}, nil

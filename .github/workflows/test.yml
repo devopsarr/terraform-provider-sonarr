@@ -46,7 +46,6 @@ jobs:
       matrix:
         # list whatever Terraform versions here you would like to support
         terraform:
-          - '1.0.*'
           - '1.1.*'
     steps:
       - uses: actions/setup-go@v2
@@ -57,8 +56,12 @@ jobs:
           terraform_version: ${{ matrix.terraform }}
           terraform_wrapper: false
       - uses: actions/checkout@v2
+      - name: run provider
+        run: docker run -d -v ${{ github.workspace }}/.github/workflows/config.xml:/config/config.xml -p 8989:8989 --health-cmd "curl --fail http://localhost:8989/system/status || exit 1" linuxserver/sonarr
       - run: go mod download
       - env:
+          SONARR_URL: "http://localhost:8989"
+          SONARR_API_KEY: "b01df9fca2e64e459d64a09888ce7451"
           TF_ACC: "1"
         run: go test -v -cover ./internal/provider/
         timeout-minutes: 10

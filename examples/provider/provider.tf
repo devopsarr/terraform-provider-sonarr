@@ -1,3 +1,3 @@
-provider "scaffolding" {
+provider "sonarr" {
   # example configuration here
 }
