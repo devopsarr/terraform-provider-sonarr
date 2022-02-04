@@ -3,10 +3,13 @@ package provider
 import (
 	"context"
 	"fmt"
+	"regexp"
+	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-go/tftypes"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
@@ -18,14 +21,15 @@ type resourceTag struct {
 
 func (t resourceTagType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		// This description is used by the documentation generator and the language server.
 		MarkdownDescription: "Tag resource",
-
 		Attributes: map[string]tfsdk.Attribute{
 			"label": {
 				MarkdownDescription: "Tag value",
 				Required:            true,
 				Type:                types.StringType,
+				Validators: []tfsdk.AttributeValidator{
+					stringLowercase(),
+				},
 			},
 			"id": {
 				MarkdownDescription: "Tag ID",
@@ -45,14 +49,6 @@ func (t resourceTagType) NewResource(ctx context.Context, in tfsdk.Provider) (tf
 }
 
 func (r resourceTag) Create(ctx context.Context, req tfsdk.CreateResourceRequest, resp *tfsdk.CreateResourceResponse) {
-	if !r.provider.configured {
-		resp.Diagnostics.AddError(
-			"Provider not configured",
-			"The provider hasn't been configured before apply, likely because it depends on an unknown value from another resource. This leads to weird stuff happening, so we'd prefer if you didn't do that. Thanks!",
-		)
-		return
-	}
-
 	// Retrieve values from plan
 	var plan Tag
 
@@ -76,9 +72,6 @@ func (r resourceTag) Create(ctx context.Context, req tfsdk.CreateResourceRequest
 		Label: types.String{Value: plan.Label.Value},
 	}
 
-	diags = resp.State.Set(ctx, &result)
-	resp.Diagnostics.Append(diags...)
-
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -95,18 +88,14 @@ func (r resourceTag) Read(ctx context.Context, req tfsdk.ReadResourceRequest, re
 		return
 	}
 
-	// Get order current value
-	tags, err := r.provider.client.GetTags()
+	// Get tag current value
+	tag, err := r.provider.client.GetTag(int(state.ID.Value))
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read tags, got error: %s", err))
 		return
 	}
 	// Map response body to resource schema attribute
-	for _, t := range tags {
-		if t.ID == int(state.ID.Value) {
-			state.Label = types.String{Value: t.Label}
-		}
-	}
+	state.Label = types.String{Value: tag.Label}
 
 	diags = resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
@@ -143,9 +132,6 @@ func (r resourceTag) Update(ctx context.Context, req tfsdk.UpdateResourceRequest
 		Label: types.String{Value: plan.Label.Value},
 	}
 
-	diags = resp.State.Set(ctx, &result)
-	resp.Diagnostics.Append(diags...)
-
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -154,28 +140,73 @@ func (r resourceTag) Update(ctx context.Context, req tfsdk.UpdateResourceRequest
 }
 
 func (r resourceTag) Delete(ctx context.Context, req tfsdk.DeleteResourceRequest, resp *tfsdk.DeleteResourceResponse) {
-	var data Tag
+	var state Tag
 
-	diags := req.State.Get(ctx, &data)
+	diags := req.State.Get(ctx, &state)
 	resp.Diagnostics.Append(diags...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	// If applicable, this is a great opportunity to initialize any necessary
-	// provider client data and make a call using it.
-	// example, err := d.provider.client.DeleteExample(...)
-	// if err != nil {
-	//     resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to delete example, got error: %s", err))
-	//     return
-	// }
+	// Delete tag current value
+	err := r.provider.client.DeleteTag(int(state.ID.Value))
+	if err != nil {
+		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read tags, got error: %s", err))
+		return
+	}
 
 	resp.State.RemoveResource(ctx)
 }
 
 func (r resourceTag) ImportState(ctx context.Context, req tfsdk.ImportResourceStateRequest, resp *tfsdk.ImportResourceStateResponse) {
-	//TODO implement import
-	//	tfsdk.ResourceImportStatePassthroughID(ctx, tftypes.NewAttributePath().WithAttributeName("id"), req, resp)
-	tfsdk.ResourceImportStateNotImplemented(ctx, "", resp)
+	//tfsdk.ResourceImportStatePassthroughID(ctx, tftypes.NewAttributePath().WithAttributeName("id"), req, resp)
+	id, err := strconv.Atoi(req.ID)
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Unexpected Import Identifier",
+			fmt.Sprintf("Expected import identifier with format: ID. Got: %q", req.ID),
+		)
+		return
+	}
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, tftypes.NewAttributePath().WithAttributeName("id"), id)...)
+}
+
+type stringLowercaseValidator struct {
+}
+
+// Description returns a plain text description of the validator's behavior, suitable for a practitioner to understand its impact.
+func (v stringLowercaseValidator) Description(ctx context.Context) string {
+	return "string must be lowercase"
+}
+
+// MarkdownDescription returns a markdown formatted description of the validator's behavior, suitable for a practitioner to understand its impact.
+func (v stringLowercaseValidator) MarkdownDescription(ctx context.Context) string {
+	return "string must be lowercase"
+}
+
+// Validate runs the main validation logic of the validator, reading configuration data out of `req` and updating `resp` with diagnostics.
+func (v stringLowercaseValidator) Validate(ctx context.Context, req tfsdk.ValidateAttributeRequest, resp *tfsdk.ValidateAttributeResponse) {
+	var str types.String
+	diags := tfsdk.ValueAs(ctx, req.AttributeConfig, &str)
+	resp.Diagnostics.Append(diags...)
+	if diags.HasError() {
+		return
+	}
+	if str.Unknown || str.Null {
+		return
+	}
+	upper, _ := regexp.Match(`^.*[A-Z]+.*$`, []byte(str.Value))
+	if upper {
+		resp.Diagnostics.AddAttributeError(
+			req.AttributePath,
+			"Invalid String Content",
+			"String cannot contains uppercase values",
+		)
+		return
+	}
+}
+
+func stringLowercase() stringLowercaseValidator {
+	return stringLowercaseValidator{}
 }

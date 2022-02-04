@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
@@ -27,7 +28,7 @@ func (t dataTagsType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnos
 			"tags": {
 				MarkdownDescription: "List of tags",
 				Computed:            true,
-				Attributes: tfsdk.ListNestedAttributes(map[string]tfsdk.Attribute{
+				Attributes: tfsdk.SetNestedAttributes(map[string]tfsdk.Attribute{
 					"id": {
 						MarkdownDescription: "ID of tag",
 						Computed:            true,
@@ -38,7 +39,7 @@ func (t dataTagsType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnos
 						Computed:            true,
 						Type:                types.StringType,
 					},
-				}, tfsdk.ListNestedAttributesOptions{}),
+				}, tfsdk.SetNestedAttributesOptions{}),
 			},
 		},
 	}, nil
@@ -53,15 +54,13 @@ func (t dataTagsType) NewDataSource(ctx context.Context, in tfsdk.Provider) (tfs
 }
 
 func (d dataTags) Read(ctx context.Context, req tfsdk.ReadDataSourceRequest, resp *tfsdk.ReadDataSourceResponse) {
-
 	var data Tags
-	diags := req.Config.Get(ctx, &data)
+	diags := resp.State.Get(ctx, &data)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
-
-	// Get order current value
+	// Get tags current value
 	tags, err := d.provider.client.GetTags()
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read tags, got error: %s", err))
@@ -74,8 +73,8 @@ func (d dataTags) Read(ctx context.Context, req tfsdk.ReadDataSourceRequest, res
 			Label: types.String{Value: t.Label},
 		})
 	}
-	//TODO: change id to something meaningful
-	data.ID = types.String{Value: "test"}
+	//TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
+	data.ID = types.String{Value: strconv.Itoa(len(tags))}
 	diags = resp.State.Set(ctx, &data)
 	resp.Diagnostics.Append(diags...)
 }

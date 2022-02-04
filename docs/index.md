@@ -14,7 +14,8 @@ description: |-
 
 ```terraform
 provider "sonarr" {
-  # example configuration here
+  url = http://example.sonarr.tv:8989
+  api_key = "APIkey-example"
 }
 ```
 

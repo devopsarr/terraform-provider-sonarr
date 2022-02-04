@@ -27,13 +27,12 @@ func TestAccExampleResource(t *testing.T) {
 					resource.TestCheckResourceAttr("sonarr_tag.test", "label", "1080p"),
 				),
 			},
-			// TODO: implement import
 			// ImportState testing
-			//			{
-			//				ResourceName:      "sonarr_tag.test",
-			//				ImportState:       true,
-			//				ImportStateVerify: true,
-			//			},
+			{
+				ResourceName:      "sonarr_tag.test",
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
 			// Delete testing automatically occurs in TestCase
 		},
 	})
