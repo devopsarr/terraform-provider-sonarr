@@ -21,6 +21,6 @@ Tag resource
 
 ### Read-Only
 
-- **id** (String) Tag ID
+- **id** (Number) Tag ID
 
 

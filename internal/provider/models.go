@@ -10,6 +10,7 @@ type Tag struct {
 	Label types.String `tfsdk:"label"`
 }
 
+//TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 // Tags -
 type Tags struct {
 	ID   types.String `tfsdk:"id"`

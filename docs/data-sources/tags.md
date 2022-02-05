@@ -17,7 +17,8 @@ List all available tags
 
 ### Read-Only
 
-- **tags** (Attributes List) List of tags (see [below for nested schema](#nestedatt--tags))
+- **id** (String) The ID of this resource.
+- **tags** (Attributes Set) List of tags (see [below for nested schema](#nestedatt--tags))
 
 <a id="nestedatt--tags"></a>
 ### Nested Schema for `tags`

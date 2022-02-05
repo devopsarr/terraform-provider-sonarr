@@ -8,9 +8,8 @@ require (
 	github.com/hashicorp/terraform-plugin-go v0.5.0
 	github.com/hashicorp/terraform-plugin-log v0.2.1
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.10.1
+	golift.io/starr v0.13.0
 )
-
-require golift.io/starr v0.13.0
 
 require (
 	cloud.google.com/go v0.61.0 // indirect
@@ -87,3 +86,6 @@ require (
 	google.golang.org/grpc v1.32.0 // indirect
 	google.golang.org/protobuf v1.25.0 // indirect
 )
+
+//To be removed with next starr update
+replace golift.io/starr => github.com/golift/starr v0.13.1-0.20220204094703-47a4dfa1389f

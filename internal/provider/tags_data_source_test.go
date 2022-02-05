@@ -6,16 +6,20 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-func TestAccExampleDataSource(t *testing.T) {
+func TestAccTagsDataSource(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
+			// Create a tag to have a value to check
+			{
+				Config: testAccTagResourceConfig("1080p"),
+			},
 			// Read testing
 			{
 				Config: testAccTagsDataSourceConfig,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttrSet("data.sonarr_tags.test", "id"),
+					resource.TestCheckTypeSetElemNestedAttrs("data.sonarr_tags.test", "tags.*", map[string]string{"label": "1080p"}),
 				),
 			},
 		},
