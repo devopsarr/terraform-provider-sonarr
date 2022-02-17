@@ -7,14 +7,14 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-func TestAccExampleResource(t *testing.T) {
+func TestAccTagResource(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			// Create and Read testing
 			{
-				Config: testAccTagResourceConfig("eng"),
+				Config: testAccTagResourceConfig("test", "eng"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("sonarr_tag.test", "label", "eng"),
 					resource.TestCheckResourceAttrSet("sonarr_tag.test", "id"),
@@ -22,7 +22,7 @@ func TestAccExampleResource(t *testing.T) {
 			},
 			// Update and Read testing
 			{
-				Config: testAccTagResourceConfig("1080p"),
+				Config: testAccTagResourceConfig("test", "1080p"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("sonarr_tag.test", "label", "1080p"),
 				),
@@ -38,10 +38,10 @@ func TestAccExampleResource(t *testing.T) {
 	})
 }
 
-func testAccTagResourceConfig(label string) string {
+func testAccTagResourceConfig(name, label string) string {
 	return fmt.Sprintf(`
-resource "sonarr_tag" "test" {
-  label = "%s"
-}
-`, label)
+		resource "sonarr_tag" "%s" {
+  			label = "%s"
+		}
+	`, name, label)
 }
