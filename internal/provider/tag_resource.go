@@ -64,7 +64,7 @@ func (r resourceTag) Create(ctx context.Context, req tfsdk.CreateResourceRequest
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to create tag, got error: %s", err))
 		return
 	}
-	tflog.Trace(ctx, "created tag", "tag_id", id)
+	tflog.Trace(ctx, "created tag: "+strconv.Itoa(id))
 
 	// Generate resource state struct
 	var result = Tag{
@@ -124,7 +124,7 @@ func (r resourceTag) Update(ctx context.Context, req tfsdk.UpdateResourceRequest
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to update tag, got error: %s", err))
 		return
 	}
-	tflog.Trace(ctx, "update tag", "tag_id", id)
+	tflog.Trace(ctx, "update tag: "+strconv.Itoa(id))
 
 	// Generate resource state struct
 	var result = Tag{
