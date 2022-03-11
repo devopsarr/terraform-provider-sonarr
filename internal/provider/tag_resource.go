@@ -11,6 +11,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
+	"golift.io/starr"
 )
 
 type resourceTagType struct{}
@@ -59,17 +60,20 @@ func (r resourceTag) Create(ctx context.Context, req tfsdk.CreateResourceRequest
 	}
 
 	// Create new Tag
-	id, err := r.provider.client.AddTag(plan.Label.Value)
+	request := starr.Tag{
+		Label: plan.Label.Value,
+	}
+	response, err := r.provider.client.AddTag(&request)
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to create tag, got error: %s", err))
 		return
 	}
-	tflog.Trace(ctx, "created tag: "+strconv.Itoa(id))
+	tflog.Trace(ctx, "created tag: "+strconv.Itoa(response.ID))
 
 	// Generate resource state struct
 	var result = Tag{
-		ID:    types.Int64{Value: int64(id)},
-		Label: types.String{Value: plan.Label.Value},
+		ID:    types.Int64{Value: int64(response.ID)},
+		Label: types.String{Value: response.Label},
 	}
 
 	diags = resp.State.Set(ctx, result)
@@ -89,13 +93,13 @@ func (r resourceTag) Read(ctx context.Context, req tfsdk.ReadResourceRequest, re
 	}
 
 	// Get tag current value
-	tag, err := r.provider.client.GetTag(int(state.ID.Value))
+	response, err := r.provider.client.GetTag(int(state.ID.Value))
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read tags, got error: %s", err))
 		return
 	}
 	// Map response body to resource schema attribute
-	state.Label = types.String{Value: tag.Label}
+	state.Label = types.String{Value: response.Label}
 
 	diags = resp.State.Set(ctx, &state)
 	resp.Diagnostics.Append(diags...)
@@ -119,17 +123,21 @@ func (r resourceTag) Update(ctx context.Context, req tfsdk.UpdateResourceRequest
 	}
 
 	// Update Tag
-	id, err := r.provider.client.UpdateTag(int(state.ID.Value), plan.Label.Value)
+	request := starr.Tag{
+		Label: plan.Label.Value,
+		ID:    int(state.ID.Value),
+	}
+	response, err := r.provider.client.UpdateTag(&request)
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to update tag, got error: %s", err))
 		return
 	}
-	tflog.Trace(ctx, "update tag: "+strconv.Itoa(id))
+	tflog.Trace(ctx, "update tag: "+strconv.Itoa(response.ID))
 
 	// Generate resource state struct
 	var result = Tag{
-		ID:    types.Int64{Value: int64(id)},
-		Label: types.String{Value: plan.Label.Value},
+		ID:    types.Int64{Value: int64(response.ID)},
+		Label: types.String{Value: response.Label},
 	}
 
 	diags = resp.State.Set(ctx, result)
