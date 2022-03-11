@@ -61,20 +61,20 @@ func (d dataTags) Read(ctx context.Context, req tfsdk.ReadDataSourceRequest, res
 		return
 	}
 	// Get tags current value
-	tags, err := d.provider.client.GetTags()
+	response, err := d.provider.client.GetTags()
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read tags, got error: %s", err))
 		return
 	}
 	// Map response body to resource schema attribute
-	for _, t := range tags {
+	for _, t := range response {
 		data.Tags = append(data.Tags, Tag{
 			ID:    types.Int64{Value: int64(t.ID)},
 			Label: types.String{Value: t.Label},
 		})
 	}
 	//TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
-	data.ID = types.String{Value: strconv.Itoa(len(tags))}
+	data.ID = types.String{Value: strconv.Itoa(len(response))}
 	diags = resp.State.Set(ctx, &data)
 	resp.Diagnostics.Append(diags...)
 }

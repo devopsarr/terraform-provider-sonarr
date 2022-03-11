@@ -12,7 +12,8 @@ import (
 	"golift.io/starr/sonarr"
 )
 
-var stderr = os.Stderr
+// could be used for logging purposes.
+// var stderr = os.Stderr
 
 // provider satisfies the tfsdk.Provider interface and usually is included
 // with all Resource and DataSource implementations.
