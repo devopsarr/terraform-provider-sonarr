@@ -11,7 +11,7 @@ on:
 # Releases need permissions to read and write the repository contents.
 # GitHub considers creating releases and uploading assets as writing contents.
 #permissions:
-  contents: write
+contents: write
 
 # Default values to simplify job configurations below.
 env:
