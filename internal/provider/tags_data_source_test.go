@@ -13,7 +13,7 @@ func TestAccTagsDataSource(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Create a tag to have a value to check
 			{
-				Config: testAccTagResourceConfig("1080p"),
+				Config: testAccTagResourceConfig("test-1", "1080p") + testAccTagResourceConfig("test-2", "4k"),
 			},
 			// Read testing
 			{

@@ -36,6 +36,9 @@ func (t resourceTagType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diag
 				MarkdownDescription: "Tag ID",
 				Computed:            true,
 				Type:                types.Int64Type,
+				PlanModifiers: tfsdk.AttributePlanModifiers{
+					tfsdk.UseStateForUnknown(),
+				},
 			},
 		},
 	}, nil
@@ -52,7 +55,6 @@ func (t resourceTagType) NewResource(ctx context.Context, in tfsdk.Provider) (tf
 func (r resourceTag) Create(ctx context.Context, req tfsdk.CreateResourceRequest, resp *tfsdk.CreateResourceResponse) {
 	// Retrieve values from plan
 	var plan Tag
-
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
@@ -63,7 +65,7 @@ func (r resourceTag) Create(ctx context.Context, req tfsdk.CreateResourceRequest
 	request := starr.Tag{
 		Label: plan.Label.Value,
 	}
-	response, err := r.provider.client.AddTag(&request)
+	response, err := r.provider.client.AddTagContext(ctx, &request)
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to create tag, got error: %s", err))
 		return
@@ -93,7 +95,7 @@ func (r resourceTag) Read(ctx context.Context, req tfsdk.ReadResourceRequest, re
 	}
 
 	// Get tag current value
-	response, err := r.provider.client.GetTag(int(state.ID.Value))
+	response, err := r.provider.client.GetTagContext(ctx, int(state.ID.Value))
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read tags, got error: %s", err))
 		return
@@ -127,7 +129,7 @@ func (r resourceTag) Update(ctx context.Context, req tfsdk.UpdateResourceRequest
 		Label: plan.Label.Value,
 		ID:    int(state.ID.Value),
 	}
-	response, err := r.provider.client.UpdateTag(&request)
+	response, err := r.provider.client.UpdateTagContext(ctx, &request)
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to update tag, got error: %s", err))
 		return
@@ -158,7 +160,7 @@ func (r resourceTag) Delete(ctx context.Context, req tfsdk.DeleteResourceRequest
 	}
 
 	// Delete tag current value
-	err := r.provider.client.DeleteTag(int(state.ID.Value))
+	err := r.provider.client.DeleteTagContext(ctx, int(state.ID.Value))
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read tags, got error: %s", err))
 		return
@@ -180,6 +182,7 @@ func (r resourceTag) ImportState(ctx context.Context, req tfsdk.ImportResourceSt
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, tftypes.NewAttributePath().WithAttributeName("id"), id)...)
 }
 
+//TODO: move into validators file
 type stringLowercaseValidator struct {
 }
 

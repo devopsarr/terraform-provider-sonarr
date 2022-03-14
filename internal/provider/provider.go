@@ -12,7 +12,7 @@ import (
 	"golift.io/starr/sonarr"
 )
 
-// could be used for logging purposes.
+// needed for tf debug mode
 // var stderr = os.Stderr
 
 // provider satisfies the tfsdk.Provider interface and usually is included
@@ -109,13 +109,19 @@ func (p *provider) Configure(ctx context.Context, req tfsdk.ConfigureProviderReq
 
 func (p *provider) GetResources(ctx context.Context) (map[string]tfsdk.ResourceType, diag.Diagnostics) {
 	return map[string]tfsdk.ResourceType{
-		"sonarr_tag": resourceTagType{},
+		"sonarr_delay_profile":    resourceDelayProfileType{},
+		"sonarr_language_profile": resourceLanguageProfileType{},
+		"sonarr_quality_profile":  resourceQualityProfileType{},
+		"sonarr_tag":              resourceTagType{},
 	}, nil
 }
 
 func (p *provider) GetDataSources(ctx context.Context) (map[string]tfsdk.DataSourceType, diag.Diagnostics) {
 	return map[string]tfsdk.DataSourceType{
-		"sonarr_tags": dataTagsType{},
+		"sonarr_delay_profiles":    dataDelayProfilesType{},
+		"sonarr_language_profiles": dataLanguageProfilesType{},
+		"sonarr_quality_profiles":  dataQualityProfilesType{},
+		"sonarr_tags":              dataTagsType{},
 	}, nil
 }
 
@@ -123,17 +129,15 @@ func (p *provider) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostic
 	return tfsdk.Schema{
 		Attributes: map[string]tfsdk.Attribute{
 			"api_key": {
-				MarkdownDescription: "API key for Sonarr authentication",
+				MarkdownDescription: "API key for Sonarr authentication. Can be specified via the `SONARR_API_KEY` environment variable.",
 				Optional:            true,
 				Type:                types.StringType,
 				Sensitive:           true,
-				//Computed:            true,
 			},
 			"url": {
-				MarkdownDescription: "Full URL of Sonarr installation",
+				MarkdownDescription: "Full Sonarr URL with protocol and port (e.g. `https://test.sonarr.tv:8989`). You should **NOT** supply any path (`/api`), the SDK will use the appropriate paths. Can be specified via the `SONARR_URL` environment variable.",
 				Optional:            true,
 				Type:                types.StringType,
-				//Computed:            true,
 			},
 		},
 	}, nil

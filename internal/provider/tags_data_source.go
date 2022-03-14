@@ -8,6 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"golift.io/starr"
 )
 
 type dataTagsType struct{}
@@ -21,6 +22,7 @@ func (t dataTagsType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnos
 		// This description is used by the documentation generator and the language server.
 		MarkdownDescription: "List all available tags",
 		Attributes: map[string]tfsdk.Attribute{
+			//TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 			"id": {
 				Computed: true,
 				Type:     types.StringType,
@@ -61,20 +63,26 @@ func (d dataTags) Read(ctx context.Context, req tfsdk.ReadDataSourceRequest, res
 		return
 	}
 	// Get tags current value
-	response, err := d.provider.client.GetTags()
+	response, err := d.provider.client.GetTagsContext(ctx)
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read tags, got error: %s", err))
 		return
 	}
 	// Map response body to resource schema attribute
-	for _, t := range response {
-		data.Tags = append(data.Tags, Tag{
-			ID:    types.Int64{Value: int64(t.ID)},
-			Label: types.String{Value: t.Label},
-		})
-	}
+	data.Tags = *writeTags(response)
 	//TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 	data.ID = types.String{Value: strconv.Itoa(len(response))}
 	diags = resp.State.Set(ctx, &data)
 	resp.Diagnostics.Append(diags...)
+}
+
+func writeTags(tags []*starr.Tag) *[]Tag {
+	output := make([]Tag, len(tags))
+	for i, t := range tags {
+		output[i] = Tag{
+			ID:    types.Int64{Value: int64(t.ID)},
+			Label: types.String{Value: t.Label},
+		}
+	}
+	return &output
 }

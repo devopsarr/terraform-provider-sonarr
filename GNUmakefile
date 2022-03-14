@@ -27,12 +27,17 @@ install: build
 	mkdir -p $(install_path)
 	cp $(build_dir)/$(bin_name) $(install_path)/$(bin_name)
 
-# Doc
+# Generate documentation
 .PHONY: doc
 doc:
-	tfplugindocs
+	go generate ./...
 
 # Lint
 .PHONY: lint
 lint:
 	golangci-lint run ./internal/...
+
+# Format
+.PHONY: fmt
+fmt:
+	go fmt ./...
