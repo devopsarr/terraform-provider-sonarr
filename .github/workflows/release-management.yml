@@ -1,5 +1,5 @@
 # Terraform Provider release workflow.
-name: Release
+name: Release Management
 
 # This GitHub action creates a release when a tag that matches the pattern
 # "v*" (e.g. v0.1.0) is created.
@@ -30,21 +30,30 @@ jobs:
       - uses: actions/setup-go@v2
         with:
           go-version: ${{ env.GO_VERSION }}
+      - name: Release Please
+        id: release_please
+        uses: google-github-actions/release-please-action@v3
+        with:
+          release-type: go
+          token: ${{ secrets.GITHUB_TOKEN }}
       # This uses an action (hashicorp/ghaction-import-gpg) that assumes you set your 
       # private key in the `GPG_PRIVATE_KEY` secret and passphrase in the `PASSPHRASE`
       # secret. If you would rather own your own GPG handling, please fork this action
       # or use an alternative one for key handling.
       - name: Import GPG key
+        if: ${{ steps.release_please.outputs.release_created }}
         id: import_gpg
         uses: hashicorp/ghaction-import-gpg@v2.1.0
         env:
           # These secrets will need to be configured for the repository:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
-      - name: Release Please
-        uses: google-github-actions/release-please-action@v3
+      - name: Run GoReleaser
+        if: ${{ steps.release_please.outputs.release_created }}
+        uses: goreleaser/goreleaser-action@v2.8.1
         with:
-          release-type: go
-          token: ${{ secrets.GITHUB_TOKEN }}
+          args: release --rm-dist
         env:
+          # GitHub sets the GITHUB_TOKEN secret automatically.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
