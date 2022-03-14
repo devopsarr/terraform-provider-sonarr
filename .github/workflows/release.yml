@@ -5,13 +5,13 @@ name: Release
 # "v*" (e.g. v0.1.0) is created.
 on:
   push:
-    branches:
-      - main
+    tags:
+      - 'v*'
 
 # Releases need permissions to read and write the repository contents.
 # GitHub considers creating releases and uploading assets as writing contents.
 #permissions:
-#  contents: write
+  contents: write
 
 # Default values to simplify job configurations below.
 env:
@@ -41,10 +41,11 @@ jobs:
           # These secrets will need to be configured for the repository:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
-      - name: Release Please
-        uses: google-github-actions/release-please-action@v3
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v2.8.1
         with:
-          release-type: go
-          token: ${{ secrets.GITHUB_TOKEN }}
+          args: release --rm-dist
         env:
+          # GitHub sets the GITHUB_TOKEN secret automatically.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
