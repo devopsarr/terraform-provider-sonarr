@@ -1,5 +1,5 @@
 # Terraform Provider release workflow.
-name: Release
+name: Release Management
 
 # This GitHub action creates a release when a tag that matches the pattern
 # "v*" (e.g. v0.1.0) is created.
@@ -20,8 +20,10 @@ env:
   GO_VERSION: '1.17'
 
 jobs:
-  goreleaser:
+  release-please:
     runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.release_please.outputs.release_created }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -30,7 +32,24 @@ jobs:
       - uses: actions/setup-go@v2
         with:
           go-version: ${{ env.GO_VERSION }}
-      # This uses an action (hashicorp/ghaction-import-gpg) that assumes you set your 
+      - name: Release Please
+        id: release_please
+        uses: google-github-actions/release-please-action@v3
+        with:
+          release-type: go
+          token: ${{ secrets.GITHUB_TOKEN }}
+  gorelease:
+    runs-on: ubuntu-latest
+    needs: release-please
+    if: ${{ needs.release-please.outputs.release_created }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          # Allow goreleaser to access older tag information.
+          fetch-depth: 0
+      - uses: actions/setup-go@v2
+        with:
+          go-version: ${{ env.GO_VERSION }}      # This uses an action (hashicorp/ghaction-import-gpg) that assumes you set your 
       # private key in the `GPG_PRIVATE_KEY` secret and passphrase in the `PASSPHRASE`
       # secret. If you would rather own your own GPG handling, please fork this action
       # or use an alternative one for key handling.
@@ -41,10 +60,11 @@ jobs:
           # These secrets will need to be configured for the repository:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
-      - name: Release Please
-        uses: google-github-actions/release-please-action@v3
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v2.9.1
         with:
-          release-type: go
-          token: ${{ secrets.GITHUB_TOKEN }}
+          args: release --rm-dist
         env:
+          # GitHub sets the GITHUB_TOKEN secret automatically.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
