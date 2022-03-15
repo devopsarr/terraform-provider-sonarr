@@ -45,4 +45,11 @@ resource "sonarr_delay_profile" "example" {
 - **id** (Number) ID of delayprofile
 - **order** (Number) Order
 
+## Import
 
+Import is supported using the following syntax:
+
+```shell
+# import using the API/UI ID
+terraform import sonarr_delay_profile.example 10
+```

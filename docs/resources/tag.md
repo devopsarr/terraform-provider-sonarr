@@ -29,4 +29,11 @@ resource "sonarr_tag" "example" {
 
 - **id** (Number) Tag ID
 
+## Import
 
+Import is supported using the following syntax:
+
+```shell
+# import using the API/UI ID
+terraform import sonarr_tag.example 10
+```
