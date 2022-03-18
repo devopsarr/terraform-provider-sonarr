@@ -17,37 +17,37 @@ List all available qualityprofiles
 
 ### Read-Only
 
-- **id** (String) The ID of this resource.
-- **quality_profiles** (Attributes Set) List of qualityprofiles (see [below for nested schema](#nestedatt--quality_profiles))
+- `id` (String) The ID of this resource.
+- `quality_profiles` (Attributes Set) List of qualityprofiles (see [below for nested schema](#nestedatt--quality_profiles))
 
 <a id="nestedatt--quality_profiles"></a>
 ### Nested Schema for `quality_profiles`
 
 Read-Only:
 
-- **cutoff** (Number) Quality ID to which cutoff
-- **id** (Number) ID of qualityprofile
-- **name** (String) Name
-- **quality_groups** (Attributes Set) Quality groups (see [below for nested schema](#nestedatt--quality_profiles--quality_groups))
-- **upgrade_allowed** (Boolean) Upgrade allowed flag
+- `cutoff` (Number) Quality ID to which cutoff
+- `id` (Number) ID of qualityprofile
+- `name` (String) Name
+- `quality_groups` (Attributes Set) Quality groups (see [below for nested schema](#nestedatt--quality_profiles--quality_groups))
+- `upgrade_allowed` (Boolean) Upgrade allowed flag
 
 <a id="nestedatt--quality_profiles--quality_groups"></a>
 ### Nested Schema for `quality_profiles.quality_groups`
 
 Read-Only:
 
-- **id** (Number) ID of quality group
-- **name** (String) Name of quality group
-- **qualities** (Attributes Set) Qualities in group (see [below for nested schema](#nestedatt--quality_profiles--quality_groups--qualities))
+- `id` (Number) ID of quality group
+- `name` (String) Name of quality group
+- `qualities` (Attributes Set) Qualities in group (see [below for nested schema](#nestedatt--quality_profiles--quality_groups--qualities))
 
 <a id="nestedatt--quality_profiles--quality_groups--qualities"></a>
 ### Nested Schema for `quality_profiles.quality_groups.qualities`
 
 Read-Only:
 
-- **id** (Number) ID of quality group
-- **name** (String) Name of quality group
-- **resolution** (Number) Resolution
-- **source** (String) Source
+- `id` (Number) ID of quality group
+- `name` (String) Name of quality group
+- `resolution` (Number) Resolution
+- `source` (String) Source
 
 

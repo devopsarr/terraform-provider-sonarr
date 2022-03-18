@@ -24,5 +24,5 @@ provider "sonarr" {
 
 ### Optional
 
-- **api_key** (String, Sensitive) API key for Sonarr authentication. Can be specified via the `SONARR_API_KEY` environment variable.
-- **url** (String) Full Sonarr URL with protocol and port (e.g. `https://test.sonarr.tv:8989`). You should **NOT** supply any path (`/api`), the SDK will use the appropriate paths. Can be specified via the `SONARR_URL` environment variable.
+- `api_key` (String, Sensitive) API key for Sonarr authentication. Can be specified via the `SONARR_API_KEY` environment variable.
+- `url` (String) Full Sonarr URL with protocol and port (e.g. `https://test.sonarr.tv:8989`). You should **NOT** supply any path (`/api`), the SDK will use the appropriate paths. Can be specified via the `SONARR_URL` environment variable.

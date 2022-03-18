@@ -22,18 +22,18 @@ data "sonarr_language_profiles" "example" {
 
 ### Read-Only
 
-- **id** (String) The ID of this resource.
-- **language_profiles** (Attributes Set) List of languageprofiles (see [below for nested schema](#nestedatt--language_profiles))
+- `id` (String) The ID of this resource.
+- `language_profiles` (Attributes Set) List of languageprofiles (see [below for nested schema](#nestedatt--language_profiles))
 
 <a id="nestedatt--language_profiles"></a>
 ### Nested Schema for `language_profiles`
 
 Read-Only:
 
-- **cutoff_language** (String) Cutoff Language
-- **id** (Number) ID of languageprofile
-- **languages** (Set of String) list of languages in profile
-- **name** (String) Name of languageprofile
-- **upgrade_allowed** (Boolean) Upgrade allowed Flag
+- `cutoff_language` (String) Cutoff Language
+- `id` (Number) ID of languageprofile
+- `languages` (Set of String) list of languages in profile
+- `name` (String) Name of languageprofile
+- `upgrade_allowed` (Boolean) Upgrade allowed Flag
 
 

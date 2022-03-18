@@ -69,7 +69,8 @@ require (
 	google.golang.org/genproto v0.0.0-20200711021454-869866162049 // indirect
 	google.golang.org/grpc v1.46.0 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
+	gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c // indirect
 )
 
 //To be removed with next starr update
-replace golift.io/starr => github.com/golift/starr v0.14.1-0.20220312083129-8453153a29b6
+replace golift.io/starr => github.com/golift/starr v0.14.1-0.20220523080935-a42b0abff340

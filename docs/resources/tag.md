@@ -23,11 +23,11 @@ resource "sonarr_tag" "example" {
 
 ### Required
 
-- **label** (String) Tag value
+- `label` (String) Tag value
 
 ### Read-Only
 
-- **id** (Number) Tag ID
+- `id` (Number) Tag ID
 
 ## Import
 

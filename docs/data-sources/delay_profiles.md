@@ -22,22 +22,22 @@ data "sonarr_delay_profiles" "example" {
 
 ### Read-Only
 
-- **delay_profiles** (Attributes Set) List of delayprofiles (see [below for nested schema](#nestedatt--delay_profiles))
-- **id** (String) The ID of this resource.
+- `delay_profiles` (Attributes Set) List of delayprofiles (see [below for nested schema](#nestedatt--delay_profiles))
+- `id` (String) The ID of this resource.
 
 <a id="nestedatt--delay_profiles"></a>
 ### Nested Schema for `delay_profiles`
 
 Read-Only:
 
-- **bypass_if_highest_quality** (Boolean) Bypass for highest quality Flag
-- **enable_torrent** (Boolean) Torrent allowed Flag
-- **enable_usenet** (Boolean) Usenet allowed Flag
-- **id** (Number) ID of delayprofile
-- **order** (Number) Order
-- **preferred_protocol** (String) Preferred protocol
-- **tags** (List of Number) List of associated tags
-- **torrent_delay** (Number) Torrent Delay
-- **usenet_delay** (Number) Usenet delay
+- `bypass_if_highest_quality` (Boolean) Bypass for highest quality Flag
+- `enable_torrent` (Boolean) Torrent allowed Flag
+- `enable_usenet` (Boolean) Usenet allowed Flag
+- `id` (Number) ID of delayprofile
+- `order` (Number) Order
+- `preferred_protocol` (String) Preferred protocol
+- `tags` (List of Number) List of associated tags
+- `torrent_delay` (Number) Torrent Delay
+- `usenet_delay` (Number) Usenet delay
 
 
