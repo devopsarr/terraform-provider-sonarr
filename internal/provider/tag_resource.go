@@ -116,18 +116,10 @@ func (r resourceTag) Update(ctx context.Context, req tfsdk.UpdateResourceRequest
 		return
 	}
 
-	// Get state values
-	var state Tag
-	diags = req.State.Get(ctx, &state)
-	resp.Diagnostics.Append(diags...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
 	// Update Tag
 	request := starr.Tag{
 		Label: plan.Label.Value,
-		ID:    int(state.ID.Value),
+		ID:    int(plan.ID.Value),
 	}
 	response, err := r.provider.client.UpdateTagContext(ctx, &request)
 	if err != nil {

@@ -157,7 +157,7 @@ func (r resourceQualityProfile) Read(ctx context.Context, req tfsdk.ReadResource
 	// Map response body to resource schema attribute
 	result := *writeQualityProfile(response)
 
-	diags = resp.State.Set(ctx, &result)
+	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
 }
 
@@ -170,16 +170,7 @@ func (r resourceQualityProfile) Update(ctx context.Context, req tfsdk.UpdateReso
 		return
 	}
 
-	// Get state values
-	var state QualityProfile
-	diags = req.State.Get(ctx, &state)
-	resp.Diagnostics.Append(diags...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
 	// Build Update resource
-	plan.ID.Value = state.ID.Value
 	data := readQualityProfile(&plan)
 
 	// Update QualityProfile

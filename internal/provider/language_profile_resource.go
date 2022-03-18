@@ -114,7 +114,7 @@ func (r resourceLanguageProfile) Read(ctx context.Context, req tfsdk.ReadResourc
 	// Map response body to resource schema attribute
 	result := *writeLanguageProfile(response)
 
-	diags = resp.State.Set(ctx, &result)
+	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
 }
 
@@ -127,16 +127,7 @@ func (r resourceLanguageProfile) Update(ctx context.Context, req tfsdk.UpdateRes
 		return
 	}
 
-	// Get state values
-	var state LanguageProfile
-	diags = req.State.Get(ctx, &state)
-	resp.Diagnostics.Append(diags...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
 	// Build Update resource
-	plan.ID.Value = state.ID.Value
 	data := readLanguageProfile(&plan)
 
 	// Update LanguageProfile
