@@ -77,4 +77,11 @@ Required:
 - **resolution** (Number) Resolution
 - **source** (String) Source
 
+## Import
 
+Import is supported using the following syntax:
+
+```shell
+# import using the API/UI ID
+terraform import sonarr_quality_profile.example 10
+```
