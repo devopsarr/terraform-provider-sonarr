@@ -112,6 +112,7 @@ func (p *provider) GetResources(ctx context.Context) (map[string]tfsdk.ResourceT
 		"sonarr_delay_profile":    resourceDelayProfileType{},
 		"sonarr_language_profile": resourceLanguageProfileType{},
 		"sonarr_quality_profile":  resourceQualityProfileType{},
+		"sonarr_series":           resourceSeriesType{},
 		"sonarr_tag":              resourceTagType{},
 	}, nil
 }
@@ -121,6 +122,7 @@ func (p *provider) GetDataSources(ctx context.Context) (map[string]tfsdk.DataSou
 		"sonarr_delay_profiles":    dataDelayProfilesType{},
 		"sonarr_language_profiles": dataLanguageProfilesType{},
 		"sonarr_quality_profiles":  dataQualityProfilesType{},
+		"sonarr_series":            dataSeriesType{},
 		"sonarr_tags":              dataTagsType{},
 	}, nil
 }
@@ -143,6 +145,7 @@ func (p *provider) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostic
 	}, nil
 }
 
+// New returns the provider with a specific version.
 func New(version string) func() tfsdk.Provider {
 	return func() tfsdk.Provider {
 		return &provider{

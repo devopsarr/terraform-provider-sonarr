@@ -140,7 +140,7 @@ func (r resourceDelayProfile) Read(ctx context.Context, req tfsdk.ReadResourceRe
 	// Map response body to resource schema attribute
 	result := *writeDelayProfile(response)
 
-	diags = resp.State.Set(ctx, &result)
+	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
 }
 
@@ -153,16 +153,7 @@ func (r resourceDelayProfile) Update(ctx context.Context, req tfsdk.UpdateResour
 		return
 	}
 
-	// Get state values
-	var state DelayProfile
-	diags = req.State.Get(ctx, &state)
-	resp.Diagnostics.Append(diags...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
 	// Build Update resource
-	plan.ID.Value = state.ID.Value
 	data := readDelayProfile(&plan)
 
 	// Update DelayProfile
