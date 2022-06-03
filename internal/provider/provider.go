@@ -113,6 +113,7 @@ func (p *provider) GetResources(ctx context.Context) (map[string]tfsdk.ResourceT
 		"sonarr_language_profile": resourceLanguageProfileType{},
 		"sonarr_media_management": resourceMediaManagementType{},
 		"sonarr_quality_profile":  resourceQualityProfileType{},
+		"sonarr_root_folder":      resourceRootFolderType{},
 		"sonarr_series":           resourceSeriesType{},
 		"sonarr_tag":              resourceTagType{},
 	}, nil
@@ -123,6 +124,7 @@ func (p *provider) GetDataSources(ctx context.Context) (map[string]tfsdk.DataSou
 		"sonarr_delay_profiles":    dataDelayProfilesType{},
 		"sonarr_language_profiles": dataLanguageProfilesType{},
 		"sonarr_quality_profiles":  dataQualityProfilesType{},
+		"sonarr_root_folders":      dataRootFoldersType{},
 		"sonarr_series":            dataSeriesType{},
 		"sonarr_tags":              dataTagsType{},
 	}, nil
