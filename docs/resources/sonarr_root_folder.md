@@ -28,7 +28,6 @@ resource "sonarr_root_folder" "example" {
 ### Read-Only
 
 - `accessible` (Boolean) Access flag
-- `free_space` (Number) Free space on folder
 - `id` (Number) RootFolder ID
 - `unmapped_folders` (Attributes Set) List of folders with no associated series (see [below for nested schema](#nestedatt--unmapped_folders))
 
