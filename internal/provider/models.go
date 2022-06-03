@@ -157,3 +157,24 @@ type MediaManagement struct {
 	RecycleBinPath            types.String `tfsdk:"recycle_bin_path"`
 	RescanAfterRefresh        types.String `tfsdk:"rescan_after_refresh"`
 }
+
+// RootFolder is the RootFolder resource.
+type RootFolder struct {
+	Accessible      types.Bool   `tfsdk:"accessible"`
+	ID              types.Int64  `tfsdk:"id"`
+	Path            types.String `tfsdk:"path"`
+	UnmappedFolders []Path       `tfsdk:"unmapped_folders"`
+}
+
+// Path part of RootFolder.
+type Path struct {
+	Name types.String `tfsdk:"name"`
+	Path types.String `tfsdk:"path"`
+}
+
+//TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
+// QualityProfiles is a list of QualityProfile.
+type RootFolders struct {
+	ID          types.String `tfsdk:"id"`
+	RootFolders []RootFolder `tfsdk:"root_folders"`
+}
