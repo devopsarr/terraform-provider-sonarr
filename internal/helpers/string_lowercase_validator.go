@@ -43,6 +43,7 @@ func (v stringLowercaseValidator) Validate(ctx context.Context, req tfsdk.Valida
 	}
 }
 
+// StringLowercase checks that a string is lowercase.
 func StringLowercase() stringLowercaseValidator {
 	return stringLowercaseValidator{}
 }

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/Fuochi/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -73,12 +74,14 @@ func (t resourceDelayProfileType) GetSchema(ctx context.Context) (tfsdk.Schema, 
 					ElemType: types.Int64Type,
 				},
 			},
-			//TODO: add validation
 			"preferred_protocol": {
 				MarkdownDescription: "Preferred protocol",
 				Optional:            true,
 				Computed:            true,
 				Type:                types.StringType,
+				Validators: []tfsdk.AttributeValidator{
+					helpers.StringMatch([]string{"usenet", "torrent"}),
+				},
 			},
 		},
 	}, nil

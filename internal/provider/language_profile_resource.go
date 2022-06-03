@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/Fuochi/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -43,11 +44,13 @@ func (t resourceLanguageProfileType) GetSchema(ctx context.Context) (tfsdk.Schem
 				Computed:            true,
 				Type:                types.BoolType,
 			},
-			//TODO: add language name validation
 			"cutoff_language": {
 				MarkdownDescription: "Name of language",
 				Required:            true,
 				Type:                types.StringType,
+				Validators: []tfsdk.AttributeValidator{
+					helpers.StringMatch(helpers.Languages),
+				},
 			},
 			"languages": {
 				MarkdownDescription: "list of languages in profile",
@@ -202,7 +205,7 @@ func readLanguageProfile(profile *LanguageProfile) *sonarr.LanguageProfile {
 			Allowed: true,
 			Language: &starr.Value{
 				Name: l.Value,
-				ID:   getLanguageID(l.Value),
+				ID:   helpers.GetLanguageID(l.Value),
 			},
 		}
 	}
@@ -212,137 +215,9 @@ func readLanguageProfile(profile *LanguageProfile) *sonarr.LanguageProfile {
 		UpgradeAllowed: profile.UpgradeAllowed.Value,
 		Cutoff: &starr.Value{
 			Name: profile.CutoffLanguage.Value,
-			ID:   getLanguageID(profile.CutoffLanguage.Value),
+			ID:   helpers.GetLanguageID(profile.CutoffLanguage.Value),
 		},
 		Languages: languages,
 		ID:        profile.ID.Value,
 	}
-}
-
-//TODO: find a better way to maintain this find  https://github.com/Sonarr/Sonarr/blob/57e3bd8b4da16bea54a23e11d614ebd6809e2f93/src/NzbDrone.Core/Languages/Language.cs
-func getLanguageID(language string) int64 {
-	languages := []starr.Value{
-		{
-			ID:   0,
-			Name: "Unknown",
-		},
-		{
-			ID:   1,
-			Name: "English",
-		},
-		{
-			ID:   2,
-			Name: "French",
-		},
-		{
-			ID:   3,
-			Name: "Spanish",
-		},
-		{
-			ID:   4,
-			Name: "German",
-		},
-		{
-			ID:   5,
-			Name: "Italian",
-		},
-		{
-			ID:   6,
-			Name: "Danish",
-		},
-		{
-			ID:   7,
-			Name: "Dutch",
-		},
-		{
-			ID:   8,
-			Name: "Japanese",
-		},
-		{
-			ID:   9,
-			Name: "Icelandic",
-		},
-		{
-			ID:   10,
-			Name: "Chinese",
-		},
-		{
-			ID:   11,
-			Name: "Russian",
-		},
-		{
-			ID:   12,
-			Name: "Polish",
-		},
-		{
-			ID:   13,
-			Name: "Vietnamese",
-		},
-		{
-			ID:   14,
-			Name: "Swedish",
-		},
-		{
-			ID:   15,
-			Name: "Norwegian",
-		},
-		{
-			ID:   16,
-			Name: "Finnish",
-		},
-		{
-			ID:   17,
-			Name: "Turkish",
-		},
-		{
-			ID:   18,
-			Name: "Portuguese",
-		},
-		{
-			ID:   19,
-			Name: "Flemish",
-		},
-		{
-			ID:   20,
-			Name: "Greek",
-		},
-		{
-			ID:   21,
-			Name: "Korean",
-		},
-		{
-			ID:   22,
-			Name: "Hungarian",
-		},
-		{
-			ID:   23,
-			Name: "Hebrew",
-		},
-		{
-			ID:   24,
-			Name: "Lithuanian",
-		},
-		{
-			ID:   25,
-			Name: "Czech",
-		},
-		{
-			ID:   26,
-			Name: "Arabic",
-		},
-		{
-			ID:   27,
-			Name: "Hindi",
-		},
-		{
-			ID:   28,
-			Name: "Bulgarian",
-		},
-	}
-	for _, l := range languages {
-		if l.Name == language {
-			return l.ID
-		}
-	}
-	return 0
 }
