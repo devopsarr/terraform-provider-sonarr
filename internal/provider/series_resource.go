@@ -178,7 +178,7 @@ func (r resourceSeries) Update(ctx context.Context, req tfsdk.UpdateResourceRequ
 	tflog.Trace(ctx, "update series: "+strconv.Itoa(int(response.ID)))
 
 	// Map response body to resource schema attribute
-	result := *writeSeries(response)
+	result := writeSeries(response)
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {

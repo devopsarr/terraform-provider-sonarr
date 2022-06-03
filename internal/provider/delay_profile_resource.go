@@ -116,7 +116,7 @@ func (r resourceDelayProfile) Create(ctx context.Context, req tfsdk.CreateResour
 	tflog.Trace(ctx, "created delayprofile: "+strconv.Itoa(int(response.ID)))
 
 	// Generate resource state struct
-	result := *writeDelayProfile(response)
+	result := writeDelayProfile(response)
 
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
@@ -141,7 +141,7 @@ func (r resourceDelayProfile) Read(ctx context.Context, req tfsdk.ReadResourceRe
 		return
 	}
 	// Map response body to resource schema attribute
-	result := *writeDelayProfile(response)
+	result := writeDelayProfile(response)
 
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
@@ -168,7 +168,7 @@ func (r resourceDelayProfile) Update(ctx context.Context, req tfsdk.UpdateResour
 	tflog.Trace(ctx, "update delayprofile: "+strconv.Itoa(int(response.ID)))
 
 	// Generate resource state struct
-	result := *writeDelayProfile(response)
+	result := writeDelayProfile(response)
 
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)

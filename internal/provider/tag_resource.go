@@ -78,7 +78,7 @@ func (r resourceTag) Create(ctx context.Context, req tfsdk.CreateResourceRequest
 		Label: types.String{Value: response.Label},
 	}
 
-	diags = resp.State.Set(ctx, result)
+	diags = resp.State.Set(ctx, &result)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -101,9 +101,12 @@ func (r resourceTag) Read(ctx context.Context, req tfsdk.ReadResourceRequest, re
 		return
 	}
 	// Map response body to resource schema attribute
-	state.Label = types.String{Value: response.Label}
+	result := Tag{
+		ID:    types.Int64{Value: int64(response.ID)},
+		Label: types.String{Value: response.Label},
+	}
 
-	diags = resp.State.Set(ctx, &state)
+	diags = resp.State.Set(ctx, &result)
 	resp.Diagnostics.Append(diags...)
 }
 
@@ -134,7 +137,7 @@ func (r resourceTag) Update(ctx context.Context, req tfsdk.UpdateResourceRequest
 		Label: types.String{Value: response.Label},
 	}
 
-	diags = resp.State.Set(ctx, result)
+	diags = resp.State.Set(ctx, &result)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return

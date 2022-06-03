@@ -130,7 +130,7 @@ func (r resourceQualityProfile) Create(ctx context.Context, req tfsdk.CreateReso
 	tflog.Trace(ctx, "created qualityprofile: "+strconv.Itoa(int(response.ID)))
 
 	// Generate resource state struct
-	result := *writeQualityProfile(response)
+	result := writeQualityProfile(response)
 
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
@@ -155,7 +155,7 @@ func (r resourceQualityProfile) Read(ctx context.Context, req tfsdk.ReadResource
 		return
 	}
 	// Map response body to resource schema attribute
-	result := *writeQualityProfile(response)
+	result := writeQualityProfile(response)
 
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
@@ -182,7 +182,7 @@ func (r resourceQualityProfile) Update(ctx context.Context, req tfsdk.UpdateReso
 	tflog.Trace(ctx, "update qualityprofile: "+strconv.Itoa(int(response.ID)))
 
 	// Generate resource state struct
-	result := *writeQualityProfile(response)
+	result := writeQualityProfile(response)
 
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
