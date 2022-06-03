@@ -73,7 +73,6 @@ func (t dataDelayProfilesType) GetSchema(ctx context.Context) (tfsdk.Schema, dia
 							ElemType: types.Int64Type,
 						},
 					},
-					//TODO: add validation
 					"preferred_protocol": {
 						MarkdownDescription: "Preferred protocol",
 						Computed:            true,

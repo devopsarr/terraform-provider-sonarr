@@ -47,6 +47,7 @@ func (v stringMatchValidator) Validate(ctx context.Context, req tfsdk.ValidateAt
 	)
 }
 
+// StringMatch check that a string is contained in a given slice.
 func StringMatch(match []string) stringMatchValidator {
 	return stringMatchValidator{
 		Slice: match,
