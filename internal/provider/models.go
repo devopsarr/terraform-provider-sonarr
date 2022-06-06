@@ -178,3 +178,17 @@ type RootFolders struct {
 	ID          types.String `tfsdk:"id"`
 	RootFolders []RootFolder `tfsdk:"root_folders"`
 }
+
+// RootFolder is the Naming resource.
+type Naming struct {
+	RenameEpisodes           types.Bool   `tfsdk:"rename_episodes"`
+	ReplaceIllegalCharacters types.Bool   `tfsdk:"replace_illegal_characters"`
+	ID                       types.Int64  `tfsdk:"id"`
+	MultiEpisodeStyle        types.Int64  `tfsdk:"multi_episode_style"`
+	DailyEpisodeFormat       types.String `tfsdk:"daily_episode_format"`
+	AnimeEpisodeFormat       types.String `tfsdk:"anime_episode_format"`
+	SeriesFolderFormat       types.String `tfsdk:"series_folder_format"`
+	SeasonFolderFormat       types.String `tfsdk:"season_folder_format"`
+	SpecialsFolderFormat     types.String `tfsdk:"specials_folder_format"`
+	StandardEpisodeFormat    types.String `tfsdk:"standard_episode_format"`
+}

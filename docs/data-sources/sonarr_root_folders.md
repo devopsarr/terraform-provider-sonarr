@@ -26,7 +26,6 @@ List all available rootfolders
 Read-Only:
 
 - `accessible` (Boolean) Access flag
-- `free_space` (Number) Free space on folder
 - `id` (Number) RootFolder ID
 - `path` (String) Absolute path of rootFolder
 - `unmapped_folders` (Attributes Set) List of folders with no associated series (see [below for nested schema](#nestedatt--root_folders--unmapped_folders))

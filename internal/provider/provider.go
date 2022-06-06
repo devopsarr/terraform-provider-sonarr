@@ -112,6 +112,7 @@ func (p *provider) GetResources(ctx context.Context) (map[string]tfsdk.ResourceT
 		"sonarr_delay_profile":    resourceDelayProfileType{},
 		"sonarr_language_profile": resourceLanguageProfileType{},
 		"sonarr_media_management": resourceMediaManagementType{},
+		"sonarr_naming":           resourceNamingType{},
 		"sonarr_quality_profile":  resourceQualityProfileType{},
 		"sonarr_root_folder":      resourceRootFolderType{},
 		"sonarr_series":           resourceSeriesType{},
