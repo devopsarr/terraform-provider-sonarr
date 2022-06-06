@@ -90,7 +90,7 @@ func (r resourceLanguageProfile) Create(ctx context.Context, req tfsdk.CreateRes
 	tflog.Trace(ctx, "created languageprofile: "+strconv.Itoa(int(response.ID)))
 
 	// Generate resource state struct
-	result := *writeLanguageProfile(response)
+	result := writeLanguageProfile(response)
 
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
@@ -115,7 +115,7 @@ func (r resourceLanguageProfile) Read(ctx context.Context, req tfsdk.ReadResourc
 		return
 	}
 	// Map response body to resource schema attribute
-	result := *writeLanguageProfile(response)
+	result := writeLanguageProfile(response)
 
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
@@ -142,7 +142,7 @@ func (r resourceLanguageProfile) Update(ctx context.Context, req tfsdk.UpdateRes
 	tflog.Trace(ctx, "update languageprofile: "+strconv.Itoa(int(response.ID)))
 
 	// Generate resource state struct
-	result := *writeLanguageProfile(response)
+	result := writeLanguageProfile(response)
 
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)

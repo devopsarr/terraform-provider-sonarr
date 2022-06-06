@@ -168,7 +168,7 @@ func (r resourceMediaManagement) Create(ctx context.Context, req tfsdk.CreateRes
 	tflog.Trace(ctx, "created mediamanagement: "+strconv.Itoa(int(response.ID)))
 
 	// Generate resource state struct
-	result := *writeMediaManagement(response)
+	result := writeMediaManagement(response)
 
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
@@ -193,7 +193,7 @@ func (r resourceMediaManagement) Read(ctx context.Context, req tfsdk.ReadResourc
 		return
 	}
 	// Map response body to resource schema attribute
-	result := *writeMediaManagement(response)
+	result := writeMediaManagement(response)
 
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
@@ -220,7 +220,7 @@ func (r resourceMediaManagement) Update(ctx context.Context, req tfsdk.UpdateRes
 	tflog.Trace(ctx, "update mediamanagement: "+strconv.Itoa(int(response.ID)))
 
 	// Generate resource state struct
-	result := *writeMediaManagement(response)
+	result := writeMediaManagement(response)
 
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
@@ -239,32 +239,31 @@ func (r resourceMediaManagement) ImportState(ctx context.Context, req tfsdk.Impo
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, tftypes.NewAttributePath().WithAttributeName("id"), 1)...)
 }
 
-func writeMediaManagement(madiaMgt *sonarr.MediaManagement) *MediaManagement {
+func writeMediaManagement(mediaMgt *sonarr.MediaManagement) *MediaManagement {
 	return &MediaManagement{
-		UnmonitorPreviousEpisodes: types.Bool{Value: madiaMgt.AutoUnmonitorPreviouslyDownloadedEpisodes},
-		HardlinksCopy:             types.Bool{Value: madiaMgt.CopyUsingHardlinks},
-		CreateEmptyFolders:        types.Bool{Value: madiaMgt.CreateEmptySeriesFolders},
-		DeleteEmptyFolders:        types.Bool{Value: madiaMgt.DeleteEmptyFolders},
-		EnableMediaInfo:           types.Bool{Value: madiaMgt.EnableMediaInfo},
-		ImportExtraFiles:          types.Bool{Value: madiaMgt.ImportExtraFiles},
-		SetPermissions:            types.Bool{Value: madiaMgt.SetPermissionsLinux},
-		SkipFreeSpaceCheck:        types.Bool{Value: madiaMgt.SkipFreeSpaceCheckWhenImporting},
-		ID:                        types.Int64{Value: madiaMgt.ID},
-		MinimumFreeSpace:          types.Int64{Value: madiaMgt.MinimumFreeSpaceWhenImporting},
-		RecycleBinDays:            types.Int64{Value: madiaMgt.RecycleBinCleanupDays},
-		ChmodFolder:               types.String{Value: madiaMgt.ChmodFolder},
-		ChownGroup:                types.String{Value: madiaMgt.ChownGroup},
-		DownloadPropersRepacks:    types.String{Value: madiaMgt.DownloadPropersAndRepacks},
-		EpisodeTitleRequired:      types.String{Value: madiaMgt.EpisodeTitleRequired},
-		ExtraFileExtensions:       types.String{Value: madiaMgt.ExtraFileExtensions},
-		FileDate:                  types.String{Value: madiaMgt.FileDate},
-		RecycleBinPath:            types.String{Value: madiaMgt.RecycleBin},
-		RescanAfterRefresh:        types.String{Value: madiaMgt.RescanAfterRefresh},
+		UnmonitorPreviousEpisodes: types.Bool{Value: mediaMgt.AutoUnmonitorPreviouslyDownloadedEpisodes},
+		HardlinksCopy:             types.Bool{Value: mediaMgt.CopyUsingHardlinks},
+		CreateEmptyFolders:        types.Bool{Value: mediaMgt.CreateEmptySeriesFolders},
+		DeleteEmptyFolders:        types.Bool{Value: mediaMgt.DeleteEmptyFolders},
+		EnableMediaInfo:           types.Bool{Value: mediaMgt.EnableMediaInfo},
+		ImportExtraFiles:          types.Bool{Value: mediaMgt.ImportExtraFiles},
+		SetPermissions:            types.Bool{Value: mediaMgt.SetPermissionsLinux},
+		SkipFreeSpaceCheck:        types.Bool{Value: mediaMgt.SkipFreeSpaceCheckWhenImporting},
+		ID:                        types.Int64{Value: mediaMgt.ID},
+		MinimumFreeSpace:          types.Int64{Value: mediaMgt.MinimumFreeSpaceWhenImporting},
+		RecycleBinDays:            types.Int64{Value: mediaMgt.RecycleBinCleanupDays},
+		ChmodFolder:               types.String{Value: mediaMgt.ChmodFolder},
+		ChownGroup:                types.String{Value: mediaMgt.ChownGroup},
+		DownloadPropersRepacks:    types.String{Value: mediaMgt.DownloadPropersAndRepacks},
+		EpisodeTitleRequired:      types.String{Value: mediaMgt.EpisodeTitleRequired},
+		ExtraFileExtensions:       types.String{Value: mediaMgt.ExtraFileExtensions},
+		FileDate:                  types.String{Value: mediaMgt.FileDate},
+		RecycleBinPath:            types.String{Value: mediaMgt.RecycleBin},
+		RescanAfterRefresh:        types.String{Value: mediaMgt.RescanAfterRefresh},
 	}
 }
 
 func readMediaManagement(mediaMgt *MediaManagement) *sonarr.MediaManagement {
-
 	return &sonarr.MediaManagement{
 		AutoUnmonitorPreviouslyDownloadedEpisodes: mediaMgt.UnmonitorPreviousEpisodes.Value,
 		CopyUsingHardlinks:                        mediaMgt.HardlinksCopy.Value,

@@ -94,7 +94,7 @@ func (r resourceRootFolder) Create(ctx context.Context, req tfsdk.CreateResource
 	tflog.Trace(ctx, "created rootFolder: "+strconv.Itoa(int(response.ID)))
 
 	// Generate resource state struct
-	result := *writeRootFolder(response)
+	result := writeRootFolder(response)
 
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
@@ -119,7 +119,7 @@ func (r resourceRootFolder) Read(ctx context.Context, req tfsdk.ReadResourceRequ
 		return
 	}
 	// Map response body to resource schema attribute
-	result := *writeRootFolder(response)
+	result := writeRootFolder(response)
 
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
