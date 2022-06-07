@@ -5,7 +5,7 @@ import (
 	"flag"
 	"log"
 
-	"github.com/Fuochi/terraform-provider-sonarr/internal/provider"
+	"github.com/devopsarr/terraform-provider-sonarr/internal/provider"
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 )
 
@@ -35,7 +35,7 @@ func main() {
 	flag.Parse()
 
 	opts := providerserver.ServeOpts{
-		Address: "registry.terraform.io/fuochi/sonarr",
+		Address: "registry.terraform.io/devopsarr/sonarr",
 		Debug:   debug,
 	}
 
