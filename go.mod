@@ -1,4 +1,4 @@
-module github.com/Fuochi/terraform-provider-sonarr
+module github.com/devopsarr/terraform-provider-sonarr
 
 go 1.17
 
