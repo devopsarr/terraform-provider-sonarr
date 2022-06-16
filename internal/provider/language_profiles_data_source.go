@@ -56,7 +56,7 @@ func (t dataLanguageProfilesType) GetSchema(ctx context.Context) (tfsdk.Schema, 
 						Computed:            true,
 						Type:                types.SetType{ElemType: types.StringType},
 					},
-				}, tfsdk.SetNestedAttributesOptions{}),
+				}),
 			},
 		},
 	}, nil

@@ -63,9 +63,9 @@ func (t dataRootFoldersType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.
 								Computed:            true,
 								Type:                types.StringType,
 							},
-						}, tfsdk.SetNestedAttributesOptions{}),
+						}),
 					},
-				}, tfsdk.SetNestedAttributesOptions{}),
+				}),
 			},
 		},
 	}, nil
