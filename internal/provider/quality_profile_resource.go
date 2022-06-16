@@ -93,9 +93,9 @@ func (t resourceQualityProfileType) GetSchema(ctx context.Context) (tfsdk.Schema
 								Computed:            true,
 								Type:                types.StringType,
 							},
-						}, tfsdk.SetNestedAttributesOptions{}),
+						}),
 					},
-				}, tfsdk.SetNestedAttributesOptions{}),
+				}),
 			},
 		},
 	}, nil

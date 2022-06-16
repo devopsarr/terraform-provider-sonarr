@@ -41,7 +41,7 @@ func (t dataTagsType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnos
 						Computed:            true,
 						Type:                types.StringType,
 					},
-				}, tfsdk.SetNestedAttributesOptions{}),
+				}),
 			},
 		},
 	}, nil

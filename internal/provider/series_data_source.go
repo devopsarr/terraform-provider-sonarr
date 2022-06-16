@@ -92,7 +92,7 @@ func (t dataSeriesType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagn
 							ElemType: types.Int64Type,
 						},
 					},
-				}, tfsdk.SetNestedAttributesOptions{}),
+				}),
 			},
 		},
 	}, nil

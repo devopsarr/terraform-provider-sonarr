@@ -78,7 +78,7 @@ func (t dataDelayProfilesType) GetSchema(ctx context.Context) (tfsdk.Schema, dia
 						Computed:            true,
 						Type:                types.StringType,
 					},
-				}, tfsdk.SetNestedAttributesOptions{}),
+				}),
 			},
 		},
 	}, nil
