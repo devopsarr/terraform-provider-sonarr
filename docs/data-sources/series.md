@@ -28,19 +28,25 @@ data "sonarr_series" "example" {
 <a id="nestedatt--series"></a>
 ### Nested Schema for `series`
 
-Read-Only:
+Required:
 
-- `id` (Number) ID of tag
 - `language_profile_id` (Number) Language Profile ID
 - `monitored` (Boolean) Monitored flag
 - `path` (String) Series Path
 - `quality_profile_id` (Number) Quality Profile ID
 - `root_folder_path` (String) Series Root Folder
 - `season_folder` (Boolean) Season Folder flag
-- `tags` (Set of Number) Tags
 - `title` (String) Series Title
 - `title_slug` (String) Series Title in kebab format
 - `tvdb_id` (Number) TVDB ID
 - `use_scene_numbering` (Boolean) Scene numbering flag
+
+Optional:
+
+- `tags` (Set of Number) Tags
+
+Read-Only:
+
+- `id` (Number) ID of tag
 
 
