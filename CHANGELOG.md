@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/devopsarr/terraform-provider-sonarr/compare/v1.1.0...v1.1.1) (2022-07-20)
+
+
+### Bug Fixes
+
+* remove set parameter for framework 0.9.0 ([370a452](https://github.com/devopsarr/terraform-provider-sonarr/commit/370a45213b53f87e46516f1404e4310c9ba384ae))
+
 ## [1.1.0](https://github.com/devopsarr/terraform-provider-sonarr/compare/v1.0.0...v1.1.0) (2022-06-06)
 
 
