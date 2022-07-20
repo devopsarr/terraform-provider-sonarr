@@ -23,27 +23,36 @@ List all available qualityprofiles
 <a id="nestedatt--quality_profiles"></a>
 ### Nested Schema for `quality_profiles`
 
-Read-Only:
+Required:
 
-- `cutoff` (Number) Quality ID to which cutoff
-- `id` (Number) ID of qualityprofile
 - `name` (String) Name
 - `quality_groups` (Attributes Set) Quality groups (see [below for nested schema](#nestedatt--quality_profiles--quality_groups))
+
+Optional:
+
+- `cutoff` (Number) Quality ID to which cutoff
 - `upgrade_allowed` (Boolean) Upgrade allowed flag
+
+Read-Only:
+
+- `id` (Number) ID of qualityprofile
 
 <a id="nestedatt--quality_profiles--quality_groups"></a>
 ### Nested Schema for `quality_profiles.quality_groups`
 
-Read-Only:
+Required:
+
+- `qualities` (Attributes Set) Qualities in group (see [below for nested schema](#nestedatt--quality_profiles--quality_groups--qualities))
+
+Optional:
 
 - `id` (Number) ID of quality group
 - `name` (String) Name of quality group
-- `qualities` (Attributes Set) Qualities in group (see [below for nested schema](#nestedatt--quality_profiles--quality_groups--qualities))
 
 <a id="nestedatt--quality_profiles--quality_groups--qualities"></a>
 ### Nested Schema for `quality_profiles.quality_groups.qualities`
 
-Read-Only:
+Optional:
 
 - `id` (Number) ID of quality group
 - `name` (String) Name of quality group

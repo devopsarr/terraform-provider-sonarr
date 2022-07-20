@@ -63,14 +63,17 @@ resource "sonarr_quality_profile" "example" {
 
 Required:
 
+- `qualities` (Attributes Set) Qualities in group (see [below for nested schema](#nestedatt--quality_groups--qualities))
+
+Optional:
+
 - `id` (Number) ID of quality group
 - `name` (String) Name of quality group
-- `qualities` (Attributes Set) Qualities in group (see [below for nested schema](#nestedatt--quality_groups--qualities))
 
 <a id="nestedatt--quality_groups--qualities"></a>
 ### Nested Schema for `quality_groups.qualities`
 
-Required:
+Optional:
 
 - `id` (Number) ID of quality group
 - `name` (String) Name of quality group
