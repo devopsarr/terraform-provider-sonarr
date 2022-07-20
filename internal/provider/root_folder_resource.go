@@ -6,9 +6,9 @@ import (
 	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/hashicorp/terraform-plugin-go/tftypes"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr/sonarr"
 )
@@ -76,7 +76,7 @@ func (t resourceRootFolderType) NewResource(ctx context.Context, in tfsdk.Provid
 func (r resourceRootFolder) Create(ctx context.Context, req tfsdk.CreateResourceRequest, resp *tfsdk.CreateResourceResponse) {
 	// Retrieve values from plan
 	var plan string
-	diags := req.Plan.GetAttribute(ctx, tftypes.NewAttributePath().WithAttributeName("path"), &plan)
+	diags := req.Plan.GetAttribute(ctx, path.Root("path"), &plan)
 	resp.Diagnostics.Append(diags...)
 	if resp.Diagnostics.HasError() {
 		return
@@ -150,7 +150,7 @@ func (r resourceRootFolder) Delete(ctx context.Context, req tfsdk.DeleteResource
 }
 
 func (r resourceRootFolder) ImportState(ctx context.Context, req tfsdk.ImportResourceStateRequest, resp *tfsdk.ImportResourceStateResponse) {
-	//tfsdk.ResourceImportStatePassthroughID(ctx, tftypes.NewAttributePath().WithAttributeName("id"), req, resp)
+	//tfsdk.ResourceImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -159,7 +159,7 @@ func (r resourceRootFolder) ImportState(ctx context.Context, req tfsdk.ImportRes
 		)
 		return
 	}
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, tftypes.NewAttributePath().WithAttributeName("id"), id)...)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 
 func writeRootFolder(rootFolder *sonarr.RootFolder) *RootFolder {
