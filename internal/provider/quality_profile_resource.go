@@ -6,9 +6,9 @@ import (
 	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"github.com/hashicorp/terraform-plugin-go/tftypes"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr"
 	"golift.io/starr/sonarr"
@@ -212,7 +212,7 @@ func (r resourceQualityProfile) Delete(ctx context.Context, req tfsdk.DeleteReso
 }
 
 func (r resourceQualityProfile) ImportState(ctx context.Context, req tfsdk.ImportResourceStateRequest, resp *tfsdk.ImportResourceStateResponse) {
-	//tfsdk.ResourceImportStatePassthroughID(ctx, tftypes.NewAttributePath().WithAttributeName("id"), req, resp)
+	//tfsdk.ResourceImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -221,7 +221,7 @@ func (r resourceQualityProfile) ImportState(ctx context.Context, req tfsdk.Impor
 		)
 		return
 	}
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, tftypes.NewAttributePath().WithAttributeName("id"), id)...)
+	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 
 func writeQualityProfile(profile *sonarr.QualityProfile) *QualityProfile {
