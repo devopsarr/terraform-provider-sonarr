@@ -5,16 +5,23 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/provider"
+	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"golift.io/starr/sonarr"
 )
 
+// Ensure provider defined types fully satisfy framework interfaces
+var _ provider.DataSourceType = dataRootFoldersType{}
+var _ datasource.DataSource = dataRootFolders{}
+
 type dataRootFoldersType struct{}
 
 type dataRootFolders struct {
-	provider provider
+	provider sonarrProvider
 }
 
 func (t dataRootFoldersType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
@@ -46,7 +53,7 @@ func (t dataRootFoldersType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.
 						Computed:            true,
 						Type:                types.Int64Type,
 						PlanModifiers: tfsdk.AttributePlanModifiers{
-							tfsdk.UseStateForUnknown(),
+							resource.UseStateForUnknown(),
 						},
 					},
 					"unmapped_folders": {
@@ -71,7 +78,7 @@ func (t dataRootFoldersType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.
 	}, nil
 }
 
-func (t dataRootFoldersType) NewDataSource(ctx context.Context, in tfsdk.Provider) (tfsdk.DataSource, diag.Diagnostics) {
+func (t dataRootFoldersType) NewDataSource(ctx context.Context, in provider.Provider) (datasource.DataSource, diag.Diagnostics) {
 	provider, diags := convertProviderType(in)
 
 	return dataRootFolders{
@@ -79,7 +86,7 @@ func (t dataRootFoldersType) NewDataSource(ctx context.Context, in tfsdk.Provide
 	}, diags
 }
 
-func (d dataRootFolders) Read(ctx context.Context, req tfsdk.ReadDataSourceRequest, resp *tfsdk.ReadDataSourceResponse) {
+func (d dataRootFolders) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 	var data RootFolders
 	diags := resp.State.Get(ctx, &data)
 	resp.Diagnostics.Append(diags...)

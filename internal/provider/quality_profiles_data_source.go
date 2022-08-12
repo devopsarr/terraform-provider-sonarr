@@ -5,16 +5,23 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/provider"
+	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"golift.io/starr/sonarr"
 )
 
+// Ensure provider defined types fully satisfy framework interfaces
+var _ provider.DataSourceType = dataQualityProfilesType{}
+var _ datasource.DataSource = dataQualityProfiles{}
+
 type dataQualityProfilesType struct{}
 
 type dataQualityProfiles struct {
-	provider provider
+	provider sonarrProvider
 }
 
 func (t dataQualityProfilesType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
@@ -36,7 +43,7 @@ func (t dataQualityProfilesType) GetSchema(ctx context.Context) (tfsdk.Schema, d
 						Computed:            true,
 						Type:                types.Int64Type,
 						PlanModifiers: tfsdk.AttributePlanModifiers{
-							tfsdk.UseStateForUnknown(),
+							resource.UseStateForUnknown(),
 						},
 					},
 					"name": {
@@ -110,7 +117,7 @@ func (t dataQualityProfilesType) GetSchema(ctx context.Context) (tfsdk.Schema, d
 	}, nil
 }
 
-func (t dataQualityProfilesType) NewDataSource(ctx context.Context, in tfsdk.Provider) (tfsdk.DataSource, diag.Diagnostics) {
+func (t dataQualityProfilesType) NewDataSource(ctx context.Context, in provider.Provider) (datasource.DataSource, diag.Diagnostics) {
 	provider, diags := convertProviderType(in)
 
 	return dataQualityProfiles{
@@ -118,7 +125,7 @@ func (t dataQualityProfilesType) NewDataSource(ctx context.Context, in tfsdk.Pro
 	}, diags
 }
 
-func (d dataQualityProfiles) Read(ctx context.Context, req tfsdk.ReadDataSourceRequest, resp *tfsdk.ReadDataSourceResponse) {
+func (d dataQualityProfiles) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 	var data QualityProfiles
 	diags := resp.State.Get(ctx, &data)
 	resp.Diagnostics.Append(diags...)

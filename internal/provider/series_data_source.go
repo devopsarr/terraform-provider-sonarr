@@ -5,15 +5,21 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
+// Ensure provider defined types fully satisfy framework interfaces
+var _ provider.DataSourceType = dataSeriesType{}
+var _ datasource.DataSource = dataSeries{}
+
 type dataSeriesType struct{}
 
 type dataSeries struct {
-	provider provider
+	provider sonarrProvider
 }
 
 func (t dataSeriesType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
@@ -98,7 +104,7 @@ func (t dataSeriesType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagn
 	}, nil
 }
 
-func (t dataSeriesType) NewDataSource(ctx context.Context, in tfsdk.Provider) (tfsdk.DataSource, diag.Diagnostics) {
+func (t dataSeriesType) NewDataSource(ctx context.Context, in provider.Provider) (datasource.DataSource, diag.Diagnostics) {
 	provider, diags := convertProviderType(in)
 
 	return dataSeries{
@@ -106,7 +112,7 @@ func (t dataSeriesType) NewDataSource(ctx context.Context, in tfsdk.Provider) (t
 	}, diags
 }
 
-func (d dataSeries) Read(ctx context.Context, req tfsdk.ReadDataSourceRequest, resp *tfsdk.ReadDataSourceResponse) {
+func (d dataSeries) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 	var data SeriesList
 	diags := resp.State.Get(ctx, &data)
 	resp.Diagnostics.Append(diags...)

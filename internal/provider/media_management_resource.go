@@ -8,16 +8,23 @@ import (
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
+	"github.com/hashicorp/terraform-plugin-framework/provider"
+	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr/sonarr"
 )
 
+// Ensure provider defined types fully satisfy framework interfaces
+var _ provider.ResourceType = resourceMediaManagementType{}
+var _ resource.Resource = resourceMediaManagement{}
+var _ resource.ResourceWithImportState = resourceMediaManagement{}
+
 type resourceMediaManagementType struct{}
 
 type resourceMediaManagement struct {
-	provider provider
+	provider sonarrProvider
 }
 
 func (t resourceMediaManagementType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
@@ -29,7 +36,7 @@ func (t resourceMediaManagementType) GetSchema(ctx context.Context) (tfsdk.Schem
 				Computed:            true,
 				Type:                types.Int64Type,
 				PlanModifiers: tfsdk.AttributePlanModifiers{
-					tfsdk.UseStateForUnknown(),
+					resource.UseStateForUnknown(),
 				},
 			},
 			"unmonitor_previous_episodes": {
@@ -138,7 +145,7 @@ func (t resourceMediaManagementType) GetSchema(ctx context.Context) (tfsdk.Schem
 	}, nil
 }
 
-func (t resourceMediaManagementType) NewResource(ctx context.Context, in tfsdk.Provider) (tfsdk.Resource, diag.Diagnostics) {
+func (t resourceMediaManagementType) NewResource(ctx context.Context, in provider.Provider) (resource.Resource, diag.Diagnostics) {
 	provider, diags := convertProviderType(in)
 
 	return resourceMediaManagement{
@@ -146,7 +153,7 @@ func (t resourceMediaManagementType) NewResource(ctx context.Context, in tfsdk.P
 	}, diags
 }
 
-func (r resourceMediaManagement) Create(ctx context.Context, req tfsdk.CreateResourceRequest, resp *tfsdk.CreateResourceResponse) {
+func (r resourceMediaManagement) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	// Retrieve values from plan
 	var plan MediaManagement
 	diags := req.Plan.Get(ctx, &plan)
@@ -177,7 +184,7 @@ func (r resourceMediaManagement) Create(ctx context.Context, req tfsdk.CreateRes
 	}
 }
 
-func (r resourceMediaManagement) Read(ctx context.Context, req tfsdk.ReadResourceRequest, resp *tfsdk.ReadResourceResponse) {
+func (r resourceMediaManagement) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	// Get current state
 	var state MediaManagement
 	diags := req.State.Get(ctx, &state)
@@ -199,7 +206,7 @@ func (r resourceMediaManagement) Read(ctx context.Context, req tfsdk.ReadResourc
 	resp.Diagnostics.Append(diags...)
 }
 
-func (r resourceMediaManagement) Update(ctx context.Context, req tfsdk.UpdateResourceRequest, resp *tfsdk.UpdateResourceResponse) {
+func (r resourceMediaManagement) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	// Get plan values
 	var plan MediaManagement
 	diags := req.Plan.Get(ctx, &plan)
@@ -229,13 +236,13 @@ func (r resourceMediaManagement) Update(ctx context.Context, req tfsdk.UpdateRes
 	}
 }
 
-func (r resourceMediaManagement) Delete(ctx context.Context, req tfsdk.DeleteResourceRequest, resp *tfsdk.DeleteResourceResponse) {
+func (r resourceMediaManagement) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	// Mediamanagement cannot be really deleted just removing configuration
 	resp.State.RemoveResource(ctx)
 }
 
-func (r resourceMediaManagement) ImportState(ctx context.Context, req tfsdk.ImportResourceStateRequest, resp *tfsdk.ImportResourceStateResponse) {
-	//tfsdk.ResourceImportStatePassthroughID(ctx, path.Root("id"), req, resp)
+func (r resourceMediaManagement) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	//resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), 1)...)
 }
 

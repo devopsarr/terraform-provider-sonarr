@@ -5,16 +5,22 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"golift.io/starr"
 )
 
+// Ensure provider defined types fully satisfy framework interfaces
+var _ provider.DataSourceType = dataTagsType{}
+var _ datasource.DataSource = dataTags{}
+
 type dataTagsType struct{}
 
 type dataTags struct {
-	provider provider
+	provider sonarrProvider
 }
 
 func (t dataTagsType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
@@ -47,7 +53,7 @@ func (t dataTagsType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnos
 	}, nil
 }
 
-func (t dataTagsType) NewDataSource(ctx context.Context, in tfsdk.Provider) (tfsdk.DataSource, diag.Diagnostics) {
+func (t dataTagsType) NewDataSource(ctx context.Context, in provider.Provider) (datasource.DataSource, diag.Diagnostics) {
 	provider, diags := convertProviderType(in)
 
 	return dataTags{
@@ -55,7 +61,7 @@ func (t dataTagsType) NewDataSource(ctx context.Context, in tfsdk.Provider) (tfs
 	}, diags
 }
 
-func (d dataTags) Read(ctx context.Context, req tfsdk.ReadDataSourceRequest, resp *tfsdk.ReadDataSourceResponse) {
+func (d dataTags) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 	var data Tags
 	diags := resp.State.Get(ctx, &data)
 	resp.Diagnostics.Append(diags...)

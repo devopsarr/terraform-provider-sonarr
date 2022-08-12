@@ -5,16 +5,22 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"golift.io/starr/sonarr"
 )
 
+// Ensure provider defined types fully satisfy framework interfaces
+var _ provider.DataSourceType = dataLanguageProfilesType{}
+var _ datasource.DataSource = dataLanguageProfiles{}
+
 type dataLanguageProfilesType struct{}
 
 type dataLanguageProfiles struct {
-	provider provider
+	provider sonarrProvider
 }
 
 func (t dataLanguageProfilesType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
@@ -62,7 +68,7 @@ func (t dataLanguageProfilesType) GetSchema(ctx context.Context) (tfsdk.Schema, 
 	}, nil
 }
 
-func (t dataLanguageProfilesType) NewDataSource(ctx context.Context, in tfsdk.Provider) (tfsdk.DataSource, diag.Diagnostics) {
+func (t dataLanguageProfilesType) NewDataSource(ctx context.Context, in provider.Provider) (datasource.DataSource, diag.Diagnostics) {
 	provider, diags := convertProviderType(in)
 
 	return dataLanguageProfiles{
@@ -70,7 +76,7 @@ func (t dataLanguageProfilesType) NewDataSource(ctx context.Context, in tfsdk.Pr
 	}, diags
 }
 
-func (d dataLanguageProfiles) Read(ctx context.Context, req tfsdk.ReadDataSourceRequest, resp *tfsdk.ReadDataSourceResponse) {
+func (d dataLanguageProfiles) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 	var data LanguageProfiles
 	diags := resp.State.Get(ctx, &data)
 	resp.Diagnostics.Append(diags...)
