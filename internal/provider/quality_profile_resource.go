@@ -7,6 +7,8 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
+	"github.com/hashicorp/terraform-plugin-framework/provider"
+	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -14,10 +16,15 @@ import (
 	"golift.io/starr/sonarr"
 )
 
+// Ensure provider defined types fully satisfy framework interfaces
+var _ provider.ResourceType = resourceQualityProfileType{}
+var _ resource.Resource = resourceQualityProfile{}
+var _ resource.ResourceWithImportState = resourceQualityProfile{}
+
 type resourceQualityProfileType struct{}
 
 type resourceQualityProfile struct {
-	provider provider
+	provider sonarrProvider
 }
 
 func (t resourceQualityProfileType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
@@ -29,7 +36,7 @@ func (t resourceQualityProfileType) GetSchema(ctx context.Context) (tfsdk.Schema
 				Computed:            true,
 				Type:                types.Int64Type,
 				PlanModifiers: tfsdk.AttributePlanModifiers{
-					tfsdk.UseStateForUnknown(),
+					resource.UseStateForUnknown(),
 				},
 			},
 			"name": {
@@ -101,7 +108,7 @@ func (t resourceQualityProfileType) GetSchema(ctx context.Context) (tfsdk.Schema
 	}, nil
 }
 
-func (t resourceQualityProfileType) NewResource(ctx context.Context, in tfsdk.Provider) (tfsdk.Resource, diag.Diagnostics) {
+func (t resourceQualityProfileType) NewResource(ctx context.Context, in provider.Provider) (resource.Resource, diag.Diagnostics) {
 	provider, diags := convertProviderType(in)
 
 	return resourceQualityProfile{
@@ -109,7 +116,7 @@ func (t resourceQualityProfileType) NewResource(ctx context.Context, in tfsdk.Pr
 	}, diags
 }
 
-func (r resourceQualityProfile) Create(ctx context.Context, req tfsdk.CreateResourceRequest, resp *tfsdk.CreateResourceResponse) {
+func (r resourceQualityProfile) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	// Retrieve values from plan
 	var plan QualityProfile
 	diags := req.Plan.Get(ctx, &plan)
@@ -139,7 +146,7 @@ func (r resourceQualityProfile) Create(ctx context.Context, req tfsdk.CreateReso
 	}
 }
 
-func (r resourceQualityProfile) Read(ctx context.Context, req tfsdk.ReadResourceRequest, resp *tfsdk.ReadResourceResponse) {
+func (r resourceQualityProfile) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	// Get current state
 	var state QualityProfile
 	diags := req.State.Get(ctx, &state)
@@ -161,7 +168,7 @@ func (r resourceQualityProfile) Read(ctx context.Context, req tfsdk.ReadResource
 	resp.Diagnostics.Append(diags...)
 }
 
-func (r resourceQualityProfile) Update(ctx context.Context, req tfsdk.UpdateResourceRequest, resp *tfsdk.UpdateResourceResponse) {
+func (r resourceQualityProfile) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	// Get plan values
 	var plan QualityProfile
 	diags := req.Plan.Get(ctx, &plan)
@@ -191,7 +198,7 @@ func (r resourceQualityProfile) Update(ctx context.Context, req tfsdk.UpdateReso
 	}
 }
 
-func (r resourceQualityProfile) Delete(ctx context.Context, req tfsdk.DeleteResourceRequest, resp *tfsdk.DeleteResourceResponse) {
+func (r resourceQualityProfile) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	var state QualityProfile
 
 	diags := req.State.Get(ctx, &state)
@@ -211,8 +218,8 @@ func (r resourceQualityProfile) Delete(ctx context.Context, req tfsdk.DeleteReso
 	resp.State.RemoveResource(ctx)
 }
 
-func (r resourceQualityProfile) ImportState(ctx context.Context, req tfsdk.ImportResourceStateRequest, resp *tfsdk.ImportResourceStateResponse) {
-	//tfsdk.ResourceImportStatePassthroughID(ctx, path.Root("id"), req, resp)
+func (r resourceQualityProfile) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	//resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(

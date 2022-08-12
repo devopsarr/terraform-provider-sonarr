@@ -7,16 +7,23 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
+	"github.com/hashicorp/terraform-plugin-framework/provider"
+	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr/sonarr"
 )
 
+// Ensure provider defined types fully satisfy framework interfaces
+var _ provider.ResourceType = resourceSeriesType{}
+var _ resource.Resource = resourceSeries{}
+var _ resource.ResourceWithImportState = resourceSeries{}
+
 type resourceSeriesType struct{}
 
 type resourceSeries struct {
-	provider provider
+	provider sonarrProvider
 }
 
 func (t resourceSeriesType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
@@ -86,14 +93,14 @@ func (t resourceSeriesType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.D
 				Computed:            true,
 				Type:                types.Int64Type,
 				PlanModifiers: tfsdk.AttributePlanModifiers{
-					tfsdk.UseStateForUnknown(),
+					resource.UseStateForUnknown(),
 				},
 			},
 		},
 	}, nil
 }
 
-func (t resourceSeriesType) NewResource(ctx context.Context, in tfsdk.Provider) (tfsdk.Resource, diag.Diagnostics) {
+func (t resourceSeriesType) NewResource(ctx context.Context, in provider.Provider) (resource.Resource, diag.Diagnostics) {
 	provider, diags := convertProviderType(in)
 
 	return resourceSeries{
@@ -101,7 +108,7 @@ func (t resourceSeriesType) NewResource(ctx context.Context, in tfsdk.Provider) 
 	}, diags
 }
 
-func (r resourceSeries) Create(ctx context.Context, req tfsdk.CreateResourceRequest, resp *tfsdk.CreateResourceResponse) {
+func (r resourceSeries) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	// Retrieve values from plan
 	var plan Series
 	diags := req.Plan.Get(ctx, &plan)
@@ -137,7 +144,7 @@ func (r resourceSeries) Create(ctx context.Context, req tfsdk.CreateResourceRequ
 	}
 }
 
-func (r resourceSeries) Read(ctx context.Context, req tfsdk.ReadResourceRequest, resp *tfsdk.ReadResourceResponse) {
+func (r resourceSeries) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	// Get current state
 	var state Series
 	diags := req.State.Get(ctx, &state)
@@ -159,7 +166,7 @@ func (r resourceSeries) Read(ctx context.Context, req tfsdk.ReadResourceRequest,
 	resp.Diagnostics.Append(diags...)
 }
 
-func (r resourceSeries) Update(ctx context.Context, req tfsdk.UpdateResourceRequest, resp *tfsdk.UpdateResourceResponse) {
+func (r resourceSeries) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	// Get plan values
 	var plan Series
 	diags := req.Plan.Get(ctx, &plan)
@@ -186,7 +193,7 @@ func (r resourceSeries) Update(ctx context.Context, req tfsdk.UpdateResourceRequ
 	}
 }
 
-func (r resourceSeries) Delete(ctx context.Context, req tfsdk.DeleteResourceRequest, resp *tfsdk.DeleteResourceResponse) {
+func (r resourceSeries) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	var state Series
 
 	diags := req.State.Get(ctx, &state)
@@ -206,8 +213,8 @@ func (r resourceSeries) Delete(ctx context.Context, req tfsdk.DeleteResourceRequ
 	resp.State.RemoveResource(ctx)
 }
 
-func (r resourceSeries) ImportState(ctx context.Context, req tfsdk.ImportResourceStateRequest, resp *tfsdk.ImportResourceStateResponse) {
-	//tfsdk.ResourceImportStatePassthroughID(ctx, path.Root("id"), req, resp)
+func (r resourceSeries) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	//resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(

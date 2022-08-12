@@ -8,6 +8,8 @@ import (
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
+	"github.com/hashicorp/terraform-plugin-framework/provider"
+	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -15,10 +17,15 @@ import (
 	"golift.io/starr/sonarr"
 )
 
+// Ensure provider defined types fully satisfy framework interfaces
+var _ provider.ResourceType = resourceLanguageProfileType{}
+var _ resource.Resource = resourceLanguageProfile{}
+var _ resource.ResourceWithImportState = resourceLanguageProfile{}
+
 type resourceLanguageProfileType struct{}
 
 type resourceLanguageProfile struct {
-	provider provider
+	provider sonarrProvider
 }
 
 func (t resourceLanguageProfileType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
@@ -30,7 +37,7 @@ func (t resourceLanguageProfileType) GetSchema(ctx context.Context) (tfsdk.Schem
 				Computed:            true,
 				Type:                types.Int64Type,
 				PlanModifiers: tfsdk.AttributePlanModifiers{
-					tfsdk.UseStateForUnknown(),
+					resource.UseStateForUnknown(),
 				},
 			},
 			"name": {
@@ -61,7 +68,7 @@ func (t resourceLanguageProfileType) GetSchema(ctx context.Context) (tfsdk.Schem
 	}, nil
 }
 
-func (t resourceLanguageProfileType) NewResource(ctx context.Context, in tfsdk.Provider) (tfsdk.Resource, diag.Diagnostics) {
+func (t resourceLanguageProfileType) NewResource(ctx context.Context, in provider.Provider) (resource.Resource, diag.Diagnostics) {
 	provider, diags := convertProviderType(in)
 
 	return resourceLanguageProfile{
@@ -69,7 +76,7 @@ func (t resourceLanguageProfileType) NewResource(ctx context.Context, in tfsdk.P
 	}, diags
 }
 
-func (r resourceLanguageProfile) Create(ctx context.Context, req tfsdk.CreateResourceRequest, resp *tfsdk.CreateResourceResponse) {
+func (r resourceLanguageProfile) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	// Retrieve values from plan
 	var plan LanguageProfile
 	diags := req.Plan.Get(ctx, &plan)
@@ -99,7 +106,7 @@ func (r resourceLanguageProfile) Create(ctx context.Context, req tfsdk.CreateRes
 	}
 }
 
-func (r resourceLanguageProfile) Read(ctx context.Context, req tfsdk.ReadResourceRequest, resp *tfsdk.ReadResourceResponse) {
+func (r resourceLanguageProfile) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	// Get current state
 	var state LanguageProfile
 	diags := req.State.Get(ctx, &state)
@@ -121,7 +128,7 @@ func (r resourceLanguageProfile) Read(ctx context.Context, req tfsdk.ReadResourc
 	resp.Diagnostics.Append(diags...)
 }
 
-func (r resourceLanguageProfile) Update(ctx context.Context, req tfsdk.UpdateResourceRequest, resp *tfsdk.UpdateResourceResponse) {
+func (r resourceLanguageProfile) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	// Get plan values
 	var plan LanguageProfile
 	diags := req.Plan.Get(ctx, &plan)
@@ -151,7 +158,7 @@ func (r resourceLanguageProfile) Update(ctx context.Context, req tfsdk.UpdateRes
 	}
 }
 
-func (r resourceLanguageProfile) Delete(ctx context.Context, req tfsdk.DeleteResourceRequest, resp *tfsdk.DeleteResourceResponse) {
+func (r resourceLanguageProfile) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	var state LanguageProfile
 
 	diags := req.State.Get(ctx, &state)
@@ -171,8 +178,8 @@ func (r resourceLanguageProfile) Delete(ctx context.Context, req tfsdk.DeleteRes
 	resp.State.RemoveResource(ctx)
 }
 
-func (r resourceLanguageProfile) ImportState(ctx context.Context, req tfsdk.ImportResourceStateRequest, resp *tfsdk.ImportResourceStateResponse) {
-	//tfsdk.ResourceImportStatePassthroughID(ctx, path.Root("id"), req, resp)
+func (r resourceLanguageProfile) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	//resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(

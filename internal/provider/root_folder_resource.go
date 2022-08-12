@@ -7,16 +7,23 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
+	"github.com/hashicorp/terraform-plugin-framework/provider"
+	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr/sonarr"
 )
 
+// Ensure provider defined types fully satisfy framework interfaces
+var _ provider.ResourceType = resourceRootFolderType{}
+var _ resource.Resource = resourceRootFolder{}
+var _ resource.ResourceWithImportState = resourceRootFolder{}
+
 type resourceRootFolderType struct{}
 
 type resourceRootFolder struct {
-	provider provider
+	provider sonarrProvider
 }
 
 func (t resourceRootFolderType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
@@ -29,7 +36,7 @@ func (t resourceRootFolderType) GetSchema(ctx context.Context) (tfsdk.Schema, di
 				Required:            true,
 				Type:                types.StringType,
 				PlanModifiers: tfsdk.AttributePlanModifiers{
-					tfsdk.RequiresReplace(),
+					resource.RequiresReplace(),
 				},
 			},
 			"accessible": {
@@ -42,7 +49,7 @@ func (t resourceRootFolderType) GetSchema(ctx context.Context) (tfsdk.Schema, di
 				Computed:            true,
 				Type:                types.Int64Type,
 				PlanModifiers: tfsdk.AttributePlanModifiers{
-					tfsdk.UseStateForUnknown(),
+					resource.UseStateForUnknown(),
 				},
 			},
 			"unmapped_folders": {
@@ -65,7 +72,7 @@ func (t resourceRootFolderType) GetSchema(ctx context.Context) (tfsdk.Schema, di
 	}, nil
 }
 
-func (t resourceRootFolderType) NewResource(ctx context.Context, in tfsdk.Provider) (tfsdk.Resource, diag.Diagnostics) {
+func (t resourceRootFolderType) NewResource(ctx context.Context, in provider.Provider) (resource.Resource, diag.Diagnostics) {
 	provider, diags := convertProviderType(in)
 
 	return resourceRootFolder{
@@ -73,7 +80,7 @@ func (t resourceRootFolderType) NewResource(ctx context.Context, in tfsdk.Provid
 	}, diags
 }
 
-func (r resourceRootFolder) Create(ctx context.Context, req tfsdk.CreateResourceRequest, resp *tfsdk.CreateResourceResponse) {
+func (r resourceRootFolder) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	// Retrieve values from plan
 	var plan string
 	diags := req.Plan.GetAttribute(ctx, path.Root("path"), &plan)
@@ -103,7 +110,7 @@ func (r resourceRootFolder) Create(ctx context.Context, req tfsdk.CreateResource
 	}
 }
 
-func (r resourceRootFolder) Read(ctx context.Context, req tfsdk.ReadResourceRequest, resp *tfsdk.ReadResourceResponse) {
+func (r resourceRootFolder) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	// Get current state
 	var state RootFolder
 	diags := req.State.Get(ctx, &state)
@@ -126,10 +133,10 @@ func (r resourceRootFolder) Read(ctx context.Context, req tfsdk.ReadResourceRequ
 }
 
 // never used
-func (r resourceRootFolder) Update(ctx context.Context, req tfsdk.UpdateResourceRequest, resp *tfsdk.UpdateResourceResponse) {
+func (r resourceRootFolder) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 }
 
-func (r resourceRootFolder) Delete(ctx context.Context, req tfsdk.DeleteResourceRequest, resp *tfsdk.DeleteResourceResponse) {
+func (r resourceRootFolder) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	var state RootFolder
 
 	diags := req.State.Get(ctx, &state)
@@ -149,8 +156,8 @@ func (r resourceRootFolder) Delete(ctx context.Context, req tfsdk.DeleteResource
 	resp.State.RemoveResource(ctx)
 }
 
-func (r resourceRootFolder) ImportState(ctx context.Context, req tfsdk.ImportResourceStateRequest, resp *tfsdk.ImportResourceStateResponse) {
-	//tfsdk.ResourceImportStatePassthroughID(ctx, path.Root("id"), req, resp)
+func (r resourceRootFolder) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	//resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(
