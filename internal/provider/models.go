@@ -16,7 +16,7 @@ type Tag struct {
 	Label types.String `tfsdk:"label"`
 }
 
-//TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
+// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 // Tags is a list of Tag.
 type Tags struct {
 	ID   types.String `tfsdk:"id"`
@@ -32,7 +32,7 @@ type LanguageProfile struct {
 	Languages      []types.String `tfsdk:"languages"`
 }
 
-//TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
+// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 // LanguageProfiles is a list of LanguageProfile.
 type LanguageProfiles struct {
 	ID               types.String      `tfsdk:"id"`
@@ -52,7 +52,7 @@ type DelayProfile struct {
 	PreferredProtocol      types.String  `tfsdk:"preferred_protocol"`
 }
 
-//TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
+// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 // DelayProfiles is a list of DelayProfile.
 type DelayProfiles struct {
 	ID            types.String   `tfsdk:"id"`
@@ -68,7 +68,7 @@ type QualityProfile struct {
 	QualityGroups  []QualityGroup `tfsdk:"quality_groups"`
 }
 
-//TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
+// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 // QualityProfiles is a list of QualityProfile.
 type QualityProfiles struct {
 	ID              types.String     `tfsdk:"id"`
@@ -82,7 +82,7 @@ type QualityGroup struct {
 	Qualities []Quality    `tfsdk:"qualities"`
 }
 
-//Quality is part of QualityGroup.
+// Quality is part of QualityGroup.
 type Quality struct {
 	ID         types.Int64  `tfsdk:"id"`
 	Resolution types.Int64  `tfsdk:"resolution"`
@@ -106,7 +106,7 @@ type Series struct {
 	Tags              []types.Int64 `tfsdk:"tags"`
 }
 
-//TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
+// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 // QualityProfiles is a list of QualityProfile.
 type SeriesList struct {
 	ID     types.String `tfsdk:"id"`
@@ -172,7 +172,7 @@ type Path struct {
 	Path types.String `tfsdk:"path"`
 }
 
-//TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
+// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 // QualityProfiles is a list of QualityProfile.
 type RootFolders struct {
 	ID          types.String `tfsdk:"id"`

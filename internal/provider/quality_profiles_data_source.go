@@ -29,7 +29,7 @@ func (t dataQualityProfilesType) GetSchema(ctx context.Context) (tfsdk.Schema, d
 		// This description is used by the documentation generator and the quality server.
 		MarkdownDescription: "List all available qualityprofiles",
 		Attributes: map[string]tfsdk.Attribute{
-			//TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
+			// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 			"id": {
 				Computed: true,
 				Type:     types.StringType,
@@ -141,7 +141,7 @@ func (d dataQualityProfiles) Read(ctx context.Context, req datasource.ReadReques
 
 	// Map response body to resource schema attribute
 	data.QualityProfiles = *writeQualitiyprofiles(response)
-	//TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
+	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 	data.ID = types.String{Value: strconv.Itoa(len(response))}
 	diags = resp.State.Set(ctx, &data)
 	resp.Diagnostics.Append(diags...)

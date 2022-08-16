@@ -28,7 +28,7 @@ func (t dataDelayProfilesType) GetSchema(ctx context.Context) (tfsdk.Schema, dia
 		// This description is used by the documentation generator and the delay server.
 		MarkdownDescription: "List all available delayprofiles",
 		Attributes: map[string]tfsdk.Attribute{
-			//TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
+			// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 			"id": {
 				Computed: true,
 				Type:     types.StringType,
@@ -113,7 +113,7 @@ func (d dataDelayProfiles) Read(ctx context.Context, req datasource.ReadRequest,
 	}
 	// Map response body to resource schema attribute
 	data.DelayProfiles = *writeDelayprofiles(response)
-	//TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
+	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 	data.ID = types.String{Value: strconv.Itoa(len(response))}
 	diags = resp.State.Set(ctx, &data)
 	resp.Diagnostics.Append(diags...)

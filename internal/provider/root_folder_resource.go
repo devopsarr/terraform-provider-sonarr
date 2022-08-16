@@ -30,7 +30,7 @@ func (t resourceRootFolderType) GetSchema(ctx context.Context) (tfsdk.Schema, di
 	return tfsdk.Schema{
 		MarkdownDescription: "RootFolder resource",
 		Attributes: map[string]tfsdk.Attribute{
-			//TODO: add validator
+			// TODO: add validator
 			"path": {
 				MarkdownDescription: "Absolute path of rootFolder",
 				Required:            true,

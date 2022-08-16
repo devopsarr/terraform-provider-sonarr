@@ -28,7 +28,7 @@ func (t dataLanguageProfilesType) GetSchema(ctx context.Context) (tfsdk.Schema, 
 		// This description is used by the documentation generator and the language server.
 		MarkdownDescription: "List all available languageprofiles",
 		Attributes: map[string]tfsdk.Attribute{
-			//TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
+			// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 			"id": {
 				Computed: true,
 				Type:     types.StringType,
@@ -91,7 +91,7 @@ func (d dataLanguageProfiles) Read(ctx context.Context, req datasource.ReadReque
 	}
 	// Map response body to resource schema attribute
 	data.LanguageProfiles = *writeLanguageprofiles(response)
-	//TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
+	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 	data.ID = types.String{Value: strconv.Itoa(len(response))}
 	diags = resp.State.Set(ctx, &data)
 	resp.Diagnostics.Append(diags...)
