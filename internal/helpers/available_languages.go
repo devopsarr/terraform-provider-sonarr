@@ -9,7 +9,7 @@ import (
 )
 
 // Languages is the available language list.
-//var Languages, _ = GetLanguages()
+// var Languages, _ = GetLanguages()
 var Languages = []string{
 	"Unknown",
 	"English",

@@ -28,7 +28,7 @@ func (t dataTagsType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnos
 		// This description is used by the documentation generator and the language server.
 		MarkdownDescription: "List all available tags",
 		Attributes: map[string]tfsdk.Attribute{
-			//TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
+			// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 			"id": {
 				Computed: true,
 				Type:     types.StringType,
@@ -76,7 +76,7 @@ func (d dataTags) Read(ctx context.Context, req datasource.ReadRequest, resp *da
 	}
 	// Map response body to resource schema attribute
 	data.Tags = *writeTags(response)
-	//TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
+	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 	data.ID = types.String{Value: strconv.Itoa(len(response))}
 	diags = resp.State.Set(ctx, &data)
 	resp.Diagnostics.Append(diags...)

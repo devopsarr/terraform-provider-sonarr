@@ -27,7 +27,7 @@ type resourceSeries struct {
 }
 
 func (t resourceSeriesType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	//TODO: waiting to implement seasons and images until empty conversion is managed natively https://www.terraform.io/plugin/framework/accessing-values#conversion-rules
+	// TODO: waiting to implement seasons and images until empty conversion is managed natively https://www.terraform.io/plugin/framework/accessing-values#conversion-rules
 	return tfsdk.Schema{
 		MarkdownDescription: "Series resource",
 		Attributes: map[string]tfsdk.Attribute{
@@ -119,7 +119,7 @@ func (r resourceSeries) Create(ctx context.Context, req resource.CreateRequest, 
 
 	// Create new Series
 	request := readSeries(&plan)
-	//TODO: can parametrize AddSeriesOptions
+	// TODO: can parametrize AddSeriesOptions
 	request.AddOptions = &sonarr.AddSeriesOptions{
 		SearchForMissingEpisodes:     true,
 		SearchForCutoffUnmetEpisodes: true,
