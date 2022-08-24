@@ -27,6 +27,30 @@ type resourceQualityProfile struct {
 	provider sonarrProvider
 }
 
+// QualityProfile is the quality_profile resource.
+type QualityProfile struct {
+	UpgradeAllowed types.Bool     `tfsdk:"upgrade_allowed"`
+	ID             types.Int64    `tfsdk:"id"`
+	Cutoff         types.Int64    `tfsdk:"cutoff"`
+	Name           types.String   `tfsdk:"name"`
+	QualityGroups  []QualityGroup `tfsdk:"quality_groups"`
+}
+
+// QualityGroup is part of QualityProfile.
+type QualityGroup struct {
+	ID        types.Int64  `tfsdk:"id"`
+	Name      types.String `tfsdk:"name"`
+	Qualities []Quality    `tfsdk:"qualities"`
+}
+
+// Quality is part of QualityGroup.
+type Quality struct {
+	ID         types.Int64  `tfsdk:"id"`
+	Resolution types.Int64  `tfsdk:"resolution"`
+	Name       types.String `tfsdk:"name"`
+	Source     types.String `tfsdk:"source"`
+}
+
 func (t resourceQualityProfileType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		MarkdownDescription: "QualityProfile resource",

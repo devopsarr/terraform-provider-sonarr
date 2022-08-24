@@ -23,6 +23,13 @@ type dataLanguageProfiles struct {
 	provider sonarrProvider
 }
 
+// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
+// LanguageProfiles is a list of LanguageProfile.
+type LanguageProfiles struct {
+	ID               types.String      `tfsdk:"id"`
+	LanguageProfiles []LanguageProfile `tfsdk:"language_profiles"`
+}
+
 func (t dataLanguageProfilesType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		// This description is used by the documentation generator and the language server.

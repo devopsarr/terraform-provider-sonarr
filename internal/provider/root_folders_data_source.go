@@ -24,6 +24,13 @@ type dataRootFolders struct {
 	provider sonarrProvider
 }
 
+// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
+// QualityProfiles is a list of QualityProfile.
+type RootFolders struct {
+	ID          types.String `tfsdk:"id"`
+	RootFolders []RootFolder `tfsdk:"root_folders"`
+}
+
 func (t dataRootFoldersType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		// This description is used by the documentation generator and the delay server.

@@ -26,6 +26,20 @@ type resourceRootFolder struct {
 	provider sonarrProvider
 }
 
+// RootFolder is the RootFolder resource.
+type RootFolder struct {
+	Accessible      types.Bool   `tfsdk:"accessible"`
+	ID              types.Int64  `tfsdk:"id"`
+	Path            types.String `tfsdk:"path"`
+	UnmappedFolders []Path       `tfsdk:"unmapped_folders"`
+}
+
+// Path part of RootFolder.
+type Path struct {
+	Name types.String `tfsdk:"name"`
+	Path types.String `tfsdk:"path"`
+}
+
 func (t resourceRootFolderType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		MarkdownDescription: "RootFolder resource",

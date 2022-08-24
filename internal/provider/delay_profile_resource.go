@@ -27,6 +27,19 @@ type resourceDelayProfile struct {
 	provider sonarrProvider
 }
 
+// DelayProfile is the delay_profile resource.
+type DelayProfile struct {
+	EnableUsenet           types.Bool    `tfsdk:"enable_usenet"`
+	EnableTorrent          types.Bool    `tfsdk:"enable_torrent"`
+	BypassIfHighestQuality types.Bool    `tfsdk:"bypass_if_highest_quality"`
+	UsenetDelay            types.Int64   `tfsdk:"usenet_delay"`
+	TorrentDelay           types.Int64   `tfsdk:"torrent_delay"`
+	ID                     types.Int64   `tfsdk:"id"`
+	Order                  types.Int64   `tfsdk:"order"`
+	Tags                   []types.Int64 `tfsdk:"tags"`
+	PreferredProtocol      types.String  `tfsdk:"preferred_protocol"`
+}
+
 func (t resourceDelayProfileType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		MarkdownDescription: "DelayProfile resource",
