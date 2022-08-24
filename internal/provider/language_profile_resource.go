@@ -28,6 +28,15 @@ type resourceLanguageProfile struct {
 	provider sonarrProvider
 }
 
+// LanguageProfile is the language_profile resource.
+type LanguageProfile struct {
+	UpgradeAllowed types.Bool     `tfsdk:"upgrade_allowed"`
+	ID             types.Int64    `tfsdk:"id"`
+	Name           types.String   `tfsdk:"name"`
+	CutoffLanguage types.String   `tfsdk:"cutoff_language"`
+	Languages      []types.String `tfsdk:"languages"`
+}
+
 func (t resourceLanguageProfileType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		MarkdownDescription: "LanguageProfile resource",

@@ -27,6 +27,29 @@ type resourceMediaManagement struct {
 	provider sonarrProvider
 }
 
+// MediaManagement is the MediaManagement resource.
+type MediaManagement struct {
+	UnmonitorPreviousEpisodes types.Bool   `tfsdk:"unmonitor_previous_episodes"`
+	HardlinksCopy             types.Bool   `tfsdk:"hardlinks_copy"`
+	CreateEmptyFolders        types.Bool   `tfsdk:"create_empty_folders"`
+	DeleteEmptyFolders        types.Bool   `tfsdk:"delete_empty_folders"`
+	EnableMediaInfo           types.Bool   `tfsdk:"enable_media_info"`
+	ImportExtraFiles          types.Bool   `tfsdk:"import_extra_files"`
+	SetPermissions            types.Bool   `tfsdk:"set_permissions"`
+	SkipFreeSpaceCheck        types.Bool   `tfsdk:"skip_free_space_check"`
+	ID                        types.Int64  `tfsdk:"id"`
+	MinimumFreeSpace          types.Int64  `tfsdk:"minimum_free_space"`
+	RecycleBinDays            types.Int64  `tfsdk:"recycle_bin_days"`
+	ChmodFolder               types.String `tfsdk:"chmod_folder"`
+	ChownGroup                types.String `tfsdk:"chown_group"`
+	DownloadPropersRepacks    types.String `tfsdk:"download_propers_repacks"`
+	EpisodeTitleRequired      types.String `tfsdk:"episode_title_required"`
+	ExtraFileExtensions       types.String `tfsdk:"extra_file_extensions"`
+	FileDate                  types.String `tfsdk:"file_date"`
+	RecycleBinPath            types.String `tfsdk:"recycle_bin_path"`
+	RescanAfterRefresh        types.String `tfsdk:"rescan_after_refresh"`
+}
+
 func (t resourceMediaManagementType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		MarkdownDescription: "MediaManagement resource",

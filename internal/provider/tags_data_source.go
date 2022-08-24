@@ -23,6 +23,13 @@ type dataTags struct {
 	provider sonarrProvider
 }
 
+// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
+// Tags is a list of Tag.
+type Tags struct {
+	ID   types.String `tfsdk:"id"`
+	Tags []Tag        `tfsdk:"tags"`
+}
+
 func (t dataTagsType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		// This description is used by the documentation generator and the language server.

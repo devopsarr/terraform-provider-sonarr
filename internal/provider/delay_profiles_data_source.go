@@ -23,6 +23,13 @@ type dataDelayProfiles struct {
 	provider sonarrProvider
 }
 
+// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
+// DelayProfiles is a list of DelayProfile.
+type DelayProfiles struct {
+	ID            types.String   `tfsdk:"id"`
+	DelayProfiles []DelayProfile `tfsdk:"delay_profiles"`
+}
+
 func (t dataDelayProfilesType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		// This description is used by the documentation generator and the delay server.

@@ -22,6 +22,13 @@ type dataSeries struct {
 	provider sonarrProvider
 }
 
+// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
+// QualityProfiles is a list of QualityProfile.
+type SeriesList struct {
+	ID     types.String `tfsdk:"id"`
+	Series []Series     `tfsdk:"series"`
+}
+
 func (t dataSeriesType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		// This description is used by the documentation generator and the language server.

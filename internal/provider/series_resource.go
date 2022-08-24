@@ -26,6 +26,44 @@ type resourceSeries struct {
 	provider sonarrProvider
 }
 
+// Series is the series resource.
+type Series struct {
+	Monitored         types.Bool    `tfsdk:"monitored"`
+	SeasonFolder      types.Bool    `tfsdk:"season_folder"`
+	UseSceneNumbering types.Bool    `tfsdk:"use_scene_numbering"`
+	ID                types.Int64   `tfsdk:"id"`
+	LanguageProfileID types.Int64   `tfsdk:"language_profile_id"`
+	QualityProfileID  types.Int64   `tfsdk:"quality_profile_id"`
+	TvdbID            types.Int64   `tfsdk:"tvdb_id"`
+	Path              types.String  `tfsdk:"path"`
+	Title             types.String  `tfsdk:"title"`
+	TitleSlug         types.String  `tfsdk:"title_slug"`
+	RootFolderPath    types.String  `tfsdk:"root_folder_path"`
+	Tags              []types.Int64 `tfsdk:"tags"`
+}
+
+// Season is part of Series.
+type Season struct {
+	Monitored    types.Bool  `tfsdk:"monitored"`
+	SeasonNumber types.Int64 `tfsdk:"season_number"`
+}
+
+// AddSeriesOptions is used in series creation.
+type AddSeriesOptions struct {
+	SearchForMissingEpisodes     types.Bool `tfsdk:"search_for_missing_episodes"`
+	SearchForCutoffUnmetEpisodes types.Bool `tfsdk:"search_for_cutoff_unmet_episodes"`
+	IgnoreEpisodesWithFiles      types.Bool `tfsdk:"ignore_episodes_with_files"`
+	IgnoreEpisodesWithoutFiles   types.Bool `tfsdk:"ignore_episodes_without_files"`
+}
+
+// Image is part of Series.
+type Image struct {
+	CoverType types.String `tfsdk:"cover_type"`
+	URL       types.String `tfsdk:"url"`
+	RemoteURL types.String `tfsdk:"remote_url"`
+	Extension types.String `tfsdk:"extension"`
+}
+
 func (t resourceSeriesType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	// TODO: waiting to implement seasons and images until empty conversion is managed natively https://www.terraform.io/plugin/framework/accessing-values#conversion-rules
 	return tfsdk.Schema{

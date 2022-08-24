@@ -27,6 +27,12 @@ type resourceTag struct {
 	provider sonarrProvider
 }
 
+// Tag is the tag resource.
+type Tag struct {
+	ID    types.Int64  `tfsdk:"id"`
+	Label types.String `tfsdk:"label"`
+}
+
 func (t resourceTagType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		MarkdownDescription: "Tag resource",
