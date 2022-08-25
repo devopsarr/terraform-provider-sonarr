@@ -17,9 +17,12 @@ var testAccProtoV6ProviderFactories = map[string]func() (tfprotov6.ProviderServe
 }
 
 func testAccPreCheck(t *testing.T) {
+	t.Helper()
+
 	if v := os.Getenv("SONARR_URL"); v == "" {
 		t.Skip("SONARR_URL must be set for acceptance tests")
 	}
+
 	if v := os.Getenv("SONARR_API_KEY"); v == "" {
 		t.Skip("SONARR_API_KEY must be set for acceptance tests")
 	}

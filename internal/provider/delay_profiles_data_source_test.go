@@ -7,13 +7,15 @@ import (
 )
 
 func TestAccDelayProfilesDataSource(t *testing.T) {
+	t.Parallel()
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			// Create a delay profile to have a value to check
 			{
-				Config: testAccDelayProfileResourceConfig("torrent"),
+				Config: testAccDelayProfileResourceConfig("dpdatasource", "torrent"),
 			},
 			// Read testing
 			{
