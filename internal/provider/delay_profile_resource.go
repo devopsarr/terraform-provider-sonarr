@@ -16,10 +16,12 @@ import (
 	"golift.io/starr/sonarr"
 )
 
-// Ensure provider defined types fully satisfy framework interfaces
-var _ provider.ResourceType = resourceDelayProfileType{}
-var _ resource.Resource = resourceDelayProfile{}
-var _ resource.ResourceWithImportState = resourceDelayProfile{}
+// Ensure provider defined types fully satisfy framework interfaces.
+var (
+	_ provider.ResourceType            = resourceDelayProfileType{}
+	_ resource.Resource                = resourceDelayProfile{}
+	_ resource.ResourceWithImportState = resourceDelayProfile{}
+)
 
 type resourceDelayProfileType struct{}
 
@@ -29,15 +31,15 @@ type resourceDelayProfile struct {
 
 // DelayProfile is the delay_profile resource.
 type DelayProfile struct {
-	EnableUsenet           types.Bool    `tfsdk:"enable_usenet"`
-	EnableTorrent          types.Bool    `tfsdk:"enable_torrent"`
-	BypassIfHighestQuality types.Bool    `tfsdk:"bypass_if_highest_quality"`
-	UsenetDelay            types.Int64   `tfsdk:"usenet_delay"`
-	TorrentDelay           types.Int64   `tfsdk:"torrent_delay"`
-	ID                     types.Int64   `tfsdk:"id"`
-	Order                  types.Int64   `tfsdk:"order"`
-	Tags                   []types.Int64 `tfsdk:"tags"`
-	PreferredProtocol      types.String  `tfsdk:"preferred_protocol"`
+	EnableUsenet           types.Bool   `tfsdk:"enable_usenet"`
+	EnableTorrent          types.Bool   `tfsdk:"enable_torrent"`
+	BypassIfHighestQuality types.Bool   `tfsdk:"bypass_if_highest_quality"`
+	UsenetDelay            types.Int64  `tfsdk:"usenet_delay"`
+	TorrentDelay           types.Int64  `tfsdk:"torrent_delay"`
+	ID                     types.Int64  `tfsdk:"id"`
+	Order                  types.Int64  `tfsdk:"order"`
+	PreferredProtocol      types.String `tfsdk:"preferred_protocol"`
+	Tags                   types.Set    `tfsdk:"tags"`
 }
 
 func (t resourceDelayProfileType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
@@ -53,13 +55,13 @@ func (t resourceDelayProfileType) GetSchema(ctx context.Context) (tfsdk.Schema, 
 				},
 			},
 			"enable_usenet": {
-				MarkdownDescription: "Usenet allowed flag at least one of enable_usenet and enable_torrent must be defined",
+				MarkdownDescription: "Usenet allowed flag at least one of `enable_usenet` and `enable_torrent` must be defined",
 				Optional:            true,
 				Computed:            true,
 				Type:                types.BoolType,
 			},
 			"enable_torrent": {
-				MarkdownDescription: "Torrent allowed flag at least one of enable_usenet and enable_torrent must be defined",
+				MarkdownDescription: "Torrent allowed flag at least one of `enable_usenet` and `enable_torrent` must be defined",
 				Optional:            true,
 				Computed:            true,
 				Type:                types.BoolType,
@@ -90,7 +92,7 @@ func (t resourceDelayProfileType) GetSchema(ctx context.Context) (tfsdk.Schema, 
 			"tags": {
 				MarkdownDescription: "List of associated tags",
 				Required:            true,
-				Type: types.ListType{
+				Type: types.SetType{
 					ElemType: types.Int64Type,
 				},
 			},
@@ -120,26 +122,30 @@ func (r resourceDelayProfile) Create(ctx context.Context, req resource.CreateReq
 	var plan DelayProfile
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Build Create resource
-	data := readDelayProfile(&plan)
+	data := readDelayProfile(ctx, &plan)
 
 	// Create new DelayProfile
 	response, err := r.provider.client.AddDelayProfileContext(ctx, data)
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to create delayprofile, got error: %s", err))
+
 		return
 	}
+
 	tflog.Trace(ctx, "created delayprofile: "+strconv.Itoa(int(response.ID)))
 
 	// Generate resource state struct
-	result := writeDelayProfile(response)
+	result := writeDelayProfile(ctx, response)
 
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -150,6 +156,7 @@ func (r resourceDelayProfile) Read(ctx context.Context, req resource.ReadRequest
 	var state DelayProfile
 	diags := req.State.Get(ctx, &state)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -158,10 +165,11 @@ func (r resourceDelayProfile) Read(ctx context.Context, req resource.ReadRequest
 	response, err := r.provider.client.GetDelayProfileContext(ctx, int(state.ID.Value))
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read delayprofiles, got error: %s", err))
+
 		return
 	}
 	// Map response body to resource schema attribute
-	result := writeDelayProfile(response)
+	result := writeDelayProfile(ctx, response)
 
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
@@ -172,26 +180,30 @@ func (r resourceDelayProfile) Update(ctx context.Context, req resource.UpdateReq
 	var plan DelayProfile
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Build Update resource
-	data := readDelayProfile(&plan)
+	data := readDelayProfile(ctx, &plan)
 
 	// Update DelayProfile
 	response, err := r.provider.client.UpdateDelayProfileContext(ctx, data)
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to update delayprofile, got error: %s", err))
+
 		return
 	}
+
 	tflog.Trace(ctx, "update delayprofile: "+strconv.Itoa(int(response.ID)))
 
 	// Generate resource state struct
-	result := writeDelayProfile(response)
+	result := writeDelayProfile(ctx, response)
 
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -211,6 +223,7 @@ func (r resourceDelayProfile) Delete(ctx context.Context, req resource.DeleteReq
 	err := r.provider.client.DeleteDelayProfileContext(ctx, int(state.ID.Value))
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read delayprofiles, got error: %s", err))
+
 		return
 	}
 
@@ -218,25 +231,22 @@ func (r resourceDelayProfile) Delete(ctx context.Context, req resource.DeleteReq
 }
 
 func (r resourceDelayProfile) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	//resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
+	// resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Unexpected Import Identifier",
 			fmt.Sprintf("Expected import identifier with format: ID. Got: %q", req.ID),
 		)
+
 		return
 	}
+
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 
-func writeDelayProfile(profile *sonarr.DelayProfile) *DelayProfile {
-	tags := make([]types.Int64, len(profile.Tags))
-
-	for i, t := range profile.Tags {
-		tags[i] = types.Int64{Value: int64(t)}
-	}
-	return &DelayProfile{
+func writeDelayProfile(ctx context.Context, profile *sonarr.DelayProfile) *DelayProfile {
+	output := DelayProfile{
 		ID:                     types.Int64{Value: profile.ID},
 		EnableUsenet:           types.Bool{Value: profile.EnableUsenet},
 		EnableTorrent:          types.Bool{Value: profile.EnableTorrent},
@@ -245,16 +255,17 @@ func writeDelayProfile(profile *sonarr.DelayProfile) *DelayProfile {
 		TorrentDelay:           types.Int64{Value: profile.TorrentDelay},
 		Order:                  types.Int64{Value: profile.Order},
 		PreferredProtocol:      types.String{Value: profile.PreferredProtocol},
-		Tags:                   tags,
+		Tags:                   types.Set{ElemType: types.Int64Type},
 	}
+
+	tfsdk.ValueFrom(ctx, profile.Tags, output.Tags.Type(ctx), &output.Tags)
+
+	return &output
 }
 
-func readDelayProfile(profile *DelayProfile) *sonarr.DelayProfile {
-	tags := make([]int, len(profile.Tags))
-
-	for i, t := range profile.Tags {
-		tags[i] = int(t.Value)
-	}
+func readDelayProfile(ctx context.Context, profile *DelayProfile) *sonarr.DelayProfile {
+	tags := make([]int, len(profile.Tags.Elems))
+	tfsdk.ValueAs(ctx, profile.Tags, &tags)
 
 	return &sonarr.DelayProfile{
 		ID:                     profile.ID.Value,

@@ -10,9 +10,10 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"golift.io/starr/sonarr"
 )
 
-// Ensure provider defined types fully satisfy framework interfaces
+// Ensure provider defined types fully satisfy framework interfaces.
 var _ provider.DataSourceType = dataSeriesType{}
 var _ datasource.DataSource = dataSeries{}
 
@@ -26,7 +27,7 @@ type dataSeries struct {
 // QualityProfiles is a list of QualityProfile.
 type SeriesList struct {
 	ID     types.String `tfsdk:"id"`
-	Series []Series     `tfsdk:"series"`
+	Series types.Set    `tfsdk:"series"`
 }
 
 func (t dataSeriesType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
@@ -123,6 +124,7 @@ func (d dataSeries) Read(ctx context.Context, req datasource.ReadRequest, resp *
 	var data SeriesList
 	diags := resp.State.Get(ctx, &data)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -130,15 +132,24 @@ func (d dataSeries) Read(ctx context.Context, req datasource.ReadRequest, resp *
 	response, err := d.provider.client.GetAllSeriesContext(ctx)
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read series, got error: %s", err))
+
 		return
 	}
 	// Map response body to resource schema attribute
-	for _, s := range response {
-		data.Series = append(data.Series, *writeSeries(s))
-	}
+	series := *writeSeriesList(ctx, response)
+	tfsdk.ValueFrom(ctx, series, data.Series.Type(context.Background()), &data.Series)
 
 	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 	data.ID = types.String{Value: strconv.Itoa(len(response))}
 	diags = resp.State.Set(ctx, &data)
 	resp.Diagnostics.Append(diags...)
+}
+
+func writeSeriesList(ctx context.Context, series []*sonarr.Series) *[]Series {
+	output := make([]Series, len(series))
+	for i, t := range series {
+		output[i] = *writeSeries(ctx, t)
+	}
+
+	return &output
 }

@@ -15,10 +15,12 @@ import (
 	"golift.io/starr/sonarr"
 )
 
-// Ensure provider defined types fully satisfy framework interfaces
-var _ provider.ResourceType = resourceNamingType{}
-var _ resource.Resource = resourceNaming{}
-var _ resource.ResourceWithImportState = resourceNaming{}
+// Ensure provider defined types fully satisfy framework interfaces.
+var (
+	_ provider.ResourceType            = resourceNamingType{}
+	_ resource.Resource                = resourceNaming{}
+	_ resource.ResourceWithImportState = resourceNaming{}
+)
 
 type resourceNamingType struct{}
 
@@ -114,6 +116,7 @@ func (r resourceNaming) Create(ctx context.Context, req resource.CreateRequest, 
 	var plan Naming
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -122,11 +125,14 @@ func (r resourceNaming) Create(ctx context.Context, req resource.CreateRequest, 
 	init, err := r.provider.client.GetNamingContext(ctx)
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to init naming, got error: %s", err))
+
 		return
 	}
+
 	_, err = r.provider.client.UpdateNamingContext(ctx, init)
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to init naming, got error: %s", err))
+
 		return
 	}
 
@@ -138,8 +144,10 @@ func (r resourceNaming) Create(ctx context.Context, req resource.CreateRequest, 
 	response, err := r.provider.client.UpdateNamingContext(ctx, data)
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to create naming, got error: %s", err))
+
 		return
 	}
+
 	tflog.Trace(ctx, "created naming: "+strconv.Itoa(int(response.ID)))
 
 	// Generate resource state struct
@@ -147,6 +155,7 @@ func (r resourceNaming) Create(ctx context.Context, req resource.CreateRequest, 
 
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -157,6 +166,7 @@ func (r resourceNaming) Read(ctx context.Context, req resource.ReadRequest, resp
 	var state Naming
 	diags := req.State.Get(ctx, &state)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -165,6 +175,7 @@ func (r resourceNaming) Read(ctx context.Context, req resource.ReadRequest, resp
 	response, err := r.provider.client.GetNamingContext(ctx)
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read namings, got error: %s", err))
+
 		return
 	}
 	// Map response body to resource schema attribute
@@ -179,6 +190,7 @@ func (r resourceNaming) Update(ctx context.Context, req resource.UpdateRequest, 
 	var plan Naming
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -190,8 +202,10 @@ func (r resourceNaming) Update(ctx context.Context, req resource.UpdateRequest, 
 	response, err := r.provider.client.UpdateNamingContext(ctx, data)
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to update naming, got error: %s", err))
+
 		return
 	}
+
 	tflog.Trace(ctx, "update naming: "+strconv.Itoa(int(response.ID)))
 
 	// Generate resource state struct
@@ -199,6 +213,7 @@ func (r resourceNaming) Update(ctx context.Context, req resource.UpdateRequest, 
 
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -210,7 +225,7 @@ func (r resourceNaming) Delete(ctx context.Context, req resource.DeleteRequest, 
 }
 
 func (r resourceNaming) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	//resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
+	// resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), 1)...)
 }
 

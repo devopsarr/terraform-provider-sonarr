@@ -35,7 +35,7 @@ doc:
 # Lint
 .PHONY: lint
 lint:
-	golangci-lint run ./internal/...
+	golangci-lint run ./...
 
 # Format
 .PHONY: fmt

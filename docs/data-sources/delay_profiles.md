@@ -36,7 +36,7 @@ Read-Only:
 - `id` (Number) ID of delayprofile
 - `order` (Number) Order
 - `preferred_protocol` (String) Preferred protocol
-- `tags` (List of Number) List of associated tags
+- `tags` (Set of Number) List of associated tags
 - `torrent_delay` (Number) Torrent Delay
 - `usenet_delay` (Number) Usenet delay
 

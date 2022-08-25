@@ -17,10 +17,12 @@ import (
 	"golift.io/starr/sonarr"
 )
 
-// Ensure provider defined types fully satisfy framework interfaces
-var _ provider.ResourceType = resourceLanguageProfileType{}
-var _ resource.Resource = resourceLanguageProfile{}
-var _ resource.ResourceWithImportState = resourceLanguageProfile{}
+// Ensure provider defined types fully satisfy framework interfaces.
+var (
+	_ provider.ResourceType            = resourceLanguageProfileType{}
+	_ resource.Resource                = resourceLanguageProfile{}
+	_ resource.ResourceWithImportState = resourceLanguageProfile{}
+)
 
 type resourceLanguageProfileType struct{}
 
@@ -30,11 +32,11 @@ type resourceLanguageProfile struct {
 
 // LanguageProfile is the language_profile resource.
 type LanguageProfile struct {
-	UpgradeAllowed types.Bool     `tfsdk:"upgrade_allowed"`
-	ID             types.Int64    `tfsdk:"id"`
-	Name           types.String   `tfsdk:"name"`
-	CutoffLanguage types.String   `tfsdk:"cutoff_language"`
-	Languages      []types.String `tfsdk:"languages"`
+	UpgradeAllowed types.Bool   `tfsdk:"upgrade_allowed"`
+	ID             types.Int64  `tfsdk:"id"`
+	Name           types.String `tfsdk:"name"`
+	CutoffLanguage types.String `tfsdk:"cutoff_language"`
+	Languages      types.Set    `tfsdk:"languages"`
 }
 
 func (t resourceLanguageProfileType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
@@ -90,26 +92,30 @@ func (r resourceLanguageProfile) Create(ctx context.Context, req resource.Create
 	var plan LanguageProfile
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Build Create resource
-	data := readLanguageProfile(&plan)
+	data := readLanguageProfile(ctx, &plan)
 
 	// Create new LanguageProfile
 	response, err := r.provider.client.AddLanguageProfileContext(ctx, data)
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to create languageprofile, got error: %s", err))
+
 		return
 	}
+
 	tflog.Trace(ctx, "created languageprofile: "+strconv.Itoa(int(response.ID)))
 
 	// Generate resource state struct
-	result := writeLanguageProfile(response)
+	result := writeLanguageProfile(ctx, response)
 
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -120,6 +126,7 @@ func (r resourceLanguageProfile) Read(ctx context.Context, req resource.ReadRequ
 	var state LanguageProfile
 	diags := req.State.Get(ctx, &state)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -128,10 +135,11 @@ func (r resourceLanguageProfile) Read(ctx context.Context, req resource.ReadRequ
 	response, err := r.provider.client.GetLanguageProfileContext(ctx, int(state.ID.Value))
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read languageprofiles, got error: %s", err))
+
 		return
 	}
 	// Map response body to resource schema attribute
-	result := writeLanguageProfile(response)
+	result := writeLanguageProfile(ctx, response)
 
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
@@ -142,26 +150,30 @@ func (r resourceLanguageProfile) Update(ctx context.Context, req resource.Update
 	var plan LanguageProfile
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Build Update resource
-	data := readLanguageProfile(&plan)
+	data := readLanguageProfile(ctx, &plan)
 
 	// Update LanguageProfile
 	response, err := r.provider.client.UpdateLanguageProfileContext(ctx, data)
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to update languageprofile, got error: %s", err))
+
 		return
 	}
+
 	tflog.Trace(ctx, "update languageprofile: "+strconv.Itoa(int(response.ID)))
 
 	// Generate resource state struct
-	result := writeLanguageProfile(response)
+	result := writeLanguageProfile(ctx, response)
 
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -181,6 +193,7 @@ func (r resourceLanguageProfile) Delete(ctx context.Context, req resource.Delete
 	err := r.provider.client.DeleteLanguageProfileContext(ctx, int(state.ID.Value))
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read languageprofiles, got error: %s", err))
+
 		return
 	}
 
@@ -188,40 +201,50 @@ func (r resourceLanguageProfile) Delete(ctx context.Context, req resource.Delete
 }
 
 func (r resourceLanguageProfile) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	//resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
+	// resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Unexpected Import Identifier",
 			fmt.Sprintf("Expected import identifier with format: ID. Got: %q", req.ID),
 		)
+
 		return
 	}
+
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 
-func writeLanguageProfile(profile *sonarr.LanguageProfile) *LanguageProfile {
-	languages := make([]types.String, len(profile.Languages))
-	for i, l := range profile.Languages {
-		languages[i] = types.String{Value: l.Language.Name}
-	}
-	return &LanguageProfile{
+func writeLanguageProfile(ctx context.Context, profile *sonarr.LanguageProfile) *LanguageProfile {
+	output := LanguageProfile{
 		UpgradeAllowed: types.Bool{Value: profile.UpgradeAllowed},
 		ID:             types.Int64{Value: profile.ID},
 		Name:           types.String{Value: profile.Name},
 		CutoffLanguage: types.String{Value: profile.Cutoff.Name},
-		Languages:      languages,
+		Languages:      types.Set{ElemType: types.StringType},
 	}
+
+	languages := make([]string, len(profile.Languages))
+	for i, l := range profile.Languages {
+		languages[i] = l.Language.Name
+	}
+
+	tfsdk.ValueFrom(ctx, languages, output.Languages.Type(ctx), &output.Languages)
+
+	return &output
 }
 
-func readLanguageProfile(profile *LanguageProfile) *sonarr.LanguageProfile {
-	languages := make([]sonarr.Language, len(profile.Languages))
-	for i, l := range profile.Languages {
+func readLanguageProfile(ctx context.Context, profile *LanguageProfile) *sonarr.LanguageProfile {
+	langs := make([]string, len(profile.Languages.Elems))
+	tfsdk.ValueAs(ctx, profile.Languages, &langs)
+
+	languages := make([]sonarr.Language, len(langs))
+	for i, l := range langs {
 		languages[i] = sonarr.Language{
 			Allowed: true,
 			Language: &starr.Value{
-				Name: l.Value,
-				ID:   helpers.GetLanguageID(l.Value),
+				Name: l,
+				ID:   helpers.GetLanguageID(l),
 			},
 		}
 	}

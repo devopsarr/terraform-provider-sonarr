@@ -8,15 +8,17 @@ import (
 )
 
 func TestAccRootFolderResource(t *testing.T) {
+	t.Parallel()
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
 			// Create and Read testing
 			{
-				Config: testAccRootFolderResourceConfig("/tmp"),
+				Config: testAccRootFolderResourceConfig("/config"),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("sonarr_root_folder.test", "path", "/tmp"),
+					resource.TestCheckResourceAttr("sonarr_root_folder.test", "path", "/config"),
 					resource.TestCheckResourceAttrSet("sonarr_root_folder.test", "id"),
 				),
 			},

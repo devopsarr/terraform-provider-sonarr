@@ -14,7 +14,7 @@ import (
 	"golift.io/starr/sonarr"
 )
 
-// Ensure provider defined types fully satisfy framework interfaces
+// Ensure provider defined types fully satisfy framework interfaces.
 var _ provider.DataSourceType = dataQualityProfilesType{}
 var _ datasource.DataSource = dataQualityProfiles{}
 
@@ -27,8 +27,8 @@ type dataQualityProfiles struct {
 // TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 // QualityProfiles is a list of QualityProfile.
 type QualityProfiles struct {
-	ID              types.String     `tfsdk:"id"`
-	QualityProfiles []QualityProfile `tfsdk:"quality_profiles"`
+	ID              types.String `tfsdk:"id"`
+	QualityProfiles types.Set    `tfsdk:"quality_profiles"`
 }
 
 func (t dataQualityProfilesType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
@@ -136,6 +136,7 @@ func (d dataQualityProfiles) Read(ctx context.Context, req datasource.ReadReques
 	var data QualityProfiles
 	diags := resp.State.Get(ctx, &data)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -143,21 +144,25 @@ func (d dataQualityProfiles) Read(ctx context.Context, req datasource.ReadReques
 	response, err := d.provider.client.GetQualityProfilesContext(ctx)
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read qualityprofiles, got error: %s", err))
+
 		return
 	}
 
 	// Map response body to resource schema attribute
-	data.QualityProfiles = *writeQualitiyprofiles(response)
+	profiles := *writeQualitiyprofiles(ctx, response)
+	tfsdk.ValueFrom(ctx, profiles, data.QualityProfiles.Type(context.Background()), &data.QualityProfiles)
+
 	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 	data.ID = types.String{Value: strconv.Itoa(len(response))}
 	diags = resp.State.Set(ctx, &data)
 	resp.Diagnostics.Append(diags...)
 }
 
-func writeQualitiyprofiles(qualities []*sonarr.QualityProfile) *[]QualityProfile {
+func writeQualitiyprofiles(ctx context.Context, qualities []*sonarr.QualityProfile) *[]QualityProfile {
 	output := make([]QualityProfile, len(qualities))
 	for i, p := range qualities {
-		output[i] = *writeQualityProfile(p)
+		output[i] = *writeQualityProfile(ctx, p)
 	}
+
 	return &output
 }

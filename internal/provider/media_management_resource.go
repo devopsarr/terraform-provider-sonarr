@@ -16,10 +16,12 @@ import (
 	"golift.io/starr/sonarr"
 )
 
-// Ensure provider defined types fully satisfy framework interfaces
-var _ provider.ResourceType = resourceMediaManagementType{}
-var _ resource.Resource = resourceMediaManagement{}
-var _ resource.ResourceWithImportState = resourceMediaManagement{}
+// Ensure provider defined types fully satisfy framework interfaces.
+var (
+	_ provider.ResourceType            = resourceMediaManagementType{}
+	_ resource.Resource                = resourceMediaManagement{}
+	_ resource.ResourceWithImportState = resourceMediaManagement{}
+)
 
 type resourceMediaManagementType struct{}
 
@@ -181,6 +183,7 @@ func (r resourceMediaManagement) Create(ctx context.Context, req resource.Create
 	var plan MediaManagement
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -193,8 +196,10 @@ func (r resourceMediaManagement) Create(ctx context.Context, req resource.Create
 	response, err := r.provider.client.UpdateMediaManagementContext(ctx, data)
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to create mediamanagement, got error: %s", err))
+
 		return
 	}
+
 	tflog.Trace(ctx, "created mediamanagement: "+strconv.Itoa(int(response.ID)))
 
 	// Generate resource state struct
@@ -202,6 +207,7 @@ func (r resourceMediaManagement) Create(ctx context.Context, req resource.Create
 
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -212,6 +218,7 @@ func (r resourceMediaManagement) Read(ctx context.Context, req resource.ReadRequ
 	var state MediaManagement
 	diags := req.State.Get(ctx, &state)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -220,6 +227,7 @@ func (r resourceMediaManagement) Read(ctx context.Context, req resource.ReadRequ
 	response, err := r.provider.client.GetMediaManagementContext(ctx)
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read mediamanagements, got error: %s", err))
+
 		return
 	}
 	// Map response body to resource schema attribute
@@ -234,6 +242,7 @@ func (r resourceMediaManagement) Update(ctx context.Context, req resource.Update
 	var plan MediaManagement
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -245,8 +254,10 @@ func (r resourceMediaManagement) Update(ctx context.Context, req resource.Update
 	response, err := r.provider.client.UpdateMediaManagementContext(ctx, data)
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to update mediamanagement, got error: %s", err))
+
 		return
 	}
+
 	tflog.Trace(ctx, "update mediamanagement: "+strconv.Itoa(int(response.ID)))
 
 	// Generate resource state struct
@@ -254,6 +265,7 @@ func (r resourceMediaManagement) Update(ctx context.Context, req resource.Update
 
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -265,7 +277,7 @@ func (r resourceMediaManagement) Delete(ctx context.Context, req resource.Delete
 }
 
 func (r resourceMediaManagement) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	//resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
+	// resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), 1)...)
 }
 

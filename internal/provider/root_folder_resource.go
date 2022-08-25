@@ -12,13 +12,16 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
+	"golift.io/starr"
 	"golift.io/starr/sonarr"
 )
 
-// Ensure provider defined types fully satisfy framework interfaces
-var _ provider.ResourceType = resourceRootFolderType{}
-var _ resource.Resource = resourceRootFolder{}
-var _ resource.ResourceWithImportState = resourceRootFolder{}
+// Ensure provider defined types fully satisfy framework interfaces.
+var (
+	_ provider.ResourceType            = resourceRootFolderType{}
+	_ resource.Resource                = resourceRootFolder{}
+	_ resource.ResourceWithImportState = resourceRootFolder{}
+)
 
 type resourceRootFolderType struct{}
 
@@ -31,7 +34,7 @@ type RootFolder struct {
 	Accessible      types.Bool   `tfsdk:"accessible"`
 	ID              types.Int64  `tfsdk:"id"`
 	Path            types.String `tfsdk:"path"`
-	UnmappedFolders []Path       `tfsdk:"unmapped_folders"`
+	UnmappedFolders types.Set    `tfsdk:"unmapped_folders"`
 }
 
 // Path part of RootFolder.
@@ -69,21 +72,27 @@ func (t resourceRootFolderType) GetSchema(ctx context.Context) (tfsdk.Schema, di
 			"unmapped_folders": {
 				MarkdownDescription: "List of folders with no associated series",
 				Computed:            true,
-				Attributes: tfsdk.SetNestedAttributes(map[string]tfsdk.Attribute{
-					"path": {
-						MarkdownDescription: "Path of unmapped folder",
-						Computed:            true,
-						Type:                types.StringType,
-					},
-					"name": {
-						MarkdownDescription: "Name of unmapped folder",
-						Computed:            true,
-						Type:                types.StringType,
-					},
-				}),
+				Attributes:          tfsdk.SetNestedAttributes(t.getUnmappedFolderSchema().Attributes),
 			},
 		},
 	}, nil
+}
+
+func (t resourceRootFolderType) getUnmappedFolderSchema() tfsdk.Schema {
+	return tfsdk.Schema{
+		Attributes: map[string]tfsdk.Attribute{
+			"path": {
+				MarkdownDescription: "Path of unmapped folder",
+				Computed:            true,
+				Type:                types.StringType,
+			},
+			"name": {
+				MarkdownDescription: "Name of unmapped folder",
+				Computed:            true,
+				Type:                types.StringType,
+			},
+		},
+	}
 }
 
 func (t resourceRootFolderType) NewResource(ctx context.Context, in provider.Provider) (resource.Resource, diag.Diagnostics) {
@@ -99,6 +108,7 @@ func (r resourceRootFolder) Create(ctx context.Context, req resource.CreateReque
 	var plan string
 	diags := req.Plan.GetAttribute(ctx, path.Root("path"), &plan)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -107,18 +117,22 @@ func (r resourceRootFolder) Create(ctx context.Context, req resource.CreateReque
 	request := sonarr.RootFolder{
 		Path: plan,
 	}
+
 	response, err := r.provider.client.AddRootFolderContext(ctx, &request)
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to create rootFolder, got error: %s", err))
+
 		return
 	}
+
 	tflog.Trace(ctx, "created rootFolder: "+strconv.Itoa(int(response.ID)))
 
 	// Generate resource state struct
-	result := writeRootFolder(response)
+	result := writeRootFolder(ctx, response)
 
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -129,6 +143,7 @@ func (r resourceRootFolder) Read(ctx context.Context, req resource.ReadRequest, 
 	var state RootFolder
 	diags := req.State.Get(ctx, &state)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -137,16 +152,17 @@ func (r resourceRootFolder) Read(ctx context.Context, req resource.ReadRequest, 
 	response, err := r.provider.client.GetRootFolderContext(ctx, int(state.ID.Value))
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read rootFolders, got error: %s", err))
+
 		return
 	}
 	// Map response body to resource schema attribute
-	result := writeRootFolder(response)
+	result := writeRootFolder(ctx, response)
 
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
 }
 
-// never used
+// never used.
 func (r resourceRootFolder) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 }
 
@@ -164,6 +180,7 @@ func (r resourceRootFolder) Delete(ctx context.Context, req resource.DeleteReque
 	err := r.provider.client.DeleteRootFolderContext(ctx, int(state.ID.Value))
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read rootFolders, got error: %s", err))
+
 		return
 	}
 
@@ -171,30 +188,42 @@ func (r resourceRootFolder) Delete(ctx context.Context, req resource.DeleteReque
 }
 
 func (r resourceRootFolder) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	//resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
+	// resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Unexpected Import Identifier",
 			fmt.Sprintf("Expected import identifier with format: ID. Got: %q", req.ID),
 		)
+
 		return
 	}
+
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 
-func writeRootFolder(rootFolder *sonarr.RootFolder) *RootFolder {
-	unmapped := make([]Path, len(rootFolder.UnmappedFolders))
-	for i, f := range rootFolder.UnmappedFolders {
-		unmapped[i] = Path{
+func writeRootFolder(ctx context.Context, rootFolder *sonarr.RootFolder) *RootFolder {
+	output := RootFolder{
+		Accessible:      types.Bool{Value: rootFolder.Accessible},
+		ID:              types.Int64{Value: rootFolder.ID},
+		Path:            types.String{Value: rootFolder.Path},
+		UnmappedFolders: types.Set{ElemType: resourceRootFolderType{}.getUnmappedFolderSchema().Type()},
+	}
+	unmapped := writeUnmappedFolders(rootFolder.UnmappedFolders)
+
+	tfsdk.ValueFrom(ctx, unmapped, output.UnmappedFolders.Type(ctx), output.UnmappedFolders)
+
+	return &output
+}
+
+func writeUnmappedFolders(folders []*starr.Path) *[]Path {
+	output := make([]Path, len(folders))
+	for i, f := range folders {
+		output[i] = Path{
 			Name: types.String{Value: f.Name},
 			Path: types.String{Value: f.Path},
 		}
 	}
-	return &RootFolder{
-		Accessible:      types.Bool{Value: rootFolder.Accessible},
-		ID:              types.Int64{Value: rootFolder.ID},
-		Path:            types.String{Value: rootFolder.Path},
-		UnmappedFolders: unmapped,
-	}
+
+	return &output
 }
