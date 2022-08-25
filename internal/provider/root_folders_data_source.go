@@ -28,7 +28,7 @@ type dataRootFolders struct {
 // QualityProfiles is a list of QualityProfile.
 type RootFolders struct {
 	ID          types.String `tfsdk:"id"`
-	RootFolders []RootFolder `tfsdk:"root_folders"`
+	RootFolders types.Set    `tfsdk:"root_folders"`
 }
 
 func (t dataRootFoldersType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
@@ -107,17 +107,18 @@ func (d dataRootFolders) Read(ctx context.Context, req datasource.ReadRequest, r
 		return
 	}
 	// Map response body to resource schema attribute
-	data.RootFolders = *writeRootFolders(response)
+	rootFolders := *writeRootFolders(ctx, response)
+	tfsdk.ValueFrom(ctx, rootFolders, data.RootFolders.Type(context.Background()), &data.RootFolders)
 	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 	data.ID = types.String{Value: strconv.Itoa(len(response))}
 	diags = resp.State.Set(ctx, &data)
 	resp.Diagnostics.Append(diags...)
 }
 
-func writeRootFolders(folders []*sonarr.RootFolder) *[]RootFolder {
+func writeRootFolders(ctx context.Context, folders []*sonarr.RootFolder) *[]RootFolder {
 	output := make([]RootFolder, len(folders))
 	for i, f := range folders {
-		output[i] = *writeRootFolder(f)
+		output[i] = *writeRootFolder(ctx, f)
 	}
 	return &output
 }
