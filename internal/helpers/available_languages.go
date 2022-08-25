@@ -9,7 +9,7 @@ import (
 )
 
 // Languages is the available language list.
-// var Languages, _ = GetLanguages()
+// var Languages, _ = GetLanguages().
 var Languages = []string{
 	"Unknown",
 	"English",
@@ -45,13 +45,14 @@ var Languages = []string{
 }
 
 // GetLanguages pull languages from Sonarr source code and converts it to slice.
-// using static slice to avoid github dependency
+// using static slice to avoid github dependency.
 func GetLanguages() ([]string, error) {
 	var languages []string
 
 	resp, err := http.Get("https://raw.githubusercontent.com/Sonarr/Sonarr/develop/src/NzbDrone.Core/Languages/Language.cs")
 	if err != nil {
 		fmt.Println(err)
+
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -59,6 +60,7 @@ func GetLanguages() ([]string, error) {
 	b, err := io.ReadAll(resp.Body)
 	if err != nil {
 		fmt.Println(err)
+
 		return nil, err
 	}
 
@@ -66,6 +68,7 @@ func GetLanguages() ([]string, error) {
 	if err := json.Unmarshal([]byte(r.Replace(strings.Split(strings.Split(string(b), "return new List<Language>\n")[1], ";")[0])), &languages); err != nil {
 		panic(err)
 	}
+
 	return languages, nil
 }
 
@@ -77,5 +80,6 @@ func GetLanguageID(language string) int64 {
 			return int64(i)
 		}
 	}
+
 	return 0
 }

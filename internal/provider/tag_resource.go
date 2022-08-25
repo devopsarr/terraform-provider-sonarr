@@ -16,10 +16,12 @@ import (
 	"golift.io/starr"
 )
 
-// Ensure provider defined types fully satisfy framework interfaces
-var _ provider.ResourceType = resourceTagType{}
-var _ resource.Resource = resourceTag{}
-var _ resource.ResourceWithImportState = resourceTag{}
+// Ensure provider defined types fully satisfy framework interfaces.
+var (
+	_ provider.ResourceType            = resourceTagType{}
+	_ resource.Resource                = resourceTag{}
+	_ resource.ResourceWithImportState = resourceTag{}
+)
 
 type resourceTagType struct{}
 
@@ -70,6 +72,7 @@ func (r resourceTag) Create(ctx context.Context, req resource.CreateRequest, res
 	var plan Tag
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -78,11 +81,14 @@ func (r resourceTag) Create(ctx context.Context, req resource.CreateRequest, res
 	request := starr.Tag{
 		Label: plan.Label.Value,
 	}
+
 	response, err := r.provider.client.AddTagContext(ctx, &request)
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to create tag, got error: %s", err))
+
 		return
 	}
+
 	tflog.Trace(ctx, "created tag: "+strconv.Itoa(response.ID))
 
 	// Generate resource state struct
@@ -90,6 +96,7 @@ func (r resourceTag) Create(ctx context.Context, req resource.CreateRequest, res
 
 	diags = resp.State.Set(ctx, &result)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -100,6 +107,7 @@ func (r resourceTag) Read(ctx context.Context, req resource.ReadRequest, resp *r
 	var state Tag
 	diags := req.State.Get(ctx, &state)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -108,6 +116,7 @@ func (r resourceTag) Read(ctx context.Context, req resource.ReadRequest, resp *r
 	response, err := r.provider.client.GetTagContext(ctx, int(state.ID.Value))
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read tags, got error: %s", err))
+
 		return
 	}
 	// Map response body to resource schema attribute
@@ -122,6 +131,7 @@ func (r resourceTag) Update(ctx context.Context, req resource.UpdateRequest, res
 	var plan Tag
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -131,11 +141,14 @@ func (r resourceTag) Update(ctx context.Context, req resource.UpdateRequest, res
 		Label: plan.Label.Value,
 		ID:    int(plan.ID.Value),
 	}
+
 	response, err := r.provider.client.UpdateTagContext(ctx, &request)
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to update tag, got error: %s", err))
+
 		return
 	}
+
 	tflog.Trace(ctx, "update tag: "+strconv.Itoa(response.ID))
 
 	// Generate resource state struct
@@ -143,6 +156,7 @@ func (r resourceTag) Update(ctx context.Context, req resource.UpdateRequest, res
 
 	diags = resp.State.Set(ctx, &result)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -162,6 +176,7 @@ func (r resourceTag) Delete(ctx context.Context, req resource.DeleteRequest, res
 	err := r.provider.client.DeleteTagContext(ctx, int(state.ID.Value))
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read tags, got error: %s", err))
+
 		return
 	}
 
@@ -169,15 +184,17 @@ func (r resourceTag) Delete(ctx context.Context, req resource.DeleteRequest, res
 }
 
 func (r resourceTag) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	//resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
+	// resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Unexpected Import Identifier",
 			fmt.Sprintf("Expected import identifier with format: ID. Got: %q", req.ID),
 		)
+
 		return
 	}
+
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 

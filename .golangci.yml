@@ -18,7 +18,7 @@ linters:
   enable:
     - deadcode
     - errcheck
-    - gofmt
+    - gofumpt
     - gomnd
     - gosimple
     - ineffassign
@@ -33,6 +33,12 @@ linters:
     - unparam
     - varcheck
     - vet
+    - godot
+    - revive
+    - wsl
+    - nlreturn
+    - paralleltest
+    - thelper
 
 linters-settings:
   errcheck:
@@ -42,14 +48,7 @@ linters-settings:
       mnd:
         checks:
           - argument
-        ignored-functions:
-          # Go
-          - make
-          - strconv.FormatFloat
-          - strconv.FormatInt
-          - strconv.ParseFloat
-          - strconv.ParseInt
-          - strings.SplitN
+        ignored-functions: "make,strconv.FormatFloat,strconv.FormatInt,strconv.ParseFloat,strconv.ParseInt,strings.SplitN"
   nolintlint:
     allow-leading-space: false
     require-explanation: true

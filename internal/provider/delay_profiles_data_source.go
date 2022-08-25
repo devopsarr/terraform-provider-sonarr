@@ -13,7 +13,7 @@ import (
 	"golift.io/starr/sonarr"
 )
 
-// Ensure provider defined types fully satisfy framework interfaces
+// Ensure provider defined types fully satisfy framework interfaces.
 var _ provider.DataSourceType = dataDelayProfilesType{}
 var _ datasource.DataSource = dataDelayProfiles{}
 
@@ -109,6 +109,7 @@ func (d dataDelayProfiles) Read(ctx context.Context, req datasource.ReadRequest,
 	var data DelayProfiles
 	diags := resp.State.Get(ctx, &data)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -116,6 +117,7 @@ func (d dataDelayProfiles) Read(ctx context.Context, req datasource.ReadRequest,
 	response, err := d.provider.client.GetDelayProfilesContext(ctx)
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read delayprofiles, got error: %s", err))
+
 		return
 	}
 	// Map response body to resource schema attribute
@@ -132,5 +134,6 @@ func writeDelayprofiles(ctx context.Context, delays []*sonarr.DelayProfile) *[]D
 	for i, p := range delays {
 		output[i] = *writeDelayProfile(ctx, p)
 	}
+
 	return &output
 }

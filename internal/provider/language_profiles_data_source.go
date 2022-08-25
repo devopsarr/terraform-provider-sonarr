@@ -13,7 +13,7 @@ import (
 	"golift.io/starr/sonarr"
 )
 
-// Ensure provider defined types fully satisfy framework interfaces
+// Ensure provider defined types fully satisfy framework interfaces.
 var _ provider.DataSourceType = dataLanguageProfilesType{}
 var _ datasource.DataSource = dataLanguageProfiles{}
 
@@ -87,6 +87,7 @@ func (d dataLanguageProfiles) Read(ctx context.Context, req datasource.ReadReque
 	var data LanguageProfiles
 	diags := resp.State.Get(ctx, &data)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -94,6 +95,7 @@ func (d dataLanguageProfiles) Read(ctx context.Context, req datasource.ReadReque
 	response, err := d.provider.client.GetLanguageProfilesContext(ctx)
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read languageprofiles, got error: %s", err))
+
 		return
 	}
 	// Map response body to resource schema attribute
@@ -110,5 +112,6 @@ func writeLanguageprofiles(ctx context.Context, languages []*sonarr.LanguageProf
 	for i, p := range languages {
 		output[i] = *writeLanguageProfile(ctx, p)
 	}
+
 	return &output
 }

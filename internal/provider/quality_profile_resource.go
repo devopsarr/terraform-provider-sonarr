@@ -16,10 +16,12 @@ import (
 	"golift.io/starr/sonarr"
 )
 
-// Ensure provider defined types fully satisfy framework interfaces
-var _ provider.ResourceType = resourceQualityProfileType{}
-var _ resource.Resource = resourceQualityProfile{}
-var _ resource.ResourceWithImportState = resourceQualityProfile{}
+// Ensure provider defined types fully satisfy framework interfaces.
+var (
+	_ provider.ResourceType            = resourceQualityProfileType{}
+	_ resource.Resource                = resourceQualityProfile{}
+	_ resource.ResourceWithImportState = resourceQualityProfile{}
+)
 
 type resourceQualityProfileType struct{}
 
@@ -157,6 +159,7 @@ func (r resourceQualityProfile) Create(ctx context.Context, req resource.CreateR
 	var plan QualityProfile
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -168,8 +171,10 @@ func (r resourceQualityProfile) Create(ctx context.Context, req resource.CreateR
 	response, err := r.provider.client.AddQualityProfileContext(ctx, data)
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to create qualityprofile, got error: %s", err))
+
 		return
 	}
+
 	tflog.Trace(ctx, "created qualityprofile: "+strconv.Itoa(int(response.ID)))
 
 	// Generate resource state struct
@@ -177,6 +182,7 @@ func (r resourceQualityProfile) Create(ctx context.Context, req resource.CreateR
 
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -187,6 +193,7 @@ func (r resourceQualityProfile) Read(ctx context.Context, req resource.ReadReque
 	var state QualityProfile
 	diags := req.State.Get(ctx, &state)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -195,6 +202,7 @@ func (r resourceQualityProfile) Read(ctx context.Context, req resource.ReadReque
 	response, err := r.provider.client.GetQualityProfileContext(ctx, int(state.ID.Value))
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read qualityprofiles, got error: %s", err))
+
 		return
 	}
 	// Map response body to resource schema attribute
@@ -209,6 +217,7 @@ func (r resourceQualityProfile) Update(ctx context.Context, req resource.UpdateR
 	var plan QualityProfile
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -220,8 +229,10 @@ func (r resourceQualityProfile) Update(ctx context.Context, req resource.UpdateR
 	response, err := r.provider.client.UpdateQualityProfileContext(ctx, data)
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to update qualityprofile, got error: %s", err))
+
 		return
 	}
+
 	tflog.Trace(ctx, "update qualityprofile: "+strconv.Itoa(int(response.ID)))
 
 	// Generate resource state struct
@@ -229,6 +240,7 @@ func (r resourceQualityProfile) Update(ctx context.Context, req resource.UpdateR
 
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -248,6 +260,7 @@ func (r resourceQualityProfile) Delete(ctx context.Context, req resource.DeleteR
 	err := r.provider.client.DeleteQualityProfileContext(ctx, int(state.ID.Value))
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read qualityprofiles, got error: %s", err))
+
 		return
 	}
 
@@ -255,15 +268,17 @@ func (r resourceQualityProfile) Delete(ctx context.Context, req resource.DeleteR
 }
 
 func (r resourceQualityProfile) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	//resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
+	// resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Unexpected Import Identifier",
 			fmt.Sprintf("Expected import identifier with format: ID. Got: %q", req.ID),
 		)
+
 		return
 	}
+
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 
@@ -283,10 +298,14 @@ func writeQualityProfile(ctx context.Context, profile *sonarr.QualityProfile) *Q
 
 func writeQualityGroups(ctx context.Context, groups []*starr.Quality) *[]QualityGroup {
 	qualityGroups := make([]QualityGroup, len(groups))
+
 	for n, g := range groups {
-		var name string
-		var id int64
-		var qualities []Quality
+		var (
+			name      string
+			id        int64
+			qualities []Quality
+		)
+
 		if len(g.Items) == 0 {
 			name = g.Quality.Name
 			id = g.Quality.ID
@@ -301,6 +320,7 @@ func writeQualityGroups(ctx context.Context, groups []*starr.Quality) *[]Quality
 			id = int64(g.ID)
 			qualities = *writeQualities(g.Items)
 		}
+
 		qualityGroups[n] = QualityGroup{
 			Name:      types.String{Value: name},
 			ID:        types.Int64{Value: id},
@@ -308,6 +328,7 @@ func writeQualityGroups(ctx context.Context, groups []*starr.Quality) *[]Quality
 		}
 		tfsdk.ValueFrom(ctx, qualities, qualityGroups[n].Qualities.Type(ctx), &qualityGroups[n].Qualities)
 	}
+
 	return &qualityGroups
 }
 
@@ -321,14 +342,15 @@ func writeQualities(qualities []*starr.Quality) *[]Quality {
 			Resolution: types.Int64{Value: int64(q.Quality.Resolution)},
 		}
 	}
+
 	return &output
 }
 
 func readQualityProfile(ctx context.Context, profile *QualityProfile) *sonarr.QualityProfile {
 	groups := make([]QualityGroup, len(profile.QualityGroups.Elems))
 	tfsdk.ValueAs(ctx, profile.QualityGroups, &groups)
-
 	qualities := make([]*starr.Quality, len(groups))
+
 	for n, g := range groups {
 		q := make([]Quality, len(g.Qualities.Elems))
 		tfsdk.ValueAs(ctx, g.Qualities, &q)
@@ -341,6 +363,7 @@ func readQualityProfile(ctx context.Context, profile *QualityProfile) *sonarr.Qu
 					Name: g.Name.Value,
 				},
 			}
+
 			continue
 		}
 
@@ -376,5 +399,6 @@ func readQualities(qualities *[]Quality) []*starr.Quality {
 			},
 		}
 	}
+
 	return output
 }

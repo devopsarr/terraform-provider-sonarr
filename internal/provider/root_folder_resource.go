@@ -16,10 +16,12 @@ import (
 	"golift.io/starr/sonarr"
 )
 
-// Ensure provider defined types fully satisfy framework interfaces
-var _ provider.ResourceType = resourceRootFolderType{}
-var _ resource.Resource = resourceRootFolder{}
-var _ resource.ResourceWithImportState = resourceRootFolder{}
+// Ensure provider defined types fully satisfy framework interfaces.
+var (
+	_ provider.ResourceType            = resourceRootFolderType{}
+	_ resource.Resource                = resourceRootFolder{}
+	_ resource.ResourceWithImportState = resourceRootFolder{}
+)
 
 type resourceRootFolderType struct{}
 
@@ -106,6 +108,7 @@ func (r resourceRootFolder) Create(ctx context.Context, req resource.CreateReque
 	var plan string
 	diags := req.Plan.GetAttribute(ctx, path.Root("path"), &plan)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -114,11 +117,14 @@ func (r resourceRootFolder) Create(ctx context.Context, req resource.CreateReque
 	request := sonarr.RootFolder{
 		Path: plan,
 	}
+
 	response, err := r.provider.client.AddRootFolderContext(ctx, &request)
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to create rootFolder, got error: %s", err))
+
 		return
 	}
+
 	tflog.Trace(ctx, "created rootFolder: "+strconv.Itoa(int(response.ID)))
 
 	// Generate resource state struct
@@ -126,6 +132,7 @@ func (r resourceRootFolder) Create(ctx context.Context, req resource.CreateReque
 
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -136,6 +143,7 @@ func (r resourceRootFolder) Read(ctx context.Context, req resource.ReadRequest, 
 	var state RootFolder
 	diags := req.State.Get(ctx, &state)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -144,6 +152,7 @@ func (r resourceRootFolder) Read(ctx context.Context, req resource.ReadRequest, 
 	response, err := r.provider.client.GetRootFolderContext(ctx, int(state.ID.Value))
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read rootFolders, got error: %s", err))
+
 		return
 	}
 	// Map response body to resource schema attribute
@@ -153,7 +162,7 @@ func (r resourceRootFolder) Read(ctx context.Context, req resource.ReadRequest, 
 	resp.Diagnostics.Append(diags...)
 }
 
-// never used
+// never used.
 func (r resourceRootFolder) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 }
 
@@ -171,6 +180,7 @@ func (r resourceRootFolder) Delete(ctx context.Context, req resource.DeleteReque
 	err := r.provider.client.DeleteRootFolderContext(ctx, int(state.ID.Value))
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read rootFolders, got error: %s", err))
+
 		return
 	}
 
@@ -178,15 +188,17 @@ func (r resourceRootFolder) Delete(ctx context.Context, req resource.DeleteReque
 }
 
 func (r resourceRootFolder) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	//resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
+	// resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Unexpected Import Identifier",
 			fmt.Sprintf("Expected import identifier with format: ID. Got: %q", req.ID),
 		)
+
 		return
 	}
+
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 
@@ -212,5 +224,6 @@ func writeUnmappedFolders(folders []*starr.Path) *[]Path {
 			Path: types.String{Value: f.Path},
 		}
 	}
+
 	return &output
 }

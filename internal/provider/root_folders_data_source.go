@@ -14,7 +14,7 @@ import (
 	"golift.io/starr/sonarr"
 )
 
-// Ensure provider defined types fully satisfy framework interfaces
+// Ensure provider defined types fully satisfy framework interfaces.
 var _ provider.DataSourceType = dataRootFoldersType{}
 var _ datasource.DataSource = dataRootFolders{}
 
@@ -97,6 +97,7 @@ func (d dataRootFolders) Read(ctx context.Context, req datasource.ReadRequest, r
 	var data RootFolders
 	diags := resp.State.Get(ctx, &data)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -104,6 +105,7 @@ func (d dataRootFolders) Read(ctx context.Context, req datasource.ReadRequest, r
 	response, err := d.provider.client.GetRootFoldersContext(ctx)
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read rootfolders, got error: %s", err))
+
 		return
 	}
 	// Map response body to resource schema attribute
@@ -120,5 +122,6 @@ func writeRootFolders(ctx context.Context, folders []*sonarr.RootFolder) *[]Root
 	for i, f := range folders {
 		output[i] = *writeRootFolder(ctx, f)
 	}
+
 	return &output
 }

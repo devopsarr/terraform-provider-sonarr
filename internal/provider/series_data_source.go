@@ -12,7 +12,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
-// Ensure provider defined types fully satisfy framework interfaces
+// Ensure provider defined types fully satisfy framework interfaces.
 var _ provider.DataSourceType = dataSeriesType{}
 var _ datasource.DataSource = dataSeries{}
 
@@ -123,6 +123,7 @@ func (d dataSeries) Read(ctx context.Context, req datasource.ReadRequest, resp *
 	var data SeriesList
 	diags := resp.State.Get(ctx, &data)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -130,6 +131,7 @@ func (d dataSeries) Read(ctx context.Context, req datasource.ReadRequest, resp *
 	response, err := d.provider.client.GetAllSeriesContext(ctx)
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read series, got error: %s", err))
+
 		return
 	}
 	// Map response body to resource schema attribute

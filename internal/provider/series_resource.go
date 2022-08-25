@@ -15,10 +15,13 @@ import (
 	"golift.io/starr/sonarr"
 )
 
-// Ensure provider defined types fully satisfy framework interfaces
-var _ provider.ResourceType = resourceSeriesType{}
-var _ resource.Resource = resourceSeries{}
-var _ resource.ResourceWithImportState = resourceSeries{}
+// Ensure provider defined types fully satisfy framework interfaces.
+
+var (
+	_ provider.ResourceType            = resourceSeriesType{}
+	_ resource.Resource                = resourceSeries{}
+	_ resource.ResourceWithImportState = resourceSeries{}
+)
 
 type resourceSeriesType struct{}
 
@@ -151,6 +154,7 @@ func (r resourceSeries) Create(ctx context.Context, req resource.CreateRequest, 
 	var plan Series
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -168,15 +172,18 @@ func (r resourceSeries) Create(ctx context.Context, req resource.CreateRequest, 
 	response, err := r.provider.client.AddSeriesContext(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to create series, got error: %s", err))
+
 		return
 	}
+
 	tflog.Trace(ctx, "created series: "+strconv.Itoa(int(response.ID)))
 
 	// Generate resource state struct
-	var result = *writeSeries(ctx, response)
+	result := *writeSeries(ctx, response)
 
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -187,6 +194,7 @@ func (r resourceSeries) Read(ctx context.Context, req resource.ReadRequest, resp
 	var state Series
 	diags := req.State.Get(ctx, &state)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -195,10 +203,11 @@ func (r resourceSeries) Read(ctx context.Context, req resource.ReadRequest, resp
 	response, err := r.provider.client.GetSeriesByIDContext(ctx, state.ID.Value)
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read series, got error: %s", err))
+
 		return
 	}
 	// Map response body to resource schema attribute
-	var result = *writeSeries(ctx, response)
+	result := *writeSeries(ctx, response)
 
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
@@ -209,23 +218,28 @@ func (r resourceSeries) Update(ctx context.Context, req resource.UpdateRequest, 
 	var plan Series
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Update Series
 	request := *readSeries(ctx, &plan)
+
 	response, err := r.provider.client.UpdateSeriesContext(ctx, &request)
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to update series, got error: %s", err))
+
 		return
 	}
+
 	tflog.Trace(ctx, "update series: "+strconv.Itoa(int(response.ID)))
 
 	// Map response body to resource schema attribute
 	result := writeSeries(ctx, response)
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -245,6 +259,7 @@ func (r resourceSeries) Delete(ctx context.Context, req resource.DeleteRequest, 
 	err := r.provider.client.DeleteSeriesContext(ctx, int(state.ID.Value), true, false)
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read tags, got error: %s", err))
+
 		return
 	}
 
@@ -252,15 +267,17 @@ func (r resourceSeries) Delete(ctx context.Context, req resource.DeleteRequest, 
 }
 
 func (r resourceSeries) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	//resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
+	// resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Unexpected Import Identifier",
 			fmt.Sprintf("Expected import identifier with format: ID. Got: %q", req.ID),
 		)
+
 		return
 	}
+
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 

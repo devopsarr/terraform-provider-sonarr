@@ -13,7 +13,7 @@ import (
 	"golift.io/starr"
 )
 
-// Ensure provider defined types fully satisfy framework interfaces
+// Ensure provider defined types fully satisfy framework interfaces.
 var _ provider.DataSourceType = dataTagsType{}
 var _ datasource.DataSource = dataTags{}
 
@@ -72,6 +72,7 @@ func (d dataTags) Read(ctx context.Context, req datasource.ReadRequest, resp *da
 	var data Tags
 	diags := resp.State.Get(ctx, &data)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -80,6 +81,7 @@ func (d dataTags) Read(ctx context.Context, req datasource.ReadRequest, resp *da
 	response, err := d.provider.client.GetTagsContext(ctx)
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read tags, got error: %s", err))
+
 		return
 	}
 
@@ -98,5 +100,6 @@ func writeTags(tags []*starr.Tag) *[]Tag {
 	for i, t := range tags {
 		output[i] = *writeTag(t)
 	}
+
 	return &output
 }

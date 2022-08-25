@@ -16,10 +16,12 @@ import (
 	"golift.io/starr/sonarr"
 )
 
-// Ensure provider defined types fully satisfy framework interfaces
-var _ provider.ResourceType = resourceDelayProfileType{}
-var _ resource.Resource = resourceDelayProfile{}
-var _ resource.ResourceWithImportState = resourceDelayProfile{}
+// Ensure provider defined types fully satisfy framework interfaces.
+var (
+	_ provider.ResourceType            = resourceDelayProfileType{}
+	_ resource.Resource                = resourceDelayProfile{}
+	_ resource.ResourceWithImportState = resourceDelayProfile{}
+)
 
 type resourceDelayProfileType struct{}
 
@@ -120,6 +122,7 @@ func (r resourceDelayProfile) Create(ctx context.Context, req resource.CreateReq
 	var plan DelayProfile
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -131,8 +134,10 @@ func (r resourceDelayProfile) Create(ctx context.Context, req resource.CreateReq
 	response, err := r.provider.client.AddDelayProfileContext(ctx, data)
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to create delayprofile, got error: %s", err))
+
 		return
 	}
+
 	tflog.Trace(ctx, "created delayprofile: "+strconv.Itoa(int(response.ID)))
 
 	// Generate resource state struct
@@ -140,6 +145,7 @@ func (r resourceDelayProfile) Create(ctx context.Context, req resource.CreateReq
 
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -150,6 +156,7 @@ func (r resourceDelayProfile) Read(ctx context.Context, req resource.ReadRequest
 	var state DelayProfile
 	diags := req.State.Get(ctx, &state)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -158,6 +165,7 @@ func (r resourceDelayProfile) Read(ctx context.Context, req resource.ReadRequest
 	response, err := r.provider.client.GetDelayProfileContext(ctx, int(state.ID.Value))
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read delayprofiles, got error: %s", err))
+
 		return
 	}
 	// Map response body to resource schema attribute
@@ -172,6 +180,7 @@ func (r resourceDelayProfile) Update(ctx context.Context, req resource.UpdateReq
 	var plan DelayProfile
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -183,8 +192,10 @@ func (r resourceDelayProfile) Update(ctx context.Context, req resource.UpdateReq
 	response, err := r.provider.client.UpdateDelayProfileContext(ctx, data)
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to update delayprofile, got error: %s", err))
+
 		return
 	}
+
 	tflog.Trace(ctx, "update delayprofile: "+strconv.Itoa(int(response.ID)))
 
 	// Generate resource state struct
@@ -192,6 +203,7 @@ func (r resourceDelayProfile) Update(ctx context.Context, req resource.UpdateReq
 
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -211,6 +223,7 @@ func (r resourceDelayProfile) Delete(ctx context.Context, req resource.DeleteReq
 	err := r.provider.client.DeleteDelayProfileContext(ctx, int(state.ID.Value))
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read delayprofiles, got error: %s", err))
+
 		return
 	}
 
@@ -218,15 +231,17 @@ func (r resourceDelayProfile) Delete(ctx context.Context, req resource.DeleteReq
 }
 
 func (r resourceDelayProfile) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	//resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
+	// resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Unexpected Import Identifier",
 			fmt.Sprintf("Expected import identifier with format: ID. Got: %q", req.ID),
 		)
+
 		return
 	}
+
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 
@@ -242,10 +257,10 @@ func writeDelayProfile(ctx context.Context, profile *sonarr.DelayProfile) *Delay
 		PreferredProtocol:      types.String{Value: profile.PreferredProtocol},
 		Tags:                   types.Set{ElemType: types.Int64Type},
 	}
+
 	tfsdk.ValueFrom(ctx, profile.Tags, output.Tags.Type(ctx), &output.Tags)
 
 	return &output
-
 }
 
 func readDelayProfile(ctx context.Context, profile *DelayProfile) *sonarr.DelayProfile {

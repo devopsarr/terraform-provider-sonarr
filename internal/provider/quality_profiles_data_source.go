@@ -14,7 +14,7 @@ import (
 	"golift.io/starr/sonarr"
 )
 
-// Ensure provider defined types fully satisfy framework interfaces
+// Ensure provider defined types fully satisfy framework interfaces.
 var _ provider.DataSourceType = dataQualityProfilesType{}
 var _ datasource.DataSource = dataQualityProfiles{}
 
@@ -136,6 +136,7 @@ func (d dataQualityProfiles) Read(ctx context.Context, req datasource.ReadReques
 	var data QualityProfiles
 	diags := resp.State.Get(ctx, &data)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -143,6 +144,7 @@ func (d dataQualityProfiles) Read(ctx context.Context, req datasource.ReadReques
 	response, err := d.provider.client.GetQualityProfilesContext(ctx)
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read qualityprofiles, got error: %s", err))
+
 		return
 	}
 
@@ -159,5 +161,6 @@ func writeQualitiyprofiles(ctx context.Context, qualities []*sonarr.QualityProfi
 	for i, p := range qualities {
 		output[i] = *writeQualityProfile(ctx, p)
 	}
+
 	return &output
 }
