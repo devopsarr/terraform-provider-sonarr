@@ -86,10 +86,7 @@ func (r resourceTag) Create(ctx context.Context, req resource.CreateRequest, res
 	tflog.Trace(ctx, "created tag: "+strconv.Itoa(response.ID))
 
 	// Generate resource state struct
-	var result = Tag{
-		ID:    types.Int64{Value: int64(response.ID)},
-		Label: types.String{Value: response.Label},
-	}
+	result := writeTag(response)
 
 	diags = resp.State.Set(ctx, &result)
 	resp.Diagnostics.Append(diags...)
@@ -114,10 +111,7 @@ func (r resourceTag) Read(ctx context.Context, req resource.ReadRequest, resp *r
 		return
 	}
 	// Map response body to resource schema attribute
-	result := Tag{
-		ID:    types.Int64{Value: int64(response.ID)},
-		Label: types.String{Value: response.Label},
-	}
+	result := writeTag(response)
 
 	diags = resp.State.Set(ctx, &result)
 	resp.Diagnostics.Append(diags...)
@@ -145,10 +139,7 @@ func (r resourceTag) Update(ctx context.Context, req resource.UpdateRequest, res
 	tflog.Trace(ctx, "update tag: "+strconv.Itoa(response.ID))
 
 	// Generate resource state struct
-	var result = Tag{
-		ID:    types.Int64{Value: int64(response.ID)},
-		Label: types.String{Value: response.Label},
-	}
+	result := writeTag(response)
 
 	diags = resp.State.Set(ctx, &result)
 	resp.Diagnostics.Append(diags...)
@@ -188,4 +179,11 @@ func (r resourceTag) ImportState(ctx context.Context, req resource.ImportStateRe
 		return
 	}
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
+}
+
+func writeTag(tag *starr.Tag) *Tag {
+	return &Tag{
+		ID:    types.Int64{Value: int64(tag.ID)},
+		Label: types.String{Value: tag.Label},
+	}
 }
