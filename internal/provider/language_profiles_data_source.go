@@ -26,8 +26,8 @@ type dataLanguageProfiles struct {
 // TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 // LanguageProfiles is a list of LanguageProfile.
 type LanguageProfiles struct {
-	ID               types.String      `tfsdk:"id"`
-	LanguageProfiles []LanguageProfile `tfsdk:"language_profiles"`
+	ID               types.String `tfsdk:"id"`
+	LanguageProfiles types.Set    `tfsdk:"language_profiles"`
 }
 
 func (t dataLanguageProfilesType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
@@ -97,17 +97,18 @@ func (d dataLanguageProfiles) Read(ctx context.Context, req datasource.ReadReque
 		return
 	}
 	// Map response body to resource schema attribute
-	data.LanguageProfiles = *writeLanguageprofiles(response)
+	profiles := *writeLanguageprofiles(ctx, response)
+	tfsdk.ValueFrom(ctx, profiles, data.LanguageProfiles.Type(context.Background()), &data.LanguageProfiles)
 	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 	data.ID = types.String{Value: strconv.Itoa(len(response))}
 	diags = resp.State.Set(ctx, &data)
 	resp.Diagnostics.Append(diags...)
 }
 
-func writeLanguageprofiles(languages []*sonarr.LanguageProfile) *[]LanguageProfile {
+func writeLanguageprofiles(ctx context.Context, languages []*sonarr.LanguageProfile) *[]LanguageProfile {
 	output := make([]LanguageProfile, len(languages))
 	for i, p := range languages {
-		output[i] = *writeLanguageProfile(p)
+		output[i] = *writeLanguageProfile(ctx, p)
 	}
 	return &output
 }
