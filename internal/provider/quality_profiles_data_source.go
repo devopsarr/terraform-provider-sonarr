@@ -147,17 +147,17 @@ func (d dataQualityProfiles) Read(ctx context.Context, req datasource.ReadReques
 	}
 
 	// Map response body to resource schema attribute
-	data.QualityProfiles = *writeQualitiyprofiles(response)
+	data.QualityProfiles = *writeQualitiyprofiles(ctx, response)
 	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 	data.ID = types.String{Value: strconv.Itoa(len(response))}
 	diags = resp.State.Set(ctx, &data)
 	resp.Diagnostics.Append(diags...)
 }
 
-func writeQualitiyprofiles(qualities []*sonarr.QualityProfile) *[]QualityProfile {
+func writeQualitiyprofiles(ctx context.Context, qualities []*sonarr.QualityProfile) *[]QualityProfile {
 	output := make([]QualityProfile, len(qualities))
 	for i, p := range qualities {
-		output[i] = *writeQualityProfile(p)
+		output[i] = *writeQualityProfile(ctx, p)
 	}
 	return &output
 }

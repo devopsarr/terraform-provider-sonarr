@@ -29,18 +29,18 @@ type resourceQualityProfile struct {
 
 // QualityProfile is the quality_profile resource.
 type QualityProfile struct {
-	UpgradeAllowed types.Bool     `tfsdk:"upgrade_allowed"`
-	ID             types.Int64    `tfsdk:"id"`
-	Cutoff         types.Int64    `tfsdk:"cutoff"`
-	Name           types.String   `tfsdk:"name"`
-	QualityGroups  []QualityGroup `tfsdk:"quality_groups"`
+	UpgradeAllowed types.Bool   `tfsdk:"upgrade_allowed"`
+	ID             types.Int64  `tfsdk:"id"`
+	Cutoff         types.Int64  `tfsdk:"cutoff"`
+	Name           types.String `tfsdk:"name"`
+	QualityGroups  types.Set    `tfsdk:"quality_groups"`
 }
 
 // QualityGroup is part of QualityProfile.
 type QualityGroup struct {
 	ID        types.Int64  `tfsdk:"id"`
 	Name      types.String `tfsdk:"name"`
-	Qualities []Quality    `tfsdk:"qualities"`
+	Qualities types.Set    `tfsdk:"qualities"`
 }
 
 // Quality is part of QualityGroup.
@@ -83,53 +83,65 @@ func (t resourceQualityProfileType) GetSchema(ctx context.Context) (tfsdk.Schema
 			"quality_groups": {
 				MarkdownDescription: "Quality groups",
 				Required:            true,
-				Attributes: tfsdk.SetNestedAttributes(map[string]tfsdk.Attribute{
-					"id": {
-						MarkdownDescription: "ID of quality group",
-						Optional:            true,
-						Computed:            true,
-						Type:                types.Int64Type,
-					},
-					"name": {
-						MarkdownDescription: "Name of quality group",
-						Optional:            true,
-						Computed:            true,
-						Type:                types.StringType,
-					},
-					"qualities": {
-						MarkdownDescription: "Qualities in group",
-						Required:            true,
-						Attributes: tfsdk.SetNestedAttributes(map[string]tfsdk.Attribute{
-							"id": {
-								MarkdownDescription: "ID of quality group",
-								Optional:            true,
-								Computed:            true,
-								Type:                types.Int64Type,
-							},
-							"resolution": {
-								MarkdownDescription: "Resolution",
-								Optional:            true,
-								Computed:            true,
-								Type:                types.Int64Type,
-							},
-							"name": {
-								MarkdownDescription: "Name of quality group",
-								Optional:            true,
-								Computed:            true,
-								Type:                types.StringType,
-							},
-							"source": {
-								MarkdownDescription: "Source",
-								Optional:            true,
-								Computed:            true,
-								Type:                types.StringType,
-							},
-						}),
-					},
-				}),
+				Attributes:          tfsdk.SetNestedAttributes(t.getQualityGroupSchema().Attributes),
 			},
 		},
 	}, nil
+}
+
+func (t resourceQualityProfileType) getQualityGroupSchema() tfsdk.Schema {
+	return tfsdk.Schema{
+		Attributes: map[string]tfsdk.Attribute{
+			"id": {
+				MarkdownDescription: "ID of quality group",
+				Optional:            true,
+				Computed:            true,
+				Type:                types.Int64Type,
+			},
+			"name": {
+				MarkdownDescription: "Name of quality group",
+				Optional:            true,
+				Computed:            true,
+				Type:                types.StringType,
+			},
+			"qualities": {
+				MarkdownDescription: "Qualities in group",
+				Required:            true,
+				Attributes:          tfsdk.SetNestedAttributes(t.getQualitySchema().Attributes),
+			},
+		},
+	}
+}
+
+func (t resourceQualityProfileType) getQualitySchema() tfsdk.Schema {
+	return tfsdk.Schema{
+		Attributes: map[string]tfsdk.Attribute{
+			"id": {
+				MarkdownDescription: "ID of quality group",
+				Optional:            true,
+				Computed:            true,
+				Type:                types.Int64Type,
+			},
+			"resolution": {
+				MarkdownDescription: "Resolution",
+				Optional:            true,
+				Computed:            true,
+				Type:                types.Int64Type,
+			},
+			"name": {
+				MarkdownDescription: "Name of quality group",
+				Optional:            true,
+				Computed:            true,
+				Type:                types.StringType,
+			},
+			"source": {
+				MarkdownDescription: "Source",
+				Optional:            true,
+				Computed:            true,
+				Type:                types.StringType,
+			},
+		},
+	}
 }
 
 func (t resourceQualityProfileType) NewResource(ctx context.Context, in provider.Provider) (resource.Resource, diag.Diagnostics) {
@@ -150,7 +162,7 @@ func (r resourceQualityProfile) Create(ctx context.Context, req resource.CreateR
 	}
 
 	// Build Create resource
-	data := readQualityProfile(&plan)
+	data := readQualityProfile(ctx, &plan)
 
 	// Create new QualityProfile
 	response, err := r.provider.client.AddQualityProfileContext(ctx, data)
@@ -161,7 +173,7 @@ func (r resourceQualityProfile) Create(ctx context.Context, req resource.CreateR
 	tflog.Trace(ctx, "created qualityprofile: "+strconv.Itoa(int(response.ID)))
 
 	// Generate resource state struct
-	result := writeQualityProfile(response)
+	result := writeQualityProfile(ctx, response)
 
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
@@ -186,7 +198,7 @@ func (r resourceQualityProfile) Read(ctx context.Context, req resource.ReadReque
 		return
 	}
 	// Map response body to resource schema attribute
-	result := writeQualityProfile(response)
+	result := writeQualityProfile(ctx, response)
 
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
@@ -202,7 +214,7 @@ func (r resourceQualityProfile) Update(ctx context.Context, req resource.UpdateR
 	}
 
 	// Build Update resource
-	data := readQualityProfile(&plan)
+	data := readQualityProfile(ctx, &plan)
 
 	// Update QualityProfile
 	response, err := r.provider.client.UpdateQualityProfileContext(ctx, data)
@@ -213,7 +225,7 @@ func (r resourceQualityProfile) Update(ctx context.Context, req resource.UpdateR
 	tflog.Trace(ctx, "update qualityprofile: "+strconv.Itoa(int(response.ID)))
 
 	// Generate resource state struct
-	result := writeQualityProfile(response)
+	result := writeQualityProfile(ctx, response)
 
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
@@ -255,38 +267,48 @@ func (r resourceQualityProfile) ImportState(ctx context.Context, req resource.Im
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 
-func writeQualityProfile(profile *sonarr.QualityProfile) *QualityProfile {
-	qualityGroups := make([]QualityGroup, len(profile.Qualities))
-	for n, g := range profile.Qualities {
-		if len(g.Items) == 0 {
-			qualityGroups[n] = QualityGroup{
-				Name: types.String{Value: g.Quality.Name},
-				ID:   types.Int64{Value: g.Quality.ID},
-				Qualities: []Quality{{
-					ID:         types.Int64{Value: g.Quality.ID},
-					Name:       types.String{Value: g.Quality.Name},
-					Source:     types.String{Value: g.Quality.Source},
-					Resolution: types.Int64{Value: int64(g.Quality.Resolution)},
-				}},
-			}
-			continue
-		}
-
-		qualities := writeQualities(g.Items)
-		qualityGroups[n] = QualityGroup{
-			Name:      types.String{Value: g.Name},
-			ID:        types.Int64{Value: int64(g.ID)},
-			Qualities: *qualities,
-		}
-	}
-
-	return &QualityProfile{
+func writeQualityProfile(ctx context.Context, profile *sonarr.QualityProfile) *QualityProfile {
+	output := QualityProfile{
 		UpgradeAllowed: types.Bool{Value: profile.UpgradeAllowed},
 		ID:             types.Int64{Value: profile.ID},
 		Name:           types.String{Value: profile.Name},
 		Cutoff:         types.Int64{Value: profile.Cutoff},
-		QualityGroups:  qualityGroups,
+		QualityGroups:  types.Set{ElemType: resourceQualityProfileType{}.getQualityGroupSchema().AttributeType()},
 	}
+	qualityGroups := *writeQualityGroups(ctx, profile.Qualities)
+	tfsdk.ValueFrom(ctx, qualityGroups, output.QualityGroups.Type(ctx), &output.QualityGroups)
+
+	return &output
+}
+
+func writeQualityGroups(ctx context.Context, groups []*starr.Quality) *[]QualityGroup {
+	qualityGroups := make([]QualityGroup, len(groups))
+	for n, g := range groups {
+		var name string
+		var id int64
+		var qualities []Quality
+		if len(g.Items) == 0 {
+			name = g.Quality.Name
+			id = g.Quality.ID
+			qualities = []Quality{{
+				ID:         types.Int64{Value: g.Quality.ID},
+				Name:       types.String{Value: g.Quality.Name},
+				Source:     types.String{Value: g.Quality.Source},
+				Resolution: types.Int64{Value: int64(g.Quality.Resolution)},
+			}}
+		} else {
+			name = g.Name
+			id = int64(g.ID)
+			qualities = *writeQualities(g.Items)
+		}
+		qualityGroups[n] = QualityGroup{
+			Name:      types.String{Value: name},
+			ID:        types.Int64{Value: id},
+			Qualities: types.Set{ElemType: resourceQualityProfileType{}.getQualitySchema().AttributeType()},
+		}
+		tfsdk.ValueFrom(ctx, qualities, qualityGroups[n].Qualities.Type(ctx), &qualityGroups[n].Qualities)
+	}
+	return &qualityGroups
 }
 
 func writeQualities(qualities []*starr.Quality) *[]Quality {
@@ -302,10 +324,16 @@ func writeQualities(qualities []*starr.Quality) *[]Quality {
 	return &output
 }
 
-func readQualityProfile(profile *QualityProfile) *sonarr.QualityProfile {
-	qualities := make([]*starr.Quality, len(profile.QualityGroups))
-	for n, g := range profile.QualityGroups {
-		if len(g.Qualities) == 0 {
+func readQualityProfile(ctx context.Context, profile *QualityProfile) *sonarr.QualityProfile {
+	groups := make([]QualityGroup, len(profile.QualityGroups.Elems))
+	tfsdk.ValueAs(ctx, profile.QualityGroups, &groups)
+
+	qualities := make([]*starr.Quality, len(groups))
+	for n, g := range groups {
+		q := make([]Quality, len(g.Qualities.Elems))
+		tfsdk.ValueAs(ctx, g.Qualities, &q)
+
+		if len(q) == 0 {
 			qualities[n] = &starr.Quality{
 				Allowed: true,
 				Quality: &starr.BaseQuality{
@@ -316,7 +344,7 @@ func readQualityProfile(profile *QualityProfile) *sonarr.QualityProfile {
 			continue
 		}
 
-		items := readQualities(&g.Qualities)
+		items := readQualities(&q)
 
 		qualities[n] = &starr.Quality{
 			Name:    g.Name.Value,
