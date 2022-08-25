@@ -134,7 +134,7 @@ func (d dataSeries) Read(ctx context.Context, req datasource.ReadRequest, resp *
 	}
 	// Map response body to resource schema attribute
 	for _, s := range response {
-		data.Series = append(data.Series, *writeSeries(s))
+		data.Series = append(data.Series, *writeSeries(ctx, s))
 	}
 
 	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
