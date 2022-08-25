@@ -303,7 +303,6 @@ func writeSeries(ctx context.Context, series *sonarr.Series) *Series {
 
 func readSeries(ctx context.Context, series *Series) *sonarr.AddSeriesInput {
 	tags := make([]int, len(series.Tags.Elems))
-
 	tfsdk.ValueAs(ctx, series.Tags, &tags)
 
 	return &sonarr.AddSeriesInput{

@@ -3,12 +3,12 @@
 page_title: "sonarr Provider"
 subcategory: ""
 description: |-
-  
+  The Sonarr provider is used to interact with any Sonarr https://sonarr.tv/ installation. You must configure the provider with the proper credentials before you can use it. Use the left navigation to read about the available resources.
 ---
 
 # sonarr Provider
 
-
+The Sonarr provider is used to interact with any [Sonarr](https://sonarr.tv/) installation. You must configure the provider with the proper credentials before you can use it. Use the left navigation to read about the available resources.
 
 ## Example Usage
 
