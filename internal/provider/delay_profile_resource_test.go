@@ -40,6 +40,10 @@ func TestAccDelayProfileResource(t *testing.T) {
 
 func testAccDelayProfileResourceConfig(protocol string) string {
 	return fmt.Sprintf(`
+	resource "sonarr_tag" "test" {
+		label = "test"
+	}
+
 	resource "sonarr_delay_profile" "test" {
 		enable_usenet = true
 		enable_torrent = true
@@ -47,6 +51,6 @@ func testAccDelayProfileResourceConfig(protocol string) string {
 		usenet_delay = 0
 		torrent_delay = 0
 		preferred_protocol= "%s"
-		tags = [0]
+		tags = [sonarr_tag.test.id]
 	}`, protocol)
 }

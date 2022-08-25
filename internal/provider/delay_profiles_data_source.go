@@ -26,8 +26,8 @@ type dataDelayProfiles struct {
 // TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 // DelayProfiles is a list of DelayProfile.
 type DelayProfiles struct {
-	ID            types.String   `tfsdk:"id"`
-	DelayProfiles []DelayProfile `tfsdk:"delay_profiles"`
+	ID            types.String `tfsdk:"id"`
+	DelayProfiles types.Set    `tfsdk:"delay_profiles"`
 }
 
 func (t dataDelayProfilesType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
@@ -82,7 +82,7 @@ func (t dataDelayProfilesType) GetSchema(ctx context.Context) (tfsdk.Schema, dia
 					"tags": {
 						MarkdownDescription: "List of associated tags",
 						Computed:            true,
-						Type: types.ListType{
+						Type: types.SetType{
 							ElemType: types.Int64Type,
 						},
 					},
@@ -119,17 +119,18 @@ func (d dataDelayProfiles) Read(ctx context.Context, req datasource.ReadRequest,
 		return
 	}
 	// Map response body to resource schema attribute
-	data.DelayProfiles = *writeDelayprofiles(response)
+	profiles := *writeDelayprofiles(ctx, response)
+	tfsdk.ValueFrom(ctx, profiles, data.DelayProfiles.Type(context.Background()), &data.DelayProfiles)
 	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 	data.ID = types.String{Value: strconv.Itoa(len(response))}
 	diags = resp.State.Set(ctx, &data)
 	resp.Diagnostics.Append(diags...)
 }
 
-func writeDelayprofiles(delays []*sonarr.DelayProfile) *[]DelayProfile {
+func writeDelayprofiles(ctx context.Context, delays []*sonarr.DelayProfile) *[]DelayProfile {
 	output := make([]DelayProfile, len(delays))
 	for i, p := range delays {
-		output[i] = *writeDelayProfile(p)
+		output[i] = *writeDelayProfile(ctx, p)
 	}
 	return &output
 }
