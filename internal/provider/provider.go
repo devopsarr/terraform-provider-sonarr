@@ -118,6 +118,7 @@ func (p *sonarrProvider) Configure(ctx context.Context, req provider.ConfigureRe
 func (p *sonarrProvider) GetResources(ctx context.Context) (map[string]provider.ResourceType, diag.Diagnostics) {
 	return map[string]provider.ResourceType{
 		"sonarr_delay_profile":    resourceDelayProfileType{},
+		"sonarr_indexer":          resourceIndexerType{},
 		"sonarr_language_profile": resourceLanguageProfileType{},
 		"sonarr_media_management": resourceMediaManagementType{},
 		"sonarr_naming":           resourceNamingType{},
