@@ -50,6 +50,6 @@ resource "sonarr_media_management" "example" {
 Import is supported using the following syntax:
 
 ```shell
-# import using the API/UI ID
-terraform import sonarr_naming.example
+# import does not need parameters
+terraform import sonarr_indexer_config.example
 ```
