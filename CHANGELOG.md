@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.2.0](https://github.com/devopsarr/terraform-provider-sonarr/compare/v1.1.0...v1.2.0) (2022-08-28)
+
+
+### Features
+
+* add indexer config resource ([375172e](https://github.com/devopsarr/terraform-provider-sonarr/commit/375172e0a572efa3f7293db043bcba7aaa1cacec))
+* add indexer resource ([b0602c5](https://github.com/devopsarr/terraform-provider-sonarr/commit/b0602c5b77e7939d6e81cf5ed7212154b0bb932a))
+* add indexers data source ([1b2cc84](https://github.com/devopsarr/terraform-provider-sonarr/commit/1b2cc8479b7da70727edc2ba4fcabc289c272934))
+
+
+### Bug Fixes
+
+* remove set parameter for framework 0.9.0 ([370a452](https://github.com/devopsarr/terraform-provider-sonarr/commit/370a45213b53f87e46516f1404e4310c9ba384ae))
+* series and qp datasource set ([3bdac5a](https://github.com/devopsarr/terraform-provider-sonarr/commit/3bdac5a62b55dd04b60cdefe19ec2ae79fa23308))
+
 ## [1.1.0](https://github.com/devopsarr/terraform-provider-sonarr/compare/v1.0.0...v1.1.0) (2022-06-06)
 
 
