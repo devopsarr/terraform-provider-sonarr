@@ -142,7 +142,6 @@ func (r resourceDelayProfile) Create(ctx context.Context, req resource.CreateReq
 
 	// Generate resource state struct
 	result := writeDelayProfile(ctx, response)
-
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
 
@@ -170,7 +169,6 @@ func (r resourceDelayProfile) Read(ctx context.Context, req resource.ReadRequest
 	}
 	// Map response body to resource schema attribute
 	result := writeDelayProfile(ctx, response)
-
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
 }
@@ -200,7 +198,6 @@ func (r resourceDelayProfile) Update(ctx context.Context, req resource.UpdateReq
 
 	// Generate resource state struct
 	result := writeDelayProfile(ctx, response)
-
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
 

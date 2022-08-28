@@ -41,3 +41,4 @@ lint:
 .PHONY: fmt
 fmt:
 	go fmt ./...
+	terraform fmt --recursive ./examples/

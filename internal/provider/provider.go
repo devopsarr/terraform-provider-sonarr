@@ -118,6 +118,8 @@ func (p *sonarrProvider) Configure(ctx context.Context, req provider.ConfigureRe
 func (p *sonarrProvider) GetResources(ctx context.Context) (map[string]provider.ResourceType, diag.Diagnostics) {
 	return map[string]provider.ResourceType{
 		"sonarr_delay_profile":    resourceDelayProfileType{},
+		"sonarr_indexer":          resourceIndexerType{},
+		"sonarr_indexer_config":   resourceIndexerConfigType{},
 		"sonarr_language_profile": resourceLanguageProfileType{},
 		"sonarr_media_management": resourceMediaManagementType{},
 		"sonarr_naming":           resourceNamingType{},
@@ -131,6 +133,7 @@ func (p *sonarrProvider) GetResources(ctx context.Context) (map[string]provider.
 func (p *sonarrProvider) GetDataSources(ctx context.Context) (map[string]provider.DataSourceType, diag.Diagnostics) {
 	return map[string]provider.DataSourceType{
 		"sonarr_delay_profiles":    dataDelayProfilesType{},
+		"sonarr_indexers":          dataIndexersType{},
 		"sonarr_language_profiles": dataLanguageProfilesType{},
 		"sonarr_quality_profiles":  dataQualityProfilesType{},
 		"sonarr_root_folders":      dataRootFoldersType{},

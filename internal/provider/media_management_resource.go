@@ -204,7 +204,6 @@ func (r resourceMediaManagement) Create(ctx context.Context, req resource.Create
 
 	// Generate resource state struct
 	result := writeMediaManagement(response)
-
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
 
@@ -232,7 +231,6 @@ func (r resourceMediaManagement) Read(ctx context.Context, req resource.ReadRequ
 	}
 	// Map response body to resource schema attribute
 	result := writeMediaManagement(response)
-
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
 }
@@ -262,7 +260,6 @@ func (r resourceMediaManagement) Update(ctx context.Context, req resource.Update
 
 	// Generate resource state struct
 	result := writeMediaManagement(response)
-
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
 
