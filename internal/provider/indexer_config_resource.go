@@ -122,7 +122,6 @@ func (r resourceIndexerConfig) Create(ctx context.Context, req resource.CreateRe
 
 	// Generate resource state struct
 	result := writeIndexerConfig(response)
-
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
 
@@ -150,7 +149,6 @@ func (r resourceIndexerConfig) Read(ctx context.Context, req resource.ReadReques
 	}
 	// Map response body to resource schema attribute
 	result := writeIndexerConfig(response)
-
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
 }
@@ -180,7 +178,6 @@ func (r resourceIndexerConfig) Update(ctx context.Context, req resource.UpdateRe
 
 	// Generate resource state struct
 	result := writeIndexerConfig(response)
-
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
 

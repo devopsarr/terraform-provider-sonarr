@@ -17,10 +17,12 @@ import (
 	"golift.io/starr/sonarr"
 )
 
-// Ensure provider defined types fully satisfy framework interfaces
-var _ provider.ResourceType = resourceIndexerType{}
-var _ resource.Resource = resourceIndexer{}
-var _ resource.ResourceWithImportState = resourceIndexer{}
+// Ensure provider defined types fully satisfy framework interfaces.
+var (
+	_ provider.ResourceType            = resourceIndexerType{}
+	_ resource.Resource                = resourceIndexer{}
+	_ resource.ResourceWithImportState = resourceIndexer{}
+)
 
 type resourceIndexerType struct{}
 
@@ -51,9 +53,9 @@ type Indexer struct {
 	SeedTime                  types.Int64   `tfsdk:"seed_time"`
 	SeedRatio                 types.Float64 `tfsdk:"seed_ratio"`
 	AdditionalParameters      types.String  `tfsdk:"additional_parameters"`
-	ApiKey                    types.String  `tfsdk:"api_key"`
-	ApiPath                   types.String  `tfsdk:"api_path"`
-	BaseUrl                   types.String  `tfsdk:"base_url"`
+	APIKey                    types.String  `tfsdk:"api_key"`
+	APIPath                   types.String  `tfsdk:"api_path"`
+	BaseURL                   types.String  `tfsdk:"base_url"`
 	CaptchaToken              types.String  `tfsdk:"captcha_token"`
 	Cookie                    types.String  `tfsdk:"cookie"`
 	Passkey                   types.String  `tfsdk:"passkey"`
@@ -265,24 +267,28 @@ func (r resourceIndexer) Create(ctx context.Context, req resource.CreateRequest,
 	var plan Indexer
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Create new Indexer
 	request := readIndexer(ctx, &plan)
+
 	response, err := r.provider.client.AddIndexerContext(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to create Indexer, got error: %s", err))
+
 		return
 	}
+
 	tflog.Trace(ctx, "created Indexer: "+strconv.Itoa(int(response.ID)))
 
 	// Generate resource state struct
 	result := writeIndexer(ctx, response)
-
 	diags = resp.State.Set(ctx, &result)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -293,6 +299,7 @@ func (r resourceIndexer) Read(ctx context.Context, req resource.ReadRequest, res
 	var state Indexer
 	diags := req.State.Get(ctx, &state)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -301,11 +308,11 @@ func (r resourceIndexer) Read(ctx context.Context, req resource.ReadRequest, res
 	response, err := r.provider.client.GetIndexerContext(ctx, int(state.ID.Value))
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read Indexers, got error: %s", err))
+
 		return
 	}
 	// Map response body to resource schema attribute
 	result := writeIndexer(ctx, response)
-
 	diags = resp.State.Set(ctx, &result)
 	resp.Diagnostics.Append(diags...)
 }
@@ -315,6 +322,7 @@ func (r resourceIndexer) Update(ctx context.Context, req resource.UpdateRequest,
 	var plan Indexer
 	diags := req.Plan.Get(ctx, &plan)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -325,15 +333,17 @@ func (r resourceIndexer) Update(ctx context.Context, req resource.UpdateRequest,
 	response, err := r.provider.client.UpdateIndexerContext(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to update Indexer, got error: %s", err))
+
 		return
 	}
+
 	tflog.Trace(ctx, "update Indexer: "+strconv.Itoa(int(response.ID)))
 
 	// Generate resource state struct
 	result := writeIndexer(ctx, response)
-
 	diags = resp.State.Set(ctx, &result)
 	resp.Diagnostics.Append(diags...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -353,6 +363,7 @@ func (r resourceIndexer) Delete(ctx context.Context, req resource.DeleteRequest,
 	err := r.provider.client.DeleteIndexerContext(ctx, int(state.ID.Value))
 	if err != nil {
 		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read Indexers, got error: %s", err))
+
 		return
 	}
 
@@ -360,15 +371,17 @@ func (r resourceIndexer) Delete(ctx context.Context, req resource.DeleteRequest,
 }
 
 func (r resourceIndexer) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	//resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
+	// resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Unexpected Import Identifier",
 			fmt.Sprintf("Expected import identifier with format: ID. Got: %q", req.ID),
 		)
+
 		return
 	}
+
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 
@@ -410,11 +423,11 @@ func writeIndexer(ctx context.Context, indexer *sonarr.IndexerOutput) *Indexer {
 			case "additionalParameters":
 				output.AdditionalParameters = types.String{Value: f.Value.(string)}
 			case "apiKey":
-				output.ApiKey = types.String{Value: f.Value.(string)}
+				output.APIKey = types.String{Value: f.Value.(string)}
 			case "apiPath":
-				output.ApiPath = types.String{Value: f.Value.(string)}
+				output.APIPath = types.String{Value: f.Value.(string)}
 			case "baseUrl":
-				output.BaseUrl = types.String{Value: f.Value.(string)}
+				output.BaseURL = types.String{Value: f.Value.(string)}
 			case "captchaToken":
 				output.CaptchaToken = types.String{Value: f.Value.(string)}
 			case "cookie":
@@ -440,6 +453,7 @@ func writeIndexer(ctx context.Context, indexer *sonarr.IndexerOutput) *Indexer {
 
 func readIndexer(ctx context.Context, indexer *Indexer) *sonarr.IndexerInput {
 	var tags []int
+
 	tfsdk.ValueAs(ctx, indexer.Tags, &tags)
 
 	return &sonarr.IndexerInput{
@@ -456,7 +470,6 @@ func readIndexer(ctx context.Context, indexer *Indexer) *sonarr.IndexerInput {
 		Tags:                    tags,
 		Fields:                  readIndexerFields(ctx, indexer),
 	}
-
 }
 
 func readIndexerFields(ctx context.Context, indexer *Indexer) []*starr.FieldInput {
@@ -467,111 +480,131 @@ func readIndexerFields(ctx context.Context, indexer *Indexer) []*starr.FieldInpu
 			Value: indexer.AllowZeroSize.Value,
 		})
 	}
+
 	if !indexer.AnimeStandardFormatSearch.IsNull() && !indexer.AnimeStandardFormatSearch.IsUnknown() {
 		output = append(output, &starr.FieldInput{
 			Name:  "animeStandardFormatSearch",
 			Value: indexer.AnimeStandardFormatSearch.Value,
 		})
 	}
+
 	if !indexer.RankedOnly.IsNull() && !indexer.RankedOnly.IsUnknown() {
 		output = append(output, &starr.FieldInput{
 			Name:  "rankedOnly",
 			Value: indexer.RankedOnly.Value,
 		})
 	}
+
 	if !indexer.Delay.IsNull() && !indexer.Delay.IsUnknown() {
 		output = append(output, &starr.FieldInput{
 			Name:  "delay",
 			Value: indexer.Delay.Value,
 		})
 	}
+
 	if !indexer.MinimumSeeders.IsNull() && !indexer.MinimumSeeders.IsUnknown() {
 		output = append(output, &starr.FieldInput{
 			Name:  "minimumSeeders",
 			Value: indexer.MinimumSeeders.Value,
 		})
 	}
+
 	if !indexer.SeasonPackSeedTime.IsNull() && !indexer.SeasonPackSeedTime.IsUnknown() {
 		output = append(output, &starr.FieldInput{
 			Name:  "seasonPackSeedTime",
 			Value: indexer.SeasonPackSeedTime.Value,
 		})
 	}
+
 	if !indexer.SeedTime.IsNull() && !indexer.SeedTime.IsUnknown() {
 		output = append(output, &starr.FieldInput{
 			Name:  "seedTime",
 			Value: indexer.SeedTime.Value,
 		})
 	}
+
 	if !indexer.SeedRatio.IsNull() && !indexer.SeedRatio.IsUnknown() {
 		output = append(output, &starr.FieldInput{
 			Name:  "seedRatio",
 			Value: indexer.SeedRatio.Value,
 		})
 	}
+
 	if !indexer.AdditionalParameters.IsNull() && !indexer.AdditionalParameters.IsUnknown() {
 		output = append(output, &starr.FieldInput{
 			Name:  "additionalParameters",
 			Value: indexer.AdditionalParameters.Value,
 		})
 	}
-	if !indexer.ApiKey.IsNull() && !indexer.ApiKey.IsUnknown() {
+
+	if !indexer.APIKey.IsNull() && !indexer.APIKey.IsUnknown() {
 		output = append(output, &starr.FieldInput{
 			Name:  "apiKey",
-			Value: indexer.ApiKey.Value,
+			Value: indexer.APIKey.Value,
 		})
 	}
-	if !indexer.ApiPath.IsNull() && !indexer.ApiPath.IsUnknown() {
+
+	if !indexer.APIPath.IsNull() && !indexer.APIPath.IsUnknown() {
 		output = append(output, &starr.FieldInput{
 			Name:  "apiPath",
-			Value: indexer.ApiPath.Value,
+			Value: indexer.APIPath.Value,
 		})
 	}
-	if !indexer.BaseUrl.IsNull() && !indexer.BaseUrl.IsUnknown() {
+
+	if !indexer.BaseURL.IsNull() && !indexer.BaseURL.IsUnknown() {
 		output = append(output, &starr.FieldInput{
 			Name:  "baseUrl",
-			Value: indexer.BaseUrl.Value,
+			Value: indexer.BaseURL.Value,
 		})
 	}
+
 	if !indexer.CaptchaToken.IsNull() && !indexer.CaptchaToken.IsUnknown() {
 		output = append(output, &starr.FieldInput{
 			Name:  "captchaToken",
 			Value: indexer.CaptchaToken.Value,
 		})
 	}
+
 	if !indexer.Cookie.IsNull() && !indexer.Cookie.IsUnknown() {
 		output = append(output, &starr.FieldInput{
 			Name:  "cookie",
 			Value: indexer.Cookie.Value,
 		})
 	}
+
 	if !indexer.Passkey.IsNull() && !indexer.Passkey.IsUnknown() {
 		output = append(output, &starr.FieldInput{
 			Name:  "passkey",
 			Value: indexer.Passkey.Value,
 		})
 	}
+
 	if !indexer.Username.IsNull() && !indexer.Username.IsUnknown() {
 		output = append(output, &starr.FieldInput{
 			Name:  "username",
 			Value: indexer.Username.Value,
 		})
 	}
+
 	if len(indexer.Categories.Elems) != 0 {
 		cat := make([]int64, len(indexer.Categories.Elems))
 		tfsdk.ValueAs(ctx, indexer.Categories, &cat)
+
 		output = append(output, &starr.FieldInput{
 			Name:  "categories",
 			Value: cat,
 		})
 	}
+
 	if len(indexer.AnimeCategories.Elems) != 0 {
 		cat := make([]int64, len(indexer.AnimeCategories.Elems))
 		tfsdk.ValueAs(ctx, indexer.AnimeCategories, &cat)
+
 		output = append(output, &starr.FieldInput{
 			Name:  "animeCategories",
 			Value: cat,
 		})
 	}
+
 	return output
 }

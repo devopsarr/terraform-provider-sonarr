@@ -129,7 +129,6 @@ func (r resourceRootFolder) Create(ctx context.Context, req resource.CreateReque
 
 	// Generate resource state struct
 	result := writeRootFolder(ctx, response)
-
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
 
@@ -157,7 +156,6 @@ func (r resourceRootFolder) Read(ctx context.Context, req resource.ReadRequest, 
 	}
 	// Map response body to resource schema attribute
 	result := writeRootFolder(ctx, response)
-
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
 }

@@ -180,7 +180,6 @@ func (r resourceSeries) Create(ctx context.Context, req resource.CreateRequest, 
 
 	// Generate resource state struct
 	result := *writeSeries(ctx, response)
-
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
 
@@ -208,7 +207,6 @@ func (r resourceSeries) Read(ctx context.Context, req resource.ReadRequest, resp
 	}
 	// Map response body to resource schema attribute
 	result := *writeSeries(ctx, response)
-
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
 }

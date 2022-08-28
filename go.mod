@@ -75,4 +75,4 @@ require (
 )
 
 //To be removed with next starr update
-replace golift.io/starr => github.com/golift/starr v0.14.1-0.20220826074056-5701f84a119e
+replace golift.io/starr => github.com/golift/starr v0.14.1-0.20220828044228-8a3b8efd33c2

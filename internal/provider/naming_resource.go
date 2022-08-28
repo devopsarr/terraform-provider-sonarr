@@ -152,7 +152,6 @@ func (r resourceNaming) Create(ctx context.Context, req resource.CreateRequest, 
 
 	// Generate resource state struct
 	result := writeNaming(response)
-
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
 
@@ -180,7 +179,6 @@ func (r resourceNaming) Read(ctx context.Context, req resource.ReadRequest, resp
 	}
 	// Map response body to resource schema attribute
 	result := writeNaming(response)
-
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
 }
@@ -210,7 +208,6 @@ func (r resourceNaming) Update(ctx context.Context, req resource.UpdateRequest, 
 
 	// Generate resource state struct
 	result := writeNaming(response)
-
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
 

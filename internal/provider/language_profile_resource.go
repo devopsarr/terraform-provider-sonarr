@@ -112,7 +112,6 @@ func (r resourceLanguageProfile) Create(ctx context.Context, req resource.Create
 
 	// Generate resource state struct
 	result := writeLanguageProfile(ctx, response)
-
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
 
@@ -140,7 +139,6 @@ func (r resourceLanguageProfile) Read(ctx context.Context, req resource.ReadRequ
 	}
 	// Map response body to resource schema attribute
 	result := writeLanguageProfile(ctx, response)
-
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
 }
@@ -170,7 +168,6 @@ func (r resourceLanguageProfile) Update(ctx context.Context, req resource.Update
 
 	// Generate resource state struct
 	result := writeLanguageProfile(ctx, response)
-
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
 

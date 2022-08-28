@@ -179,7 +179,6 @@ func (r resourceQualityProfile) Create(ctx context.Context, req resource.CreateR
 
 	// Generate resource state struct
 	result := writeQualityProfile(ctx, response)
-
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
 
@@ -207,7 +206,6 @@ func (r resourceQualityProfile) Read(ctx context.Context, req resource.ReadReque
 	}
 	// Map response body to resource schema attribute
 	result := writeQualityProfile(ctx, response)
-
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
 }
@@ -237,7 +235,6 @@ func (r resourceQualityProfile) Update(ctx context.Context, req resource.UpdateR
 
 	// Generate resource state struct
 	result := writeQualityProfile(ctx, response)
-
 	diags = resp.State.Set(ctx, result)
 	resp.Diagnostics.Append(diags...)
 
