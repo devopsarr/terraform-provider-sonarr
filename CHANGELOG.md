@@ -5,6 +5,13 @@
 
 ### Bug Fixes
 
+* release gpg dependencies ([b2e7065](https://github.com/devopsarr/terraform-provider-sonarr/commit/b2e7065aa4869219981759cf2af5aa06497d1db8))
+
+## [1.2.1](https://github.com/devopsarr/terraform-provider-sonarr/compare/v1.2.0...v1.2.1) (2022-08-28)
+
+
+### Bug Fixes
+
 * release gpg dependencies ([0c5a8da](https://github.com/devopsarr/terraform-provider-sonarr/commit/0c5a8da58d37e9443daad242105ca47dbaf82c4e))
 
 ## [1.2.0](https://github.com/devopsarr/terraform-provider-sonarr/compare/v1.1.0...v1.2.0) (2022-08-28)
