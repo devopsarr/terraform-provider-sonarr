@@ -3,12 +3,12 @@
 page_title: "sonarr_delay_profile Resource - terraform-provider-sonarr"
 subcategory: ""
 description: |-
-  DelayProfile resource
+  Delay Profile resource.For more information refer to Delay Profiles https://wiki.servarr.com/sonarr/settings#delay-profiles documentation.
 ---
 
 # sonarr_delay_profile (Resource)
 
-DelayProfile resource
+Delay Profile resource.<br/>For more information refer to [Delay Profiles](https://wiki.servarr.com/sonarr/settings#delay-profiles) documentation.
 
 ## Example Usage
 
@@ -29,21 +29,21 @@ resource "sonarr_delay_profile" "example" {
 
 ### Required
 
-- `tags` (Set of Number) List of associated tags
+- `tags` (Set of Number) List of associated tags.
 
 ### Optional
 
-- `bypass_if_highest_quality` (Boolean) Bypass for highest quality flag
-- `enable_torrent` (Boolean) Torrent allowed flag at least one of `enable_usenet` and `enable_torrent` must be defined
-- `enable_usenet` (Boolean) Usenet allowed flag at least one of `enable_usenet` and `enable_torrent` must be defined
-- `preferred_protocol` (String) Preferred protocol
-- `torrent_delay` (Number) Torrent Delay
-- `usenet_delay` (Number) Usenet delay
+- `bypass_if_highest_quality` (Boolean) Bypass for highest quality flag.
+- `enable_torrent` (Boolean) Torrent allowed flag at least one of `enable_usenet` and `enable_torrent` must be defined.
+- `enable_usenet` (Boolean) Usenet allowed flag at least one of `enable_usenet` and `enable_torrent` must be defined.
+- `preferred_protocol` (String) Preferred protocol.
+- `torrent_delay` (Number) Torrent Delay.
+- `usenet_delay` (Number) Usenet delay.
 
 ### Read-Only
 
-- `id` (Number) ID of delayprofile
-- `order` (Number) Order
+- `id` (Number) Delay Profile ID.
+- `order` (Number) Order.
 
 ## Import
 

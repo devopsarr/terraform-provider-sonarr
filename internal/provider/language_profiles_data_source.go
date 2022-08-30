@@ -33,7 +33,7 @@ type LanguageProfiles struct {
 func (t dataLanguageProfilesType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		// This description is used by the documentation generator and the language server.
-		MarkdownDescription: "List all available languageprofiles",
+		MarkdownDescription: "List all available [Language Profiles](../resources/language_profile).",
 		Attributes: map[string]tfsdk.Attribute{
 			// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 			"id": {
@@ -41,31 +41,31 @@ func (t dataLanguageProfilesType) GetSchema(ctx context.Context) (tfsdk.Schema, 
 				Type:     types.StringType,
 			},
 			"language_profiles": {
-				MarkdownDescription: "List of languageprofiles",
+				MarkdownDescription: "Language Profile list.",
 				Computed:            true,
 				Attributes: tfsdk.SetNestedAttributes(map[string]tfsdk.Attribute{
 					"id": {
-						MarkdownDescription: "ID of languageprofile",
+						MarkdownDescription: "Language Profile ID.",
 						Computed:            true,
 						Type:                types.Int64Type,
 					},
 					"name": {
-						MarkdownDescription: "Name of languageprofile",
+						MarkdownDescription: "Language Profile name.",
 						Computed:            true,
 						Type:                types.StringType,
 					},
 					"upgrade_allowed": {
-						MarkdownDescription: "Upgrade allowed Flag",
+						MarkdownDescription: "Upgrade allowed Flag.",
 						Computed:            true,
 						Type:                types.BoolType,
 					},
 					"cutoff_language": {
-						MarkdownDescription: "Cutoff Language",
+						MarkdownDescription: "Cutoff Language.",
 						Computed:            true,
 						Type:                types.StringType,
 					},
 					"languages": {
-						MarkdownDescription: "list of languages in profile",
+						MarkdownDescription: "list of languages in profile.",
 						Computed:            true,
 						Type:                types.SetType{ElemType: types.StringType},
 					},

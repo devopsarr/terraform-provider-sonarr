@@ -144,7 +144,7 @@ func (p *sonarrProvider) GetDataSources(ctx context.Context) (map[string]provide
 
 func (p *sonarrProvider) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		MarkdownDescription: "The Sonarr provider is used to interact with any [Sonarr](https://sonarr.tv/) installation. You must configure the provider with the proper credentials before you can use it. Use the left navigation to read about the available resources.",
+		MarkdownDescription: "The Sonarr provider is used to interact with any [Sonarr](https://sonarr.tv/) installation.<br/>You must configure the provider with the proper [credentials](#api_key) before you can use it. <br/>Use the left navigation to read about the available resources.<br/><br/>For more information about Sonarr and its resources, as well as configuration guides and hints, visit the [Servarr wiki](https://wiki.servarr.com/en/sonarr).",
 		Attributes: map[string]tfsdk.Attribute{
 			"api_key": {
 				MarkdownDescription: "API key for Sonarr authentication. Can be specified via the `SONARR_API_KEY` environment variable.",

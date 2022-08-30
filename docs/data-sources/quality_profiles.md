@@ -3,12 +3,12 @@
 page_title: "sonarr_quality_profiles Data Source - terraform-provider-sonarr"
 subcategory: ""
 description: |-
-  List all available qualityprofiles
+  List all available Quality Profiles ../resources/quality_profile.
 ---
 
 # sonarr_quality_profiles (Data Source)
 
-List all available qualityprofiles
+List all available [Quality Profiles](../resources/quality_profile).
 
 
 
@@ -18,45 +18,45 @@ List all available qualityprofiles
 ### Read-Only
 
 - `id` (String) The ID of this resource.
-- `quality_profiles` (Attributes Set) List of qualityprofiles (see [below for nested schema](#nestedatt--quality_profiles))
+- `quality_profiles` (Attributes Set) Quality Profile list. (see [below for nested schema](#nestedatt--quality_profiles))
 
 <a id="nestedatt--quality_profiles"></a>
 ### Nested Schema for `quality_profiles`
 
 Required:
 
-- `name` (String) Name
-- `quality_groups` (Attributes Set) Quality groups (see [below for nested schema](#nestedatt--quality_profiles--quality_groups))
+- `name` (String) Quality Profile Name.
+- `quality_groups` (Attributes Set) Quality groups. (see [below for nested schema](#nestedatt--quality_profiles--quality_groups))
 
 Optional:
 
-- `cutoff` (Number) Quality ID to which cutoff
-- `upgrade_allowed` (Boolean) Upgrade allowed flag
+- `cutoff` (Number) Quality ID to which cutoff.
+- `upgrade_allowed` (Boolean) Upgrade allowed flag.
 
 Read-Only:
 
-- `id` (Number) ID of qualityprofile
+- `id` (Number) Quality Profile ID.
 
 <a id="nestedatt--quality_profiles--quality_groups"></a>
 ### Nested Schema for `quality_profiles.quality_groups`
 
 Required:
 
-- `qualities` (Attributes Set) Qualities in group (see [below for nested schema](#nestedatt--quality_profiles--quality_groups--qualities))
+- `qualities` (Attributes Set) Qualities in group. (see [below for nested schema](#nestedatt--quality_profiles--quality_groups--qualities))
 
 Optional:
 
-- `id` (Number) ID of quality group
-- `name` (String) Name of quality group
+- `id` (Number) Quality group ID.
+- `name` (String) Quality group name.
 
 <a id="nestedatt--quality_profiles--quality_groups--qualities"></a>
 ### Nested Schema for `quality_profiles.quality_groups.qualities`
 
 Optional:
 
-- `id` (Number) ID of quality group
-- `name` (String) Name of quality group
-- `resolution` (Number) Resolution
-- `source` (String) Source
+- `id` (Number) Quality ID.
+- `name` (String) Quality name.
+- `resolution` (Number) Resolution.
+- `source` (String) Source.
 
 

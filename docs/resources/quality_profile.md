@@ -3,12 +3,12 @@
 page_title: "sonarr_quality_profile Resource - terraform-provider-sonarr"
 subcategory: ""
 description: |-
-  QualityProfile resource
+  Quality Profile resource.For more information refer to Quality Profile https://wiki.servarr.com/sonarr/settings#quality-profiles documentation.
 ---
 
 # sonarr_quality_profile (Resource)
 
-QualityProfile resource
+Quality Profile resource.<br/>For more information refer to [Quality Profile](https://wiki.servarr.com/sonarr/settings#quality-profiles) documentation.
 
 ## Example Usage
 
@@ -46,39 +46,39 @@ resource "sonarr_quality_profile" "example" {
 
 ### Required
 
-- `name` (String) Name
-- `quality_groups` (Attributes Set) Quality groups (see [below for nested schema](#nestedatt--quality_groups))
+- `name` (String) Quality Profile Name.
+- `quality_groups` (Attributes Set) Quality groups. (see [below for nested schema](#nestedatt--quality_groups))
 
 ### Optional
 
-- `cutoff` (Number) Quality ID to which cutoff
-- `upgrade_allowed` (Boolean) Upgrade allowed flag
+- `cutoff` (Number) Quality ID to which cutoff.
+- `upgrade_allowed` (Boolean) Upgrade allowed flag.
 
 ### Read-Only
 
-- `id` (Number) ID of qualityprofile
+- `id` (Number) Quality Profile ID.
 
 <a id="nestedatt--quality_groups"></a>
 ### Nested Schema for `quality_groups`
 
 Required:
 
-- `qualities` (Attributes Set) Qualities in group (see [below for nested schema](#nestedatt--quality_groups--qualities))
+- `qualities` (Attributes Set) Qualities in group. (see [below for nested schema](#nestedatt--quality_groups--qualities))
 
 Optional:
 
-- `id` (Number) ID of quality group
-- `name` (String) Name of quality group
+- `id` (Number) Quality group ID.
+- `name` (String) Quality group name.
 
 <a id="nestedatt--quality_groups--qualities"></a>
 ### Nested Schema for `quality_groups.qualities`
 
 Optional:
 
-- `id` (Number) ID of quality group
-- `name` (String) Name of quality group
-- `resolution` (Number) Resolution
-- `source` (String) Source
+- `id` (Number) Quality ID.
+- `name` (String) Quality name.
+- `resolution` (Number) Resolution.
+- `source` (String) Source.
 
 ## Import
 

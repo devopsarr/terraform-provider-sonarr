@@ -66,55 +66,55 @@ type Indexer struct {
 
 func (t resourceIndexerType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		MarkdownDescription: "Indexer resource",
+		MarkdownDescription: "Indexer resource.<br/>For more information refer to [Indexer](https://wiki.servarr.com/sonarr/settings#indexers) documentation.",
 		Attributes: map[string]tfsdk.Attribute{
 			"enable_automatic_search": {
-				MarkdownDescription: "Enable automatic search flag",
+				MarkdownDescription: "Enable automatic search flag.",
 				Optional:            true,
 				Computed:            true,
 				Type:                types.BoolType,
 			},
 			"enable_interactive_search": {
-				MarkdownDescription: "Enable interactive search flag",
+				MarkdownDescription: "Enable interactive search flag.",
 				Optional:            true,
 				Computed:            true,
 				Type:                types.BoolType,
 			},
 			"enable_rss": {
-				MarkdownDescription: "Enable RSS flag",
+				MarkdownDescription: "Enable RSS flag.",
 				Optional:            true,
 				Computed:            true,
 				Type:                types.BoolType,
 			},
 			"priority": {
-				MarkdownDescription: "Priority",
+				MarkdownDescription: "Priority.",
 				Optional:            true,
 				Computed:            true,
 				Type:                types.Int64Type,
 			},
 			"download_client_id": {
-				MarkdownDescription: "Download client ID",
+				MarkdownDescription: "Download client ID.",
 				Optional:            true,
 				Computed:            true,
 				Type:                types.Int64Type,
 			},
 			"config_contract": {
-				MarkdownDescription: "Indexer configuration template",
+				MarkdownDescription: "Indexer configuration template.",
 				Required:            true,
 				Type:                types.StringType,
 			},
 			"implementation": {
-				MarkdownDescription: "Indexer implementation name",
+				MarkdownDescription: "Indexer implementation name.",
 				Required:            true,
 				Type:                types.StringType,
 			},
 			"name": {
-				MarkdownDescription: "Name",
+				MarkdownDescription: "Indexer name.",
 				Required:            true,
 				Type:                types.StringType,
 			},
 			"protocol": {
-				MarkdownDescription: "Protocol. Valid values are 'usenet' and 'torrent'",
+				MarkdownDescription: "Protocol. Valid values are 'usenet' and 'torrent'.",
 				Required:            true,
 				Type:                types.StringType,
 				Validators: []tfsdk.AttributeValidator{
@@ -122,7 +122,7 @@ func (t resourceIndexerType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.
 				},
 			},
 			"tags": {
-				MarkdownDescription: "List of associated tags",
+				MarkdownDescription: "List of associated tags.",
 				Optional:            true,
 				Computed:            true,
 				Type: types.SetType{
@@ -130,7 +130,7 @@ func (t resourceIndexerType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.
 				},
 			},
 			"id": {
-				MarkdownDescription: "Indexer ID",
+				MarkdownDescription: "Indexer ID.",
 				Computed:            true,
 				Type:                types.Int64Type,
 				PlanModifiers: tfsdk.AttributePlanModifiers{
@@ -139,103 +139,103 @@ func (t resourceIndexerType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.
 			},
 			// Field values
 			"allow_zero_size": {
-				MarkdownDescription: "Allow zero size files",
+				MarkdownDescription: "Allow zero size files.",
 				Optional:            true,
 				Computed:            true,
 				Type:                types.BoolType,
 			},
 			"anime_standard_format_search": {
-				MarkdownDescription: "Search anime in standard format",
+				MarkdownDescription: "Search anime in standard format.",
 				Optional:            true,
 				Computed:            true,
 				Type:                types.BoolType,
 			},
 			"ranked_only": {
-				MarkdownDescription: "Allow ranked only",
+				MarkdownDescription: "Allow ranked only.",
 				Optional:            true,
 				Computed:            true,
 				Type:                types.BoolType,
 			},
 			"delay": {
-				MarkdownDescription: "Delay before grabbing",
+				MarkdownDescription: "Delay before grabbing.",
 				Optional:            true,
 				Computed:            true,
 				Type:                types.Int64Type,
 			},
 			"minimum_seeders": {
-				MarkdownDescription: "Minimum seeders",
+				MarkdownDescription: "Minimum seeders.",
 				Optional:            true,
 				Computed:            true,
 				Type:                types.Int64Type,
 			},
 			"season_pack_seed_time": {
-				MarkdownDescription: "Season seed time",
+				MarkdownDescription: "Season seed time.",
 				Optional:            true,
 				Computed:            true,
 				Type:                types.Int64Type,
 			},
 			"seed_time": {
-				MarkdownDescription: "Seed time",
+				MarkdownDescription: "Seed time.",
 				Optional:            true,
 				Computed:            true,
 				Type:                types.Int64Type,
 			},
 			"seed_ratio": {
-				MarkdownDescription: "Seed ratio",
+				MarkdownDescription: "Seed ratio.",
 				Optional:            true,
 				Computed:            true,
 				Type:                types.Float64Type,
 			},
 			"additional_parameters": {
-				MarkdownDescription: "Additional parameters",
+				MarkdownDescription: "Additional parameters.",
 				Optional:            true,
 				Computed:            true,
 				Type:                types.StringType,
 			},
 			"api_key": {
-				MarkdownDescription: "API key",
+				MarkdownDescription: "API key.",
 				Optional:            true,
 				Computed:            true,
 				Type:                types.StringType,
 			},
 			"api_path": {
-				MarkdownDescription: "API path",
+				MarkdownDescription: "API path.",
 				Optional:            true,
 				Computed:            true,
 				Type:                types.StringType,
 			},
 			"base_url": {
-				MarkdownDescription: "Base URL",
+				MarkdownDescription: "Base URL.",
 				Optional:            true,
 				Computed:            true,
 				Type:                types.StringType,
 			},
 			"captcha_token": {
-				MarkdownDescription: "Captcha token",
+				MarkdownDescription: "Captcha token.",
 				Optional:            true,
 				Computed:            true,
 				Type:                types.StringType,
 			},
 			"cookie": {
-				MarkdownDescription: "Cookie",
+				MarkdownDescription: "Cookie.",
 				Optional:            true,
 				Computed:            true,
 				Type:                types.StringType,
 			},
 			"passkey": {
-				MarkdownDescription: "Passkey",
+				MarkdownDescription: "Passkey.",
 				Optional:            true,
 				Computed:            true,
 				Type:                types.StringType,
 			},
 			"username": {
-				MarkdownDescription: "Username",
+				MarkdownDescription: "Username.",
 				Optional:            true,
 				Computed:            true,
 				Type:                types.StringType,
 			},
 			"categories": {
-				MarkdownDescription: "Series list",
+				MarkdownDescription: "Series list.",
 				Optional:            true,
 				Computed:            true,
 				Type: types.SetType{
@@ -243,7 +243,7 @@ func (t resourceIndexerType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.
 				},
 			},
 			"anime_categories": {
-				MarkdownDescription: "Anime list",
+				MarkdownDescription: "Anime list.",
 				Optional:            true,
 				Computed:            true,
 				Type: types.SetType{

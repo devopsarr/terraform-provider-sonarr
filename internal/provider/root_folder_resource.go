@@ -45,11 +45,11 @@ type Path struct {
 
 func (t resourceRootFolderType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		MarkdownDescription: "RootFolder resource",
+		MarkdownDescription: "Root Folder resource.<br/>For more information refer to [Root Folders](https://wiki.servarr.com/sonarr/settings#root-folders) documentation.",
 		Attributes: map[string]tfsdk.Attribute{
 			// TODO: add validator
 			"path": {
-				MarkdownDescription: "Absolute path of rootFolder",
+				MarkdownDescription: "Root Folder absolute path.",
 				Required:            true,
 				Type:                types.StringType,
 				PlanModifiers: tfsdk.AttributePlanModifiers{
@@ -57,12 +57,12 @@ func (t resourceRootFolderType) GetSchema(ctx context.Context) (tfsdk.Schema, di
 				},
 			},
 			"accessible": {
-				MarkdownDescription: "Access flag",
+				MarkdownDescription: "Access flag.",
 				Computed:            true,
 				Type:                types.BoolType,
 			},
 			"id": {
-				MarkdownDescription: "RootFolder ID",
+				MarkdownDescription: "Root Folder ID.",
 				Computed:            true,
 				Type:                types.Int64Type,
 				PlanModifiers: tfsdk.AttributePlanModifiers{
@@ -70,7 +70,7 @@ func (t resourceRootFolderType) GetSchema(ctx context.Context) (tfsdk.Schema, di
 				},
 			},
 			"unmapped_folders": {
-				MarkdownDescription: "List of folders with no associated series",
+				MarkdownDescription: "List of folders with no associated series.",
 				Computed:            true,
 				Attributes:          tfsdk.SetNestedAttributes(t.getUnmappedFolderSchema().Attributes),
 			},
@@ -82,12 +82,12 @@ func (t resourceRootFolderType) getUnmappedFolderSchema() tfsdk.Schema {
 	return tfsdk.Schema{
 		Attributes: map[string]tfsdk.Attribute{
 			"path": {
-				MarkdownDescription: "Path of unmapped folder",
+				MarkdownDescription: "Path of unmapped folder.",
 				Computed:            true,
 				Type:                types.StringType,
 			},
 			"name": {
-				MarkdownDescription: "Name of unmapped folder",
+				MarkdownDescription: "Name of unmapped folder.",
 				Computed:            true,
 				Type:                types.StringType,
 			},

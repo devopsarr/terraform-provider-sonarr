@@ -3,12 +3,12 @@
 page_title: "sonarr_tag Resource - terraform-provider-sonarr"
 subcategory: ""
 description: |-
-  Tag resource
+  Tag resource.For more information refer to Tags https://wiki.servarr.com/sonarr/settings#tags documentation.
 ---
 
 # sonarr_tag (Resource)
 
-Tag resource
+Tag resource.<br/>For more information refer to [Tags](https://wiki.servarr.com/sonarr/settings#tags) documentation.
 
 ## Example Usage
 
@@ -23,11 +23,11 @@ resource "sonarr_tag" "example" {
 
 ### Required
 
-- `label` (String) Tag value
+- `label` (String) Tag label. It must be lowercase.
 
 ### Read-Only
 
-- `id` (Number) Tag ID
+- `id` (Number) Tag ID.
 
 ## Import
 

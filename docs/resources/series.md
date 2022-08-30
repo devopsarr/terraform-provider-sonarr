@@ -3,12 +3,12 @@
 page_title: "sonarr_series Resource - terraform-provider-sonarr"
 subcategory: ""
 description: |-
-  Series resource
+  Series resource.For more information refer to Series https://wiki.servarr.com/sonarr/library#series documentation.
 ---
 
 # sonarr_series (Resource)
 
-Series resource
+Series resource.<br/>For more information refer to [Series](https://wiki.servarr.com/sonarr/library#series) documentation.
 
 ## Example Usage
 
@@ -35,24 +35,24 @@ resource "sonarr_series" "example" {
 
 ### Required
 
-- `language_profile_id` (Number) Language Profile ID
-- `monitored` (Boolean) Monitored flag
-- `path` (String) Series Path
-- `quality_profile_id` (Number) Quality Profile ID
-- `root_folder_path` (String) Series Root Folder
-- `season_folder` (Boolean) Season Folder flag
-- `title` (String) Series Title
-- `title_slug` (String) Series Title in kebab format
-- `tvdb_id` (Number) TVDB ID
-- `use_scene_numbering` (Boolean) Scene numbering flag
+- `language_profile_id` (Number) Language Profile ID .
+- `monitored` (Boolean) Monitored flag.
+- `path` (String) Series Path.
+- `quality_profile_id` (Number) Quality Profile ID.
+- `root_folder_path` (String) Series Root Folder.
+- `season_folder` (Boolean) Season Folder flag.
+- `title` (String) Series Title.
+- `title_slug` (String) Series Title in kebab format.
+- `tvdb_id` (Number) TVDB ID.
+- `use_scene_numbering` (Boolean) Scene numbering flag.
 
 ### Optional
 
-- `tags` (Set of Number) Tags
+- `tags` (Set of Number) Tags.
 
 ### Read-Only
 
-- `id` (Number) Series ID
+- `id` (Number) Series ID.
 
 ## Import
 

@@ -3,12 +3,12 @@
 page_title: "sonarr_language_profile Resource - terraform-provider-sonarr"
 subcategory: ""
 description: |-
-  LanguageProfile resource
+  Language Profile resource.For more information refer to Language Profile https://wiki.servarr.com/sonarr/settings#language-profiles documentation.
 ---
 
 # sonarr_language_profile (Resource)
 
-LanguageProfile resource
+Language Profile resource.<br/>For more information refer to [Language Profile](https://wiki.servarr.com/sonarr/settings#language-profiles) documentation.
 
 ## Example Usage
 
@@ -26,17 +26,17 @@ resource "sonarr_language_profile" "example" {
 
 ### Required
 
-- `cutoff_language` (String) Name of language
-- `languages` (Set of String) list of languages in profile
-- `name` (String) Name of languageprofile
+- `cutoff_language` (String) Name of language.
+- `languages` (Set of String) list of languages in profile.
+- `name` (String) Language Profile name.
 
 ### Optional
 
-- `upgrade_allowed` (Boolean) Upgrade allowed Flag
+- `upgrade_allowed` (Boolean) Upgrade allowed Flag.
 
 ### Read-Only
 
-- `id` (Number) ID of languageprofile
+- `id` (Number) Language Profile ID.
 
 ## Import
 

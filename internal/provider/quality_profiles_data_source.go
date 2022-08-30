@@ -34,7 +34,7 @@ type QualityProfiles struct {
 func (t dataQualityProfilesType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		// This description is used by the documentation generator and the quality server.
-		MarkdownDescription: "List all available qualityprofiles",
+		MarkdownDescription: "List all available [Quality Profiles](../resources/quality_profile).",
 		Attributes: map[string]tfsdk.Attribute{
 			// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 			"id": {
@@ -42,11 +42,11 @@ func (t dataQualityProfilesType) GetSchema(ctx context.Context) (tfsdk.Schema, d
 				Type:     types.StringType,
 			},
 			"quality_profiles": {
-				MarkdownDescription: "List of qualityprofiles",
+				MarkdownDescription: "Quality Profile list.",
 				Computed:            true,
 				Attributes: tfsdk.SetNestedAttributes(map[string]tfsdk.Attribute{
 					"id": {
-						MarkdownDescription: "ID of qualityprofile",
+						MarkdownDescription: "Quality Profile ID.",
 						Computed:            true,
 						Type:                types.Int64Type,
 						PlanModifiers: tfsdk.AttributePlanModifiers{
@@ -54,62 +54,62 @@ func (t dataQualityProfilesType) GetSchema(ctx context.Context) (tfsdk.Schema, d
 						},
 					},
 					"name": {
-						MarkdownDescription: "Name",
+						MarkdownDescription: "Quality Profile Name.",
 						Required:            true,
 						Type:                types.StringType,
 					},
 					"upgrade_allowed": {
-						MarkdownDescription: "Upgrade allowed flag",
+						MarkdownDescription: "Upgrade allowed flag.",
 						Optional:            true,
 						Computed:            true,
 						Type:                types.BoolType,
 					},
 					"cutoff": {
-						MarkdownDescription: "Quality ID to which cutoff",
+						MarkdownDescription: "Quality ID to which cutoff.",
 						Optional:            true,
 						Computed:            true,
 						Type:                types.Int64Type,
 					},
 					"quality_groups": {
-						MarkdownDescription: "Quality groups",
+						MarkdownDescription: "Quality groups.",
 						Required:            true,
 						Attributes: tfsdk.SetNestedAttributes(map[string]tfsdk.Attribute{
 							"id": {
-								MarkdownDescription: "ID of quality group",
+								MarkdownDescription: "Quality group ID.",
 								Optional:            true,
 								Computed:            true,
 								Type:                types.Int64Type,
 							},
 							"name": {
-								MarkdownDescription: "Name of quality group",
+								MarkdownDescription: "Quality group name.",
 								Optional:            true,
 								Computed:            true,
 								Type:                types.StringType,
 							},
 							"qualities": {
-								MarkdownDescription: "Qualities in group",
+								MarkdownDescription: "Qualities in group.",
 								Required:            true,
 								Attributes: tfsdk.SetNestedAttributes(map[string]tfsdk.Attribute{
 									"id": {
-										MarkdownDescription: "ID of quality group",
+										MarkdownDescription: "Quality ID.",
 										Optional:            true,
 										Computed:            true,
 										Type:                types.Int64Type,
 									},
 									"resolution": {
-										MarkdownDescription: "Resolution",
+										MarkdownDescription: "Resolution.",
 										Optional:            true,
 										Computed:            true,
 										Type:                types.Int64Type,
 									},
 									"name": {
-										MarkdownDescription: "Name of quality group",
+										MarkdownDescription: "Quality name.",
 										Optional:            true,
 										Computed:            true,
 										Type:                types.StringType,
 									},
 									"source": {
-										MarkdownDescription: "Source",
+										MarkdownDescription: "Source.",
 										Optional:            true,
 										Computed:            true,
 										Type:                types.StringType,

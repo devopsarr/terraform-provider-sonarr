@@ -33,7 +33,7 @@ type DelayProfiles struct {
 func (t dataDelayProfilesType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		// This description is used by the documentation generator and the delay server.
-		MarkdownDescription: "List all available delayprofiles",
+		MarkdownDescription: "List all available [Delay Profiles](../resources/delay_profile).",
 		Attributes: map[string]tfsdk.Attribute{
 			// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 			"id": {
@@ -41,53 +41,53 @@ func (t dataDelayProfilesType) GetSchema(ctx context.Context) (tfsdk.Schema, dia
 				Type:     types.StringType,
 			},
 			"delay_profiles": {
-				MarkdownDescription: "List of delayprofiles",
+				MarkdownDescription: "Delay Profile list.",
 				Computed:            true,
 				Attributes: tfsdk.SetNestedAttributes(map[string]tfsdk.Attribute{
 					"id": {
-						MarkdownDescription: "ID of delayprofile",
+						MarkdownDescription: "Delay Profile ID.",
 						Computed:            true,
 						Type:                types.Int64Type,
 					},
 					"enable_usenet": {
-						MarkdownDescription: "Usenet allowed Flag",
+						MarkdownDescription: "Usenet allowed Flag.",
 						Computed:            true,
 						Type:                types.BoolType,
 					},
 					"enable_torrent": {
-						MarkdownDescription: "Torrent allowed Flag",
+						MarkdownDescription: "Torrent allowed Flag.",
 						Computed:            true,
 						Type:                types.BoolType,
 					},
 					"bypass_if_highest_quality": {
-						MarkdownDescription: "Bypass for highest quality Flag",
+						MarkdownDescription: "Bypass for highest quality Flag.",
 						Computed:            true,
 						Type:                types.BoolType,
 					},
 					"usenet_delay": {
-						MarkdownDescription: "Usenet delay",
+						MarkdownDescription: "Usenet delay.",
 						Computed:            true,
 						Type:                types.Int64Type,
 					},
 					"torrent_delay": {
-						MarkdownDescription: "Torrent Delay",
+						MarkdownDescription: "Torrent Delay.",
 						Computed:            true,
 						Type:                types.Int64Type,
 					},
 					"order": {
-						MarkdownDescription: "Order",
+						MarkdownDescription: "Order.",
 						Computed:            true,
 						Type:                types.Int64Type,
 					},
 					"tags": {
-						MarkdownDescription: "List of associated tags",
+						MarkdownDescription: "List of associated tags.",
 						Computed:            true,
 						Type: types.SetType{
 							ElemType: types.Int64Type,
 						},
 					},
 					"preferred_protocol": {
-						MarkdownDescription: "Preferred protocol",
+						MarkdownDescription: "Preferred protocol.",
 						Computed:            true,
 						Type:                types.StringType,
 					},

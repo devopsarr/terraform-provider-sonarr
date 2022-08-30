@@ -3,12 +3,12 @@
 page_title: "sonarr_root_folder Resource - terraform-provider-sonarr"
 subcategory: ""
 description: |-
-  RootFolder resource
+  Root Folder resource.For more information refer to Root Folders https://wiki.servarr.com/sonarr/settings#root-folders documentation.
 ---
 
 # sonarr_root_folder (Resource)
 
-RootFolder resource
+Root Folder resource.<br/>For more information refer to [Root Folders](https://wiki.servarr.com/sonarr/settings#root-folders) documentation.
 
 ## Example Usage
 
@@ -23,21 +23,21 @@ resource "sonarr_root_folder" "example" {
 
 ### Required
 
-- `path` (String) Absolute path of rootFolder
+- `path` (String) Root Folder absolute path.
 
 ### Read-Only
 
-- `accessible` (Boolean) Access flag
-- `id` (Number) RootFolder ID
-- `unmapped_folders` (Attributes Set) List of folders with no associated series (see [below for nested schema](#nestedatt--unmapped_folders))
+- `accessible` (Boolean) Access flag.
+- `id` (Number) Root Folder ID.
+- `unmapped_folders` (Attributes Set) List of folders with no associated series. (see [below for nested schema](#nestedatt--unmapped_folders))
 
 <a id="nestedatt--unmapped_folders"></a>
 ### Nested Schema for `unmapped_folders`
 
 Read-Only:
 
-- `name` (String) Name of unmapped folder
-- `path` (String) Path of unmapped folder
+- `name` (String) Name of unmapped folder.
+- `path` (String) Path of unmapped folder.
 
 ## Import
 

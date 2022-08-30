@@ -44,10 +44,10 @@ type Naming struct {
 
 func (t resourceNamingType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		MarkdownDescription: "Naming resource",
+		MarkdownDescription: "Naming resource. <br/>For more information refer to [Naming](https://wiki.servarr.com/sonarr/settings#community-naming-suggestions) documentation.",
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
-				MarkdownDescription: "ID of naming",
+				MarkdownDescription: "Naming ID.",
 				Computed:            true,
 				Type:                types.Int64Type,
 				PlanModifiers: tfsdk.AttributePlanModifiers{
@@ -55,47 +55,47 @@ func (t resourceNamingType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.D
 				},
 			},
 			"rename_episodes": {
-				MarkdownDescription: "Sonarr will use the existing file name if false",
+				MarkdownDescription: "Sonarr will use the existing file name if false.",
 				Required:            true,
 				Type:                types.BoolType,
 			},
 			"replace_illegal_characters": {
-				MarkdownDescription: "Replace illegal characters. They will be removed if false",
+				MarkdownDescription: "Replace illegal characters. They will be removed if false.",
 				Required:            true,
 				Type:                types.BoolType,
 			},
 			"multi_episode_style": {
-				MarkdownDescription: "Multi episode style. 0 - 'Extend' 1 - 'Duplicate' 2 - 'Repeat' 3 - 'Scene' 4 - 'Range' 5 - 'Prefixed Range'",
+				MarkdownDescription: "Multi episode style. 0 - 'Extend' 1 - 'Duplicate' 2 - 'Repeat' 3 - 'Scene' 4 - 'Range' 5 - 'Prefixed Range'.",
 				Required:            true,
 				Type:                types.Int64Type,
 			},
 			"daily_episode_format": {
-				MarkdownDescription: "Daily episode format",
+				MarkdownDescription: "Daily episode format.",
 				Required:            true,
 				Type:                types.StringType,
 			},
 			"anime_episode_format": {
-				MarkdownDescription: "Anime episode format",
+				MarkdownDescription: "Anime episode format.",
 				Required:            true,
 				Type:                types.StringType,
 			},
 			"series_folder_format": {
-				MarkdownDescription: "Series folder format",
+				MarkdownDescription: "Series folder format.",
 				Required:            true,
 				Type:                types.StringType,
 			},
 			"season_folder_format": {
-				MarkdownDescription: "Season folder format",
+				MarkdownDescription: "Season folder format.",
 				Required:            true,
 				Type:                types.StringType,
 			},
 			"specials_folder_format": {
-				MarkdownDescription: "Special folder format",
+				MarkdownDescription: "Special folder format.",
 				Required:            true,
 				Type:                types.StringType,
 			},
 			"standard_episode_format": {
-				MarkdownDescription: "Standard episode formatss",
+				MarkdownDescription: "Standard episode formatss.",
 				Required:            true,
 				Type:                types.StringType,
 			},
