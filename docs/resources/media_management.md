@@ -68,6 +68,6 @@ resource "sonarr_media_management" "example" {
 Import is supported using the following syntax:
 
 ```shell
-# import using the API/UI ID
+# import does not need parameters
 terraform import sonarr_media_management.example
 ```
