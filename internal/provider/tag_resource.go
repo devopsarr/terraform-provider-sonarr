@@ -37,10 +37,10 @@ type Tag struct {
 
 func (t resourceTagType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		MarkdownDescription: "Tag resource",
+		MarkdownDescription: "Tag resource.<br/>For more information refer to [Tags](https://wiki.servarr.com/sonarr/settings#tags) documentation.",
 		Attributes: map[string]tfsdk.Attribute{
 			"label": {
-				MarkdownDescription: "Tag value",
+				MarkdownDescription: "Tag label. It must be lowercase.",
 				Required:            true,
 				Type:                types.StringType,
 				Validators: []tfsdk.AttributeValidator{
@@ -48,7 +48,7 @@ func (t resourceTagType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diag
 				},
 			},
 			"id": {
-				MarkdownDescription: "Tag ID",
+				MarkdownDescription: "Tag ID.",
 				Computed:            true,
 				Type:                types.Int64Type,
 				PlanModifiers: tfsdk.AttributePlanModifiers{

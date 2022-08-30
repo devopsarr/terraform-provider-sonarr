@@ -3,12 +3,12 @@
 page_title: "sonarr_indexers Data Source - terraform-provider-sonarr"
 subcategory: ""
 description: |-
-  List all available indexers
+  List all available Indexers ../resources/indexer.
 ---
 
 # sonarr_indexers (Data Source)
 
-List all available indexers
+List all available [Indexers](../resources/indexer).
 
 ## Example Usage
 
@@ -23,41 +23,41 @@ data "sonarr_indexers" "example" {
 ### Read-Only
 
 - `id` (String) The ID of this resource.
-- `indexers` (Attributes Set) List of indexer (see [below for nested schema](#nestedatt--indexers))
+- `indexers` (Attributes Set) Indexer list. (see [below for nested schema](#nestedatt--indexers))
 
 <a id="nestedatt--indexers"></a>
 ### Nested Schema for `indexers`
 
 Read-Only:
 
-- `additional_parameters` (String) Additional parameters
-- `allow_zero_size` (Boolean) Allow zero size files
-- `anime_categories` (Set of Number) Anime list
-- `anime_standard_format_search` (Boolean) Search anime in standard format
-- `api_key` (String) API key
-- `api_path` (String) API path
-- `base_url` (String) Base URL
-- `captcha_token` (String) Captcha token
-- `categories` (Set of Number) Series list
-- `config_contract` (String) Indexer configuration template
-- `cookie` (String) Cookie
-- `delay` (Number) Delay before grabbing
-- `download_client_id` (Number) Download client ID
-- `enable_automatic_search` (Boolean) Enable automatic search flag
-- `enable_interactive_search` (Boolean) Enable interactive search flag
-- `enable_rss` (Boolean) Enable RSS flag
-- `id` (Number) Indexer ID
-- `implementation` (String) Indexer implementation name
-- `minimum_seeders` (Number) Minimum seeders
-- `name` (String) Name
-- `passkey` (String) Passkey
-- `priority` (Number) Priority
-- `protocol` (String) Protocol. Valid values are 'usenet' and 'torrent'
-- `ranked_only` (Boolean) Allow ranked only
-- `season_pack_seed_time` (Number) Season seed time
-- `seed_ratio` (Number) Seed ratio
-- `seed_time` (Number) Seed time
-- `tags` (Set of Number) List of associated tags
-- `username` (String) Username
+- `additional_parameters` (String) Additional parameters.
+- `allow_zero_size` (Boolean) Allow zero size files.
+- `anime_categories` (Set of Number) Anime list.
+- `anime_standard_format_search` (Boolean) Search anime in standard format.
+- `api_key` (String) API key.
+- `api_path` (String) API path.
+- `base_url` (String) Base URL.
+- `captcha_token` (String) Captcha token.
+- `categories` (Set of Number) Series list.
+- `config_contract` (String) Indexer configuration template.
+- `cookie` (String) Cookie.
+- `delay` (Number) Delay before grabbing.
+- `download_client_id` (Number) Download client ID.
+- `enable_automatic_search` (Boolean) Enable automatic search flag.
+- `enable_interactive_search` (Boolean) Enable interactive search flag.
+- `enable_rss` (Boolean) Enable RSS flag.
+- `id` (Number) Indexer ID.
+- `implementation` (String) Indexer implementation name.
+- `minimum_seeders` (Number) Minimum seeders.
+- `name` (String) Indexer name.
+- `passkey` (String) Passkey.
+- `priority` (Number) Priority.
+- `protocol` (String) Protocol. Valid values are 'usenet' and 'torrent'.
+- `ranked_only` (Boolean) Allow ranked only.
+- `season_pack_seed_time` (Number) Season seed time.
+- `seed_ratio` (Number) Seed ratio.
+- `seed_time` (Number) Seed time.
+- `tags` (Set of Number) List of associated tags.
+- `username` (String) Username.
 
 

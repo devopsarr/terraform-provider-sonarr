@@ -3,12 +3,12 @@
 page_title: "sonarr_naming Resource - terraform-provider-sonarr"
 subcategory: ""
 description: |-
-  Naming resource
+  Naming resource. For more information refer to Naming https://wiki.servarr.com/sonarr/settings#community-naming-suggestions documentation.
 ---
 
 # sonarr_naming (Resource)
 
-Naming resource
+Naming resource. <br/>For more information refer to [Naming](https://wiki.servarr.com/sonarr/settings#community-naming-suggestions) documentation.
 
 ## Example Usage
 
@@ -31,19 +31,19 @@ resource "sonarr_media_management" "example" {
 
 ### Required
 
-- `anime_episode_format` (String) Anime episode format
-- `daily_episode_format` (String) Daily episode format
-- `multi_episode_style` (Number) Multi episode style. 0 - 'Extend' 1 - 'Duplicate' 2 - 'Repeat' 3 - 'Scene' 4 - 'Range' 5 - 'Prefixed Range'
-- `rename_episodes` (Boolean) Sonarr will use the existing file name if false
-- `replace_illegal_characters` (Boolean) Replace illegal characters. They will be removed if false
-- `season_folder_format` (String) Season folder format
-- `series_folder_format` (String) Series folder format
-- `specials_folder_format` (String) Special folder format
-- `standard_episode_format` (String) Standard episode formatss
+- `anime_episode_format` (String) Anime episode format.
+- `daily_episode_format` (String) Daily episode format.
+- `multi_episode_style` (Number) Multi episode style. 0 - 'Extend' 1 - 'Duplicate' 2 - 'Repeat' 3 - 'Scene' 4 - 'Range' 5 - 'Prefixed Range'.
+- `rename_episodes` (Boolean) Sonarr will use the existing file name if false.
+- `replace_illegal_characters` (Boolean) Replace illegal characters. They will be removed if false.
+- `season_folder_format` (String) Season folder format.
+- `series_folder_format` (String) Series folder format.
+- `specials_folder_format` (String) Special folder format.
+- `standard_episode_format` (String) Standard episode formatss.
 
 ### Read-Only
 
-- `id` (Number) ID of naming
+- `id` (Number) Naming ID.
 
 ## Import
 

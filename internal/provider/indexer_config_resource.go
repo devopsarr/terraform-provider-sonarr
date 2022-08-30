@@ -39,10 +39,10 @@ type IndexerConfig struct {
 
 func (t resourceIndexerConfigType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		MarkdownDescription: "IndexerConfig resource",
+		MarkdownDescription: "Indexer Config resource.<br/>For more information refer to [Indexer](https://wiki.servarr.com/sonarr/settings#options) documentation.",
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
-				MarkdownDescription: "ID of indexer configuration",
+				MarkdownDescription: "Indexer Config ID.",
 				Computed:            true,
 				Type:                types.Int64Type,
 				PlanModifiers: tfsdk.AttributePlanModifiers{
@@ -50,22 +50,22 @@ func (t resourceIndexerConfigType) GetSchema(ctx context.Context) (tfsdk.Schema,
 				},
 			},
 			"maximum_size": {
-				MarkdownDescription: "Maximum size",
+				MarkdownDescription: "Maximum size.",
 				Required:            true,
 				Type:                types.Int64Type,
 			},
 			"minimum_age": {
-				MarkdownDescription: "Minimum age",
+				MarkdownDescription: "Minimum age.",
 				Required:            true,
 				Type:                types.Int64Type,
 			},
 			"retention": {
-				MarkdownDescription: "Retention",
+				MarkdownDescription: "Retention.",
 				Required:            true,
 				Type:                types.Int64Type,
 			},
 			"rss_sync_interval": {
-				MarkdownDescription: "RSS sync interval",
+				MarkdownDescription: "RSS sync interval.",
 				Required:            true,
 				Type:                types.Int64Type,
 			},

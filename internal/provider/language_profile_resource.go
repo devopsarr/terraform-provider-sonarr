@@ -41,10 +41,10 @@ type LanguageProfile struct {
 
 func (t resourceLanguageProfileType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		MarkdownDescription: "LanguageProfile resource",
+		MarkdownDescription: "Language Profile resource.<br/>For more information refer to [Language Profile](https://wiki.servarr.com/sonarr/settings#language-profiles) documentation.",
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
-				MarkdownDescription: "ID of languageprofile",
+				MarkdownDescription: "Language Profile ID.",
 				Computed:            true,
 				Type:                types.Int64Type,
 				PlanModifiers: tfsdk.AttributePlanModifiers{
@@ -52,18 +52,18 @@ func (t resourceLanguageProfileType) GetSchema(ctx context.Context) (tfsdk.Schem
 				},
 			},
 			"name": {
-				MarkdownDescription: "Name of languageprofile",
+				MarkdownDescription: "Language Profile name.",
 				Required:            true,
 				Type:                types.StringType,
 			},
 			"upgrade_allowed": {
-				MarkdownDescription: "Upgrade allowed Flag",
+				MarkdownDescription: "Upgrade allowed Flag.",
 				Optional:            true,
 				Computed:            true,
 				Type:                types.BoolType,
 			},
 			"cutoff_language": {
-				MarkdownDescription: "Name of language",
+				MarkdownDescription: "Name of language.",
 				Required:            true,
 				Type:                types.StringType,
 				Validators: []tfsdk.AttributeValidator{
@@ -71,7 +71,7 @@ func (t resourceLanguageProfileType) GetSchema(ctx context.Context) (tfsdk.Schem
 				},
 			},
 			"languages": {
-				MarkdownDescription: "list of languages in profile",
+				MarkdownDescription: "list of languages in profile.",
 				Required:            true,
 				Type:                types.SetType{ElemType: types.StringType},
 			},

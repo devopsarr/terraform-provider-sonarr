@@ -3,12 +3,12 @@
 page_title: "sonarr_indexer_config Resource - terraform-provider-sonarr"
 subcategory: ""
 description: |-
-  IndexerConfig resource
+  Indexer Config resource.For more information refer to Indexer https://wiki.servarr.com/sonarr/settings#options documentation.
 ---
 
 # sonarr_indexer_config (Resource)
 
-IndexerConfig resource
+Indexer Config resource.<br/>For more information refer to [Indexer](https://wiki.servarr.com/sonarr/settings#options) documentation.
 
 ## Example Usage
 
@@ -26,14 +26,14 @@ resource "sonarr_indexer_config" "example" {
 
 ### Required
 
-- `maximum_size` (Number) Maximum size
-- `minimum_age` (Number) Minimum age
-- `retention` (Number) Retention
-- `rss_sync_interval` (Number) RSS sync interval
+- `maximum_size` (Number) Maximum size.
+- `minimum_age` (Number) Minimum age.
+- `retention` (Number) Retention.
+- `rss_sync_interval` (Number) RSS sync interval.
 
 ### Read-Only
 
-- `id` (Number) ID of indexer configuration
+- `id` (Number) Indexer Config ID.
 
 ## Import
 

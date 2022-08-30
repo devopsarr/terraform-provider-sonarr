@@ -3,12 +3,12 @@
 page_title: "sonarr_media_management Resource - terraform-provider-sonarr"
 subcategory: ""
 description: |-
-  MediaManagement resource
+  Media Management resource.For more information refer to Naming https://wiki.servarr.com/sonarr/settings#file-management documentation.
 ---
 
 # sonarr_media_management (Resource)
 
-MediaManagement resource
+Media Management resource.<br/>For more information refer to [Naming](https://wiki.servarr.com/sonarr/settings#file-management) documentation.
 
 ## Example Usage
 
@@ -40,28 +40,28 @@ resource "sonarr_media_management" "example" {
 
 ### Required
 
-- `chmod_folder` (String) Permission in linux format
-- `chown_group` (String) Group used for permission
-- `create_empty_folders` (Boolean) Create empty series directories
-- `delete_empty_folders` (Boolean) Delete empty series directories
-- `download_propers_repacks` (String) Download proper and repack policy. valid inputs are: 'preferAndUpgrade', 'doNotUpgrade', and 'doNotPrefer'
-- `enable_media_info` (Boolean) Scan files details
-- `episode_title_required` (String) Episode title requirement policy. valid inputs are: 'always', 'bulkSeasonReleases' and 'never'
-- `extra_file_extensions` (String) Comma separated list of extra files to import (.nfo will be imported as .nfo-orig)
-- `file_date` (String) Define the file date modification. valid inputs are: 'none', 'localAirDate, and 'utcAirDate'
-- `hardlinks_copy` (Boolean) Use hardlinks instead of copy
-- `import_extra_files` (Boolean) Import extra files. If enabled it will leverage 'extra_file_extensions'
-- `minimum_free_space` (Number) Minimum free space in MB to allow import
-- `recycle_bin_days` (Number) Recyle bin days of retention
-- `recycle_bin_path` (String) Recycle bin absolute path
-- `rescan_after_refresh` (String) Rescan after refresh policy. valid inputs are: 'always', 'afterManual' and 'never'
-- `set_permissions` (Boolean) Set permission for imported files
-- `skip_free_space_check` (Boolean) Skip free space check before importing
-- `unmonitor_previous_episodes` (Boolean) Unmonitor deleted files
+- `chmod_folder` (String) Permission in linux format.
+- `chown_group` (String) Group used for permission.
+- `create_empty_folders` (Boolean) Create empty series directories.
+- `delete_empty_folders` (Boolean) Delete empty series directories.
+- `download_propers_repacks` (String) Download proper and repack policy. valid inputs are: 'preferAndUpgrade', 'doNotUpgrade', and 'doNotPrefer'.
+- `enable_media_info` (Boolean) Scan files details.
+- `episode_title_required` (String) Episode title requirement policy. valid inputs are: 'always', 'bulkSeasonReleases' and 'never'.
+- `extra_file_extensions` (String) Comma separated list of extra files to import (.nfo will be imported as .nfo-orig).
+- `file_date` (String) Define the file date modification. valid inputs are: 'none', 'localAirDate, and 'utcAirDate'.
+- `hardlinks_copy` (Boolean) Use hardlinks instead of copy.
+- `import_extra_files` (Boolean) Import extra files. If enabled it will leverage 'extra_file_extensions'.
+- `minimum_free_space` (Number) Minimum free space in MB to allow import.
+- `recycle_bin_days` (Number) Recyle bin days of retention.
+- `recycle_bin_path` (String) Recycle bin absolute path.
+- `rescan_after_refresh` (String) Rescan after refresh policy. valid inputs are: 'always', 'afterManual' and 'never'.
+- `set_permissions` (Boolean) Set permission for imported files.
+- `skip_free_space_check` (Boolean) Skip free space check before importing.
+- `unmonitor_previous_episodes` (Boolean) Unmonitor deleted files.
 
 ### Read-Only
 
-- `id` (Number) ID of mediamanagement
+- `id` (Number) Media Management ID.
 
 ## Import
 

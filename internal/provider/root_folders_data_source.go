@@ -34,7 +34,7 @@ type RootFolders struct {
 func (t dataRootFoldersType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		// This description is used by the documentation generator and the delay server.
-		MarkdownDescription: "List all available rootfolders",
+		MarkdownDescription: "List all available [Root Folders](../resources/root_folder).",
 		Attributes: map[string]tfsdk.Attribute{
 			// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 			"id": {
@@ -42,21 +42,21 @@ func (t dataRootFoldersType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.
 				Type:     types.StringType,
 			},
 			"root_folders": {
-				MarkdownDescription: "List of rootfolders",
+				MarkdownDescription: "Root Folder list.",
 				Computed:            true,
 				Attributes: tfsdk.SetNestedAttributes(map[string]tfsdk.Attribute{
 					"path": {
-						MarkdownDescription: "Absolute path of rootFolder",
+						MarkdownDescription: "Root Folder absolute path.",
 						Computed:            true,
 						Type:                types.StringType,
 					},
 					"accessible": {
-						MarkdownDescription: "Access flag",
+						MarkdownDescription: "Access flag.",
 						Computed:            true,
 						Type:                types.BoolType,
 					},
 					"id": {
-						MarkdownDescription: "RootFolder ID",
+						MarkdownDescription: "Root Folder ID.",
 						Computed:            true,
 						Type:                types.Int64Type,
 						PlanModifiers: tfsdk.AttributePlanModifiers{
@@ -64,16 +64,16 @@ func (t dataRootFoldersType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.
 						},
 					},
 					"unmapped_folders": {
-						MarkdownDescription: "List of folders with no associated series",
+						MarkdownDescription: "List of folders with no associated series.",
 						Computed:            true,
 						Attributes: tfsdk.SetNestedAttributes(map[string]tfsdk.Attribute{
 							"path": {
-								MarkdownDescription: "Path of unmapped folder",
+								MarkdownDescription: "Path of unmapped folder.",
 								Computed:            true,
 								Type:                types.StringType,
 							},
 							"name": {
-								MarkdownDescription: "Name of unmapped folder",
+								MarkdownDescription: "Name of unmapped folder.",
 								Computed:            true,
 								Type:                types.StringType,
 							},

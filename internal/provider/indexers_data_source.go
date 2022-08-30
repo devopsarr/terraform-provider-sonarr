@@ -33,7 +33,7 @@ type Indexers struct {
 func (t dataIndexersType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		// This description is used by the documentation generator and the delay server.
-		MarkdownDescription: "List all available indexers",
+		MarkdownDescription: "List all available [Indexers](../resources/indexer).",
 		Attributes: map[string]tfsdk.Attribute{
 			// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 			"id": {
@@ -41,156 +41,156 @@ func (t dataIndexersType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Dia
 				Type:     types.StringType,
 			},
 			"indexers": {
-				MarkdownDescription: "List of indexer",
+				MarkdownDescription: "Indexer list.",
 				Computed:            true,
 				Attributes: tfsdk.SetNestedAttributes(map[string]tfsdk.Attribute{
 					"enable_automatic_search": {
-						MarkdownDescription: "Enable automatic search flag",
+						MarkdownDescription: "Enable automatic search flag.",
 						Computed:            true,
 						Type:                types.BoolType,
 					},
 					"enable_interactive_search": {
-						MarkdownDescription: "Enable interactive search flag",
+						MarkdownDescription: "Enable interactive search flag.",
 						Computed:            true,
 						Type:                types.BoolType,
 					},
 					"enable_rss": {
-						MarkdownDescription: "Enable RSS flag",
+						MarkdownDescription: "Enable RSS flag.",
 						Computed:            true,
 						Type:                types.BoolType,
 					},
 					"priority": {
-						MarkdownDescription: "Priority",
+						MarkdownDescription: "Priority.",
 						Computed:            true,
 						Type:                types.Int64Type,
 					},
 					"download_client_id": {
-						MarkdownDescription: "Download client ID",
+						MarkdownDescription: "Download client ID.",
 						Computed:            true,
 						Type:                types.Int64Type,
 					},
 					"config_contract": {
-						MarkdownDescription: "Indexer configuration template",
+						MarkdownDescription: "Indexer configuration template.",
 						Computed:            true,
 						Type:                types.StringType,
 					},
 					"implementation": {
-						MarkdownDescription: "Indexer implementation name",
+						MarkdownDescription: "Indexer implementation name.",
 						Computed:            true,
 						Type:                types.StringType,
 					},
 					"name": {
-						MarkdownDescription: "Name",
+						MarkdownDescription: "Indexer name.",
 						Computed:            true,
 						Type:                types.StringType,
 					},
 					"protocol": {
-						MarkdownDescription: "Protocol. Valid values are 'usenet' and 'torrent'",
+						MarkdownDescription: "Protocol. Valid values are 'usenet' and 'torrent'.",
 						Computed:            true,
 						Type:                types.StringType,
 					},
 					"tags": {
-						MarkdownDescription: "List of associated tags",
+						MarkdownDescription: "List of associated tags.",
 						Computed:            true,
 						Type: types.SetType{
 							ElemType: types.Int64Type,
 						},
 					},
 					"id": {
-						MarkdownDescription: "Indexer ID",
+						MarkdownDescription: "Indexer ID.",
 						Computed:            true,
 						Type:                types.Int64Type,
 					},
 					// Field values
 					"allow_zero_size": {
-						MarkdownDescription: "Allow zero size files",
+						MarkdownDescription: "Allow zero size files.",
 						Computed:            true,
 						Type:                types.BoolType,
 					},
 					"anime_standard_format_search": {
-						MarkdownDescription: "Search anime in standard format",
+						MarkdownDescription: "Search anime in standard format.",
 						Computed:            true,
 						Type:                types.BoolType,
 					},
 					"ranked_only": {
-						MarkdownDescription: "Allow ranked only",
+						MarkdownDescription: "Allow ranked only.",
 						Computed:            true,
 						Type:                types.BoolType,
 					},
 					"delay": {
-						MarkdownDescription: "Delay before grabbing",
+						MarkdownDescription: "Delay before grabbing.",
 						Computed:            true,
 						Type:                types.Int64Type,
 					},
 					"minimum_seeders": {
-						MarkdownDescription: "Minimum seeders",
+						MarkdownDescription: "Minimum seeders.",
 						Computed:            true,
 						Type:                types.Int64Type,
 					},
 					"season_pack_seed_time": {
-						MarkdownDescription: "Season seed time",
+						MarkdownDescription: "Season seed time.",
 						Computed:            true,
 						Type:                types.Int64Type,
 					},
 					"seed_time": {
-						MarkdownDescription: "Seed time",
+						MarkdownDescription: "Seed time.",
 						Computed:            true,
 						Type:                types.Int64Type,
 					},
 					"seed_ratio": {
-						MarkdownDescription: "Seed ratio",
+						MarkdownDescription: "Seed ratio.",
 						Computed:            true,
 						Type:                types.Float64Type,
 					},
 					"additional_parameters": {
-						MarkdownDescription: "Additional parameters",
+						MarkdownDescription: "Additional parameters.",
 						Computed:            true,
 						Type:                types.StringType,
 					},
 					"api_key": {
-						MarkdownDescription: "API key",
+						MarkdownDescription: "API key.",
 						Computed:            true,
 						Type:                types.StringType,
 					},
 					"api_path": {
-						MarkdownDescription: "API path",
+						MarkdownDescription: "API path.",
 						Computed:            true,
 						Type:                types.StringType,
 					},
 					"base_url": {
-						MarkdownDescription: "Base URL",
+						MarkdownDescription: "Base URL.",
 						Computed:            true,
 						Type:                types.StringType,
 					},
 					"captcha_token": {
-						MarkdownDescription: "Captcha token",
+						MarkdownDescription: "Captcha token.",
 						Computed:            true,
 						Type:                types.StringType,
 					},
 					"cookie": {
-						MarkdownDescription: "Cookie",
+						MarkdownDescription: "Cookie.",
 						Computed:            true,
 						Type:                types.StringType,
 					},
 					"passkey": {
-						MarkdownDescription: "Passkey",
+						MarkdownDescription: "Passkey.",
 						Computed:            true,
 						Type:                types.StringType,
 					},
 					"username": {
-						MarkdownDescription: "Username",
+						MarkdownDescription: "Username.",
 						Computed:            true,
 						Type:                types.StringType,
 					},
 					"categories": {
-						MarkdownDescription: "Series list",
+						MarkdownDescription: "Series list.",
 						Computed:            true,
 						Type: types.SetType{
 							ElemType: types.Int64Type,
 						},
 					},
 					"anime_categories": {
-						MarkdownDescription: "Anime list",
+						MarkdownDescription: "Anime list.",
 						Computed:            true,
 						Type: types.SetType{
 							ElemType: types.Int64Type,

@@ -33,7 +33,7 @@ type Tags struct {
 func (t dataTagsType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		// This description is used by the documentation generator and the language server.
-		MarkdownDescription: "List all available tags",
+		MarkdownDescription: "List all available [Tags](../resources/tag).",
 		Attributes: map[string]tfsdk.Attribute{
 			// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 			"id": {
@@ -41,16 +41,16 @@ func (t dataTagsType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnos
 				Type:     types.StringType,
 			},
 			"tags": {
-				MarkdownDescription: "List of tags",
+				MarkdownDescription: "Tag list.",
 				Computed:            true,
 				Attributes: tfsdk.SetNestedAttributes(map[string]tfsdk.Attribute{
 					"id": {
-						MarkdownDescription: "ID of tag",
+						MarkdownDescription: "Tag ID.",
 						Computed:            true,
 						Type:                types.Int64Type,
 					},
 					"label": {
-						MarkdownDescription: "Actual tag",
+						MarkdownDescription: "Tag label.",
 						Computed:            true,
 						Type:                types.StringType,
 					},

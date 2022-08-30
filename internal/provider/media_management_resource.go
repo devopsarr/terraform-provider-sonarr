@@ -54,10 +54,10 @@ type MediaManagement struct {
 
 func (t resourceMediaManagementType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		MarkdownDescription: "MediaManagement resource",
+		MarkdownDescription: "Media Management resource.<br/>For more information refer to [Naming](https://wiki.servarr.com/sonarr/settings#file-management) documentation.",
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
-				MarkdownDescription: "ID of mediamanagement",
+				MarkdownDescription: "Media Management ID.",
 				Computed:            true,
 				Type:                types.Int64Type,
 				PlanModifiers: tfsdk.AttributePlanModifiers{
@@ -65,67 +65,67 @@ func (t resourceMediaManagementType) GetSchema(ctx context.Context) (tfsdk.Schem
 				},
 			},
 			"unmonitor_previous_episodes": {
-				MarkdownDescription: "Unmonitor deleted files",
+				MarkdownDescription: "Unmonitor deleted files.",
 				Required:            true,
 				Type:                types.BoolType,
 			},
 			"hardlinks_copy": {
-				MarkdownDescription: "Use hardlinks instead of copy",
+				MarkdownDescription: "Use hardlinks instead of copy.",
 				Required:            true,
 				Type:                types.BoolType,
 			},
 			"create_empty_folders": {
-				MarkdownDescription: "Create empty series directories",
+				MarkdownDescription: "Create empty series directories.",
 				Required:            true,
 				Type:                types.BoolType,
 			},
 			"delete_empty_folders": {
-				MarkdownDescription: "Delete empty series directories",
+				MarkdownDescription: "Delete empty series directories.",
 				Required:            true,
 				Type:                types.BoolType,
 			},
 			"enable_media_info": {
-				MarkdownDescription: "Scan files details",
+				MarkdownDescription: "Scan files details.",
 				Required:            true,
 				Type:                types.BoolType,
 			},
 			"import_extra_files": {
-				MarkdownDescription: "Import extra files. If enabled it will leverage 'extra_file_extensions'",
+				MarkdownDescription: "Import extra files. If enabled it will leverage 'extra_file_extensions'.",
 				Required:            true,
 				Type:                types.BoolType,
 			},
 			"set_permissions": {
-				MarkdownDescription: "Set permission for imported files",
+				MarkdownDescription: "Set permission for imported files.",
 				Required:            true,
 				Type:                types.BoolType,
 			},
 			"skip_free_space_check": {
-				MarkdownDescription: "Skip free space check before importing",
+				MarkdownDescription: "Skip free space check before importing.",
 				Required:            true,
 				Type:                types.BoolType,
 			},
 			"minimum_free_space": {
-				MarkdownDescription: "Minimum free space in MB to allow import",
+				MarkdownDescription: "Minimum free space in MB to allow import.",
 				Required:            true,
 				Type:                types.Int64Type,
 			},
 			"recycle_bin_days": {
-				MarkdownDescription: "Recyle bin days of retention",
+				MarkdownDescription: "Recyle bin days of retention.",
 				Required:            true,
 				Type:                types.Int64Type,
 			},
 			"chmod_folder": {
-				MarkdownDescription: "Permission in linux format",
+				MarkdownDescription: "Permission in linux format.",
 				Required:            true,
 				Type:                types.StringType,
 			},
 			"chown_group": {
-				MarkdownDescription: "Group used for permission",
+				MarkdownDescription: "Group used for permission.",
 				Required:            true,
 				Type:                types.StringType,
 			},
 			"download_propers_repacks": {
-				MarkdownDescription: "Download proper and repack policy. valid inputs are: 'preferAndUpgrade', 'doNotUpgrade', and 'doNotPrefer'",
+				MarkdownDescription: "Download proper and repack policy. valid inputs are: 'preferAndUpgrade', 'doNotUpgrade', and 'doNotPrefer'.",
 				Required:            true,
 				Type:                types.StringType,
 				Validators: []tfsdk.AttributeValidator{
@@ -133,7 +133,7 @@ func (t resourceMediaManagementType) GetSchema(ctx context.Context) (tfsdk.Schem
 				},
 			},
 			"episode_title_required": {
-				MarkdownDescription: "Episode title requirement policy. valid inputs are: 'always', 'bulkSeasonReleases' and 'never'",
+				MarkdownDescription: "Episode title requirement policy. valid inputs are: 'always', 'bulkSeasonReleases' and 'never'.",
 				Required:            true,
 				Type:                types.StringType,
 				Validators: []tfsdk.AttributeValidator{
@@ -141,12 +141,12 @@ func (t resourceMediaManagementType) GetSchema(ctx context.Context) (tfsdk.Schem
 				},
 			},
 			"extra_file_extensions": {
-				MarkdownDescription: "Comma separated list of extra files to import (.nfo will be imported as .nfo-orig)",
+				MarkdownDescription: "Comma separated list of extra files to import (.nfo will be imported as .nfo-orig).",
 				Required:            true,
 				Type:                types.StringType,
 			},
 			"file_date": {
-				MarkdownDescription: "Define the file date modification. valid inputs are: 'none', 'localAirDate, and 'utcAirDate'",
+				MarkdownDescription: "Define the file date modification. valid inputs are: 'none', 'localAirDate, and 'utcAirDate'.",
 				Required:            true,
 				Type:                types.StringType,
 				Validators: []tfsdk.AttributeValidator{
@@ -154,12 +154,12 @@ func (t resourceMediaManagementType) GetSchema(ctx context.Context) (tfsdk.Schem
 				},
 			},
 			"recycle_bin_path": {
-				MarkdownDescription: "Recycle bin absolute path",
+				MarkdownDescription: "Recycle bin absolute path.",
 				Required:            true,
 				Type:                types.StringType,
 			},
 			"rescan_after_refresh": {
-				MarkdownDescription: "Rescan after refresh policy. valid inputs are: 'always', 'afterManual' and 'never'",
+				MarkdownDescription: "Rescan after refresh policy. valid inputs are: 'always', 'afterManual' and 'never'.",
 				Required:            true,
 				Type:                types.StringType,
 				Validators: []tfsdk.AttributeValidator{

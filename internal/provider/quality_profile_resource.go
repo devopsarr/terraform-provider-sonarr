@@ -55,10 +55,10 @@ type Quality struct {
 
 func (t resourceQualityProfileType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		MarkdownDescription: "QualityProfile resource",
+		MarkdownDescription: "Quality Profile resource.<br/>For more information refer to [Quality Profile](https://wiki.servarr.com/sonarr/settings#quality-profiles) documentation.",
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
-				MarkdownDescription: "ID of qualityprofile",
+				MarkdownDescription: "Quality Profile ID.",
 				Computed:            true,
 				Type:                types.Int64Type,
 				PlanModifiers: tfsdk.AttributePlanModifiers{
@@ -66,24 +66,24 @@ func (t resourceQualityProfileType) GetSchema(ctx context.Context) (tfsdk.Schema
 				},
 			},
 			"name": {
-				MarkdownDescription: "Name",
+				MarkdownDescription: "Quality Profile Name.",
 				Required:            true,
 				Type:                types.StringType,
 			},
 			"upgrade_allowed": {
-				MarkdownDescription: "Upgrade allowed flag",
+				MarkdownDescription: "Upgrade allowed flag.",
 				Optional:            true,
 				Computed:            true,
 				Type:                types.BoolType,
 			},
 			"cutoff": {
-				MarkdownDescription: "Quality ID to which cutoff",
+				MarkdownDescription: "Quality ID to which cutoff.",
 				Optional:            true,
 				Computed:            true,
 				Type:                types.Int64Type,
 			},
 			"quality_groups": {
-				MarkdownDescription: "Quality groups",
+				MarkdownDescription: "Quality groups.",
 				Required:            true,
 				Attributes:          tfsdk.SetNestedAttributes(t.getQualityGroupSchema().Attributes),
 			},
@@ -95,19 +95,19 @@ func (t resourceQualityProfileType) getQualityGroupSchema() tfsdk.Schema {
 	return tfsdk.Schema{
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
-				MarkdownDescription: "ID of quality group",
+				MarkdownDescription: "Quality group ID.",
 				Optional:            true,
 				Computed:            true,
 				Type:                types.Int64Type,
 			},
 			"name": {
-				MarkdownDescription: "Name of quality group",
+				MarkdownDescription: "Quality group name.",
 				Optional:            true,
 				Computed:            true,
 				Type:                types.StringType,
 			},
 			"qualities": {
-				MarkdownDescription: "Qualities in group",
+				MarkdownDescription: "Qualities in group.",
 				Required:            true,
 				Attributes:          tfsdk.SetNestedAttributes(t.getQualitySchema().Attributes),
 			},
@@ -119,25 +119,25 @@ func (t resourceQualityProfileType) getQualitySchema() tfsdk.Schema {
 	return tfsdk.Schema{
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
-				MarkdownDescription: "ID of quality group",
+				MarkdownDescription: "Quality ID.",
 				Optional:            true,
 				Computed:            true,
 				Type:                types.Int64Type,
 			},
 			"resolution": {
-				MarkdownDescription: "Resolution",
+				MarkdownDescription: "Resolution.",
 				Optional:            true,
 				Computed:            true,
 				Type:                types.Int64Type,
 			},
 			"name": {
-				MarkdownDescription: "Name of quality group",
+				MarkdownDescription: "Quality name.",
 				Optional:            true,
 				Computed:            true,
 				Type:                types.StringType,
 			},
 			"source": {
-				MarkdownDescription: "Source",
+				MarkdownDescription: "Source.",
 				Optional:            true,
 				Computed:            true,
 				Type:                types.StringType,

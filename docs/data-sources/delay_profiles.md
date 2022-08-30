@@ -3,12 +3,12 @@
 page_title: "sonarr_delay_profiles Data Source - terraform-provider-sonarr"
 subcategory: ""
 description: |-
-  List all available delayprofiles
+  List all available Delay Profiles ../resources/delay_profile.
 ---
 
 # sonarr_delay_profiles (Data Source)
 
-List all available delayprofiles
+List all available [Delay Profiles](../resources/delay_profile).
 
 ## Example Usage
 
@@ -22,7 +22,7 @@ data "sonarr_delay_profiles" "example" {
 
 ### Read-Only
 
-- `delay_profiles` (Attributes Set) List of delayprofiles (see [below for nested schema](#nestedatt--delay_profiles))
+- `delay_profiles` (Attributes Set) Delay Profile list. (see [below for nested schema](#nestedatt--delay_profiles))
 - `id` (String) The ID of this resource.
 
 <a id="nestedatt--delay_profiles"></a>
@@ -30,14 +30,14 @@ data "sonarr_delay_profiles" "example" {
 
 Read-Only:
 
-- `bypass_if_highest_quality` (Boolean) Bypass for highest quality Flag
-- `enable_torrent` (Boolean) Torrent allowed Flag
-- `enable_usenet` (Boolean) Usenet allowed Flag
-- `id` (Number) ID of delayprofile
-- `order` (Number) Order
-- `preferred_protocol` (String) Preferred protocol
-- `tags` (Set of Number) List of associated tags
-- `torrent_delay` (Number) Torrent Delay
-- `usenet_delay` (Number) Usenet delay
+- `bypass_if_highest_quality` (Boolean) Bypass for highest quality Flag.
+- `enable_torrent` (Boolean) Torrent allowed Flag.
+- `enable_usenet` (Boolean) Usenet allowed Flag.
+- `id` (Number) Delay Profile ID.
+- `order` (Number) Order.
+- `preferred_protocol` (String) Preferred protocol.
+- `tags` (Set of Number) List of associated tags.
+- `torrent_delay` (Number) Torrent Delay.
+- `usenet_delay` (Number) Usenet delay.
 
 
