@@ -398,6 +398,8 @@ func writeIndexer(ctx context.Context, indexer *sonarr.IndexerOutput) *Indexer {
 		Name:                    types.String{Value: indexer.Name},
 		Protocol:                types.String{Value: indexer.Protocol},
 		Tags:                    types.Set{ElemType: types.Int64Type},
+		AnimeCategories:         types.Set{ElemType: types.Int64Type},
+		Categories:              types.Set{ElemType: types.Int64Type},
 	}
 	tfsdk.ValueFrom(ctx, indexer.Tags, output.Tags.Type(ctx), &output.Tags)
 
@@ -411,13 +413,13 @@ func writeIndexer(ctx context.Context, indexer *sonarr.IndexerOutput) *Indexer {
 			case "rankedOnly":
 				output.RankedOnly = types.Bool{Value: f.Value.(bool)}
 			case "delay":
-				output.Delay = types.Int64{Value: f.Value.(int64)}
+				output.Delay = types.Int64{Value: int64(f.Value.(float64))}
 			case "minimumSeeders":
-				output.MinimumSeeders = types.Int64{Value: f.Value.(int64)}
+				output.MinimumSeeders = types.Int64{Value: int64(f.Value.(float64))}
 			case "seasonPackSeedTime":
-				output.SeasonPackSeedTime = types.Int64{Value: f.Value.(int64)}
+				output.SeasonPackSeedTime = types.Int64{Value: int64(f.Value.(float64))}
 			case "seedTime":
-				output.SeedTime = types.Int64{Value: f.Value.(int64)}
+				output.SeedTime = types.Int64{Value: int64(f.Value.(float64))}
 			case "seedRatio":
 				output.SeedRatio = types.Float64{Value: f.Value.(float64)}
 			case "additionalParameters":
@@ -437,10 +439,8 @@ func writeIndexer(ctx context.Context, indexer *sonarr.IndexerOutput) *Indexer {
 			case "username":
 				output.Username = types.String{Value: f.Value.(string)}
 			case "animeCategories":
-				output.AnimeCategories = types.Set{ElemType: types.Int64Type}
 				tfsdk.ValueFrom(ctx, f.Value, output.AnimeCategories.Type(ctx), &output.AnimeCategories)
 			case "categories":
-				output.Categories = types.Set{ElemType: types.Int64Type}
 				tfsdk.ValueFrom(ctx, f.Value, output.Categories.Type(ctx), &output.Categories)
 			// TODO: manage unknown values
 			default:

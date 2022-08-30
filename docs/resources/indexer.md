@@ -72,6 +72,6 @@ resource "sonarr_indexer" "example" {
 Import is supported using the following syntax:
 
 ```shell
-# import does not need parameters
-terraform import sonarr_indexer.example
+# import using the API/UI ID
+terraform import sonarr_indexer.example 1
 ```
