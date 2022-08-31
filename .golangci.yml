@@ -28,7 +28,6 @@ linters:
     - nilerr
     - nolintlint
     - staticcheck
-    - structcheck
     - unconvert
     - unparam
     - varcheck
@@ -41,6 +40,9 @@ linters:
     - thelper
 
 linters-settings:
+  misspell:
+    ignore-words:
+    - "intial"
   errcheck:
     ignore: github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema:ForceNew|Set,fmt:.*,io:Close
   gomnd:
