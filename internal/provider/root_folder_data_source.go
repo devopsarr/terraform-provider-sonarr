@@ -13,8 +13,10 @@ import (
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ provider.DataSourceType = dataRootFolderType{}
-var _ datasource.DataSource = dataRootFolder{}
+var (
+	_ provider.DataSourceType = dataRootFolderType{}
+	_ datasource.DataSource   = dataRootFolder{}
+)
 
 type dataRootFolderType struct{}
 

@@ -14,8 +14,10 @@ import (
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ provider.DataSourceType = dataAllSeriesType{}
-var _ datasource.DataSource = dataAllSeries{}
+var (
+	_ provider.DataSourceType = dataAllSeriesType{}
+	_ datasource.DataSource   = dataAllSeries{}
+)
 
 type dataAllSeriesType struct{}
 
@@ -24,7 +26,7 @@ type dataAllSeries struct {
 }
 
 // TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
-// QualityProfiles is a list of QualityProfile.
+// SeriesList is a list of Series.
 type SeriesList struct {
 	ID     types.String `tfsdk:"id"`
 	Series types.Set    `tfsdk:"series"`

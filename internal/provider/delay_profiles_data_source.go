@@ -14,8 +14,10 @@ import (
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ provider.DataSourceType = dataDelayProfilesType{}
-var _ datasource.DataSource = dataDelayProfiles{}
+var (
+	_ provider.DataSourceType = dataDelayProfilesType{}
+	_ datasource.DataSource   = dataDelayProfiles{}
+)
 
 type dataDelayProfilesType struct{}
 
@@ -23,9 +25,9 @@ type dataDelayProfiles struct {
 	provider sonarrProvider
 }
 
-// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 // DelayProfiles is a list of DelayProfile.
 type DelayProfiles struct {
+	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 	ID            types.String `tfsdk:"id"`
 	DelayProfiles types.Set    `tfsdk:"delay_profiles"`
 }
@@ -107,7 +109,7 @@ func (t dataDelayProfilesType) NewDataSource(ctx context.Context, in provider.Pr
 
 func (d dataDelayProfiles) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 	var data DelayProfiles
-	diags := resp.State.Get(ctx, &data)
+	diags := req.Config.Get(ctx, &data)
 	resp.Diagnostics.Append(diags...)
 
 	if resp.Diagnostics.HasError() {
