@@ -1,5 +1,32 @@
 # Changelog
 
+## [2.0.0](https://github.com/devopsarr/terraform-provider-sonarr/compare/v1.2.2...v2.0.0) (2022-09-01)
+
+
+### ⚠ BREAKING CHANGES
+
+* move series to all_series
+
+### Features
+
+* add delay profile data source ([7118dd1](https://github.com/devopsarr/terraform-provider-sonarr/commit/7118dd14e18d124bdb5c58570254a503591f065e))
+* add indexer config data source ([049cfe5](https://github.com/devopsarr/terraform-provider-sonarr/commit/049cfe5affd6f54b29094393b98bd289407e141a))
+* add indexer data source ([af79355](https://github.com/devopsarr/terraform-provider-sonarr/commit/af79355f18f49ea80bb286c31af6f24ad6944b57))
+* add language profile data source ([c980f9d](https://github.com/devopsarr/terraform-provider-sonarr/commit/c980f9d743d8f6c2ee03428282cacbbd1579145d))
+* add media management data source ([6ee6c80](https://github.com/devopsarr/terraform-provider-sonarr/commit/6ee6c800357c2a3412c6d48c5706c8a8ee28f66a))
+* add naming data source ([c4f5c8e](https://github.com/devopsarr/terraform-provider-sonarr/commit/c4f5c8e9e30866df18629662c9bdf65a62846690))
+* add quality profile data soruce ([3f46e2b](https://github.com/devopsarr/terraform-provider-sonarr/commit/3f46e2b9ade3d839b8e91299a47c17f5902c2538))
+* add root folder data source ([1958c1f](https://github.com/devopsarr/terraform-provider-sonarr/commit/1958c1f00b9c210103ca6bc406c1013f10a90e02))
+* add series data source ([2a7f3ca](https://github.com/devopsarr/terraform-provider-sonarr/commit/2a7f3caf93c31073cc55ebe17cbfc7a0d5e98737))
+* add tag data source ([4c260e0](https://github.com/devopsarr/terraform-provider-sonarr/commit/4c260e053b256a45e9b23b64a7a7f2f43593ccfd))
+* move series to all_series ([b98d12b](https://github.com/devopsarr/terraform-provider-sonarr/commit/b98d12b38a38ed3002c41b838af1742a0814297e))
+
+
+### Bug Fixes
+
+* data source read from config ([ec64614](https://github.com/devopsarr/terraform-provider-sonarr/commit/ec646149bf6fcc876aac91c69d9e541d5df6c77d))
+* list data source requirements ([c3aa214](https://github.com/devopsarr/terraform-provider-sonarr/commit/c3aa2140131e12a2892f0de5e5414a41f8aafb95))
+
 ## [1.2.2](https://github.com/devopsarr/terraform-provider-sonarr/compare/v1.2.1...v1.2.2) (2022-08-30)
 
 
