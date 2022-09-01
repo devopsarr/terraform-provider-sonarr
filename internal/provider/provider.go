@@ -134,6 +134,7 @@ func (p *sonarrProvider) GetDataSources(ctx context.Context) (map[string]provide
 	return map[string]provider.DataSourceType{
 		"sonarr_delay_profile":     dataDelayProfileType{},
 		"sonarr_delay_profiles":    dataDelayProfilesType{},
+		"sonarr_indexer":           dataIndexerType{},
 		"sonarr_indexers":          dataIndexersType{},
 		"sonarr_language_profile":  dataLanguageProfileType{},
 		"sonarr_language_profiles": dataLanguageProfilesType{},
