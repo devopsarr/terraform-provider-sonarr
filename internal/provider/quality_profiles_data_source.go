@@ -8,7 +8,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
-	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"golift.io/starr/sonarr"
@@ -49,40 +48,33 @@ func (t dataQualityProfilesType) GetSchema(ctx context.Context) (tfsdk.Schema, d
 						MarkdownDescription: "Quality Profile ID.",
 						Computed:            true,
 						Type:                types.Int64Type,
-						PlanModifiers: tfsdk.AttributePlanModifiers{
-							resource.UseStateForUnknown(),
-						},
 					},
 					"name": {
 						MarkdownDescription: "Quality Profile Name.",
-						Required:            true,
+						Computed:            true,
 						Type:                types.StringType,
 					},
 					"upgrade_allowed": {
 						MarkdownDescription: "Upgrade allowed flag.",
-						Optional:            true,
 						Computed:            true,
 						Type:                types.BoolType,
 					},
 					"cutoff": {
 						MarkdownDescription: "Quality ID to which cutoff.",
-						Optional:            true,
 						Computed:            true,
 						Type:                types.Int64Type,
 					},
 					"quality_groups": {
 						MarkdownDescription: "Quality groups.",
-						Required:            true,
+						Computed:            true,
 						Attributes: tfsdk.SetNestedAttributes(map[string]tfsdk.Attribute{
 							"id": {
 								MarkdownDescription: "Quality group ID.",
-								Optional:            true,
 								Computed:            true,
 								Type:                types.Int64Type,
 							},
 							"name": {
 								MarkdownDescription: "Quality group name.",
-								Optional:            true,
 								Computed:            true,
 								Type:                types.StringType,
 							},
@@ -92,25 +84,21 @@ func (t dataQualityProfilesType) GetSchema(ctx context.Context) (tfsdk.Schema, d
 								Attributes: tfsdk.SetNestedAttributes(map[string]tfsdk.Attribute{
 									"id": {
 										MarkdownDescription: "Quality ID.",
-										Optional:            true,
 										Computed:            true,
 										Type:                types.Int64Type,
 									},
 									"resolution": {
 										MarkdownDescription: "Resolution.",
-										Optional:            true,
 										Computed:            true,
 										Type:                types.Int64Type,
 									},
 									"name": {
 										MarkdownDescription: "Quality name.",
-										Optional:            true,
 										Computed:            true,
 										Type:                types.StringType,
 									},
 									"source": {
 										MarkdownDescription: "Source.",
-										Optional:            true,
 										Computed:            true,
 										Type:                types.StringType,
 									},

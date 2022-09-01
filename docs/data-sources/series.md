@@ -28,8 +28,13 @@ data "sonarr_series" "example" {
 <a id="nestedatt--series"></a>
 ### Nested Schema for `series`
 
-Required:
+Optional:
 
+- `tags` (Set of Number) Tags.
+
+Read-Only:
+
+- `id` (Number) Series ID.
 - `language_profile_id` (Number) Language Profile ID .
 - `monitored` (Boolean) Monitored flag.
 - `path` (String) Series Path.
@@ -40,13 +45,5 @@ Required:
 - `title_slug` (String) Series Title in kebab format.
 - `tvdb_id` (Number) TVDB ID.
 - `use_scene_numbering` (Boolean) Scene numbering flag.
-
-Optional:
-
-- `tags` (Set of Number) Tags.
-
-Read-Only:
-
-- `id` (Number) Series ID.
 
 

@@ -51,52 +51,52 @@ func (t dataSeriesType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagn
 					},
 					"title": {
 						MarkdownDescription: "Series Title.",
-						Required:            true,
+						Computed:            true,
 						Type:                types.StringType,
 					},
 					"title_slug": {
 						MarkdownDescription: "Series Title in kebab format.",
-						Required:            true,
+						Computed:            true,
 						Type:                types.StringType,
 					},
 					"monitored": {
 						MarkdownDescription: "Monitored flag.",
-						Required:            true,
+						Computed:            true,
 						Type:                types.BoolType,
 					},
 					"season_folder": {
 						MarkdownDescription: "Season Folder flag.",
-						Required:            true,
+						Computed:            true,
 						Type:                types.BoolType,
 					},
 					"use_scene_numbering": {
 						MarkdownDescription: "Scene numbering flag.",
-						Required:            true,
+						Computed:            true,
 						Type:                types.BoolType,
 					},
 					"language_profile_id": {
 						MarkdownDescription: "Language Profile ID .",
-						Required:            true,
+						Computed:            true,
 						Type:                types.Int64Type,
 					},
 					"quality_profile_id": {
 						MarkdownDescription: "Quality Profile ID.",
-						Required:            true,
+						Computed:            true,
 						Type:                types.Int64Type,
 					},
 					"tvdb_id": {
 						MarkdownDescription: "TVDB ID.",
-						Required:            true,
+						Computed:            true,
 						Type:                types.Int64Type,
 					},
 					"path": {
 						MarkdownDescription: "Series Path.",
-						Required:            true,
+						Computed:            true,
 						Type:                types.StringType,
 					},
 					"root_folder_path": {
 						MarkdownDescription: "Series Root Folder.",
-						Required:            true,
+						Computed:            true,
 						Type:                types.StringType,
 					},
 					"tags": {
