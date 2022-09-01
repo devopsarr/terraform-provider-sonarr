@@ -136,6 +136,7 @@ func (p *sonarrProvider) GetDataSources(ctx context.Context) (map[string]provide
 		"sonarr_indexers":          dataIndexersType{},
 		"sonarr_language_profiles": dataLanguageProfilesType{},
 		"sonarr_quality_profiles":  dataQualityProfilesType{},
+		"sonarr_root_folder":       dataRootFolderType{},
 		"sonarr_root_folders":      dataRootFoldersType{},
 		"sonarr_series":            dataSeriesType{},
 		"sonarr_tag":               dataTagType{},
