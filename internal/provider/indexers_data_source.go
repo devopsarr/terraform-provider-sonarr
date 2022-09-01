@@ -14,8 +14,10 @@ import (
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ provider.DataSourceType = dataIndexersType{}
-var _ datasource.DataSource = dataIndexers{}
+var (
+	_ provider.DataSourceType = dataIndexersType{}
+	_ datasource.DataSource   = dataIndexers{}
+)
 
 type dataIndexersType struct{}
 
@@ -23,9 +25,9 @@ type dataIndexers struct {
 	provider sonarrProvider
 }
 
-// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 // Indexers is a list of Indexer.
 type Indexers struct {
+	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 	ID       types.String `tfsdk:"id"`
 	Indexers types.Set    `tfsdk:"indexers"`
 }
@@ -212,7 +214,7 @@ func (t dataIndexersType) NewDataSource(ctx context.Context, in provider.Provide
 
 func (d dataIndexers) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 	var data Indexers
-	diags := resp.State.Get(ctx, &data)
+	diags := req.Config.Get(ctx, &data)
 	resp.Diagnostics.Append(diags...)
 
 	if resp.Diagnostics.HasError() {

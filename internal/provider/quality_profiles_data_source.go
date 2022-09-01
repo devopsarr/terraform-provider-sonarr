@@ -14,8 +14,10 @@ import (
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ provider.DataSourceType = dataQualityProfilesType{}
-var _ datasource.DataSource = dataQualityProfiles{}
+var (
+	_ provider.DataSourceType = dataQualityProfilesType{}
+	_ datasource.DataSource   = dataQualityProfiles{}
+)
 
 type dataQualityProfilesType struct{}
 
@@ -23,9 +25,9 @@ type dataQualityProfiles struct {
 	provider sonarrProvider
 }
 
-// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 // QualityProfiles is a list of QualityProfile.
 type QualityProfiles struct {
+	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 	ID              types.String `tfsdk:"id"`
 	QualityProfiles types.Set    `tfsdk:"quality_profiles"`
 }
@@ -122,7 +124,7 @@ func (t dataQualityProfilesType) NewDataSource(ctx context.Context, in provider.
 
 func (d dataQualityProfiles) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 	var data QualityProfiles
-	diags := resp.State.Get(ctx, &data)
+	diags := req.Config.Get(ctx, &data)
 	resp.Diagnostics.Append(diags...)
 
 	if resp.Diagnostics.HasError() {

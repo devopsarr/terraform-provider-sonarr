@@ -24,9 +24,9 @@ func TestAccRootFolderResource(t *testing.T) {
 			},
 			// Update and Read testing
 			{
-				Config: testAccRootFolderResourceConfig("/defaults"),
+				Config: testAccRootFolderResourceConfig("/config/logs"),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("sonarr_root_folder.test", "path", "/defaults"),
+					resource.TestCheckResourceAttr("sonarr_root_folder.test", "path", "/config/logs"),
 				),
 			},
 			// ImportState testing

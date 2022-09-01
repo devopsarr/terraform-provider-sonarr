@@ -14,8 +14,10 @@ import (
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ provider.DataSourceType = dataLanguageProfilesType{}
-var _ datasource.DataSource = dataLanguageProfiles{}
+var (
+	_ provider.DataSourceType = dataLanguageProfilesType{}
+	_ datasource.DataSource   = dataLanguageProfiles{}
+)
 
 type dataLanguageProfilesType struct{}
 
@@ -23,9 +25,9 @@ type dataLanguageProfiles struct {
 	provider sonarrProvider
 }
 
-// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 // LanguageProfiles is a list of LanguageProfile.
 type LanguageProfiles struct {
+	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 	ID               types.String `tfsdk:"id"`
 	LanguageProfiles types.Set    `tfsdk:"language_profiles"`
 }
@@ -85,7 +87,7 @@ func (t dataLanguageProfilesType) NewDataSource(ctx context.Context, in provider
 
 func (d dataLanguageProfiles) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 	var data LanguageProfiles
-	diags := resp.State.Get(ctx, &data)
+	diags := req.Config.Get(ctx, &data)
 	resp.Diagnostics.Append(diags...)
 
 	if resp.Diagnostics.HasError() {
