@@ -139,6 +139,7 @@ func (p *sonarrProvider) GetDataSources(ctx context.Context) (map[string]provide
 		"sonarr_language_profile":  dataLanguageProfileType{},
 		"sonarr_indexer_config":    dataIndexerConfigType{},
 		"sonarr_language_profiles": dataLanguageProfilesType{},
+		"sonarr_media_management":  dataMediaManagementType{},
 		"sonarr_quality_profile":   dataQualityProfileType{},
 		"sonarr_quality_profiles":  dataQualityProfilesType{},
 		"sonarr_root_folder":       dataRootFolderType{},
