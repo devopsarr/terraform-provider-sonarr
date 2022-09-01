@@ -14,12 +14,12 @@ import (
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ provider.DataSourceType = dataSeriesType{}
-var _ datasource.DataSource = dataSeries{}
+var _ provider.DataSourceType = dataAllSeriesType{}
+var _ datasource.DataSource = dataAllSeries{}
 
-type dataSeriesType struct{}
+type dataAllSeriesType struct{}
 
-type dataSeries struct {
+type dataAllSeries struct {
 	provider sonarrProvider
 }
 
@@ -30,7 +30,7 @@ type SeriesList struct {
 	Series types.Set    `tfsdk:"series"`
 }
 
-func (t dataSeriesType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
+func (t dataAllSeriesType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		// This description is used by the documentation generator and the language server.
 		MarkdownDescription: "List all available [Series](../resources/series).",
@@ -101,7 +101,7 @@ func (t dataSeriesType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagn
 					},
 					"tags": {
 						MarkdownDescription: "Tags.",
-						Optional:            true,
+						Computed:            true,
 						Type: types.SetType{
 							ElemType: types.Int64Type,
 						},
@@ -112,15 +112,15 @@ func (t dataSeriesType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagn
 	}, nil
 }
 
-func (t dataSeriesType) NewDataSource(ctx context.Context, in provider.Provider) (datasource.DataSource, diag.Diagnostics) {
+func (t dataAllSeriesType) NewDataSource(ctx context.Context, in provider.Provider) (datasource.DataSource, diag.Diagnostics) {
 	provider, diags := convertProviderType(in)
 
-	return dataSeries{
+	return dataAllSeries{
 		provider: provider,
 	}, diags
 }
 
-func (d dataSeries) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+func (d dataAllSeries) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 	var data SeriesList
 	diags := resp.State.Get(ctx, &data)
 	resp.Diagnostics.Append(diags...)

@@ -6,7 +6,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-func TestAccSeriesDataSource(t *testing.T) {
+func TestAccAllSeriesDataSource(t *testing.T) {
 	t.Parallel()
 
 	resource.Test(t, resource.TestCase{
@@ -19,16 +19,16 @@ func TestAccSeriesDataSource(t *testing.T) {
 			},
 			// Read testing
 			{
-				Config: testAccSeriesDataSourceConfig,
+				Config: testAccAllSeriesDataSourceConfig,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckTypeSetElemNestedAttrs("data.sonarr_series.test", "series.*", map[string]string{"monitored": "false"}),
+					resource.TestCheckTypeSetElemNestedAttrs("data.sonarr_all_series.test", "series.*", map[string]string{"monitored": "false"}),
 				),
 			},
 		},
 	})
 }
 
-const testAccSeriesDataSourceConfig = `
-data "sonarr_series" "test" {
+const testAccAllSeriesDataSourceConfig = `
+data "sonarr_all_series" "test" {
 }
 `
