@@ -132,12 +132,22 @@ func (p *sonarrProvider) GetResources(ctx context.Context) (map[string]provider.
 
 func (p *sonarrProvider) GetDataSources(ctx context.Context) (map[string]provider.DataSourceType, diag.Diagnostics) {
 	return map[string]provider.DataSourceType{
+		"sonarr_delay_profile":     dataDelayProfileType{},
 		"sonarr_delay_profiles":    dataDelayProfilesType{},
+		"sonarr_indexer":           dataIndexerType{},
 		"sonarr_indexers":          dataIndexersType{},
+		"sonarr_language_profile":  dataLanguageProfileType{},
+		"sonarr_indexer_config":    dataIndexerConfigType{},
 		"sonarr_language_profiles": dataLanguageProfilesType{},
+		"sonarr_media_management":  dataMediaManagementType{},
+		"sonarr_naming":            dataNamingType{},
+		"sonarr_quality_profile":   dataQualityProfileType{},
 		"sonarr_quality_profiles":  dataQualityProfilesType{},
+		"sonarr_root_folder":       dataRootFolderType{},
 		"sonarr_root_folders":      dataRootFoldersType{},
 		"sonarr_series":            dataSeriesType{},
+		"sonarr_all_series":        dataAllSeriesType{},
+		"sonarr_tag":               dataTagType{},
 		"sonarr_tags":              dataTagsType{},
 	}, nil
 }

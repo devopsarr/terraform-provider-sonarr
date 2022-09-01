@@ -3,7 +3,6 @@ package provider
 import (
 	"context"
 	"fmt"
-	"strconv"
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -14,8 +13,10 @@ import (
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ provider.DataSourceType = dataSeriesType{}
-var _ datasource.DataSource = dataSeries{}
+var (
+	_ provider.DataSourceType = dataSeriesType{}
+	_ datasource.DataSource   = dataSeries{}
+)
 
 type dataSeriesType struct{}
 
@@ -23,90 +24,72 @@ type dataSeries struct {
 	provider sonarrProvider
 }
 
-// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
-// QualityProfiles is a list of QualityProfile.
-type SeriesList struct {
-	ID     types.String `tfsdk:"id"`
-	Series types.Set    `tfsdk:"series"`
-}
-
 func (t dataSeriesType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		// This description is used by the documentation generator and the language server.
-		MarkdownDescription: "List all available [Series](../resources/series).",
+		MarkdownDescription: "Single [Series](../resources/series).",
 		Attributes: map[string]tfsdk.Attribute{
-			// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 			"id": {
-				Computed: true,
-				Type:     types.StringType,
-			},
-			"series": {
-				MarkdownDescription: "Series list.",
+				MarkdownDescription: "Series ID.",
 				Computed:            true,
-				Attributes: tfsdk.SetNestedAttributes(map[string]tfsdk.Attribute{
-					"id": {
-						MarkdownDescription: "Series ID.",
-						Computed:            true,
-						Type:                types.Int64Type,
-					},
-					"title": {
-						MarkdownDescription: "Series Title.",
-						Required:            true,
-						Type:                types.StringType,
-					},
-					"title_slug": {
-						MarkdownDescription: "Series Title in kebab format.",
-						Required:            true,
-						Type:                types.StringType,
-					},
-					"monitored": {
-						MarkdownDescription: "Monitored flag.",
-						Required:            true,
-						Type:                types.BoolType,
-					},
-					"season_folder": {
-						MarkdownDescription: "Season Folder flag.",
-						Required:            true,
-						Type:                types.BoolType,
-					},
-					"use_scene_numbering": {
-						MarkdownDescription: "Scene numbering flag.",
-						Required:            true,
-						Type:                types.BoolType,
-					},
-					"language_profile_id": {
-						MarkdownDescription: "Language Profile ID .",
-						Required:            true,
-						Type:                types.Int64Type,
-					},
-					"quality_profile_id": {
-						MarkdownDescription: "Quality Profile ID.",
-						Required:            true,
-						Type:                types.Int64Type,
-					},
-					"tvdb_id": {
-						MarkdownDescription: "TVDB ID.",
-						Required:            true,
-						Type:                types.Int64Type,
-					},
-					"path": {
-						MarkdownDescription: "Series Path.",
-						Required:            true,
-						Type:                types.StringType,
-					},
-					"root_folder_path": {
-						MarkdownDescription: "Series Root Folder.",
-						Required:            true,
-						Type:                types.StringType,
-					},
-					"tags": {
-						MarkdownDescription: "Tags.",
-						Optional:            true,
-						Type: types.SetType{
-							ElemType: types.Int64Type,
-						},
-					},
-				}),
+				Type:                types.Int64Type,
+			},
+			"title": {
+				MarkdownDescription: "Series Title.",
+				Required:            true,
+				Type:                types.StringType,
+			},
+			"title_slug": {
+				MarkdownDescription: "Series Title in kebab format.",
+				Computed:            true,
+				Type:                types.StringType,
+			},
+			"monitored": {
+				MarkdownDescription: "Monitored flag.",
+				Computed:            true,
+				Type:                types.BoolType,
+			},
+			"season_folder": {
+				MarkdownDescription: "Season Folder flag.",
+				Computed:            true,
+				Type:                types.BoolType,
+			},
+			"use_scene_numbering": {
+				MarkdownDescription: "Scene numbering flag.",
+				Computed:            true,
+				Type:                types.BoolType,
+			},
+			"language_profile_id": {
+				MarkdownDescription: "Language Profile ID .",
+				Computed:            true,
+				Type:                types.Int64Type,
+			},
+			"quality_profile_id": {
+				MarkdownDescription: "Quality Profile ID.",
+				Computed:            true,
+				Type:                types.Int64Type,
+			},
+			"tvdb_id": {
+				MarkdownDescription: "TVDB ID.",
+				Computed:            true,
+				Type:                types.Int64Type,
+			},
+			"path": {
+				MarkdownDescription: "Series Path.",
+				Computed:            true,
+				Type:                types.StringType,
+			},
+			"root_folder_path": {
+				MarkdownDescription: "Series Root Folder.",
+				Computed:            true,
+				Type:                types.StringType,
+			},
+			"tags": {
+				MarkdownDescription: "Tags.",
+				Optional:            true,
+				Type: types.SetType{
+					ElemType: types.Int64Type,
+				},
 			},
 		},
 	}, nil
@@ -121,7 +104,7 @@ func (t dataSeriesType) NewDataSource(ctx context.Context, in provider.Provider)
 }
 
 func (d dataSeries) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var data SeriesList
+	var data Series
 	diags := resp.State.Get(ctx, &data)
 	resp.Diagnostics.Append(diags...)
 
@@ -135,21 +118,25 @@ func (d dataSeries) Read(ctx context.Context, req datasource.ReadRequest, resp *
 
 		return
 	}
-	// Map response body to resource schema attribute
-	series := *writeSeriesList(ctx, response)
-	tfsdk.ValueFrom(ctx, series, data.Series.Type(context.Background()), &data.Series)
 
-	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
-	data.ID = types.String{Value: strconv.Itoa(len(response))}
-	diags = resp.State.Set(ctx, &data)
+	series, err := findSeries(data.Title.Value, response)
+	if err != nil {
+		resp.Diagnostics.AddError("Data Source Error", fmt.Sprintf("Unable to find series, got error: %s", err))
+
+		return
+	}
+
+	result := writeSeries(ctx, series)
+	diags = resp.State.Set(ctx, &result)
 	resp.Diagnostics.Append(diags...)
 }
 
-func writeSeriesList(ctx context.Context, series []*sonarr.Series) *[]Series {
-	output := make([]Series, len(series))
-	for i, t := range series {
-		output[i] = *writeSeries(ctx, t)
+func findSeries(title string, series []*sonarr.Series) (*sonarr.Series, error) {
+	for _, s := range series {
+		if s.Title == title {
+			return s, nil
+		}
 	}
 
-	return &output
+	return nil, fmt.Errorf("no series with title %s", title)
 }

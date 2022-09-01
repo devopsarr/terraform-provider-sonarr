@@ -23,19 +23,13 @@ List all available [Quality Profiles](../resources/quality_profile).
 <a id="nestedatt--quality_profiles"></a>
 ### Nested Schema for `quality_profiles`
 
-Required:
-
-- `name` (String) Quality Profile Name.
-- `quality_groups` (Attributes Set) Quality groups. (see [below for nested schema](#nestedatt--quality_profiles--quality_groups))
-
-Optional:
-
-- `cutoff` (Number) Quality ID to which cutoff.
-- `upgrade_allowed` (Boolean) Upgrade allowed flag.
-
 Read-Only:
 
+- `cutoff` (Number) Quality ID to which cutoff.
 - `id` (Number) Quality Profile ID.
+- `name` (String) Quality Profile Name.
+- `quality_groups` (Attributes Set) Quality groups. (see [below for nested schema](#nestedatt--quality_profiles--quality_groups))
+- `upgrade_allowed` (Boolean) Upgrade allowed flag.
 
 <a id="nestedatt--quality_profiles--quality_groups"></a>
 ### Nested Schema for `quality_profiles.quality_groups`
@@ -44,7 +38,7 @@ Required:
 
 - `qualities` (Attributes Set) Qualities in group. (see [below for nested schema](#nestedatt--quality_profiles--quality_groups--qualities))
 
-Optional:
+Read-Only:
 
 - `id` (Number) Quality group ID.
 - `name` (String) Quality group name.
@@ -52,7 +46,7 @@ Optional:
 <a id="nestedatt--quality_profiles--quality_groups--qualities"></a>
 ### Nested Schema for `quality_profiles.quality_groups.qualities`
 
-Optional:
+Read-Only:
 
 - `id` (Number) Quality ID.
 - `name` (String) Quality name.

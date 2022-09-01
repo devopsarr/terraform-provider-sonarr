@@ -13,22 +13,35 @@ func TestAccSeriesDataSource(t *testing.T) {
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
-			// Create a series to have a value to check
-			{
-				Config: testAccSeriesResourceConfig(332606, "Friends", "friends", "false"),
-			},
 			// Read testing
 			{
 				Config: testAccSeriesDataSourceConfig,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckTypeSetElemNestedAttrs("data.sonarr_series.test", "series.*", map[string]string{"monitored": "false"}),
-				),
+					resource.TestCheckResourceAttrSet("data.sonarr_series.test", "id"),
+					resource.TestCheckResourceAttr("data.sonarr_series.test", "path", "/tmp/the-walking-dead")),
 			},
 		},
 	})
 }
 
 const testAccSeriesDataSourceConfig = `
+resource "sonarr_series" "test" {
+	title      = "The Walking Dead"
+	title_slug = "the-walking-dead"
+	tvdb_id    = 153021
+  
+	monitored           = false
+	season_folder       = true
+	use_scene_numbering = false
+	path                = "/tmp/the-walking-dead"
+	root_folder_path    = "/tmp"
+  
+	language_profile_id = 1
+	quality_profile_id  = 1
+	tags                = []
+}
+
 data "sonarr_series" "test" {
+	title = sonarr_series.test.title
 }
 `
