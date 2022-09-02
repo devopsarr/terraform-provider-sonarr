@@ -3,12 +3,12 @@
 page_title: "sonarr_system_status Data Source - terraform-provider-sonarr"
 subcategory: ""
 description: |-
-  Series resource.For more information refer to Series https://wiki.servarr.com/sonarr/system#status documentation.
+  System Status resource. User must have rights to read config.xml.For more information refer to System Status https://wiki.servarr.com/sonarr/system#status documentation.
 ---
 
 # sonarr_system_status (Data Source)
 
-Series resource.<br/>For more information refer to [Series](https://wiki.servarr.com/sonarr/system#status) documentation.
+System Status resource. User must have rights to read config.xml.<br/>For more information refer to [System Status](https://wiki.servarr.com/sonarr/system#status) documentation.
 
 ## Example Usage
 

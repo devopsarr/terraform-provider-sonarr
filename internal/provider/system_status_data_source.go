@@ -59,7 +59,7 @@ type SystemStatus struct {
 func (t dataSystemStatusType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		// This description is used by the documentation generator and the delay server.
-		MarkdownDescription: "Series resource.<br/>For more information refer to [Series](https://wiki.servarr.com/sonarr/system#status) documentation.",
+		MarkdownDescription: "System Status resource. User must have rights to read config.xml.<br/>For more information refer to [System Status](https://wiki.servarr.com/sonarr/system#status) documentation.",
 		Attributes: map[string]tfsdk.Attribute{
 			// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 			"id": {
@@ -213,7 +213,7 @@ func (d dataSystemStatus) Read(ctx context.Context, req datasource.ReadRequest, 
 	// Get naming current value
 	response, err := d.provider.client.GetSystemStatusContext(ctx)
 	if err != nil {
-		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read naming, got error: %s", err))
+		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read system status, got error: %s", err))
 
 		return
 	}
