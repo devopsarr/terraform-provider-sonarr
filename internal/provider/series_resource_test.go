@@ -14,10 +14,6 @@ func TestAccSeriesResource(t *testing.T) {
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
-			// Init a Tag to be there for testing
-			{
-				Config: testAccTagResourceConfig("test", "series"),
-			},
 			// Create and Read testing
 			{
 				Config: testAccSeriesResourceConfig(81189, "Breaking Bad", "breaking-bad", "false"),
@@ -46,6 +42,10 @@ func TestAccSeriesResource(t *testing.T) {
 
 func testAccSeriesResourceConfig(id int, title, slug, monitored string) string {
 	return fmt.Sprintf(`
+	resource "sonarr_tag" "test" {
+		label = "series_resource"
+	}
+
 	resource "sonarr_series" "test" {
 		title      = "%s"
 		title_slug = "%s"
@@ -59,7 +59,7 @@ func testAccSeriesResourceConfig(id int, title, slug, monitored string) string {
 	  
 		language_profile_id = 1
 		quality_profile_id  = 1
-		tags                = [1]
+		tags                = [sonarr_tag.test.id]
 	}
 	`, title, slug, id, monitored, slug)
 }

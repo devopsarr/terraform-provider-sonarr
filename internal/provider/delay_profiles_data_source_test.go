@@ -15,7 +15,7 @@ func TestAccDelayProfilesDataSource(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Create a delay profile to have a value to check
 			{
-				Config: testAccDelayProfileResourceConfig("dpdatasource", "torrent"),
+				Config: testAccDelayProfileResourceConfig("torrent"),
 			},
 			// Read testing
 			{
