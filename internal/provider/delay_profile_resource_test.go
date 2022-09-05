@@ -16,7 +16,7 @@ func TestAccDelayProfileResource(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Create and Read testing
 			{
-				Config: testAccDelayProfileResourceConfig("dpresource", "usenet"),
+				Config: testAccDelayProfileResourceConfig("usenet"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("sonarr_delay_profile.test", "preferred_protocol", "usenet"),
 					resource.TestCheckResourceAttrSet("sonarr_delay_profile.test", "id"),
@@ -24,7 +24,7 @@ func TestAccDelayProfileResource(t *testing.T) {
 			},
 			// Update and Read testing
 			{
-				Config: testAccDelayProfileResourceConfig("dpresource", "torrent"),
+				Config: testAccDelayProfileResourceConfig("torrent"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("sonarr_delay_profile.test", "preferred_protocol", "torrent"),
 				),
@@ -40,10 +40,10 @@ func TestAccDelayProfileResource(t *testing.T) {
 	})
 }
 
-func testAccDelayProfileResourceConfig(tag, protocol string) string {
+func testAccDelayProfileResourceConfig(protocol string) string {
 	return fmt.Sprintf(`
 	resource "sonarr_tag" "test" {
-		label = "%s"
+		label = "delay_profile_resource"
 	}
 
 	resource "sonarr_delay_profile" "test" {
@@ -54,5 +54,5 @@ func testAccDelayProfileResourceConfig(tag, protocol string) string {
 		torrent_delay = 0
 		preferred_protocol= "%s"
 		tags = [sonarr_tag.test.id]
-	}`, tag, protocol)
+	}`, protocol)
 }

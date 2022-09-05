@@ -13,10 +13,6 @@ func TestAccDelayProfilesDataSource(t *testing.T) {
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
-			// Create a delay profile to have a value to check
-			{
-				Config: testAccDelayProfileResourceConfig("dpdatasource", "torrent"),
-			},
 			// Read testing
 			{
 				Config: testAccDelayProfilesDataSourceConfig,
@@ -29,6 +25,20 @@ func TestAccDelayProfilesDataSource(t *testing.T) {
 }
 
 const testAccDelayProfilesDataSourceConfig = `
+resource "sonarr_tag" "test" {
+	label = "delay_profiles_datasource"
+}
+
+resource "sonarr_delay_profile" "test" {
+	enable_usenet = true
+	enable_torrent = true
+	bypass_if_highest_quality = true
+	usenet_delay = 0
+	torrent_delay = 0
+	preferred_protocol= "torrent"
+	tags = [sonarr_tag.test.id]
+}
+
 data "sonarr_delay_profiles" "test" {
 }
 `

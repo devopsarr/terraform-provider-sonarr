@@ -147,6 +147,7 @@ func (p *sonarrProvider) GetDataSources(ctx context.Context) (map[string]provide
 		"sonarr_root_folders":      dataRootFoldersType{},
 		"sonarr_series":            dataSeriesType{},
 		"sonarr_all_series":        dataAllSeriesType{},
+		"sonarr_system_status":     dataSystemStatusType{},
 		"sonarr_tag":               dataTagType{},
 		"sonarr_tags":              dataTagsType{},
 	}, nil

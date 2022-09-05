@@ -26,7 +26,7 @@ func TestAccDelayProfileDataSource(t *testing.T) {
 
 const testAccDelayProfileDataSourceConfig = `
 resource "sonarr_tag" "test" {
-	label = "dpdata"
+	label = "delay_profile_datasource"
 }
 
 resource "sonarr_delay_profile" "test" {

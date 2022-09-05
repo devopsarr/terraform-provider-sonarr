@@ -17,7 +17,7 @@ func TestAccTagDataSource(t *testing.T) {
 				Config: testAccTagDataSourceConfig,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrSet("data.sonarr_tag.test", "id"),
-					resource.TestCheckResourceAttr("data.sonarr_tag.test", "label", "singleds"),
+					resource.TestCheckResourceAttr("data.sonarr_tag.test", "label", "tag_datasource"),
 				),
 			},
 		},
@@ -26,7 +26,7 @@ func TestAccTagDataSource(t *testing.T) {
 
 const testAccTagDataSourceConfig = `
 resource "sonarr_tag" "test" {
-	label = "singleds"
+	label = "tag_datasource"
 }
 
 data "sonarr_tag" "test" {
