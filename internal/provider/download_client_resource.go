@@ -400,7 +400,7 @@ func (r *DownloadClientResource) Create(ctx context.Context, req resource.Create
 
 	response, err := r.client.AddDownloadClientContext(ctx, request)
 	if err != nil {
-		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to create DownloadClient, got error: %s", err))
+		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to create DownloadClient, got error: %s", err))
 
 		return
 	}
@@ -424,7 +424,7 @@ func (r *DownloadClientResource) Read(ctx context.Context, req resource.ReadRequ
 	// Get DownloadClient current value
 	response, err := r.client.GetDownloadClientContext(ctx, int(state.ID.Value))
 	if err != nil {
-		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read DownloadClients, got error: %s", err))
+		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read DownloadClients, got error: %s", err))
 
 		return
 	}
@@ -450,7 +450,7 @@ func (r *DownloadClientResource) Update(ctx context.Context, req resource.Update
 
 	response, err := r.client.UpdateDownloadClientContext(ctx, request)
 	if err != nil {
-		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to update DownloadClient, got error: %s", err))
+		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to update DownloadClient, got error: %s", err))
 
 		return
 	}
@@ -473,7 +473,7 @@ func (r *DownloadClientResource) Delete(ctx context.Context, req resource.Delete
 	// Delete DownloadClient current value
 	err := r.client.DeleteDownloadClientContext(ctx, int(state.ID.Value))
 	if err != nil {
-		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read DownloadClients, got error: %s", err))
+		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read DownloadClients, got error: %s", err))
 
 		return
 	}

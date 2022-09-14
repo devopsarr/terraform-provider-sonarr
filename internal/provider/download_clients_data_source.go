@@ -314,7 +314,7 @@ func (d *DownloadClientsDataSource) Read(ctx context.Context, req datasource.Rea
 	// Get download clients current value
 	response, err := d.client.GetDownloadClientsContext(ctx)
 	if err != nil {
-		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read download clients, got error: %s", err))
+		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read download clients, got error: %s", err))
 
 		return
 	}
