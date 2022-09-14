@@ -438,6 +438,7 @@ func (r *DownloadClientResource) Read(ctx context.Context, req resource.ReadRequ
 func (r *DownloadClientResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	// Get plan values
 	var plan DownloadClient
+
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
 
 	if resp.Diagnostics.HasError() {

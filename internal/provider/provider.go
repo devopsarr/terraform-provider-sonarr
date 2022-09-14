@@ -151,6 +151,7 @@ func (p *SonarrProvider) DataSources(ctx context.Context) []func() datasource.Da
 		NewDelayProfileDataSource,
 		NewDelayProfilesDataSource,
 		NewDownloadClientDataSource,
+		NewDownloadClientsDataSource,
 		NewIndexerConfigDataSource,
 		NewIndexerDataSource,
 		NewIndexersDataSource,
