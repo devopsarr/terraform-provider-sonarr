@@ -487,7 +487,7 @@ func (r *DownloadClientResource) ImportState(ctx context.Context, req resource.I
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			"Unexpected Import Identifier",
+			UnexpectedImportIdentifier,
 			fmt.Sprintf("Expected import identifier with format: ID. Got: %q", req.ID),
 		)
 

@@ -164,6 +164,7 @@ func (p *SonarrProvider) DataSources(ctx context.Context) []func() datasource.Da
 		NewNamingDataSource,
 		NewQualityProfileDataSource,
 		NewQualityProfilesDataSource,
+		NewRemotePathMappingDataSource,
 		NewRootFolderDataSource,
 		NewRootFoldersDataSource,
 		NewSeriesDataSource,

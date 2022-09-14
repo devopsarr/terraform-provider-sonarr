@@ -302,7 +302,7 @@ func (d *DownloadClientDataSource) Read(ctx context.Context, req datasource.Read
 
 	downloadClient, err := findDownloadClient(data.Name.Value, response)
 	if err != nil {
-		resp.Diagnostics.AddError("Data Source Error", fmt.Sprintf("Unable to find downloadClient, got error: %s", err))
+		resp.Diagnostics.AddError(DataSourceError, fmt.Sprintf("Unable to find downloadClient, got error: %s", err))
 
 		return
 	}

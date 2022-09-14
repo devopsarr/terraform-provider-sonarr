@@ -192,7 +192,7 @@ func (r *RemotePathMappingResource) ImportState(ctx context.Context, req resourc
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			"Unexpected Import Identifier",
+			UnexpectedImportIdentifier,
 			fmt.Sprintf("Expected import identifier with format: ID. Got: %q", req.ID),
 		)
 
