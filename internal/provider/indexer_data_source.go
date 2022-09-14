@@ -6,25 +6,28 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"golift.io/starr/sonarr"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var (
-	_ provider.DataSourceType = dataIndexerType{}
-	_ datasource.DataSource   = dataIndexer{}
-)
+var _ datasource.DataSource = &IndexerDataSource{}
 
-type dataIndexerType struct{}
-
-type dataIndexer struct {
-	provider sonarrProvider
+func NewIndexerDataSource() datasource.DataSource {
+	return &IndexerDataSource{}
 }
 
-func (t dataIndexerType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
+// IndexerDataSource defines the indexer implementation.
+type IndexerDataSource struct {
+	client *sonarr.Sonarr
+}
+
+func (d *IndexerDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+	resp.TypeName = req.ProviderTypeName + "_indexer"
+}
+
+func (d *IndexerDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		// This description is used by the documentation generator and the delay server.
 		MarkdownDescription: "Single [Indexer](../resources/indexer).",
@@ -185,40 +188,50 @@ func (t dataIndexerType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diag
 	}, nil
 }
 
-func (t dataIndexerType) NewDataSource(ctx context.Context, in provider.Provider) (datasource.DataSource, diag.Diagnostics) {
-	provider, diags := convertProviderType(in)
+func (d *IndexerDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
+	// Prevent panic if the provider has not been configured.
+	if req.ProviderData == nil {
+		return
+	}
 
-	return dataIndexer{
-		provider: provider,
-	}, diags
+	client, ok := req.ProviderData.(*sonarr.Sonarr)
+	if !ok {
+		resp.Diagnostics.AddError(
+			UnexpectedDataSourceConfigureType,
+			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+		)
+
+		return
+	}
+
+	d.client = client
 }
 
-func (d dataIndexer) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+func (d *IndexerDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 	var data Indexer
-	diags := resp.State.Get(ctx, &data)
-	resp.Diagnostics.Append(diags...)
+
+	resp.Diagnostics.Append(resp.State.Get(ctx, &data)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 	// Get indexer current value
-	response, err := d.provider.client.GetIndexersContext(ctx)
+	response, err := d.client.GetIndexersContext(ctx)
 	if err != nil {
-		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read indexer, got error: %s", err))
+		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read indexer, got error: %s", err))
 
 		return
 	}
 
 	indexer, err := findIndexer(data.Name.Value, response)
 	if err != nil {
-		resp.Diagnostics.AddError("Data Source Error", fmt.Sprintf("Unable to find indexer, got error: %s", err))
+		resp.Diagnostics.AddError(DataSourceError, fmt.Sprintf("Unable to find indexer, got error: %s", err))
 
 		return
 	}
 
 	result := writeIndexer(ctx, indexer)
-	diags = resp.State.Set(ctx, &result)
-	resp.Diagnostics.Append(diags...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
 }
 
 func findIndexer(name string, indexers []*sonarr.IndexerOutput) (*sonarr.IndexerOutput, error) {

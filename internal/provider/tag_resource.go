@@ -8,34 +8,38 @@ import (
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
-	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr"
+	"golift.io/starr/sonarr"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var (
-	_ provider.ResourceType            = resourceTagType{}
-	_ resource.Resource                = resourceTag{}
-	_ resource.ResourceWithImportState = resourceTag{}
-)
+var _ resource.Resource = &TagResource{}
+var _ resource.ResourceWithImportState = &TagResource{}
 
-type resourceTagType struct{}
-
-type resourceTag struct {
-	provider sonarrProvider
+func NewTagResource() resource.Resource {
+	return &TagResource{}
 }
 
-// Tag is the tag resource.
+// TagResource defines the tag implementation.
+type TagResource struct {
+	client *sonarr.Sonarr
+}
+
+// Tag describes the tag data model.
 type Tag struct {
 	ID    types.Int64  `tfsdk:"id"`
 	Label types.String `tfsdk:"label"`
 }
 
-func (t resourceTagType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
+func (r *TagResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+	resp.TypeName = req.ProviderTypeName + "_tag"
+}
+
+func (r *TagResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		MarkdownDescription: "Tag resource.<br/>For more information refer to [Tags](https://wiki.servarr.com/sonarr/settings#tags) documentation.",
 		Attributes: map[string]tfsdk.Attribute{
@@ -59,19 +63,30 @@ func (t resourceTagType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diag
 	}, nil
 }
 
-func (t resourceTagType) NewResource(ctx context.Context, in provider.Provider) (resource.Resource, diag.Diagnostics) {
-	provider, diags := convertProviderType(in)
+func (r *TagResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+	// Prevent panic if the provider has not been configured.
+	if req.ProviderData == nil {
+		return
+	}
 
-	return resourceTag{
-		provider: provider,
-	}, diags
+	client, ok := req.ProviderData.(*sonarr.Sonarr)
+	if !ok {
+		resp.Diagnostics.AddError(
+			UnexpectedResourceConfigureType,
+			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+		)
+
+		return
+	}
+
+	r.client = client
 }
 
-func (r resourceTag) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
+func (r *TagResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	// Retrieve values from plan
 	var plan Tag
-	diags := req.Plan.Get(ctx, &plan)
-	resp.Diagnostics.Append(diags...)
+
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
 
 	if resp.Diagnostics.HasError() {
 		return
@@ -82,9 +97,9 @@ func (r resourceTag) Create(ctx context.Context, req resource.CreateRequest, res
 		Label: plan.Label.Value,
 	}
 
-	response, err := r.provider.client.AddTagContext(ctx, &request)
+	response, err := r.client.AddTagContext(ctx, &request)
 	if err != nil {
-		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to create tag, got error: %s", err))
+		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to create tag, got error: %s", err))
 
 		return
 	}
@@ -93,42 +108,36 @@ func (r resourceTag) Create(ctx context.Context, req resource.CreateRequest, res
 
 	// Generate resource state struct
 	result := writeTag(response)
-	diags = resp.State.Set(ctx, &result)
-	resp.Diagnostics.Append(diags...)
-
-	if resp.Diagnostics.HasError() {
-		return
-	}
+	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
 }
 
-func (r resourceTag) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
+func (r *TagResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	// Get current state
 	var state Tag
-	diags := req.State.Get(ctx, &state)
-	resp.Diagnostics.Append(diags...)
+
+	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Get tag current value
-	response, err := r.provider.client.GetTagContext(ctx, int(state.ID.Value))
+	response, err := r.client.GetTagContext(ctx, int(state.ID.Value))
 	if err != nil {
-		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read tags, got error: %s", err))
+		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read tags, got error: %s", err))
 
 		return
 	}
 	// Map response body to resource schema attribute
 	result := writeTag(response)
-	diags = resp.State.Set(ctx, &result)
-	resp.Diagnostics.Append(diags...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
 }
 
-func (r resourceTag) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+func (r *TagResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	// Get plan values
 	var plan Tag
-	diags := req.Plan.Get(ctx, &plan)
-	resp.Diagnostics.Append(diags...)
+
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
 
 	if resp.Diagnostics.HasError() {
 		return
@@ -140,9 +149,9 @@ func (r resourceTag) Update(ctx context.Context, req resource.UpdateRequest, res
 		ID:    int(plan.ID.Value),
 	}
 
-	response, err := r.provider.client.UpdateTagContext(ctx, &request)
+	response, err := r.client.UpdateTagContext(ctx, &request)
 	if err != nil {
-		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to update tag, got error: %s", err))
+		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to update tag, got error: %s", err))
 
 		return
 	}
@@ -151,28 +160,22 @@ func (r resourceTag) Update(ctx context.Context, req resource.UpdateRequest, res
 
 	// Generate resource state struct
 	result := writeTag(response)
-	diags = resp.State.Set(ctx, &result)
-	resp.Diagnostics.Append(diags...)
-
-	if resp.Diagnostics.HasError() {
-		return
-	}
+	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
 }
 
-func (r resourceTag) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
+func (r *TagResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	var state Tag
 
-	diags := req.State.Get(ctx, &state)
-	resp.Diagnostics.Append(diags...)
+	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Delete tag current value
-	err := r.provider.client.DeleteTagContext(ctx, int(state.ID.Value))
+	err := r.client.DeleteTagContext(ctx, int(state.ID.Value))
 	if err != nil {
-		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read tags, got error: %s", err))
+		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read tags, got error: %s", err))
 
 		return
 	}
@@ -180,12 +183,12 @@ func (r resourceTag) Delete(ctx context.Context, req resource.DeleteRequest, res
 	resp.State.RemoveResource(ctx)
 }
 
-func (r resourceTag) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+func (r *TagResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	// resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			"Unexpected Import Identifier",
+			UnexpectedImportIdentifier,
 			fmt.Sprintf("Expected import identifier with format: ID. Got: %q", req.ID),
 		)
 

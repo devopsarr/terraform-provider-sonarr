@@ -8,7 +8,6 @@ import (
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
-	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -17,19 +16,19 @@ import (
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var (
-	_ provider.ResourceType            = resourceDelayProfileType{}
-	_ resource.Resource                = resourceDelayProfile{}
-	_ resource.ResourceWithImportState = resourceDelayProfile{}
-)
+var _ resource.Resource = &DelayProfileResource{}
+var _ resource.ResourceWithImportState = &DelayProfileResource{}
 
-type resourceDelayProfileType struct{}
-
-type resourceDelayProfile struct {
-	provider sonarrProvider
+func NewDelayProfileResource() resource.Resource {
+	return &DelayProfileResource{}
 }
 
-// DelayProfile is the delay_profile resource.
+// DelayProfileResource defines the delay profile implementation.
+type DelayProfileResource struct {
+	client *sonarr.Sonarr
+}
+
+// DelayProfile describes the delay profile data model.
 type DelayProfile struct {
 	EnableUsenet           types.Bool   `tfsdk:"enable_usenet"`
 	EnableTorrent          types.Bool   `tfsdk:"enable_torrent"`
@@ -42,7 +41,11 @@ type DelayProfile struct {
 	Tags                   types.Set    `tfsdk:"tags"`
 }
 
-func (t resourceDelayProfileType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
+func (r *DelayProfileResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+	resp.TypeName = req.ProviderTypeName + "_delay_profile"
+}
+
+func (r *DelayProfileResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		MarkdownDescription: "Delay Profile resource.<br/>For more information refer to [Delay Profiles](https://wiki.servarr.com/sonarr/settings#delay-profiles) documentation.",
 		Attributes: map[string]tfsdk.Attribute{
@@ -109,19 +112,30 @@ func (t resourceDelayProfileType) GetSchema(ctx context.Context) (tfsdk.Schema, 
 	}, nil
 }
 
-func (t resourceDelayProfileType) NewResource(ctx context.Context, in provider.Provider) (resource.Resource, diag.Diagnostics) {
-	provider, diags := convertProviderType(in)
+func (r *DelayProfileResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+	// Prevent panic if the provider has not been configured.
+	if req.ProviderData == nil {
+		return
+	}
 
-	return resourceDelayProfile{
-		provider: provider,
-	}, diags
+	client, ok := req.ProviderData.(*sonarr.Sonarr)
+	if !ok {
+		resp.Diagnostics.AddError(
+			UnexpectedResourceConfigureType,
+			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+		)
+
+		return
+	}
+
+	r.client = client
 }
 
-func (r resourceDelayProfile) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
+func (r *DelayProfileResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	// Retrieve values from plan
 	var plan DelayProfile
-	diags := req.Plan.Get(ctx, &plan)
-	resp.Diagnostics.Append(diags...)
+
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
 
 	if resp.Diagnostics.HasError() {
 		return
@@ -131,53 +145,46 @@ func (r resourceDelayProfile) Create(ctx context.Context, req resource.CreateReq
 	data := readDelayProfile(ctx, &plan)
 
 	// Create new DelayProfile
-	response, err := r.provider.client.AddDelayProfileContext(ctx, data)
+	response, err := r.client.AddDelayProfileContext(ctx, data)
 	if err != nil {
-		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to create delayprofile, got error: %s", err))
+		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to create delayprofile, got error: %s", err))
 
 		return
 	}
 
 	tflog.Trace(ctx, "created delayprofile: "+strconv.Itoa(int(response.ID)))
-
 	// Generate resource state struct
 	result := writeDelayProfile(ctx, response)
-	diags = resp.State.Set(ctx, result)
-	resp.Diagnostics.Append(diags...)
-
-	if resp.Diagnostics.HasError() {
-		return
-	}
+	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
 }
 
-func (r resourceDelayProfile) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
+func (r *DelayProfileResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	// Get current state
 	var state DelayProfile
-	diags := req.State.Get(ctx, &state)
-	resp.Diagnostics.Append(diags...)
+
+	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Get delayprofile current value
-	response, err := r.provider.client.GetDelayProfileContext(ctx, int(state.ID.Value))
+	response, err := r.client.GetDelayProfileContext(ctx, int(state.ID.Value))
 	if err != nil {
-		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read delayprofiles, got error: %s", err))
+		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read delayprofiles, got error: %s", err))
 
 		return
 	}
 	// Map response body to resource schema attribute
 	result := writeDelayProfile(ctx, response)
-	diags = resp.State.Set(ctx, result)
-	resp.Diagnostics.Append(diags...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
 }
 
-func (r resourceDelayProfile) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+func (r *DelayProfileResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	// Get plan values
 	var plan DelayProfile
-	diags := req.Plan.Get(ctx, &plan)
-	resp.Diagnostics.Append(diags...)
+
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
 
 	if resp.Diagnostics.HasError() {
 		return
@@ -187,39 +194,32 @@ func (r resourceDelayProfile) Update(ctx context.Context, req resource.UpdateReq
 	data := readDelayProfile(ctx, &plan)
 
 	// Update DelayProfile
-	response, err := r.provider.client.UpdateDelayProfileContext(ctx, data)
+	response, err := r.client.UpdateDelayProfileContext(ctx, data)
 	if err != nil {
-		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to update delayprofile, got error: %s", err))
+		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to update delayprofile, got error: %s", err))
 
 		return
 	}
 
 	tflog.Trace(ctx, "update delayprofile: "+strconv.Itoa(int(response.ID)))
-
 	// Generate resource state struct
 	result := writeDelayProfile(ctx, response)
-	diags = resp.State.Set(ctx, result)
-	resp.Diagnostics.Append(diags...)
-
-	if resp.Diagnostics.HasError() {
-		return
-	}
+	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
 }
 
-func (r resourceDelayProfile) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
+func (r *DelayProfileResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	var state DelayProfile
 
-	diags := req.State.Get(ctx, &state)
-	resp.Diagnostics.Append(diags...)
+	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Delete delayprofile current value
-	err := r.provider.client.DeleteDelayProfileContext(ctx, int(state.ID.Value))
+	err := r.client.DeleteDelayProfileContext(ctx, int(state.ID.Value))
 	if err != nil {
-		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read delayprofiles, got error: %s", err))
+		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read delayprofiles, got error: %s", err))
 
 		return
 	}
@@ -227,12 +227,12 @@ func (r resourceDelayProfile) Delete(ctx context.Context, req resource.DeleteReq
 	resp.State.RemoveResource(ctx)
 }
 
-func (r resourceDelayProfile) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+func (r *DelayProfileResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	// resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			"Unexpected Import Identifier",
+			UnexpectedImportIdentifier,
 			fmt.Sprintf("Expected import identifier with format: ID. Got: %q", req.ID),
 		)
 

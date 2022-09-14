@@ -7,7 +7,6 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
-	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -17,19 +16,19 @@ import (
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var (
-	_ provider.ResourceType            = resourceRootFolderType{}
-	_ resource.Resource                = resourceRootFolder{}
-	_ resource.ResourceWithImportState = resourceRootFolder{}
-)
+var _ resource.Resource = &RootFolderResource{}
+var _ resource.ResourceWithImportState = &RootFolderResource{}
 
-type resourceRootFolderType struct{}
-
-type resourceRootFolder struct {
-	provider sonarrProvider
+func NewRootFolderResource() resource.Resource {
+	return &RootFolderResource{}
 }
 
-// RootFolder is the RootFolder resource.
+// RootFolderResource defines the root folder implementation.
+type RootFolderResource struct {
+	client *sonarr.Sonarr
+}
+
+// RootFolder describes the root folder data model.
 type RootFolder struct {
 	Accessible      types.Bool   `tfsdk:"accessible"`
 	ID              types.Int64  `tfsdk:"id"`
@@ -43,7 +42,11 @@ type Path struct {
 	Path types.String `tfsdk:"path"`
 }
 
-func (t resourceRootFolderType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
+func (r *RootFolderResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+	resp.TypeName = req.ProviderTypeName + "_root_folder"
+}
+
+func (r *RootFolderResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		MarkdownDescription: "Root Folder resource.<br/>For more information refer to [Root Folders](https://wiki.servarr.com/sonarr/settings#root-folders) documentation.",
 		Attributes: map[string]tfsdk.Attribute{
@@ -72,13 +75,13 @@ func (t resourceRootFolderType) GetSchema(ctx context.Context) (tfsdk.Schema, di
 			"unmapped_folders": {
 				MarkdownDescription: "List of folders with no associated series.",
 				Computed:            true,
-				Attributes:          tfsdk.SetNestedAttributes(t.getUnmappedFolderSchema().Attributes),
+				Attributes:          tfsdk.SetNestedAttributes(r.getUnmappedFolderSchema().Attributes),
 			},
 		},
 	}, nil
 }
 
-func (t resourceRootFolderType) getUnmappedFolderSchema() tfsdk.Schema {
+func (r RootFolderResource) getUnmappedFolderSchema() tfsdk.Schema {
 	return tfsdk.Schema{
 		Attributes: map[string]tfsdk.Attribute{
 			"path": {
@@ -95,19 +98,30 @@ func (t resourceRootFolderType) getUnmappedFolderSchema() tfsdk.Schema {
 	}
 }
 
-func (t resourceRootFolderType) NewResource(ctx context.Context, in provider.Provider) (resource.Resource, diag.Diagnostics) {
-	provider, diags := convertProviderType(in)
+func (r *RootFolderResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+	// Prevent panic if the provider has not been configured.
+	if req.ProviderData == nil {
+		return
+	}
 
-	return resourceRootFolder{
-		provider: provider,
-	}, diags
+	client, ok := req.ProviderData.(*sonarr.Sonarr)
+	if !ok {
+		resp.Diagnostics.AddError(
+			UnexpectedResourceConfigureType,
+			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+		)
+
+		return
+	}
+
+	r.client = client
 }
 
-func (r resourceRootFolder) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
+func (r *RootFolderResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	// Retrieve values from plan
 	var plan string
-	diags := req.Plan.GetAttribute(ctx, path.Root("path"), &plan)
-	resp.Diagnostics.Append(diags...)
+
+	resp.Diagnostics.Append(req.Plan.GetAttribute(ctx, path.Root("path"), &plan)...)
 
 	if resp.Diagnostics.HasError() {
 		return
@@ -118,9 +132,9 @@ func (r resourceRootFolder) Create(ctx context.Context, req resource.CreateReque
 		Path: plan,
 	}
 
-	response, err := r.provider.client.AddRootFolderContext(ctx, &request)
+	response, err := r.client.AddRootFolderContext(ctx, &request)
 	if err != nil {
-		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to create rootFolder, got error: %s", err))
+		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to create rootFolder, got error: %s", err))
 
 		return
 	}
@@ -129,55 +143,48 @@ func (r resourceRootFolder) Create(ctx context.Context, req resource.CreateReque
 
 	// Generate resource state struct
 	result := writeRootFolder(ctx, response)
-	diags = resp.State.Set(ctx, result)
-	resp.Diagnostics.Append(diags...)
-
-	if resp.Diagnostics.HasError() {
-		return
-	}
+	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
 }
 
-func (r resourceRootFolder) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
+func (r *RootFolderResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	// Get current state
 	var state RootFolder
-	diags := req.State.Get(ctx, &state)
-	resp.Diagnostics.Append(diags...)
+
+	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Get rootFolder current value
-	response, err := r.provider.client.GetRootFolderContext(ctx, int(state.ID.Value))
+	response, err := r.client.GetRootFolderContext(ctx, int(state.ID.Value))
 	if err != nil {
-		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read rootFolders, got error: %s", err))
+		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read rootFolders, got error: %s", err))
 
 		return
 	}
 	// Map response body to resource schema attribute
 	result := writeRootFolder(ctx, response)
-	diags = resp.State.Set(ctx, result)
-	resp.Diagnostics.Append(diags...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
 }
 
 // never used.
-func (r resourceRootFolder) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+func (r *RootFolderResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 }
 
-func (r resourceRootFolder) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
+func (r *RootFolderResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	var state RootFolder
 
-	diags := req.State.Get(ctx, &state)
-	resp.Diagnostics.Append(diags...)
+	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Delete rootFolder current value
-	err := r.provider.client.DeleteRootFolderContext(ctx, int(state.ID.Value))
+	err := r.client.DeleteRootFolderContext(ctx, int(state.ID.Value))
 	if err != nil {
-		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read rootFolders, got error: %s", err))
+		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read rootFolders, got error: %s", err))
 
 		return
 	}
@@ -185,12 +192,12 @@ func (r resourceRootFolder) Delete(ctx context.Context, req resource.DeleteReque
 	resp.State.RemoveResource(ctx)
 }
 
-func (r resourceRootFolder) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+func (r *RootFolderResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	// resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			"Unexpected Import Identifier",
+			UnexpectedImportIdentifier,
 			fmt.Sprintf("Expected import identifier with format: ID. Got: %q", req.ID),
 		)
 
@@ -205,7 +212,7 @@ func writeRootFolder(ctx context.Context, rootFolder *sonarr.RootFolder) *RootFo
 		Accessible:      types.Bool{Value: rootFolder.Accessible},
 		ID:              types.Int64{Value: rootFolder.ID},
 		Path:            types.String{Value: rootFolder.Path},
-		UnmappedFolders: types.Set{ElemType: resourceRootFolderType{}.getUnmappedFolderSchema().Type()},
+		UnmappedFolders: types.Set{ElemType: RootFolderResource{}.getUnmappedFolderSchema().Type()},
 	}
 	unmapped := writeUnmappedFolders(rootFolder.UnmappedFolders)
 

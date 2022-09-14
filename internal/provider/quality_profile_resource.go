@@ -7,7 +7,6 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
-	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -17,19 +16,19 @@ import (
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var (
-	_ provider.ResourceType            = resourceQualityProfileType{}
-	_ resource.Resource                = resourceQualityProfile{}
-	_ resource.ResourceWithImportState = resourceQualityProfile{}
-)
+var _ resource.Resource = &QualityProfileResource{}
+var _ resource.ResourceWithImportState = &QualityProfileResource{}
 
-type resourceQualityProfileType struct{}
-
-type resourceQualityProfile struct {
-	provider sonarrProvider
+func NewQualityProfileResource() resource.Resource {
+	return &QualityProfileResource{}
 }
 
-// QualityProfile is the quality_profile resource.
+// QualityProfileResource defines the quality profile implementation.
+type QualityProfileResource struct {
+	client *sonarr.Sonarr
+}
+
+// QualityProfile describes the quality profile data model.
 type QualityProfile struct {
 	UpgradeAllowed types.Bool   `tfsdk:"upgrade_allowed"`
 	ID             types.Int64  `tfsdk:"id"`
@@ -53,7 +52,11 @@ type Quality struct {
 	Source     types.String `tfsdk:"source"`
 }
 
-func (t resourceQualityProfileType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
+func (r *QualityProfileResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+	resp.TypeName = req.ProviderTypeName + "_quality_profile"
+}
+
+func (r *QualityProfileResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		MarkdownDescription: "Quality Profile resource.<br/>For more information refer to [Quality Profile](https://wiki.servarr.com/sonarr/settings#quality-profiles) documentation.",
 		Attributes: map[string]tfsdk.Attribute{
@@ -85,13 +88,13 @@ func (t resourceQualityProfileType) GetSchema(ctx context.Context) (tfsdk.Schema
 			"quality_groups": {
 				MarkdownDescription: "Quality groups.",
 				Required:            true,
-				Attributes:          tfsdk.SetNestedAttributes(t.getQualityGroupSchema().Attributes),
+				Attributes:          tfsdk.SetNestedAttributes(r.getQualityGroupSchema().Attributes),
 			},
 		},
 	}, nil
 }
 
-func (t resourceQualityProfileType) getQualityGroupSchema() tfsdk.Schema {
+func (r QualityProfileResource) getQualityGroupSchema() tfsdk.Schema {
 	return tfsdk.Schema{
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
@@ -109,13 +112,13 @@ func (t resourceQualityProfileType) getQualityGroupSchema() tfsdk.Schema {
 			"qualities": {
 				MarkdownDescription: "Qualities in group.",
 				Required:            true,
-				Attributes:          tfsdk.SetNestedAttributes(t.getQualitySchema().Attributes),
+				Attributes:          tfsdk.SetNestedAttributes(r.getQualitySchema().Attributes),
 			},
 		},
 	}
 }
 
-func (t resourceQualityProfileType) getQualitySchema() tfsdk.Schema {
+func (r QualityProfileResource) getQualitySchema() tfsdk.Schema {
 	return tfsdk.Schema{
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
@@ -146,19 +149,30 @@ func (t resourceQualityProfileType) getQualitySchema() tfsdk.Schema {
 	}
 }
 
-func (t resourceQualityProfileType) NewResource(ctx context.Context, in provider.Provider) (resource.Resource, diag.Diagnostics) {
-	provider, diags := convertProviderType(in)
+func (r *QualityProfileResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+	// Prevent panic if the provider has not been configured.
+	if req.ProviderData == nil {
+		return
+	}
 
-	return resourceQualityProfile{
-		provider: provider,
-	}, diags
+	client, ok := req.ProviderData.(*sonarr.Sonarr)
+	if !ok {
+		resp.Diagnostics.AddError(
+			UnexpectedResourceConfigureType,
+			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+		)
+
+		return
+	}
+
+	r.client = client
 }
 
-func (r resourceQualityProfile) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
+func (r *QualityProfileResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	// Retrieve values from plan
 	var plan QualityProfile
-	diags := req.Plan.Get(ctx, &plan)
-	resp.Diagnostics.Append(diags...)
+
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
 
 	if resp.Diagnostics.HasError() {
 		return
@@ -168,9 +182,9 @@ func (r resourceQualityProfile) Create(ctx context.Context, req resource.CreateR
 	data := readQualityProfile(ctx, &plan)
 
 	// Create new QualityProfile
-	response, err := r.provider.client.AddQualityProfileContext(ctx, data)
+	response, err := r.client.AddQualityProfileContext(ctx, data)
 	if err != nil {
-		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to create qualityprofile, got error: %s", err))
+		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to create qualityprofile, got error: %s", err))
 
 		return
 	}
@@ -179,42 +193,36 @@ func (r resourceQualityProfile) Create(ctx context.Context, req resource.CreateR
 
 	// Generate resource state struct
 	result := writeQualityProfile(ctx, response)
-	diags = resp.State.Set(ctx, result)
-	resp.Diagnostics.Append(diags...)
-
-	if resp.Diagnostics.HasError() {
-		return
-	}
+	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
 }
 
-func (r resourceQualityProfile) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
+func (r *QualityProfileResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	// Get current state
 	var state QualityProfile
-	diags := req.State.Get(ctx, &state)
-	resp.Diagnostics.Append(diags...)
+
+	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Get qualityprofile current value
-	response, err := r.provider.client.GetQualityProfileContext(ctx, int(state.ID.Value))
+	response, err := r.client.GetQualityProfileContext(ctx, int(state.ID.Value))
 	if err != nil {
-		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read qualityprofiles, got error: %s", err))
+		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read qualityprofiles, got error: %s", err))
 
 		return
 	}
 	// Map response body to resource schema attribute
 	result := writeQualityProfile(ctx, response)
-	diags = resp.State.Set(ctx, result)
-	resp.Diagnostics.Append(diags...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
 }
 
-func (r resourceQualityProfile) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+func (r *QualityProfileResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	// Get plan values
 	var plan QualityProfile
-	diags := req.Plan.Get(ctx, &plan)
-	resp.Diagnostics.Append(diags...)
+
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
 
 	if resp.Diagnostics.HasError() {
 		return
@@ -224,9 +232,9 @@ func (r resourceQualityProfile) Update(ctx context.Context, req resource.UpdateR
 	data := readQualityProfile(ctx, &plan)
 
 	// Update QualityProfile
-	response, err := r.provider.client.UpdateQualityProfileContext(ctx, data)
+	response, err := r.client.UpdateQualityProfileContext(ctx, data)
 	if err != nil {
-		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to update qualityprofile, got error: %s", err))
+		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to update qualityprofile, got error: %s", err))
 
 		return
 	}
@@ -235,28 +243,22 @@ func (r resourceQualityProfile) Update(ctx context.Context, req resource.UpdateR
 
 	// Generate resource state struct
 	result := writeQualityProfile(ctx, response)
-	diags = resp.State.Set(ctx, result)
-	resp.Diagnostics.Append(diags...)
-
-	if resp.Diagnostics.HasError() {
-		return
-	}
+	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
 }
 
-func (r resourceQualityProfile) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
+func (r *QualityProfileResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	var state QualityProfile
 
-	diags := req.State.Get(ctx, &state)
-	resp.Diagnostics.Append(diags...)
+	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Delete qualityprofile current value
-	err := r.provider.client.DeleteQualityProfileContext(ctx, int(state.ID.Value))
+	err := r.client.DeleteQualityProfileContext(ctx, int(state.ID.Value))
 	if err != nil {
-		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read qualityprofiles, got error: %s", err))
+		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read qualityprofiles, got error: %s", err))
 
 		return
 	}
@@ -264,12 +266,12 @@ func (r resourceQualityProfile) Delete(ctx context.Context, req resource.DeleteR
 	resp.State.RemoveResource(ctx)
 }
 
-func (r resourceQualityProfile) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+func (r *QualityProfileResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	// resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			"Unexpected Import Identifier",
+			UnexpectedImportIdentifier,
 			fmt.Sprintf("Expected import identifier with format: ID. Got: %q", req.ID),
 		)
 
@@ -285,7 +287,7 @@ func writeQualityProfile(ctx context.Context, profile *sonarr.QualityProfile) *Q
 		ID:             types.Int64{Value: profile.ID},
 		Name:           types.String{Value: profile.Name},
 		Cutoff:         types.Int64{Value: profile.Cutoff},
-		QualityGroups:  types.Set{ElemType: resourceQualityProfileType{}.getQualityGroupSchema().AttributeType()},
+		QualityGroups:  types.Set{ElemType: QualityProfileResource{}.getQualityGroupSchema().Type()},
 	}
 	qualityGroups := *writeQualityGroups(ctx, profile.Qualities)
 	tfsdk.ValueFrom(ctx, qualityGroups, output.QualityGroups.Type(ctx), &output.QualityGroups)
@@ -321,7 +323,7 @@ func writeQualityGroups(ctx context.Context, groups []*starr.Quality) *[]Quality
 		qualityGroups[n] = QualityGroup{
 			Name:      types.String{Value: name},
 			ID:        types.Int64{Value: id},
-			Qualities: types.Set{ElemType: resourceQualityProfileType{}.getQualitySchema().AttributeType()},
+			Qualities: types.Set{ElemType: QualityProfileResource{}.getQualitySchema().Type()},
 		}
 		tfsdk.ValueFrom(ctx, qualities, qualityGroups[n].Qualities.Type(ctx), &qualityGroups[n].Qualities)
 	}
