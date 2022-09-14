@@ -133,6 +133,7 @@ func (p *SonarrProvider) Configure(ctx context.Context, req provider.ConfigureRe
 func (p *SonarrProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
 		NewDelayProfileResource,
+		NewDownloadClientResource,
 		NewIndexerConfigResource,
 		NewIndexerResource,
 		NewLanguageProfileResource,
