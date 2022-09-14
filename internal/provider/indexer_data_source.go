@@ -243,5 +243,5 @@ func findIndexer(name string, indexers []*sonarr.IndexerOutput) (*sonarr.Indexer
 		}
 	}
 
-	return nil, fmt.Errorf("no language indexer with name %s", name)
+	return nil, fmt.Errorf("no indexer with name %s", name)
 }

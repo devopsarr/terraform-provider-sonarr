@@ -29,12 +29,12 @@ install: build
 
 # Generate documentation
 .PHONY: doc
-doc:
+doc: lint
 	go generate ./...
 
 # Lint
 .PHONY: lint
-lint:
+lint: fmt
 	golangci-lint run ./...
 
 # Format
