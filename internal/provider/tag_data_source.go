@@ -6,25 +6,30 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr"
+	"golift.io/starr/sonarr"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var (
-	_ provider.DataSourceType = dataTagType{}
-	_ datasource.DataSource   = dataTag{}
-)
+var _ datasource.DataSource = &TagDataSource{}
 
-type dataTagType struct{}
-
-type dataTag struct {
-	provider sonarrProvider
+func NewTagDataSource() datasource.DataSource {
+	return &TagDataSource{}
 }
 
-func (t dataTagType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
+// TagDataSource defines the tag implementation.
+type TagDataSource struct {
+	client *sonarr.Sonarr
+}
+
+func (d *TagDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+	resp.TypeName = req.ProviderTypeName + "_tag"
+}
+
+func (d *TagDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		// This description is used by the documentation generator and the language server.
 		MarkdownDescription: "Single [Tag](../resources/tag).",
@@ -43,42 +48,54 @@ func (t dataTagType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnost
 	}, nil
 }
 
-func (t dataTagType) NewDataSource(ctx context.Context, in provider.Provider) (datasource.DataSource, diag.Diagnostics) {
-	provider, diags := convertProviderType(in)
+func (d *TagDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
+	// Prevent panic if the provider has not been configured.
+	if req.ProviderData == nil {
+		return
+	}
 
-	return dataTag{
-		provider: provider,
-	}, diags
+	client, ok := req.ProviderData.(*sonarr.Sonarr)
+	if !ok {
+		resp.Diagnostics.AddError(
+			UnexpectedDataSourceConfigureType,
+			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+		)
+
+		return
+	}
+
+	d.client = client
 }
 
-func (d dataTag) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+func (d *TagDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 	var data Tag
-	diags := req.Config.Get(ctx, &data)
-	resp.Diagnostics.Append(diags...)
+
+	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Get tags current value
-	response, err := d.provider.client.GetTagsContext(ctx)
+	response, err := d.client.GetTagsContext(ctx)
 	if err != nil {
-		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read tags, got error: %s", err))
+		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read tags, got error: %s", err))
 
 		return
 	}
 
 	tag, err := findTag(data.Label.Value, response)
 	if err != nil {
-		resp.Diagnostics.AddError("Data Source Error", fmt.Sprintf("Unable to find tags, got error: %s", err))
+		resp.Diagnostics.AddError(DataSourceError, fmt.Sprintf("Unable to find tags, got error: %s", err))
 
 		return
 	}
 
+	tflog.Trace(ctx, "read tag")
+
 	result := writeTag(tag)
 	// Map response body to resource schema attribute
-	diags = resp.State.Set(ctx, &result)
-	resp.Diagnostics.Append(diags...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
 }
 
 func findTag(label string, tags []*starr.Tag) (*starr.Tag, error) {

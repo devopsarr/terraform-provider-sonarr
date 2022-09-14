@@ -7,7 +7,6 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
-	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -16,20 +15,19 @@ import (
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
+var _ resource.Resource = &SeriesResource{}
+var _ resource.ResourceWithImportState = &SeriesResource{}
 
-var (
-	_ provider.ResourceType            = resourceSeriesType{}
-	_ resource.Resource                = resourceSeries{}
-	_ resource.ResourceWithImportState = resourceSeries{}
-)
-
-type resourceSeriesType struct{}
-
-type resourceSeries struct {
-	provider sonarrProvider
+func NewSeriesResource() resource.Resource {
+	return &SeriesResource{}
 }
 
-// Series is the series resource.
+// SeriesResource defines the series implementation.
+type SeriesResource struct {
+	client *sonarr.Sonarr
+}
+
+// Series describes the series data model.
 type Series struct {
 	Monitored         types.Bool   `tfsdk:"monitored"`
 	SeasonFolder      types.Bool   `tfsdk:"season_folder"`
@@ -67,7 +65,11 @@ type Image struct {
 	Extension types.String `tfsdk:"extension"`
 }
 
-func (t resourceSeriesType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
+func (r *SeriesResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+	resp.TypeName = req.ProviderTypeName + "_series"
+}
+
+func (r *SeriesResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	// TODO: waiting to implement seasons and images until empty conversion is managed natively https://www.terraform.io/plugin/framework/accessing-values#conversion-rules
 	return tfsdk.Schema{
 		MarkdownDescription: "Series resource.<br/>For more information refer to [Series](https://wiki.servarr.com/sonarr/library#series) documentation.",
@@ -141,19 +143,30 @@ func (t resourceSeriesType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.D
 	}, nil
 }
 
-func (t resourceSeriesType) NewResource(ctx context.Context, in provider.Provider) (resource.Resource, diag.Diagnostics) {
-	provider, diags := convertProviderType(in)
+func (r *SeriesResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+	// Prevent panic if the provider has not been configured.
+	if req.ProviderData == nil {
+		return
+	}
 
-	return resourceSeries{
-		provider: provider,
-	}, diags
+	client, ok := req.ProviderData.(*sonarr.Sonarr)
+	if !ok {
+		resp.Diagnostics.AddError(
+			UnexpectedResourceConfigureType,
+			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+		)
+
+		return
+	}
+
+	r.client = client
 }
 
-func (r resourceSeries) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
+func (r *SeriesResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	// Retrieve values from plan
 	var plan Series
-	diags := req.Plan.Get(ctx, &plan)
-	resp.Diagnostics.Append(diags...)
+
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
 
 	if resp.Diagnostics.HasError() {
 		return
@@ -169,53 +182,48 @@ func (r resourceSeries) Create(ctx context.Context, req resource.CreateRequest, 
 		IgnoreEpisodesWithoutFiles:   false,
 	}
 
-	response, err := r.provider.client.AddSeriesContext(ctx, request)
+	response, err := r.client.AddSeriesContext(ctx, request)
 	if err != nil {
-		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to create series, got error: %s", err))
+		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to create series, got error: %s", err))
 
 		return
 	}
 
 	tflog.Trace(ctx, "created series: "+strconv.Itoa(int(response.ID)))
-
 	// Generate resource state struct
 	result := *writeSeries(ctx, response)
-	diags = resp.State.Set(ctx, result)
-	resp.Diagnostics.Append(diags...)
-
-	if resp.Diagnostics.HasError() {
-		return
-	}
+	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
 }
 
-func (r resourceSeries) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
+func (r *SeriesResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	// Get current state
 	var state Series
-	diags := req.State.Get(ctx, &state)
-	resp.Diagnostics.Append(diags...)
+
+	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Get series current value
-	response, err := r.provider.client.GetSeriesByIDContext(ctx, state.ID.Value)
+	response, err := r.client.GetSeriesByIDContext(ctx, state.ID.Value)
 	if err != nil {
-		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read series, got error: %s", err))
+		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read series, got error: %s", err))
 
 		return
 	}
+
+	tflog.Trace(ctx, "read series: "+strconv.Itoa(int(response.ID)))
 	// Map response body to resource schema attribute
 	result := *writeSeries(ctx, response)
-	diags = resp.State.Set(ctx, result)
-	resp.Diagnostics.Append(diags...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
 }
 
-func (r resourceSeries) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+func (r *SeriesResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	// Get plan values
 	var plan Series
-	diags := req.Plan.Get(ctx, &plan)
-	resp.Diagnostics.Append(diags...)
+
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
 
 	if resp.Diagnostics.HasError() {
 		return
@@ -224,58 +232,53 @@ func (r resourceSeries) Update(ctx context.Context, req resource.UpdateRequest, 
 	// Update Series
 	request := *readSeries(ctx, &plan)
 
-	response, err := r.provider.client.UpdateSeriesContext(ctx, &request)
+	response, err := r.client.UpdateSeriesContext(ctx, &request)
 	if err != nil {
-		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to update series, got error: %s", err))
+		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to update series, got error: %s", err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "update series: "+strconv.Itoa(int(response.ID)))
-
+	tflog.Trace(ctx, "updated series: "+strconv.Itoa(int(response.ID)))
 	// Map response body to resource schema attribute
 	result := writeSeries(ctx, response)
-	diags = resp.State.Set(ctx, result)
-	resp.Diagnostics.Append(diags...)
-
-	if resp.Diagnostics.HasError() {
-		return
-	}
+	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
 }
 
-func (r resourceSeries) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
+func (r *SeriesResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	var state Series
 
-	diags := req.State.Get(ctx, &state)
-	resp.Diagnostics.Append(diags...)
+	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	// Delete tag current value
-	err := r.provider.client.DeleteSeriesContext(ctx, int(state.ID.Value), true, false)
+	// Delete series current value
+	err := r.client.DeleteSeriesContext(ctx, int(state.ID.Value), true, false)
 	if err != nil {
-		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read tags, got error: %s", err))
+		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to delete series, got error: %s", err))
 
 		return
 	}
 
+	tflog.Trace(ctx, "deleted series: "+strconv.Itoa(int(state.ID.Value)))
 	resp.State.RemoveResource(ctx)
 }
 
-func (r resourceSeries) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+func (r *SeriesResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	// resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			"Unexpected Import Identifier",
+			UnexpectedImportIdentifier,
 			fmt.Sprintf("Expected import identifier with format: ID. Got: %q", req.ID),
 		)
 
 		return
 	}
 
+	tflog.Trace(ctx, "imported series: "+strconv.Itoa(id))
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 

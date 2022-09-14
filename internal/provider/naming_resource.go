@@ -7,7 +7,6 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
-	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -16,19 +15,19 @@ import (
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var (
-	_ provider.ResourceType            = resourceNamingType{}
-	_ resource.Resource                = resourceNaming{}
-	_ resource.ResourceWithImportState = resourceNaming{}
-)
+var _ resource.Resource = &NamingResource{}
+var _ resource.ResourceWithImportState = &NamingResource{}
 
-type resourceNamingType struct{}
-
-type resourceNaming struct {
-	provider sonarrProvider
+func NewNamingResource() resource.Resource {
+	return &NamingResource{}
 }
 
-// Naming is the Naming resource.
+// NamingResource defines the naming implementation.
+type NamingResource struct {
+	client *sonarr.Sonarr
+}
+
+// Naming describes the naming data model.
 type Naming struct {
 	RenameEpisodes           types.Bool   `tfsdk:"rename_episodes"`
 	ReplaceIllegalCharacters types.Bool   `tfsdk:"replace_illegal_characters"`
@@ -42,7 +41,11 @@ type Naming struct {
 	StandardEpisodeFormat    types.String `tfsdk:"standard_episode_format"`
 }
 
-func (t resourceNamingType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
+func (r *NamingResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+	resp.TypeName = req.ProviderTypeName + "_naming"
+}
+
+func (r *NamingResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		MarkdownDescription: "Naming resource. <br/>For more information refer to [Naming](https://wiki.servarr.com/sonarr/settings#community-naming-suggestions) documentation.",
 		Attributes: map[string]tfsdk.Attribute{
@@ -103,35 +106,46 @@ func (t resourceNamingType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.D
 	}, nil
 }
 
-func (t resourceNamingType) NewResource(ctx context.Context, in provider.Provider) (resource.Resource, diag.Diagnostics) {
-	provider, diags := convertProviderType(in)
+func (r *NamingResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+	// Prevent panic if the provider has not been configured.
+	if req.ProviderData == nil {
+		return
+	}
 
-	return resourceNaming{
-		provider: provider,
-	}, diags
+	client, ok := req.ProviderData.(*sonarr.Sonarr)
+	if !ok {
+		resp.Diagnostics.AddError(
+			UnexpectedResourceConfigureType,
+			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+		)
+
+		return
+	}
+
+	r.client = client
 }
 
-func (r resourceNaming) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
+func (r *NamingResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	// Retrieve values from plan
 	var plan Naming
-	diags := req.Plan.Get(ctx, &plan)
-	resp.Diagnostics.Append(diags...)
+
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Init call if we remove this it the very first update on a brand new instance will fail
-	init, err := r.provider.client.GetNamingContext(ctx)
+	init, err := r.client.GetNamingContext(ctx)
 	if err != nil {
-		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to init naming, got error: %s", err))
+		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to init naming, got error: %s", err))
 
 		return
 	}
 
-	_, err = r.provider.client.UpdateNamingContext(ctx, init)
+	_, err = r.client.UpdateNamingContext(ctx, init)
 	if err != nil {
-		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to init naming, got error: %s", err))
+		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to init naming, got error: %s", err))
 
 		return
 	}
@@ -141,53 +155,48 @@ func (r resourceNaming) Create(ctx context.Context, req resource.CreateRequest, 
 	data.ID = 1
 
 	// Create new Naming
-	response, err := r.provider.client.UpdateNamingContext(ctx, data)
+	response, err := r.client.UpdateNamingContext(ctx, data)
 	if err != nil {
-		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to create naming, got error: %s", err))
+		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to create naming, got error: %s", err))
 
 		return
 	}
 
 	tflog.Trace(ctx, "created naming: "+strconv.Itoa(int(response.ID)))
-
 	// Generate resource state struct
 	result := writeNaming(response)
-	diags = resp.State.Set(ctx, result)
-	resp.Diagnostics.Append(diags...)
-
-	if resp.Diagnostics.HasError() {
-		return
-	}
+	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
 }
 
-func (r resourceNaming) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
+func (r *NamingResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	// Get current state
 	var state Naming
-	diags := req.State.Get(ctx, &state)
-	resp.Diagnostics.Append(diags...)
+
+	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Get naming current value
-	response, err := r.provider.client.GetNamingContext(ctx)
+	response, err := r.client.GetNamingContext(ctx)
 	if err != nil {
-		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read namings, got error: %s", err))
+		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read namings, got error: %s", err))
 
 		return
 	}
+
+	tflog.Trace(ctx, "read naming: "+strconv.Itoa(int(response.ID)))
 	// Map response body to resource schema attribute
 	result := writeNaming(response)
-	diags = resp.State.Set(ctx, result)
-	resp.Diagnostics.Append(diags...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
 }
 
-func (r resourceNaming) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+func (r *NamingResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	// Get plan values
 	var plan Naming
-	diags := req.Plan.Get(ctx, &plan)
-	resp.Diagnostics.Append(diags...)
+
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
 
 	if resp.Diagnostics.HasError() {
 		return
@@ -197,32 +206,28 @@ func (r resourceNaming) Update(ctx context.Context, req resource.UpdateRequest, 
 	data := readNaming(&plan)
 
 	// Update Naming
-	response, err := r.provider.client.UpdateNamingContext(ctx, data)
+	response, err := r.client.UpdateNamingContext(ctx, data)
 	if err != nil {
-		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to update naming, got error: %s", err))
+		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to update naming, got error: %s", err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "update naming: "+strconv.Itoa(int(response.ID)))
-
+	tflog.Trace(ctx, "updated naming: "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
 	result := writeNaming(response)
-	diags = resp.State.Set(ctx, result)
-	resp.Diagnostics.Append(diags...)
-
-	if resp.Diagnostics.HasError() {
-		return
-	}
+	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
 }
 
-func (r resourceNaming) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
+func (r *NamingResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	// Naming cannot be really deleted just removing configuration
+	tflog.Trace(ctx, "decoupled naming: 1")
 	resp.State.RemoveResource(ctx)
 }
 
-func (r resourceNaming) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+func (r *NamingResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	// resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
+	tflog.Trace(ctx, "imported naming: 1")
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), 1)...)
 }
 

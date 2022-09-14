@@ -40,5 +40,6 @@ resource "sonarr_delay_profile" "test" {
 }
 
 data "sonarr_delay_profiles" "test" {
+	depends_on = [sonarr_delay_profile.test]
 }
 `

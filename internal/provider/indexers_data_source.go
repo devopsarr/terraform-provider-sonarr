@@ -7,32 +7,36 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr/sonarr"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var (
-	_ provider.DataSourceType = dataIndexersType{}
-	_ datasource.DataSource   = dataIndexers{}
-)
+var _ datasource.DataSource = &IndexersDataSource{}
 
-type dataIndexersType struct{}
-
-type dataIndexers struct {
-	provider sonarrProvider
+func NewIndexersDataSource() datasource.DataSource {
+	return &IndexersDataSource{}
 }
 
-// Indexers is a list of Indexer.
+// IndexersDataSource defines the indexers implementation.
+type IndexersDataSource struct {
+	client *sonarr.Sonarr
+}
+
+// Indexers describes the indexers data model.
 type Indexers struct {
 	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 	ID       types.String `tfsdk:"id"`
 	Indexers types.Set    `tfsdk:"indexers"`
 }
 
-func (t dataIndexersType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
+func (d *IndexersDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+	resp.TypeName = req.ProviderTypeName + "_indexers"
+}
+
+func (d *IndexersDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		// This description is used by the documentation generator and the delay server.
 		MarkdownDescription: "List all available [Indexers](../resources/indexer).",
@@ -204,36 +208,48 @@ func (t dataIndexersType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Dia
 	}, nil
 }
 
-func (t dataIndexersType) NewDataSource(ctx context.Context, in provider.Provider) (datasource.DataSource, diag.Diagnostics) {
-	provider, diags := convertProviderType(in)
+func (d *IndexersDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
+	// Prevent panic if the provider has not been configured.
+	if req.ProviderData == nil {
+		return
+	}
 
-	return dataIndexers{
-		provider: provider,
-	}, diags
+	client, ok := req.ProviderData.(*sonarr.Sonarr)
+	if !ok {
+		resp.Diagnostics.AddError(
+			UnexpectedDataSourceConfigureType,
+			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+		)
+
+		return
+	}
+
+	d.client = client
 }
 
-func (d dataIndexers) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+func (d *IndexersDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 	var data Indexers
-	diags := req.Config.Get(ctx, &data)
-	resp.Diagnostics.Append(diags...)
+
+	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 	// Get indexers current value
-	response, err := d.provider.client.GetIndexersContext(ctx)
+	response, err := d.client.GetIndexersContext(ctx)
 	if err != nil {
-		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read indexers, got error: %s", err))
+		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read indexers, got error: %s", err))
 
 		return
 	}
+
+	tflog.Trace(ctx, "read indexers")
 	// Map response body to resource schema attribute
 	profiles := *writeIndexers(ctx, response)
 	tfsdk.ValueFrom(ctx, profiles, data.Indexers.Type(context.Background()), &data.Indexers)
 	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 	data.ID = types.String{Value: strconv.Itoa(len(response))}
-	diags = resp.State.Set(ctx, &data)
-	resp.Diagnostics.Append(diags...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
 func writeIndexers(ctx context.Context, delays []*sonarr.IndexerOutput) *[]Indexer {

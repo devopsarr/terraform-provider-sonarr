@@ -8,7 +8,6 @@ import (
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
-	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -18,19 +17,19 @@ import (
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var (
-	_ provider.ResourceType            = resourceIndexerType{}
-	_ resource.Resource                = resourceIndexer{}
-	_ resource.ResourceWithImportState = resourceIndexer{}
-)
+var _ resource.Resource = &IndexerResource{}
+var _ resource.ResourceWithImportState = &IndexerResource{}
 
-type resourceIndexerType struct{}
-
-type resourceIndexer struct {
-	provider sonarrProvider
+func NewIndexerResource() resource.Resource {
+	return &IndexerResource{}
 }
 
-// Indexer is the indexer resource.
+// IndexerResource defines the indexer implementation.
+type IndexerResource struct {
+	client *sonarr.Sonarr
+}
+
+// Indexer describes the indexer data model.
 type Indexer struct {
 	EnableAutomaticSearch   types.Bool   `tfsdk:"enable_automatic_search"`
 	EnableInteractiveSearch types.Bool   `tfsdk:"enable_interactive_search"`
@@ -64,7 +63,11 @@ type Indexer struct {
 	Categories                types.Set     `tfsdk:"categories"`
 }
 
-func (t resourceIndexerType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
+func (r *IndexerResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+	resp.TypeName = req.ProviderTypeName + "_indexer"
+}
+
+func (r *IndexerResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		MarkdownDescription: "Indexer resource.<br/>For more information refer to [Indexer](https://wiki.servarr.com/sonarr/settings#indexers) documentation.",
 		Attributes: map[string]tfsdk.Attribute{
@@ -254,19 +257,30 @@ func (t resourceIndexerType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.
 	}, nil
 }
 
-func (t resourceIndexerType) NewResource(ctx context.Context, in provider.Provider) (resource.Resource, diag.Diagnostics) {
-	provider, diags := convertProviderType(in)
+func (r *IndexerResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+	// Prevent panic if the provider has not been configured.
+	if req.ProviderData == nil {
+		return
+	}
 
-	return resourceIndexer{
-		provider: provider,
-	}, diags
+	client, ok := req.ProviderData.(*sonarr.Sonarr)
+	if !ok {
+		resp.Diagnostics.AddError(
+			UnexpectedResourceConfigureType,
+			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+		)
+
+		return
+	}
+
+	r.client = client
 }
 
-func (r resourceIndexer) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
+func (r *IndexerResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	// Retrieve values from plan
 	var plan Indexer
-	diags := req.Plan.Get(ctx, &plan)
-	resp.Diagnostics.Append(diags...)
+
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
 
 	if resp.Diagnostics.HasError() {
 		return
@@ -275,53 +289,48 @@ func (r resourceIndexer) Create(ctx context.Context, req resource.CreateRequest,
 	// Create new Indexer
 	request := readIndexer(ctx, &plan)
 
-	response, err := r.provider.client.AddIndexerContext(ctx, request)
+	response, err := r.client.AddIndexerContext(ctx, request)
 	if err != nil {
-		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to create Indexer, got error: %s", err))
+		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to create Indexer, got error: %s", err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "created Indexer: "+strconv.Itoa(int(response.ID)))
-
+	tflog.Trace(ctx, "created indexer: "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
 	result := writeIndexer(ctx, response)
-	diags = resp.State.Set(ctx, &result)
-	resp.Diagnostics.Append(diags...)
-
-	if resp.Diagnostics.HasError() {
-		return
-	}
+	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
 }
 
-func (r resourceIndexer) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
+func (r *IndexerResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	// Get current state
 	var state Indexer
-	diags := req.State.Get(ctx, &state)
-	resp.Diagnostics.Append(diags...)
+
+	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Get Indexer current value
-	response, err := r.provider.client.GetIndexerContext(ctx, int(state.ID.Value))
+	response, err := r.client.GetIndexerContext(ctx, int(state.ID.Value))
 	if err != nil {
-		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read Indexers, got error: %s", err))
+		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read Indexers, got error: %s", err))
 
 		return
 	}
+
+	tflog.Trace(ctx, "read indexer: "+strconv.Itoa(int(response.ID)))
 	// Map response body to resource schema attribute
 	result := writeIndexer(ctx, response)
-	diags = resp.State.Set(ctx, &result)
-	resp.Diagnostics.Append(diags...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
 }
 
-func (r resourceIndexer) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+func (r *IndexerResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	// Get plan values
 	var plan Indexer
-	diags := req.Plan.Get(ctx, &plan)
-	resp.Diagnostics.Append(diags...)
+
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
 
 	if resp.Diagnostics.HasError() {
 		return
@@ -330,58 +339,53 @@ func (r resourceIndexer) Update(ctx context.Context, req resource.UpdateRequest,
 	// Update Indexer
 	request := readIndexer(ctx, &plan)
 
-	response, err := r.provider.client.UpdateIndexerContext(ctx, request)
+	response, err := r.client.UpdateIndexerContext(ctx, request)
 	if err != nil {
-		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to update Indexer, got error: %s", err))
+		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to update Indexer, got error: %s", err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "update Indexer: "+strconv.Itoa(int(response.ID)))
-
+	tflog.Trace(ctx, "updated indexer: "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
 	result := writeIndexer(ctx, response)
-	diags = resp.State.Set(ctx, &result)
-	resp.Diagnostics.Append(diags...)
-
-	if resp.Diagnostics.HasError() {
-		return
-	}
+	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
 }
 
-func (r resourceIndexer) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
+func (r *IndexerResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	var state Indexer
 
-	diags := req.State.Get(ctx, &state)
-	resp.Diagnostics.Append(diags...)
+	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Delete Indexer current value
-	err := r.provider.client.DeleteIndexerContext(ctx, int(state.ID.Value))
+	err := r.client.DeleteIndexerContext(ctx, int(state.ID.Value))
 	if err != nil {
-		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read Indexers, got error: %s", err))
+		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read Indexers, got error: %s", err))
 
 		return
 	}
 
+	tflog.Trace(ctx, "deleted indexer: "+strconv.Itoa(int(state.ID.Value)))
 	resp.State.RemoveResource(ctx)
 }
 
-func (r resourceIndexer) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+func (r *IndexerResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	// resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			"Unexpected Import Identifier",
+			UnexpectedImportIdentifier,
 			fmt.Sprintf("Expected import identifier with format: ID. Got: %q", req.ID),
 		)
 
 		return
 	}
 
+	tflog.Trace(ctx, "imported indexer: "+strconv.Itoa(id))
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 

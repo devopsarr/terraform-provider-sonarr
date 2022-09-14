@@ -6,25 +6,25 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr/sonarr"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var (
-	_ provider.DataSourceType = dataSystemStatusType{}
-	_ datasource.DataSource   = dataSystemStatus{}
-)
+var _ datasource.DataSource = &SystemStatusDataSource{}
 
-type dataSystemStatusType struct{}
-
-type dataSystemStatus struct {
-	provider sonarrProvider
+func NewSystemStatusDataSource() datasource.DataSource {
+	return &SystemStatusDataSource{}
 }
 
-// SystemStatus is the SystemStatus resource.
+// SystemStatusDataSource defines the system status implementation.
+type SystemStatusDataSource struct {
+	client *sonarr.Sonarr
+}
+
+// SystemStatus describes the system status data model.
 type SystemStatus struct {
 	IsDebug           types.Bool `tfsdk:"is_debug"`
 	IsProduction      types.Bool `tfsdk:"is_production"`
@@ -56,7 +56,11 @@ type SystemStatus struct {
 	StartTime              types.String `tfsdk:"start_time"`
 }
 
-func (t dataSystemStatusType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
+func (d *SystemStatusDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+	resp.TypeName = req.ProviderTypeName + "_system_status"
+}
+
+func (d *SystemStatusDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		// This description is used by the documentation generator and the delay server.
 		MarkdownDescription: "System Status resource. User must have rights to read config.xml.<br/>For more information refer to [System Status](https://wiki.servarr.com/sonarr/system#status) documentation.",
@@ -201,26 +205,38 @@ func (t dataSystemStatusType) GetSchema(ctx context.Context) (tfsdk.Schema, diag
 	}, nil
 }
 
-func (t dataSystemStatusType) NewDataSource(ctx context.Context, in provider.Provider) (datasource.DataSource, diag.Diagnostics) {
-	provider, diags := convertProviderType(in)
+func (d *SystemStatusDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
+	// Prevent panic if the provider has not been configured.
+	if req.ProviderData == nil {
+		return
+	}
 
-	return dataSystemStatus{
-		provider: provider,
-	}, diags
-}
-
-func (d dataSystemStatus) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	// Get naming current value
-	response, err := d.provider.client.GetSystemStatusContext(ctx)
-	if err != nil {
-		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read system status, got error: %s", err))
+	client, ok := req.ProviderData.(*sonarr.Sonarr)
+	if !ok {
+		resp.Diagnostics.AddError(
+			UnexpectedDataSourceConfigureType,
+			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+		)
 
 		return
 	}
 
+	d.client = client
+}
+
+func (d *SystemStatusDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+	// Get naming current value
+	response, err := d.client.GetSystemStatusContext(ctx)
+	if err != nil {
+		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read system status, got error: %s", err))
+
+		return
+	}
+
+	tflog.Trace(ctx, "read system status")
+
 	result := writeSystemStatus(response)
-	diags := resp.State.Set(ctx, &result)
-	resp.Diagnostics.Append(diags...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
 }
 
 func writeSystemStatus(status *sonarr.SystemStatus) *SystemStatus {

@@ -6,25 +6,29 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr/sonarr"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var (
-	_ provider.DataSourceType = dataQualityProfileType{}
-	_ datasource.DataSource   = dataQualityProfile{}
-)
+var _ datasource.DataSource = &QualityProfileDataSource{}
 
-type dataQualityProfileType struct{}
-
-type dataQualityProfile struct {
-	provider sonarrProvider
+func NewQualityProfileDataSource() datasource.DataSource {
+	return &QualityProfileDataSource{}
 }
 
-func (t dataQualityProfileType) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
+// QualityProfileDataSource defines the quality profiles implementation.
+type QualityProfileDataSource struct {
+	client *sonarr.Sonarr
+}
+
+func (d *QualityProfileDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+	resp.TypeName = req.ProviderTypeName + "_quality_profile"
+}
+
+func (d *QualityProfileDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		// This description is used by the documentation generator and the quality server.
 		MarkdownDescription: "Single [Quality Profile](../resources/quality_profile).",
@@ -95,40 +99,51 @@ func (t dataQualityProfileType) GetSchema(ctx context.Context) (tfsdk.Schema, di
 	}, nil
 }
 
-func (t dataQualityProfileType) NewDataSource(ctx context.Context, in provider.Provider) (datasource.DataSource, diag.Diagnostics) {
-	provider, diags := convertProviderType(in)
+func (d *QualityProfileDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
+	// Prevent panic if the provider has not been configured.
+	if req.ProviderData == nil {
+		return
+	}
 
-	return dataQualityProfile{
-		provider: provider,
-	}, diags
+	client, ok := req.ProviderData.(*sonarr.Sonarr)
+	if !ok {
+		resp.Diagnostics.AddError(
+			UnexpectedDataSourceConfigureType,
+			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+		)
+
+		return
+	}
+
+	d.client = client
 }
 
-func (d dataQualityProfile) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+func (d *QualityProfileDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 	var data QualityProfile
-	diags := resp.State.Get(ctx, &data)
-	resp.Diagnostics.Append(diags...)
+
+	resp.Diagnostics.Append(resp.State.Get(ctx, &data)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 	// Get qualityprofiles current value
-	response, err := d.provider.client.GetQualityProfilesContext(ctx)
+	response, err := d.client.GetQualityProfilesContext(ctx)
 	if err != nil {
-		resp.Diagnostics.AddError("Client Error", fmt.Sprintf("Unable to read qualityprofiles, got error: %s", err))
+		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read qualityprofiles, got error: %s", err))
 
 		return
 	}
 
 	profile, err := findQualityProfile(data.Name.Value, response)
 	if err != nil {
-		resp.Diagnostics.AddError("Data Source Error", fmt.Sprintf("Unable to find qualityprofile, got error: %s", err))
+		resp.Diagnostics.AddError(DataSourceError, fmt.Sprintf("Unable to find qualityprofile, got error: %s", err))
 
 		return
 	}
 
+	tflog.Trace(ctx, "read quality_profile")
 	result := writeQualityProfile(ctx, profile)
-	diags = resp.State.Set(ctx, &result)
-	resp.Diagnostics.Append(diags...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
 }
 
 func findQualityProfile(name string, profiles []*sonarr.QualityProfile) (*sonarr.QualityProfile, error) {
