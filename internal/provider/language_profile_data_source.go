@@ -8,6 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr/sonarr"
 )
 
@@ -103,6 +104,7 @@ func (d *LanguageProfileDataSource) Read(ctx context.Context, req datasource.Rea
 		return
 	}
 
+	tflog.Trace(ctx, "read language_profile")
 	result := writeLanguageProfile(ctx, profile)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
 }

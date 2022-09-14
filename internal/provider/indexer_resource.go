@@ -296,8 +296,7 @@ func (r *IndexerResource) Create(ctx context.Context, req resource.CreateRequest
 		return
 	}
 
-	tflog.Trace(ctx, "created Indexer: "+strconv.Itoa(int(response.ID)))
-
+	tflog.Trace(ctx, "created indexer: "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
 	result := writeIndexer(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
@@ -320,6 +319,8 @@ func (r *IndexerResource) Read(ctx context.Context, req resource.ReadRequest, re
 
 		return
 	}
+
+	tflog.Trace(ctx, "read indexer: "+strconv.Itoa(int(response.ID)))
 	// Map response body to resource schema attribute
 	result := writeIndexer(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
@@ -345,8 +346,7 @@ func (r *IndexerResource) Update(ctx context.Context, req resource.UpdateRequest
 		return
 	}
 
-	tflog.Trace(ctx, "update Indexer: "+strconv.Itoa(int(response.ID)))
-
+	tflog.Trace(ctx, "updated indexer: "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
 	result := writeIndexer(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
@@ -369,6 +369,7 @@ func (r *IndexerResource) Delete(ctx context.Context, req resource.DeleteRequest
 		return
 	}
 
+	tflog.Trace(ctx, "deleted indexer: "+strconv.Itoa(int(state.ID.Value)))
 	resp.State.RemoveResource(ctx)
 }
 
@@ -384,6 +385,7 @@ func (r *IndexerResource) ImportState(ctx context.Context, req resource.ImportSt
 		return
 	}
 
+	tflog.Trace(ctx, "imported indexer: "+strconv.Itoa(id))
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 

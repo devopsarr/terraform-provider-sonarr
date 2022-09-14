@@ -132,7 +132,7 @@ func (r *IndexerConfigResource) Create(ctx context.Context, req resource.CreateR
 		return
 	}
 
-	tflog.Trace(ctx, "created indexerConfig: "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "created indexer_config: "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
 	result := writeIndexerConfig(response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
@@ -155,6 +155,8 @@ func (r *IndexerConfigResource) Read(ctx context.Context, req resource.ReadReque
 
 		return
 	}
+
+	tflog.Trace(ctx, "read indexer_config: "+strconv.Itoa(int(response.ID)))
 	// Map response body to resource schema attribute
 	result := writeIndexerConfig(response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
@@ -181,7 +183,7 @@ func (r *IndexerConfigResource) Update(ctx context.Context, req resource.UpdateR
 		return
 	}
 
-	tflog.Trace(ctx, "update indexerConfig: "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "updated indexer_config: "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
 	result := writeIndexerConfig(response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
@@ -189,11 +191,13 @@ func (r *IndexerConfigResource) Update(ctx context.Context, req resource.UpdateR
 
 func (r *IndexerConfigResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	// IndexerConfig cannot be really deleted just removing configuration
+	tflog.Trace(ctx, "decoupled indexer_config: 1")
 	resp.State.RemoveResource(ctx)
 }
 
 func (r *IndexerConfigResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	// resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
+	tflog.Trace(ctx, "imported indexer_config: "+strconv.Itoa(1))
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), 1)...)
 }
 

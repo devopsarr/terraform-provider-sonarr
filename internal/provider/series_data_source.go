@@ -8,6 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr/sonarr"
 )
 
@@ -140,6 +141,7 @@ func (d *SeriesDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 		return
 	}
 
+	tflog.Trace(ctx, "read series")
 	result := writeSeries(ctx, series)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
 }

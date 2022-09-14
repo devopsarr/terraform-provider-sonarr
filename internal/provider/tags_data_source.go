@@ -9,6 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr"
 	"golift.io/starr/sonarr"
 )
@@ -102,10 +103,10 @@ func (d *TagsDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 		return
 	}
 
+	tflog.Trace(ctx, "read tags")
 	// Map response body to resource schema attribute
 	tags := *writeTags(response)
 	tfsdk.ValueFrom(ctx, tags, data.Tags.Type(context.Background()), &data.Tags)
-
 	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 	data.ID = types.String{Value: strconv.Itoa(len(response))}
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

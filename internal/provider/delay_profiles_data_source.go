@@ -9,6 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr/sonarr"
 )
 
@@ -136,6 +137,8 @@ func (d *DelayProfilesDataSource) Read(ctx context.Context, req datasource.ReadR
 
 		return
 	}
+
+	tflog.Trace(ctx, "read delay_profiles")
 	// Map response body to resource schema attribute
 	profiles := *writeDelayprofiles(ctx, response)
 	tfsdk.ValueFrom(ctx, profiles, data.DelayProfiles.Type(context.Background()), &data.DelayProfiles)

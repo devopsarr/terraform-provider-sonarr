@@ -139,8 +139,7 @@ func (r *RootFolderResource) Create(ctx context.Context, req resource.CreateRequ
 		return
 	}
 
-	tflog.Trace(ctx, "created rootFolder: "+strconv.Itoa(int(response.ID)))
-
+	tflog.Trace(ctx, "created root_folder: "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
 	result := writeRootFolder(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
@@ -163,6 +162,8 @@ func (r *RootFolderResource) Read(ctx context.Context, req resource.ReadRequest,
 
 		return
 	}
+
+	tflog.Trace(ctx, "read root_folder: "+strconv.Itoa(int(response.ID)))
 	// Map response body to resource schema attribute
 	result := writeRootFolder(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
@@ -189,6 +190,7 @@ func (r *RootFolderResource) Delete(ctx context.Context, req resource.DeleteRequ
 		return
 	}
 
+	tflog.Trace(ctx, "deleted root_folder: "+strconv.Itoa(int(state.ID.Value)))
 	resp.State.RemoveResource(ctx)
 }
 
@@ -204,6 +206,7 @@ func (r *RootFolderResource) ImportState(ctx context.Context, req resource.Impor
 		return
 	}
 
+	tflog.Trace(ctx, "imported root_folder: "+strconv.Itoa(id))
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 

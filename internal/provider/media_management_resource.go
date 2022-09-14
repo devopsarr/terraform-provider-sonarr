@@ -214,8 +214,7 @@ func (r *MediaManagementResource) Create(ctx context.Context, req resource.Creat
 		return
 	}
 
-	tflog.Trace(ctx, "created mediamanagement: "+strconv.Itoa(int(response.ID)))
-
+	tflog.Trace(ctx, "created media_management: "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
 	result := writeMediaManagement(response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
@@ -238,6 +237,8 @@ func (r *MediaManagementResource) Read(ctx context.Context, req resource.ReadReq
 
 		return
 	}
+
+	tflog.Trace(ctx, "read media_management: "+strconv.Itoa(int(response.ID)))
 	// Map response body to resource schema attribute
 	result := writeMediaManagement(response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
@@ -264,8 +265,7 @@ func (r *MediaManagementResource) Update(ctx context.Context, req resource.Updat
 		return
 	}
 
-	tflog.Trace(ctx, "update mediamanagement: "+strconv.Itoa(int(response.ID)))
-
+	tflog.Trace(ctx, "updated media_management: "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
 	result := writeMediaManagement(response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
@@ -273,11 +273,13 @@ func (r *MediaManagementResource) Update(ctx context.Context, req resource.Updat
 
 func (r *MediaManagementResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	// Mediamanagement cannot be really deleted just removing configuration
+	tflog.Trace(ctx, "decoupled media_management: 1")
 	resp.State.RemoveResource(ctx)
 }
 
 func (r *MediaManagementResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	// resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
+	tflog.Trace(ctx, "imported media_management: 1")
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), 1)...)
 }
 

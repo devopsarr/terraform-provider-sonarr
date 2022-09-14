@@ -122,8 +122,7 @@ func (r *LanguageProfileResource) Create(ctx context.Context, req resource.Creat
 		return
 	}
 
-	tflog.Trace(ctx, "created languageprofile: "+strconv.Itoa(int(response.ID)))
-
+	tflog.Trace(ctx, "created language_profile: "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
 	result := writeLanguageProfile(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
@@ -146,6 +145,8 @@ func (r *LanguageProfileResource) Read(ctx context.Context, req resource.ReadReq
 
 		return
 	}
+
+	tflog.Trace(ctx, "read language_profile: "+strconv.Itoa(int(response.ID)))
 	// Map response body to resource schema attribute
 	result := writeLanguageProfile(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
@@ -172,8 +173,7 @@ func (r *LanguageProfileResource) Update(ctx context.Context, req resource.Updat
 		return
 	}
 
-	tflog.Trace(ctx, "update languageprofile: "+strconv.Itoa(int(response.ID)))
-
+	tflog.Trace(ctx, "updated language_profile: "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
 	result := writeLanguageProfile(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
@@ -196,6 +196,7 @@ func (r *LanguageProfileResource) Delete(ctx context.Context, req resource.Delet
 		return
 	}
 
+	tflog.Trace(ctx, "deleted language_profile: "+strconv.Itoa(int(state.ID.Value)))
 	resp.State.RemoveResource(ctx)
 }
 
@@ -211,6 +212,7 @@ func (r *LanguageProfileResource) ImportState(ctx context.Context, req resource.
 		return
 	}
 
+	tflog.Trace(ctx, "imported language_profile: "+strconv.Itoa(id))
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 

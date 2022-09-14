@@ -105,7 +105,6 @@ func (r *TagResource) Create(ctx context.Context, req resource.CreateRequest, re
 	}
 
 	tflog.Trace(ctx, "created tag: "+strconv.Itoa(response.ID))
-
 	// Generate resource state struct
 	result := writeTag(response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
@@ -128,6 +127,8 @@ func (r *TagResource) Read(ctx context.Context, req resource.ReadRequest, resp *
 
 		return
 	}
+
+	tflog.Trace(ctx, "read tag: "+strconv.Itoa(response.ID))
 	// Map response body to resource schema attribute
 	result := writeTag(response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
@@ -156,8 +157,7 @@ func (r *TagResource) Update(ctx context.Context, req resource.UpdateRequest, re
 		return
 	}
 
-	tflog.Trace(ctx, "update tag: "+strconv.Itoa(response.ID))
-
+	tflog.Trace(ctx, "updated tag: "+strconv.Itoa(response.ID))
 	// Generate resource state struct
 	result := writeTag(response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
@@ -180,6 +180,7 @@ func (r *TagResource) Delete(ctx context.Context, req resource.DeleteRequest, re
 		return
 	}
 
+	tflog.Trace(ctx, "deleted tag: "+strconv.Itoa(int(state.ID.Value)))
 	resp.State.RemoveResource(ctx)
 }
 
@@ -195,6 +196,7 @@ func (r *TagResource) ImportState(ctx context.Context, req resource.ImportStateR
 		return
 	}
 
+	tflog.Trace(ctx, "imported tag: "+strconv.Itoa(id))
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 

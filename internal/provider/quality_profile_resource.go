@@ -189,8 +189,7 @@ func (r *QualityProfileResource) Create(ctx context.Context, req resource.Create
 		return
 	}
 
-	tflog.Trace(ctx, "created qualityprofile: "+strconv.Itoa(int(response.ID)))
-
+	tflog.Trace(ctx, "created quality_profile: "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
 	result := writeQualityProfile(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
@@ -213,6 +212,8 @@ func (r *QualityProfileResource) Read(ctx context.Context, req resource.ReadRequ
 
 		return
 	}
+
+	tflog.Trace(ctx, "read quality_profile: "+strconv.Itoa(int(response.ID)))
 	// Map response body to resource schema attribute
 	result := writeQualityProfile(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
@@ -239,8 +240,7 @@ func (r *QualityProfileResource) Update(ctx context.Context, req resource.Update
 		return
 	}
 
-	tflog.Trace(ctx, "update qualityprofile: "+strconv.Itoa(int(response.ID)))
-
+	tflog.Trace(ctx, "updated quality_profile: "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
 	result := writeQualityProfile(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
@@ -263,6 +263,7 @@ func (r *QualityProfileResource) Delete(ctx context.Context, req resource.Delete
 		return
 	}
 
+	tflog.Trace(ctx, "deleted quality_profile: "+strconv.Itoa(int(state.ID.Value)))
 	resp.State.RemoveResource(ctx)
 }
 
@@ -278,6 +279,7 @@ func (r *QualityProfileResource) ImportState(ctx context.Context, req resource.I
 		return
 	}
 
+	tflog.Trace(ctx, "imported quality_profile: "+strconv.Itoa(id))
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 

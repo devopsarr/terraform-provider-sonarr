@@ -9,6 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr/sonarr"
 )
 
@@ -241,6 +242,8 @@ func (d *IndexersDataSource) Read(ctx context.Context, req datasource.ReadReques
 
 		return
 	}
+
+	tflog.Trace(ctx, "read indexers")
 	// Map response body to resource schema attribute
 	profiles := *writeIndexers(ctx, response)
 	tfsdk.ValueFrom(ctx, profiles, data.Indexers.Type(context.Background()), &data.Indexers)

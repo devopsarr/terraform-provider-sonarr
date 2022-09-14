@@ -9,6 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr/sonarr"
 )
 
@@ -152,6 +153,7 @@ func (d *QualityProfilesDataSource) Read(ctx context.Context, req datasource.Rea
 		return
 	}
 
+	tflog.Trace(ctx, "read quality_profiles")
 	// Map response body to resource schema attribute
 	profiles := *writeQualitiyprofiles(ctx, response)
 	tfsdk.ValueFrom(ctx, profiles, data.QualityProfiles.Type(context.Background()), &data.QualityProfiles)

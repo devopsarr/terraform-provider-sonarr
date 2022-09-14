@@ -8,6 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr"
 	"golift.io/starr/sonarr"
 )
@@ -89,6 +90,8 @@ func (d *TagDataSource) Read(ctx context.Context, req datasource.ReadRequest, re
 
 		return
 	}
+
+	tflog.Trace(ctx, "read tag")
 
 	result := writeTag(tag)
 	// Map response body to resource schema attribute

@@ -8,6 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr/sonarr"
 )
 
@@ -158,6 +159,8 @@ func (d *MediaManagementDataSource) Read(ctx context.Context, req datasource.Rea
 
 		return
 	}
+
+	tflog.Trace(ctx, "read madia_management")
 
 	result := writeMediaManagement(response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)

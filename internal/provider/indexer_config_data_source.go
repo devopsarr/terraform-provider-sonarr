@@ -8,6 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr/sonarr"
 )
 
@@ -88,6 +89,8 @@ func (d *IndexerConfigDataSource) Read(ctx context.Context, req datasource.ReadR
 
 		return
 	}
+
+	tflog.Trace(ctx, "read indexer_config")
 
 	result := writeIndexerConfig(response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)

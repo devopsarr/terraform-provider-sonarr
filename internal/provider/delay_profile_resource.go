@@ -152,7 +152,7 @@ func (r *DelayProfileResource) Create(ctx context.Context, req resource.CreateRe
 		return
 	}
 
-	tflog.Trace(ctx, "created delayprofile: "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "created delay_profile: "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
 	result := writeDelayProfile(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
@@ -175,6 +175,8 @@ func (r *DelayProfileResource) Read(ctx context.Context, req resource.ReadReques
 
 		return
 	}
+
+	tflog.Trace(ctx, "read delay_profile: "+strconv.Itoa(int(response.ID)))
 	// Map response body to resource schema attribute
 	result := writeDelayProfile(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
@@ -201,7 +203,7 @@ func (r *DelayProfileResource) Update(ctx context.Context, req resource.UpdateRe
 		return
 	}
 
-	tflog.Trace(ctx, "update delayprofile: "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "updated delay_profile: "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
 	result := writeDelayProfile(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
@@ -224,6 +226,7 @@ func (r *DelayProfileResource) Delete(ctx context.Context, req resource.DeleteRe
 		return
 	}
 
+	tflog.Trace(ctx, "deleted delay_profile: "+strconv.Itoa(int(state.ID.Value)))
 	resp.State.RemoveResource(ctx)
 }
 
@@ -239,6 +242,7 @@ func (r *DelayProfileResource) ImportState(ctx context.Context, req resource.Imp
 		return
 	}
 
+	tflog.Trace(ctx, "imported delay_profile: "+strconv.Itoa(id))
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 

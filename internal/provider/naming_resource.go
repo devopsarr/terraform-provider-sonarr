@@ -163,7 +163,6 @@ func (r *NamingResource) Create(ctx context.Context, req resource.CreateRequest,
 	}
 
 	tflog.Trace(ctx, "created naming: "+strconv.Itoa(int(response.ID)))
-
 	// Generate resource state struct
 	result := writeNaming(response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
@@ -186,6 +185,8 @@ func (r *NamingResource) Read(ctx context.Context, req resource.ReadRequest, res
 
 		return
 	}
+
+	tflog.Trace(ctx, "read naming: "+strconv.Itoa(int(response.ID)))
 	// Map response body to resource schema attribute
 	result := writeNaming(response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
@@ -212,8 +213,7 @@ func (r *NamingResource) Update(ctx context.Context, req resource.UpdateRequest,
 		return
 	}
 
-	tflog.Trace(ctx, "update naming: "+strconv.Itoa(int(response.ID)))
-
+	tflog.Trace(ctx, "updated naming: "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
 	result := writeNaming(response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
@@ -221,11 +221,13 @@ func (r *NamingResource) Update(ctx context.Context, req resource.UpdateRequest,
 
 func (r *NamingResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	// Naming cannot be really deleted just removing configuration
+	tflog.Trace(ctx, "decoupled naming: 1")
 	resp.State.RemoveResource(ctx)
 }
 
 func (r *NamingResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	// resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
+	tflog.Trace(ctx, "imported naming: 1")
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), 1)...)
 }
 

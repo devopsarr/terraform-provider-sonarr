@@ -8,6 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr/sonarr"
 )
 
@@ -140,6 +141,7 @@ func (d *QualityProfileDataSource) Read(ctx context.Context, req datasource.Read
 		return
 	}
 
+	tflog.Trace(ctx, "read quality_profile")
 	result := writeQualityProfile(ctx, profile)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
 }

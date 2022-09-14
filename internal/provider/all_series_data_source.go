@@ -9,6 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr/sonarr"
 )
 
@@ -151,6 +152,8 @@ func (d *AllSeriessDataSource) Read(ctx context.Context, req datasource.ReadRequ
 
 		return
 	}
+
+	tflog.Trace(ctx, "read series")
 	// Map response body to resource schema attribute
 	series := *writeSeriesList(ctx, response)
 	tfsdk.ValueFrom(ctx, series, data.Series.Type(context.Background()), &data.Series)

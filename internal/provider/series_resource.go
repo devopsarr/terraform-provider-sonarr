@@ -190,7 +190,6 @@ func (r *SeriesResource) Create(ctx context.Context, req resource.CreateRequest,
 	}
 
 	tflog.Trace(ctx, "created series: "+strconv.Itoa(int(response.ID)))
-
 	// Generate resource state struct
 	result := *writeSeries(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
@@ -213,6 +212,8 @@ func (r *SeriesResource) Read(ctx context.Context, req resource.ReadRequest, res
 
 		return
 	}
+
+	tflog.Trace(ctx, "read series: "+strconv.Itoa(int(response.ID)))
 	// Map response body to resource schema attribute
 	result := *writeSeries(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
@@ -238,8 +239,7 @@ func (r *SeriesResource) Update(ctx context.Context, req resource.UpdateRequest,
 		return
 	}
 
-	tflog.Trace(ctx, "update series: "+strconv.Itoa(int(response.ID)))
-
+	tflog.Trace(ctx, "updated series: "+strconv.Itoa(int(response.ID)))
 	// Map response body to resource schema attribute
 	result := writeSeries(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
@@ -262,6 +262,7 @@ func (r *SeriesResource) Delete(ctx context.Context, req resource.DeleteRequest,
 		return
 	}
 
+	tflog.Trace(ctx, "deleted series: "+strconv.Itoa(int(state.ID.Value)))
 	resp.State.RemoveResource(ctx)
 }
 
@@ -277,6 +278,7 @@ func (r *SeriesResource) ImportState(ctx context.Context, req resource.ImportSta
 		return
 	}
 
+	tflog.Trace(ctx, "imported series: "+strconv.Itoa(id))
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 

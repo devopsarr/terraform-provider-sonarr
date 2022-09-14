@@ -10,6 +10,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr/sonarr"
 )
 
@@ -124,6 +125,8 @@ func (d *RootFoldersDataSource) Read(ctx context.Context, req datasource.ReadReq
 
 		return
 	}
+
+	tflog.Trace(ctx, "read root folders")
 	// Map response body to resource schema attribute
 	rootFolders := *writeRootFolders(ctx, response)
 	tfsdk.ValueFrom(ctx, rootFolders, data.RootFolders.Type(context.Background()), &data.RootFolders)

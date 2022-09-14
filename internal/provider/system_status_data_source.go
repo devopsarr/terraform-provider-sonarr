@@ -8,6 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr/sonarr"
 )
 
@@ -231,6 +232,8 @@ func (d *SystemStatusDataSource) Read(ctx context.Context, req datasource.ReadRe
 
 		return
 	}
+
+	tflog.Trace(ctx, "read system status")
 
 	result := writeSystemStatus(response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
