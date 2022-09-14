@@ -88,6 +88,7 @@ func (r *DownloadClientConfigResource) Configure(ctx context.Context, req resour
 
 	r.client = client
 }
+
 func (r *DownloadClientConfigResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	// Retrieve values from plan
 	var plan DownloadClientConfig
