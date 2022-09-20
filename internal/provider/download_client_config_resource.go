@@ -41,7 +41,7 @@ func (r *DownloadClientConfigResource) Metadata(ctx context.Context, req resourc
 
 func (r *DownloadClientConfigResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		MarkdownDescription: "Download Client Config resource.<br/>For more information refer to [Download Client](https://wiki.servarr.com/sonarr/settings#completed-download-handling) documentation.",
+		MarkdownDescription: "[subcategory:Download Clients]: #\nDownload Client Config resource.\nFor more information refer to [Download Client](https://wiki.servarr.com/sonarr/settings#completed-download-handling) documentation.",
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
 				MarkdownDescription: "Download Client Config ID.",

@@ -37,7 +37,7 @@ type RemotePathMapping struct {
 
 func (r *RemotePathMappingResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		MarkdownDescription: "Remote Path Mapping resource.<br/>For more information refer to [Remote Path Mapping](https://wiki.servarr.com/sonarr/settings#remote-path-mappings) documentation.",
+		MarkdownDescription: "[subcategory:Download Clients]: #\nRemote Path Mapping resource.\nFor more information refer to [Remote Path Mapping](https://wiki.servarr.com/sonarr/settings#remote-path-mappings) documentation.",
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
 				MarkdownDescription: "Remote Path Mapping ID.",

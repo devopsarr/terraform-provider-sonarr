@@ -1,4 +1,4 @@
-resource "sonarr_indexer" "example" {
+resource "sonarr_download_client" "example" {
   enable          = true
   priority        = 1
   name            = "Example"

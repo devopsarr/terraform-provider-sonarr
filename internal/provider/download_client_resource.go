@@ -83,7 +83,7 @@ func (r *DownloadClientResource) Metadata(ctx context.Context, req resource.Meta
 
 func (r *DownloadClientResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		MarkdownDescription: "Download Client resource.<br/>For more information refer to [Download Client](https://wiki.servarr.com/sonarr/settings#download-clients).",
+		MarkdownDescription: "[subcategory:Download Clients]: #\nDownload Client resource.\nFor more information refer to [Download Client](https://wiki.servarr.com/sonarr/settings#download-clients).",
 		Attributes: map[string]tfsdk.Attribute{
 			"enable": {
 				MarkdownDescription: "Enable flag.",

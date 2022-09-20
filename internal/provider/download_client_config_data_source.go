@@ -31,7 +31,7 @@ func (d *DownloadClientConfigDataSource) Metadata(ctx context.Context, req datas
 func (d *DownloadClientConfigDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		// This description is used by the documentation generator and the delay server.
-		MarkdownDescription: "[Download Client Config](../resources/download_client_config).",
+		MarkdownDescription: "[subcategory:Download Clients]: #\n[Download Client Config](../resources/download_client_config).",
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
 				MarkdownDescription: "Download Client Config ID.",

@@ -39,7 +39,7 @@ func (d *RemotePathMappingsDataSource) Metadata(ctx context.Context, req datasou
 func (d *RemotePathMappingsDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		// This description is used by the documentation generator and the delay server.
-		MarkdownDescription: "List all available [Remote Path Mappings](../resources/remote_path_mapping).",
+		MarkdownDescription: "[subcategory:Download Clients]: #\nList all available [Remote Path Mappings](../resources/remote_path_mapping).",
 		Attributes: map[string]tfsdk.Attribute{
 			// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 			"id": {
