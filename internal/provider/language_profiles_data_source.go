@@ -39,7 +39,7 @@ func (d *LanguageProfilesDataSource) Metadata(ctx context.Context, req datasourc
 func (d *LanguageProfilesDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		// This description is used by the documentation generator and the language server.
-		MarkdownDescription: "List all available [Language Profiles](../resources/language_profile).",
+		MarkdownDescription: "[subcategory:Profiles]: #\nList all available [Language Profiles](../resources/language_profile).",
 		Attributes: map[string]tfsdk.Attribute{
 			// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 			"id": {

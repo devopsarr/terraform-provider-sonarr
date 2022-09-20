@@ -31,7 +31,7 @@ func (d *QualityProfileDataSource) Metadata(ctx context.Context, req datasource.
 func (d *QualityProfileDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		// This description is used by the documentation generator and the quality server.
-		MarkdownDescription: "Single [Quality Profile](../resources/quality_profile).",
+		MarkdownDescription: "[subcategory:Profiles]: #\nSingle [Quality Profile](../resources/quality_profile).",
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
 				MarkdownDescription: "Quality Profile ID.",

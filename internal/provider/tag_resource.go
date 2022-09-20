@@ -41,7 +41,7 @@ func (r *TagResource) Metadata(ctx context.Context, req resource.MetadataRequest
 
 func (r *TagResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		MarkdownDescription: "Tag resource.<br/>For more information refer to [Tags](https://wiki.servarr.com/sonarr/settings#tags) documentation.",
+		MarkdownDescription: "[subcategory:Tags]: #\nTag resource.\nFor more information refer to [Tags](https://wiki.servarr.com/sonarr/settings#tags) documentation.",
 		Attributes: map[string]tfsdk.Attribute{
 			"label": {
 				MarkdownDescription: "Tag label. It must be lowercase.",

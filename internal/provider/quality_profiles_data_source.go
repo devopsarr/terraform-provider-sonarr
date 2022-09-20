@@ -39,7 +39,7 @@ func (d *QualityProfilesDataSource) Metadata(ctx context.Context, req datasource
 func (d *QualityProfilesDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		// This description is used by the documentation generator and the quality server.
-		MarkdownDescription: "List all available [Quality Profiles](../resources/quality_profile).",
+		MarkdownDescription: "[subcategory:Profiles]: #\nList all available [Quality Profiles](../resources/quality_profile).",
 		Attributes: map[string]tfsdk.Attribute{
 			// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 			"id": {

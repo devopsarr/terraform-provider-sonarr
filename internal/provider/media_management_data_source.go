@@ -31,7 +31,7 @@ func (d *MediaManagementDataSource) Metadata(ctx context.Context, req datasource
 func (d *MediaManagementDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		// This description is used by the documentation generator and the delay server.
-		MarkdownDescription: "[Media Management](../resources/media_management).",
+		MarkdownDescription: "[subcategory:Media Management]: #\n[Media Management](../resources/media_management).",
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
 				MarkdownDescription: "Delay Profile ID.",

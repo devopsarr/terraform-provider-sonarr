@@ -47,7 +47,7 @@ func (r *NamingResource) Metadata(ctx context.Context, req resource.MetadataRequ
 
 func (r *NamingResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		MarkdownDescription: "Naming resource. <br/>For more information refer to [Naming](https://wiki.servarr.com/sonarr/settings#community-naming-suggestions) documentation.",
+		MarkdownDescription: "[subcategory:Media Management]: #\nNaming resource.\nFor more information refer to [Naming](https://wiki.servarr.com/sonarr/settings#community-naming-suggestions) documentation.",
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
 				MarkdownDescription: "Naming ID.",

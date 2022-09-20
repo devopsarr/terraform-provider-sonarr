@@ -44,7 +44,7 @@ func (r *LanguageProfileResource) Metadata(ctx context.Context, req resource.Met
 
 func (r *LanguageProfileResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		MarkdownDescription: "Language Profile resource.<br/>For more information refer to [Language Profile](https://wiki.servarr.com/sonarr/settings#language-profiles) documentation.",
+		MarkdownDescription: "[subcategory:Profiles]: #\nLanguage Profile resource.\nFor more information refer to [Language Profile](https://wiki.servarr.com/sonarr/settings#language-profiles) documentation.",
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
 				MarkdownDescription: "Language Profile ID.",
