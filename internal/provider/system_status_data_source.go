@@ -63,7 +63,7 @@ func (d *SystemStatusDataSource) Metadata(ctx context.Context, req datasource.Me
 func (d *SystemStatusDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		// This description is used by the documentation generator and the delay server.
-		MarkdownDescription: "System Status resource. User must have rights to read config.xml.<br/>For more information refer to [System Status](https://wiki.servarr.com/sonarr/system#status) documentation.",
+		MarkdownDescription: "[subcategory:Status]: #\nSystem Status resource. User must have rights to read `config.xml`.\nFor more information refer to [System Status](https://wiki.servarr.com/sonarr/system#status) documentation.",
 		Attributes: map[string]tfsdk.Attribute{
 			// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 			"id": {

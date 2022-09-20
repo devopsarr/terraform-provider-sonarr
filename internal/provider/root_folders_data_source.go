@@ -40,7 +40,7 @@ func (d *RootFoldersDataSource) Metadata(ctx context.Context, req datasource.Met
 func (d *RootFoldersDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		// This description is used by the documentation generator and the delay server.
-		MarkdownDescription: "List all available [Root Folders](../resources/root_folder).",
+		MarkdownDescription: "[subcategory:Media Management]: #\nList all available [Root Folders](../resources/root_folder).",
 		Attributes: map[string]tfsdk.Attribute{
 			// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 			"id": {

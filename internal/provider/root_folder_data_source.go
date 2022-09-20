@@ -31,7 +31,7 @@ func (d *RootFolderDataSource) Metadata(ctx context.Context, req datasource.Meta
 func (d *RootFolderDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		// This description is used by the documentation generator and the delay server.
-		MarkdownDescription: "Single [Root Folder](../resources/root_folder).",
+		MarkdownDescription: "[subcategory:Media Management]: #\nSingle [Root Folder](../resources/root_folder).",
 		Attributes: map[string]tfsdk.Attribute{
 			"path": {
 				MarkdownDescription: "Root Folder absolute path.",

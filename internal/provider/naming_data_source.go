@@ -31,7 +31,7 @@ func (d *NamingDataSource) Metadata(ctx context.Context, req datasource.Metadata
 func (d *NamingDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		// This description is used by the documentation generator and the delay server.
-		MarkdownDescription: "[Naming](../resources/naming).",
+		MarkdownDescription: "[subcategory:Media Management]: #\n[Naming](../resources/naming).",
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
 				MarkdownDescription: "Delay Profile ID.",

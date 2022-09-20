@@ -31,7 +31,7 @@ func (d *IndexerConfigDataSource) Metadata(ctx context.Context, req datasource.M
 func (d *IndexerConfigDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		// This description is used by the documentation generator and the delay server.
-		MarkdownDescription: "[Indexer Config](../resources/indexer_config).",
+		MarkdownDescription: "[subcategory:Indexers]: #\n[Indexer Config](../resources/indexer_config).",
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
 				MarkdownDescription: "Delay Profile ID.",

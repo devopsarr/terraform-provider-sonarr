@@ -72,7 +72,7 @@ func (r *SeriesResource) Metadata(ctx context.Context, req resource.MetadataRequ
 func (r *SeriesResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	// TODO: waiting to implement seasons and images until empty conversion is managed natively https://www.terraform.io/plugin/framework/accessing-values#conversion-rules
 	return tfsdk.Schema{
-		MarkdownDescription: "Series resource.<br/>For more information refer to [Series](https://wiki.servarr.com/sonarr/library#series) documentation.",
+		MarkdownDescription: "[subcategory:Series]: #\nSeries resource.\nFor more information refer to [Series](https://wiki.servarr.com/sonarr/library#series) documentation.",
 		Attributes: map[string]tfsdk.Attribute{
 			"title": {
 				MarkdownDescription: "Series Title.",

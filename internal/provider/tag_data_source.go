@@ -32,7 +32,7 @@ func (d *TagDataSource) Metadata(ctx context.Context, req datasource.MetadataReq
 func (d *TagDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		// This description is used by the documentation generator and the language server.
-		MarkdownDescription: "Single [Tag](../resources/tag).",
+		MarkdownDescription: "[subcategory:Tags]: #\nSingle [Tag](../resources/tag).",
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
 				MarkdownDescription: "Tag ID.",
