@@ -13,10 +13,6 @@ func TestAccAllSeriesDataSource(t *testing.T) {
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
-			// Create a series to have a value to check
-			{
-				Config: testAccSeriesResourceConfig(332606, "Friends", "friends", "false"),
-			},
 			// Read testing
 			{
 				Config: testAccAllSeriesDataSourceConfig,
