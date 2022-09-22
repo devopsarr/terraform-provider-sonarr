@@ -59,6 +59,6 @@ func testAccNotificationResourceConfig(name, upgrade string) string {
 		implementation  = "CustomScript"
 		config_contract = "CustomScriptSettings"
 	  
-		path = "/defaults/test.sh"
+		path = "/scripts/test.sh"
 	}`, upgrade, name)
 }

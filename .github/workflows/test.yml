@@ -65,9 +65,20 @@ jobs:
       - name: run downloadclient
         run: docker run -d --name transmission linuxserver/transmission
       - name: config rights
-        run:  sudo chown 1000:1000 ${{ github.workspace }}/.github/workflows/config.xml
+        run: >
+          sudo chown 1000:1000 ${{ github.workspace }}/.github/workflows/config.xml &&
+          sudo chmod +x ${{ github.workspace }}/.github/workflows/test.sh
       - name: run provider
-        run: docker run -e PUID=1000 -e PGID=1000 -d --link transmission -v ${{ github.workspace }}/.github/workflows/config.xml:/config/config.xml -p 8989:8989 --health-cmd "curl --fail http://localhost:8989/system/status || exit 1" linuxserver/sonarr
+        run: >
+          docker run -d
+          -e PUID=1000
+          -e PGID=1000
+          --link transmission
+          -v ${{ github.workspace }}/.github/workflows/test.sh:/scripts/test.sh
+          -v ${{ github.workspace }}/.github/workflows/config.xml:/config/config.xml
+          -p 8989:8989
+          --health-cmd "curl --fail http://localhost:8989/system/status || exit 1"
+          linuxserver/sonarr
       - uses: actions/setup-go@v3
         with:
           go-version: ${{ env.GO_VERSION }}

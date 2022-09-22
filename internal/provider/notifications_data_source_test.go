@@ -21,7 +21,7 @@ func TestAccNotificationsDataSource(t *testing.T) {
 			{
 				Config: testAccNotificationsDataSourceConfig,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckTypeSetElemNestedAttrs("data.sonarr_notifications.test", "notifications.*", map[string]string{"path": "/defaults/test.sh"}),
+					resource.TestCheckTypeSetElemNestedAttrs("data.sonarr_notifications.test", "notifications.*", map[string]string{"path": "/scripts/test.sh"}),
 				),
 			},
 		},

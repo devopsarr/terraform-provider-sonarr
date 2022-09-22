@@ -163,6 +163,7 @@ func (p *SonarrProvider) DataSources(ctx context.Context) []func() datasource.Da
 		NewLanguageProfilesDataSource,
 		NewMediaManagementDataSource,
 		NewNamingDataSource,
+		NewNotificationDataSource,
 		NewNotificationsDataSource,
 		NewQualityProfileDataSource,
 		NewQualityProfilesDataSource,
