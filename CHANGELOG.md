@@ -1,5 +1,24 @@
 # Changelog
 
+## [2.1.0](https://github.com/devopsarr/terraform-provider-sonarr/compare/v2.0.0...v2.1.0) (2022-09-22)
+
+
+### Features
+
+* add download client ([25a1a85](https://github.com/devopsarr/terraform-provider-sonarr/commit/25a1a85cca35159d14e791564587a1c033c74f0b))
+* add download client config datasource ([eda31c2](https://github.com/devopsarr/terraform-provider-sonarr/commit/eda31c2123e26d4abe329b7882d456768ad8870c))
+* add download client config resource ([2791a4a](https://github.com/devopsarr/terraform-provider-sonarr/commit/2791a4a637bdbfa1a5c74526311ade6d44a61ad2))
+* add download client datasource ([e06e3a2](https://github.com/devopsarr/terraform-provider-sonarr/commit/e06e3a250e66b7d26ad378f652b677f7a6de212d))
+* add download clients datasource ([bb8c794](https://github.com/devopsarr/terraform-provider-sonarr/commit/bb8c7944ba079d3e17d5781a52ba7cfdf6b3b351))
+* add int match helper ([7dc4fd4](https://github.com/devopsarr/terraform-provider-sonarr/commit/7dc4fd4b2f2bfbd478d3ac5307367836d6ee033d))
+* add notification datasource ([65a91e5](https://github.com/devopsarr/terraform-provider-sonarr/commit/65a91e5c132b157428f3feed9f8513b6772051a1))
+* add notification resource ([ea406f1](https://github.com/devopsarr/terraform-provider-sonarr/commit/ea406f1c5f9d87f72d96ce9e1ee7544e900f1e01))
+* add notifications datasource ([bae788f](https://github.com/devopsarr/terraform-provider-sonarr/commit/bae788f16f699f6d428be9f61b5315de8f1eb077))
+* add remote path mapping data source ([18b347a](https://github.com/devopsarr/terraform-provider-sonarr/commit/18b347a3d330aaac18e7c1994aad40052529de12))
+* add remote path mapping resource ([7d1a6a6](https://github.com/devopsarr/terraform-provider-sonarr/commit/7d1a6a602e45ce8fc57bb6ae4f2d623a2964e995))
+* add remote path mappings data source ([a1d93a9](https://github.com/devopsarr/terraform-provider-sonarr/commit/a1d93a9f04e4ac0d67555c92ee7ae07d34e81d52))
+* add system status datasource ([6613dff](https://github.com/devopsarr/terraform-provider-sonarr/commit/6613dffa5e5eb797408b64c63624f4a1f4bafc80))
+
 ## [2.0.0](https://github.com/devopsarr/terraform-provider-sonarr/compare/v1.2.2...v2.0.0) (2022-09-01)
 
 
