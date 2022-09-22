@@ -582,7 +582,6 @@ func writeDownloadClient(ctx context.Context, downloadClient *sonarr.DownloadCli
 			case "fieldTags":
 				tfsdk.ValueFrom(ctx, f.Value, output.FieldTags.Type(ctx), &output.FieldTags)
 			case "postImTags":
-				output.PostImTags = types.Set{ElemType: types.StringType}
 				tfsdk.ValueFrom(ctx, f.Value, output.PostImTags.Type(ctx), &output.PostImTags)
 			case "additionalTags":
 				tfsdk.ValueFrom(ctx, f.Value, output.AdditionalTags.Type(ctx), &output.AdditionalTags)
