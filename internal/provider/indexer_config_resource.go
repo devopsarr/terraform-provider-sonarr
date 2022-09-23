@@ -105,21 +105,6 @@ func (r *IndexerConfigResource) Create(ctx context.Context, req resource.CreateR
 		return
 	}
 
-	// Init call if we remove this it the very first update on a brand new instance will fail
-	init, err := r.client.GetIndexerConfigContext(ctx)
-	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to init indexerConfig, got error: %s", err))
-
-		return
-	}
-
-	_, err = r.client.UpdateIndexerConfigContext(ctx, init)
-	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to init indexerConfig, got error: %s", err))
-
-		return
-	}
-
 	// Build Create resource
 	data := readIndexerConfig(&plan)
 	data.ID = 1
