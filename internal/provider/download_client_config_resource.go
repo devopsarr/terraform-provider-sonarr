@@ -99,21 +99,6 @@ func (r *DownloadClientConfigResource) Create(ctx context.Context, req resource.
 		return
 	}
 
-	// Init call if we remove this it the very first update on a brand new instance will fail
-	init, err := r.client.GetDownloadClientConfigContext(ctx)
-	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to init downloadClientConfig, got error: %s", err))
-
-		return
-	}
-
-	_, err = r.client.UpdateDownloadClientConfigContext(ctx, init)
-	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to init downloadClientConfig, got error: %s", err))
-
-		return
-	}
-
 	// Build Create resource
 	data := readDownloadClientConfig(&plan)
 	data.ID = 1

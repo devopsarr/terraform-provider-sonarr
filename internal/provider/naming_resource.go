@@ -136,15 +136,7 @@ func (r *NamingResource) Create(ctx context.Context, req resource.CreateRequest,
 	}
 
 	// Init call if we remove this it the very first update on a brand new instance will fail
-	init, err := r.client.GetNamingContext(ctx)
-	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to init naming, got error: %s", err))
-
-		return
-	}
-
-	_, err = r.client.UpdateNamingContext(ctx, init)
-	if err != nil {
+	if _, err := r.client.GetNamingContext(ctx); err != nil {
 		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to init naming, got error: %s", err))
 
 		return
