@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
@@ -11,6 +12,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr/sonarr"
 )
+
+const systemStatusDataSourceName = "system_status"
 
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ datasource.DataSource = &SystemStatusDataSource{}
@@ -26,38 +29,37 @@ type SystemStatusDataSource struct {
 
 // SystemStatus describes the system status data model.
 type SystemStatus struct {
-	IsDebug           types.Bool `tfsdk:"is_debug"`
-	IsProduction      types.Bool `tfsdk:"is_production"`
-	IsAdmin           types.Bool `tfsdk:"is_admin"`
-	IsUserInteractive types.Bool `tfsdk:"is_user_interactive"`
-	IsMonoRuntime     types.Bool `tfsdk:"is_mono_runtime"`
-	IsMono            types.Bool `tfsdk:"is_mono"`
-	IsLinux           types.Bool `tfsdk:"is_linux"`
-	IsOsx             types.Bool `tfsdk:"is_osx"`
-	IsWindows         types.Bool `tfsdk:"is_windows"`
-	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
-	ID                     types.Int64  `tfsdk:"id"`
-	Version                types.String `tfsdk:"version"`
-	StartupPath            types.String `tfsdk:"startup_path"`
-	AppData                types.String `tfsdk:"app_data"`
-	OsName                 types.String `tfsdk:"os_name"`
-	OsVersion              types.String `tfsdk:"os_version"`
-	Mode                   types.String `tfsdk:"mode"`
-	Branch                 types.String `tfsdk:"branch"`
-	Authentication         types.String `tfsdk:"authentication"`
 	SqliteVersion          types.String `tfsdk:"sqlite_version"`
 	URLBase                types.String `tfsdk:"url_base"`
-	RuntimeVersion         types.String `tfsdk:"runtime_version"`
-	RuntimeName            types.String `tfsdk:"runtime_name"`
-	PackageVersion         types.String `tfsdk:"package_version"`
-	PackageAuthor          types.String `tfsdk:"package_author"`
-	PackageUpdateMechanism types.String `tfsdk:"package_update_mechanism"`
+	AppData                types.String `tfsdk:"app_data"`
+	OsName                 types.String `tfsdk:"os_name"`
 	BuildTime              types.String `tfsdk:"build_time"`
+	PackageUpdateMechanism types.String `tfsdk:"package_update_mechanism"`
+	PackageAuthor          types.String `tfsdk:"package_author"`
+	PackageVersion         types.String `tfsdk:"package_version"`
+	OsVersion              types.String `tfsdk:"os_version"`
+	RuntimeVersion         types.String `tfsdk:"runtime_version"`
+	Version                types.String `tfsdk:"version"`
+	StartupPath            types.String `tfsdk:"startup_path"`
+	Authentication         types.String `tfsdk:"authentication"`
 	StartTime              types.String `tfsdk:"start_time"`
+	RuntimeName            types.String `tfsdk:"runtime_name"`
+	Mode                   types.String `tfsdk:"mode"`
+	Branch                 types.String `tfsdk:"branch"`
+	ID                     types.Int64  `tfsdk:"id"`
+	IsAdmin                types.Bool   `tfsdk:"is_admin"`
+	IsDebug                types.Bool   `tfsdk:"is_debug"`
+	IsProduction           types.Bool   `tfsdk:"is_production"`
+	IsWindows              types.Bool   `tfsdk:"is_windows"`
+	IsOsx                  types.Bool   `tfsdk:"is_osx"`
+	IsLinux                types.Bool   `tfsdk:"is_linux"`
+	IsMono                 types.Bool   `tfsdk:"is_mono"`
+	IsMonoRuntime          types.Bool   `tfsdk:"is_mono_runtime"`
+	IsUserInteractive      types.Bool   `tfsdk:"is_user_interactive"`
 }
 
 func (d *SystemStatusDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_system_status"
+	resp.TypeName = req.ProviderTypeName + "_" + systemStatusDataSourceName
 }
 
 func (d *SystemStatusDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
@@ -214,7 +216,7 @@ func (d *SystemStatusDataSource) Configure(ctx context.Context, req datasource.C
 	client, ok := req.ProviderData.(*sonarr.Sonarr)
 	if !ok {
 		resp.Diagnostics.AddError(
-			UnexpectedDataSourceConfigureType,
+			helpers.UnexpectedDataSourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -228,12 +230,12 @@ func (d *SystemStatusDataSource) Read(ctx context.Context, req datasource.ReadRe
 	// Get naming current value
 	response, err := d.client.GetSystemStatusContext(ctx)
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read system status, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", systemStatusDataSourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read system status")
+	tflog.Trace(ctx, "read "+systemStatusDataSourceName)
 
 	result := writeSystemStatus(response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)

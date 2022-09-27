@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -13,6 +14,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr/sonarr"
 )
+
+const seriesResourceName = "series"
 
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ resource.Resource = &SeriesResource{}
@@ -29,18 +32,18 @@ type SeriesResource struct {
 
 // Series describes the series data model.
 type Series struct {
-	Monitored         types.Bool   `tfsdk:"monitored"`
-	SeasonFolder      types.Bool   `tfsdk:"season_folder"`
-	UseSceneNumbering types.Bool   `tfsdk:"use_scene_numbering"`
-	ID                types.Int64  `tfsdk:"id"`
-	LanguageProfileID types.Int64  `tfsdk:"language_profile_id"`
-	QualityProfileID  types.Int64  `tfsdk:"quality_profile_id"`
-	TvdbID            types.Int64  `tfsdk:"tvdb_id"`
+	Tags              types.Set    `tfsdk:"tags"`
 	Path              types.String `tfsdk:"path"`
 	Title             types.String `tfsdk:"title"`
 	TitleSlug         types.String `tfsdk:"title_slug"`
 	RootFolderPath    types.String `tfsdk:"root_folder_path"`
-	Tags              types.Set    `tfsdk:"tags"`
+	ID                types.Int64  `tfsdk:"id"`
+	LanguageProfileID types.Int64  `tfsdk:"language_profile_id"`
+	QualityProfileID  types.Int64  `tfsdk:"quality_profile_id"`
+	TvdbID            types.Int64  `tfsdk:"tvdb_id"`
+	Monitored         types.Bool   `tfsdk:"monitored"`
+	SeasonFolder      types.Bool   `tfsdk:"season_folder"`
+	UseSceneNumbering types.Bool   `tfsdk:"use_scene_numbering"`
 }
 
 // Season is part of Series.
@@ -66,7 +69,7 @@ type Image struct {
 }
 
 func (r *SeriesResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_series"
+	resp.TypeName = req.ProviderTypeName + "_" + seriesResourceName
 }
 
 func (r *SeriesResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
@@ -152,7 +155,7 @@ func (r *SeriesResource) Configure(ctx context.Context, req resource.ConfigureRe
 	client, ok := req.ProviderData.(*sonarr.Sonarr)
 	if !ok {
 		resp.Diagnostics.AddError(
-			UnexpectedResourceConfigureType,
+			helpers.UnexpectedResourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -184,12 +187,12 @@ func (r *SeriesResource) Create(ctx context.Context, req resource.CreateRequest,
 
 	response, err := r.client.AddSeriesContext(ctx, request)
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to create series, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", seriesResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "created series: "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "created "+seriesResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
 	result := *writeSeries(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
@@ -208,12 +211,12 @@ func (r *SeriesResource) Read(ctx context.Context, req resource.ReadRequest, res
 	// Get series current value
 	response, err := r.client.GetSeriesByIDContext(ctx, state.ID.Value)
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read series, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", seriesResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read series: "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "read "+seriesResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Map response body to resource schema attribute
 	result := *writeSeries(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
@@ -234,12 +237,12 @@ func (r *SeriesResource) Update(ctx context.Context, req resource.UpdateRequest,
 
 	response, err := r.client.UpdateSeriesContext(ctx, &request)
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to update series, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", seriesResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "updated series: "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "updated "+seriesResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Map response body to resource schema attribute
 	result := writeSeries(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
@@ -257,12 +260,12 @@ func (r *SeriesResource) Delete(ctx context.Context, req resource.DeleteRequest,
 	// Delete series current value
 	err := r.client.DeleteSeriesContext(ctx, int(state.ID.Value), true, false)
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to delete series, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to delete %s, got error: %s", seriesResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted series: "+strconv.Itoa(int(state.ID.Value)))
+	tflog.Trace(ctx, "deleted "+seriesResourceName+": "+strconv.Itoa(int(state.ID.Value)))
 	resp.State.RemoveResource(ctx)
 }
 
@@ -271,14 +274,14 @@ func (r *SeriesResource) ImportState(ctx context.Context, req resource.ImportSta
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			UnexpectedImportIdentifier,
+			helpers.UnexpectedImportIdentifier,
 			fmt.Sprintf("Expected import identifier with format: ID. Got: %q", req.ID),
 		)
 
 		return
 	}
 
-	tflog.Trace(ctx, "imported series: "+strconv.Itoa(id))
+	tflog.Trace(ctx, "imported "+seriesResourceName+": "+strconv.Itoa(id))
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 

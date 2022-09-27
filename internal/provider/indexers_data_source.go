@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
@@ -12,6 +13,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr/sonarr"
 )
+
+const indexersDataSourceName = "indexers"
 
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ datasource.DataSource = &IndexersDataSource{}
@@ -27,13 +30,12 @@ type IndexersDataSource struct {
 
 // Indexers describes the indexers data model.
 type Indexers struct {
-	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
-	ID       types.String `tfsdk:"id"`
 	Indexers types.Set    `tfsdk:"indexers"`
+	ID       types.String `tfsdk:"id"`
 }
 
 func (d *IndexersDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_indexers"
+	resp.TypeName = req.ProviderTypeName + "_" + indexersDataSourceName
 }
 
 func (d *IndexersDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
@@ -217,7 +219,7 @@ func (d *IndexersDataSource) Configure(ctx context.Context, req datasource.Confi
 	client, ok := req.ProviderData.(*sonarr.Sonarr)
 	if !ok {
 		resp.Diagnostics.AddError(
-			UnexpectedDataSourceConfigureType,
+			helpers.UnexpectedDataSourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -238,12 +240,12 @@ func (d *IndexersDataSource) Read(ctx context.Context, req datasource.ReadReques
 	// Get indexers current value
 	response, err := d.client.GetIndexersContext(ctx)
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read indexers, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexersDataSourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read indexers")
+	tflog.Trace(ctx, "read "+indexersDataSourceName)
 	// Map response body to resource schema attribute
 	profiles := *writeIndexers(ctx, response)
 	tfsdk.ValueFrom(ctx, profiles, data.Indexers.Type(context.Background()), &data.Indexers)

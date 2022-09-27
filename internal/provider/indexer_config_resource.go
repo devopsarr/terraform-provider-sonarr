@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -13,6 +14,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr/sonarr"
 )
+
+const indexerConfigResourceName = "indexer_config"
 
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ resource.Resource = &IndexerConfigResource{}
@@ -37,7 +40,7 @@ type IndexerConfig struct {
 }
 
 func (r *IndexerConfigResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_indexer_config"
+	resp.TypeName = req.ProviderTypeName + "_" + indexerConfigResourceName
 }
 
 func (r *IndexerConfigResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
@@ -85,7 +88,7 @@ func (r *IndexerConfigResource) Configure(ctx context.Context, req resource.Conf
 	client, ok := req.ProviderData.(*sonarr.Sonarr)
 	if !ok {
 		resp.Diagnostics.AddError(
-			UnexpectedResourceConfigureType,
+			helpers.UnexpectedResourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -112,12 +115,12 @@ func (r *IndexerConfigResource) Create(ctx context.Context, req resource.CreateR
 	// Create new IndexerConfig
 	response, err := r.client.UpdateIndexerConfigContext(ctx, data)
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to create indexerConfig, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", indexerConfigResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "created indexer_config: "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "created "+indexerConfigResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
 	result := writeIndexerConfig(response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
@@ -136,12 +139,12 @@ func (r *IndexerConfigResource) Read(ctx context.Context, req resource.ReadReque
 	// Get indexerConfig current value
 	response, err := r.client.GetIndexerConfigContext(ctx)
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read indexerConfig, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerConfigResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read indexer_config: "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "read "+indexerConfigResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Map response body to resource schema attribute
 	result := writeIndexerConfig(response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
@@ -163,12 +166,12 @@ func (r *IndexerConfigResource) Update(ctx context.Context, req resource.UpdateR
 	// Update IndexerConfig
 	response, err := r.client.UpdateIndexerConfigContext(ctx, data)
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to update indexerConfig, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", indexerConfigResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "updated indexer_config: "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "updated "+indexerConfigResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
 	result := writeIndexerConfig(response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
@@ -176,13 +179,13 @@ func (r *IndexerConfigResource) Update(ctx context.Context, req resource.UpdateR
 
 func (r *IndexerConfigResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	// IndexerConfig cannot be really deleted just removing configuration
-	tflog.Trace(ctx, "decoupled indexer_config: 1")
+	tflog.Trace(ctx, "decoupled "+indexerConfigResourceName+": 1")
 	resp.State.RemoveResource(ctx)
 }
 
 func (r *IndexerConfigResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	// resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
-	tflog.Trace(ctx, "imported indexer_config: "+strconv.Itoa(1))
+	tflog.Trace(ctx, "imported "+indexerConfigResourceName+": "+strconv.Itoa(1))
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), 1)...)
 }
 

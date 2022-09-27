@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
@@ -12,6 +13,8 @@ import (
 	"golift.io/starr"
 	"golift.io/starr/sonarr"
 )
+
+const tagDataSourceName = "tag"
 
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ datasource.DataSource = &TagDataSource{}
@@ -26,7 +29,7 @@ type TagDataSource struct {
 }
 
 func (d *TagDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_tag"
+	resp.TypeName = req.ProviderTypeName + "_" + tagDataSourceName
 }
 
 func (d *TagDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
@@ -57,7 +60,7 @@ func (d *TagDataSource) Configure(ctx context.Context, req datasource.ConfigureR
 	client, ok := req.ProviderData.(*sonarr.Sonarr)
 	if !ok {
 		resp.Diagnostics.AddError(
-			UnexpectedDataSourceConfigureType,
+			helpers.UnexpectedDataSourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -79,14 +82,14 @@ func (d *TagDataSource) Read(ctx context.Context, req datasource.ReadRequest, re
 	// Get tags current value
 	response, err := d.client.GetTagsContext(ctx)
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read tags, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.UnableToRead(tagDataSourceName, err))
 
 		return
 	}
 
 	tag, err := findTag(data.Label.Value, response)
 	if err != nil {
-		resp.Diagnostics.AddError(DataSourceError, fmt.Sprintf("Unable to find tags, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", tagDataSourceName, err))
 
 		return
 	}
@@ -105,5 +108,5 @@ func findTag(label string, tags []*starr.Tag) (*starr.Tag, error) {
 		}
 	}
 
-	return nil, fmt.Errorf("no tag with label %s", label)
+	return nil, helpers.ErrDataNotFoundError(tagDataSourceName, "label", label)
 }

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -13,6 +14,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr/sonarr"
 )
+
+const rootFoldersDataSourceName = "root_folders"
 
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ datasource.DataSource = &RootFoldersDataSource{}
@@ -28,13 +31,12 @@ type RootFoldersDataSource struct {
 
 // RootFolders describes the root folders data model.
 type RootFolders struct {
-	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
-	ID          types.String `tfsdk:"id"`
 	RootFolders types.Set    `tfsdk:"root_folders"`
+	ID          types.String `tfsdk:"id"`
 }
 
 func (d *RootFoldersDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_root_folders"
+	resp.TypeName = req.ProviderTypeName + "_" + rootFoldersDataSourceName
 }
 
 func (d *RootFoldersDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
@@ -100,7 +102,7 @@ func (d *RootFoldersDataSource) Configure(ctx context.Context, req datasource.Co
 	client, ok := req.ProviderData.(*sonarr.Sonarr)
 	if !ok {
 		resp.Diagnostics.AddError(
-			UnexpectedDataSourceConfigureType,
+			helpers.UnexpectedDataSourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -121,12 +123,12 @@ func (d *RootFoldersDataSource) Read(ctx context.Context, req datasource.ReadReq
 	// Get rootfolders current value
 	response, err := d.client.GetRootFoldersContext(ctx)
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read rootfolders, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", rootFoldersDataSourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read root folders")
+	tflog.Trace(ctx, "read "+rootFoldersDataSourceName)
 	// Map response body to resource schema attribute
 	rootFolders := *writeRootFolders(ctx, response)
 	tfsdk.ValueFrom(ctx, rootFolders, data.RootFolders.Type(context.Background()), &data.RootFolders)

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -14,6 +15,8 @@ import (
 	"golift.io/starr"
 	"golift.io/starr/sonarr"
 )
+
+const rootFolderResourceName = "root_folder"
 
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ resource.Resource = &RootFolderResource{}
@@ -30,10 +33,10 @@ type RootFolderResource struct {
 
 // RootFolder describes the root folder data model.
 type RootFolder struct {
-	Accessible      types.Bool   `tfsdk:"accessible"`
-	ID              types.Int64  `tfsdk:"id"`
-	Path            types.String `tfsdk:"path"`
 	UnmappedFolders types.Set    `tfsdk:"unmapped_folders"`
+	Path            types.String `tfsdk:"path"`
+	ID              types.Int64  `tfsdk:"id"`
+	Accessible      types.Bool   `tfsdk:"accessible"`
 }
 
 // Path part of RootFolder.
@@ -43,7 +46,7 @@ type Path struct {
 }
 
 func (r *RootFolderResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_root_folder"
+	resp.TypeName = req.ProviderTypeName + "_" + rootFolderResourceName
 }
 
 func (r *RootFolderResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
@@ -107,7 +110,7 @@ func (r *RootFolderResource) Configure(ctx context.Context, req resource.Configu
 	client, ok := req.ProviderData.(*sonarr.Sonarr)
 	if !ok {
 		resp.Diagnostics.AddError(
-			UnexpectedResourceConfigureType,
+			helpers.UnexpectedResourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -134,12 +137,12 @@ func (r *RootFolderResource) Create(ctx context.Context, req resource.CreateRequ
 
 	response, err := r.client.AddRootFolderContext(ctx, &request)
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to create rootFolder, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", rootFolderResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "created root_folder: "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "created "+rootFolderResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
 	result := writeRootFolder(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
@@ -158,12 +161,12 @@ func (r *RootFolderResource) Read(ctx context.Context, req resource.ReadRequest,
 	// Get rootFolder current value
 	response, err := r.client.GetRootFolderContext(ctx, int(state.ID.Value))
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read rootFolders, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", rootFolderResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read root_folder: "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "read "+rootFolderResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Map response body to resource schema attribute
 	result := writeRootFolder(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
@@ -185,12 +188,12 @@ func (r *RootFolderResource) Delete(ctx context.Context, req resource.DeleteRequ
 	// Delete rootFolder current value
 	err := r.client.DeleteRootFolderContext(ctx, int(state.ID.Value))
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read rootFolders, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", rootFolderResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted root_folder: "+strconv.Itoa(int(state.ID.Value)))
+	tflog.Trace(ctx, "deleted "+rootFolderResourceName+": "+strconv.Itoa(int(state.ID.Value)))
 	resp.State.RemoveResource(ctx)
 }
 
@@ -199,14 +202,14 @@ func (r *RootFolderResource) ImportState(ctx context.Context, req resource.Impor
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			UnexpectedImportIdentifier,
+			helpers.UnexpectedImportIdentifier,
 			fmt.Sprintf("Expected import identifier with format: ID. Got: %q", req.ID),
 		)
 
 		return
 	}
 
-	tflog.Trace(ctx, "imported root_folder: "+strconv.Itoa(id))
+	tflog.Trace(ctx, "imported "+rootFolderResourceName+": "+strconv.Itoa(id))
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 

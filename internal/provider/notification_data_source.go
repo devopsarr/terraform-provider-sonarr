@@ -14,6 +14,8 @@ import (
 	"golift.io/starr/sonarr"
 )
 
+const notificationDataSourceName = "notification"
+
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ datasource.DataSource = &NotificationDataSource{}
 
@@ -27,7 +29,7 @@ type NotificationDataSource struct {
 }
 
 func (d *NotificationDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_notification"
+	resp.TypeName = req.ProviderTypeName + "_" + notificationDataSourceName
 }
 
 func (d *NotificationDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
@@ -425,7 +427,7 @@ func (d *NotificationDataSource) Configure(ctx context.Context, req datasource.C
 	client, ok := req.ProviderData.(*sonarr.Sonarr)
 	if !ok {
 		resp.Diagnostics.AddError(
-			UnexpectedDataSourceConfigureType,
+			helpers.UnexpectedDataSourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -446,19 +448,19 @@ func (d *NotificationDataSource) Read(ctx context.Context, req datasource.ReadRe
 	// Get notification current value
 	response, err := d.client.GetNotificationsContext(ctx)
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read notification, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", notificationDataSourceName, err))
 
 		return
 	}
 
 	notification, err := findNotification(data.Name.Value, response)
 	if err != nil {
-		resp.Diagnostics.AddError(DataSourceError, fmt.Sprintf("Unable to find notification, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", notificationDataSourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read notification")
+	tflog.Trace(ctx, "read "+notificationDataSourceName)
 	result := writeNotification(ctx, notification)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
 }
@@ -470,5 +472,5 @@ func findNotification(name string, notifications []*sonarr.NotificationOutput) (
 		}
 	}
 
-	return nil, fmt.Errorf("no notification with name %s", name)
+	return nil, helpers.ErrDataNotFoundError(notificationDataSourceName, "name", name)
 }

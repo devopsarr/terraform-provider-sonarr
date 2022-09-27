@@ -68,9 +68,9 @@ resource "sonarr_notification" "example" {
 - `auth_user` (String) Auth user.
 - `author` (String) Author.
 - `avatar` (String) Avatar.
-- `bcc` (String) BCC.
+- `bcc` (String) Bcc.
 - `bot_token` (String) Bot token.
-- `cc` (String) CC.
+- `cc` (String) Cc.
 - `channel` (String) Channel.
 - `channel_tags` (Set of String) Channel tags.
 - `chat_id` (String) Chat ID.

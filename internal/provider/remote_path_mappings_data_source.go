@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
@@ -12,6 +13,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr/sonarr"
 )
+
+const remotePathMappingsDataSourceName = "remote_path_mappings"
 
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ datasource.DataSource = &RemotePathMappingsDataSource{}
@@ -27,13 +30,12 @@ type RemotePathMappingsDataSource struct {
 
 // RemotePathMappings describes the remote path mappings data model.
 type RemotePathMappings struct {
-	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
-	ID                 types.String `tfsdk:"id"`
 	RemotePathMappings types.Set    `tfsdk:"remote_path_mappings"`
+	ID                 types.String `tfsdk:"id"`
 }
 
 func (d *RemotePathMappingsDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_remote_path_mappings"
+	resp.TypeName = req.ProviderTypeName + "_" + remotePathMappingsDataSourceName
 }
 
 func (d *RemotePathMappingsDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
@@ -85,7 +87,7 @@ func (d *RemotePathMappingsDataSource) Configure(ctx context.Context, req dataso
 	client, ok := req.ProviderData.(*sonarr.Sonarr)
 	if !ok {
 		resp.Diagnostics.AddError(
-			UnexpectedDataSourceConfigureType,
+			helpers.UnexpectedDataSourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -106,12 +108,12 @@ func (d *RemotePathMappingsDataSource) Read(ctx context.Context, req datasource.
 	// Get remotePathMappings current value
 	response, err := d.client.GetRemotePathMappingsContext(ctx)
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read remotePathMappings, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", remotePathMappingsDataSourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read remote_path_mappings")
+	tflog.Trace(ctx, "read "+remotePathMappingsDataSourceName)
 	// Map response body to resource schema attribute
 	profiles := *writeRemotePathMappings(response)
 	tfsdk.ValueFrom(ctx, profiles, data.RemotePathMappings.Type(context.Background()), &data.RemotePathMappings)

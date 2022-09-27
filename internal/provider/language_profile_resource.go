@@ -16,6 +16,8 @@ import (
 	"golift.io/starr/sonarr"
 )
 
+const languageProfileResourceName = "language_profile"
+
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ resource.Resource = &LanguageProfileResource{}
 var _ resource.ResourceWithImportState = &LanguageProfileResource{}
@@ -31,15 +33,15 @@ type LanguageProfileResource struct {
 
 // LanguageProfile describes the language profile data model.
 type LanguageProfile struct {
-	UpgradeAllowed types.Bool   `tfsdk:"upgrade_allowed"`
-	ID             types.Int64  `tfsdk:"id"`
+	Languages      types.Set    `tfsdk:"languages"`
 	Name           types.String `tfsdk:"name"`
 	CutoffLanguage types.String `tfsdk:"cutoff_language"`
-	Languages      types.Set    `tfsdk:"languages"`
+	ID             types.Int64  `tfsdk:"id"`
+	UpgradeAllowed types.Bool   `tfsdk:"upgrade_allowed"`
 }
 
 func (r *LanguageProfileResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_language_profile"
+	resp.TypeName = req.ProviderTypeName + "_" + languageProfileResourceName
 }
 
 func (r *LanguageProfileResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
@@ -91,7 +93,7 @@ func (r *LanguageProfileResource) Configure(ctx context.Context, req resource.Co
 	client, ok := req.ProviderData.(*sonarr.Sonarr)
 	if !ok {
 		resp.Diagnostics.AddError(
-			UnexpectedResourceConfigureType,
+			helpers.UnexpectedResourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -117,12 +119,12 @@ func (r *LanguageProfileResource) Create(ctx context.Context, req resource.Creat
 	// Create new LanguageProfile
 	response, err := r.client.AddLanguageProfileContext(ctx, data)
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to create languageprofile, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", languageProfileResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "created language_profile: "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "created "+languageProfileResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
 	result := writeLanguageProfile(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
@@ -141,12 +143,12 @@ func (r *LanguageProfileResource) Read(ctx context.Context, req resource.ReadReq
 	// Get languageprofile current value
 	response, err := r.client.GetLanguageProfileContext(ctx, int(state.ID.Value))
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read languageprofiles, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", languageProfileResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read language_profile: "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "read "+languageProfileResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Map response body to resource schema attribute
 	result := writeLanguageProfile(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
@@ -168,12 +170,12 @@ func (r *LanguageProfileResource) Update(ctx context.Context, req resource.Updat
 	// Update LanguageProfile
 	response, err := r.client.UpdateLanguageProfileContext(ctx, data)
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to update languageprofile, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", languageProfileResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "updated language_profile: "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "updated "+languageProfileResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
 	result := writeLanguageProfile(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
@@ -191,12 +193,12 @@ func (r *LanguageProfileResource) Delete(ctx context.Context, req resource.Delet
 	// Delete languageprofile current value
 	err := r.client.DeleteLanguageProfileContext(ctx, int(state.ID.Value))
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read languageprofiles, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", languageProfileResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted language_profile: "+strconv.Itoa(int(state.ID.Value)))
+	tflog.Trace(ctx, "deleted "+languageProfileResourceName+": "+strconv.Itoa(int(state.ID.Value)))
 	resp.State.RemoveResource(ctx)
 }
 
@@ -205,14 +207,14 @@ func (r *LanguageProfileResource) ImportState(ctx context.Context, req resource.
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			UnexpectedImportIdentifier,
+			helpers.UnexpectedImportIdentifier,
 			fmt.Sprintf("Expected import identifier with format: ID. Got: %q", req.ID),
 		)
 
 		return
 	}
 
-	tflog.Trace(ctx, "imported language_profile: "+strconv.Itoa(id))
+	tflog.Trace(ctx, "imported "+languageProfileResourceName+": "+strconv.Itoa(id))
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 

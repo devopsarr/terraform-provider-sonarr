@@ -3,7 +3,9 @@ package provider
 import (
 	"context"
 	"fmt"
+	"strconv"
 
+	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
@@ -11,6 +13,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr/sonarr"
 )
+
+const remotePathMappingDataSourceName = "remote_path_mapping"
 
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ datasource.DataSource = &RemotePathMappingDataSource{}
@@ -25,7 +29,7 @@ type RemotePathMappingDataSource struct {
 }
 
 func (d *RemotePathMappingDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_remote_path_mapping"
+	resp.TypeName = req.ProviderTypeName + "_" + remotePathMappingDataSourceName
 }
 
 func (d *RemotePathMappingDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
@@ -66,7 +70,7 @@ func (d *RemotePathMappingDataSource) Configure(ctx context.Context, req datasou
 	client, ok := req.ProviderData.(*sonarr.Sonarr)
 	if !ok {
 		resp.Diagnostics.AddError(
-			UnexpectedDataSourceConfigureType,
+			helpers.UnexpectedDataSourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -87,7 +91,7 @@ func (d *RemotePathMappingDataSource) Read(ctx context.Context, req datasource.R
 	// Get remote path mapping current value
 	response, err := d.client.GetRemotePathMappingsContext(ctx)
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read remote path mapping, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", remotePathMappingDataSourceName, err))
 
 		return
 	}
@@ -95,12 +99,12 @@ func (d *RemotePathMappingDataSource) Read(ctx context.Context, req datasource.R
 	// Map response body to resource schema attribute
 	mapping, err := findRemotePathMapping(data.ID.Value, response)
 	if err != nil {
-		resp.Diagnostics.AddError(DataSourceError, fmt.Sprintf("Unable to find remote path mappings, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", remotePathMappingDataSourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read remote_path_mapping")
+	tflog.Trace(ctx, "read "+remotePathMappingDataSourceName)
 
 	result := writeRemotePathMapping(mapping)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
@@ -113,5 +117,5 @@ func findRemotePathMapping(id int64, mappings []*sonarr.RemotePathMapping) (*son
 		}
 	}
 
-	return nil, fmt.Errorf("no remote path mapping with id %d", id)
+	return nil, helpers.ErrDataNotFoundError(remotePathMappingDataSourceName, "id", strconv.Itoa(int(id)))
 }

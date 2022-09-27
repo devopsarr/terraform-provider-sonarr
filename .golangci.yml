@@ -38,8 +38,17 @@ linters:
     - nlreturn
     - paralleltest
     - thelper
+    - gocognit
+    - govet
+    - forcetypeassert
+    - goerr113
+    # - maintidx
 
 linters-settings:
+  govet:
+    check-shadowing: true
+    enable:
+      - fieldalignment
   misspell:
     ignore-words:
     - "intial"

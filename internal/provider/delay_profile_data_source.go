@@ -3,7 +3,9 @@ package provider
 import (
 	"context"
 	"fmt"
+	"strconv"
 
+	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
@@ -11,6 +13,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr/sonarr"
 )
+
+const delayProfileDataSourceName = "delay_profile"
 
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ datasource.DataSource = &DelayProfileDataSource{}
@@ -25,7 +29,7 @@ type DelayProfileDataSource struct {
 }
 
 func (d *DelayProfileDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_delay_profile"
+	resp.TypeName = req.ProviderTypeName + "_" + delayProfileDataSourceName
 }
 
 func (d *DelayProfileDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
@@ -93,7 +97,7 @@ func (d *DelayProfileDataSource) Configure(ctx context.Context, req datasource.C
 	client, ok := req.ProviderData.(*sonarr.Sonarr)
 	if !ok {
 		resp.Diagnostics.AddError(
-			UnexpectedDataSourceConfigureType,
+			helpers.UnexpectedDataSourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -114,19 +118,19 @@ func (d *DelayProfileDataSource) Read(ctx context.Context, req datasource.ReadRe
 	// Get delayprofiles current value
 	response, err := d.client.GetDelayProfilesContext(ctx)
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read delayprofiles, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", delayProfileDataSourceName, err))
 
 		return
 	}
 
 	profile, err := findDelayProfile(data.ID.Value, response)
 	if err != nil {
-		resp.Diagnostics.AddError(DataSourceError, fmt.Sprintf("Unable to find delayprofile, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", delayProfileDataSourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read delay_profile")
+	tflog.Trace(ctx, "read "+delayProfileDataSourceName)
 	result := writeDelayProfile(ctx, profile)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
 }
@@ -138,5 +142,5 @@ func findDelayProfile(id int64, profiles []*sonarr.DelayProfile) (*sonarr.DelayP
 		}
 	}
 
-	return nil, fmt.Errorf("no delay profile with id %d", id)
+	return nil, helpers.ErrDataNotFoundError(delayProfileDataSourceName, "id", strconv.Itoa(int(id)))
 }

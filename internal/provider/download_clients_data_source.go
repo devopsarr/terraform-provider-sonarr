@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -13,6 +14,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr/sonarr"
 )
+
+const downloadClientsDataSourceName = "download_clients"
 
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ datasource.DataSource = &DownloadClientsDataSource{}
@@ -28,13 +31,12 @@ type DownloadClientsDataSource struct {
 
 // DownloadClients describes the download clients data model.
 type DownloadClients struct {
-	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
-	ID              types.String `tfsdk:"id"`
 	DownloadClients types.Set    `tfsdk:"download_clients"`
+	ID              types.String `tfsdk:"id"`
 }
 
 func (d *DownloadClientsDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_download_clients"
+	resp.TypeName = req.ProviderTypeName + "_" + downloadClientsDataSourceName
 }
 
 func (d *DownloadClientsDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
@@ -293,7 +295,7 @@ func (d *DownloadClientsDataSource) Configure(ctx context.Context, req datasourc
 	client, ok := req.ProviderData.(*sonarr.Sonarr)
 	if !ok {
 		resp.Diagnostics.AddError(
-			UnexpectedDataSourceConfigureType,
+			helpers.UnexpectedDataSourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -314,12 +316,12 @@ func (d *DownloadClientsDataSource) Read(ctx context.Context, req datasource.Rea
 	// Get download clients current value
 	response, err := d.client.GetDownloadClientsContext(ctx)
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read download clients, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", downloadClientsDataSourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read download_clients")
+	tflog.Trace(ctx, "read "+downloadClientsDataSourceName)
 	// Map response body to resource schema attribute
 	profiles := *writeDownloadClients(ctx, response)
 	tfsdk.ValueFrom(ctx, profiles, data.DownloadClients.Type(context.Background()), &data.DownloadClients)

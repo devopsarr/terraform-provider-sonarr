@@ -13,6 +13,8 @@ import (
 	"golift.io/starr/sonarr"
 )
 
+const downloadClientDataSourceName = "download_client"
+
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ datasource.DataSource = &DownloadClientDataSource{}
 
@@ -26,7 +28,7 @@ type DownloadClientDataSource struct {
 }
 
 func (d *DownloadClientDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_download_client"
+	resp.TypeName = req.ProviderTypeName + "_" + downloadClientDataSourceName
 }
 
 func (d *DownloadClientDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
@@ -274,7 +276,7 @@ func (d *DownloadClientDataSource) Configure(ctx context.Context, req datasource
 	client, ok := req.ProviderData.(*sonarr.Sonarr)
 	if !ok {
 		resp.Diagnostics.AddError(
-			UnexpectedDataSourceConfigureType,
+			helpers.UnexpectedDataSourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -295,19 +297,19 @@ func (d *DownloadClientDataSource) Read(ctx context.Context, req datasource.Read
 	// Get downloadClient current value
 	response, err := d.client.GetDownloadClientsContext(ctx)
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read downloadClient, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", downloadClientDataSourceName, err))
 
 		return
 	}
 
 	downloadClient, err := findDownloadClient(data.Name.Value, response)
 	if err != nil {
-		resp.Diagnostics.AddError(DataSourceError, fmt.Sprintf("Unable to find downloadClient, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", downloadClientDataSourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read download_client")
+	tflog.Trace(ctx, "read "+downloadClientDataSourceName)
 	result := writeDownloadClient(ctx, downloadClient)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
 }
@@ -319,5 +321,5 @@ func findDownloadClient(name string, downloadClients []*sonarr.DownloadClientOut
 		}
 	}
 
-	return nil, fmt.Errorf("no downloadClient with name %s", name)
+	return nil, helpers.ErrDataNotFoundError(downloadClientDataSourceName, "name", name)
 }

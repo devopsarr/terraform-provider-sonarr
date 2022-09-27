@@ -16,6 +16,8 @@ import (
 	"golift.io/starr/sonarr"
 )
 
+const tagResourceName = "tag"
+
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ resource.Resource = &TagResource{}
 var _ resource.ResourceWithImportState = &TagResource{}
@@ -31,12 +33,12 @@ type TagResource struct {
 
 // Tag describes the tag data model.
 type Tag struct {
-	ID    types.Int64  `tfsdk:"id"`
 	Label types.String `tfsdk:"label"`
+	ID    types.Int64  `tfsdk:"id"`
 }
 
 func (r *TagResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_tag"
+	resp.TypeName = req.ProviderTypeName + "_" + tagResourceName
 }
 
 func (r *TagResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
@@ -72,7 +74,7 @@ func (r *TagResource) Configure(ctx context.Context, req resource.ConfigureReque
 	client, ok := req.ProviderData.(*sonarr.Sonarr)
 	if !ok {
 		resp.Diagnostics.AddError(
-			UnexpectedResourceConfigureType,
+			helpers.UnexpectedResourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -99,7 +101,7 @@ func (r *TagResource) Create(ctx context.Context, req resource.CreateRequest, re
 
 	response, err := r.client.AddTagContext(ctx, &request)
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to create tag, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", tagResourceName, err))
 
 		return
 	}
@@ -123,12 +125,12 @@ func (r *TagResource) Read(ctx context.Context, req resource.ReadRequest, resp *
 	// Get tag current value
 	response, err := r.client.GetTagContext(ctx, int(state.ID.Value))
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read tags, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", tagResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read tag: "+strconv.Itoa(response.ID))
+	tflog.Trace(ctx, "read "+tagResourceName+": "+strconv.Itoa(response.ID))
 	// Map response body to resource schema attribute
 	result := writeTag(response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
@@ -152,12 +154,12 @@ func (r *TagResource) Update(ctx context.Context, req resource.UpdateRequest, re
 
 	response, err := r.client.UpdateTagContext(ctx, &request)
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to update tag, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", tagResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "updated tag: "+strconv.Itoa(response.ID))
+	tflog.Trace(ctx, "updated "+tagResourceName+": "+strconv.Itoa(response.ID))
 	// Generate resource state struct
 	result := writeTag(response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
@@ -175,12 +177,12 @@ func (r *TagResource) Delete(ctx context.Context, req resource.DeleteRequest, re
 	// Delete tag current value
 	err := r.client.DeleteTagContext(ctx, int(state.ID.Value))
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read tags, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", tagResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted tag: "+strconv.Itoa(int(state.ID.Value)))
+	tflog.Trace(ctx, "deleted "+tagResourceName+": "+strconv.Itoa(int(state.ID.Value)))
 	resp.State.RemoveResource(ctx)
 }
 
@@ -189,14 +191,14 @@ func (r *TagResource) ImportState(ctx context.Context, req resource.ImportStateR
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			UnexpectedImportIdentifier,
+			helpers.UnexpectedImportIdentifier,
 			fmt.Sprintf("Expected import identifier with format: ID. Got: %q", req.ID),
 		)
 
 		return
 	}
 
-	tflog.Trace(ctx, "imported tag: "+strconv.Itoa(id))
+	tflog.Trace(ctx, "imported "+tagResourceName+": "+strconv.Itoa(id))
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 

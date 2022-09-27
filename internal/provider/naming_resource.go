@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -13,6 +14,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr/sonarr"
 )
+
+const namingResourceName = "naming"
 
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ resource.Resource = &NamingResource{}
@@ -29,20 +32,20 @@ type NamingResource struct {
 
 // Naming describes the naming data model.
 type Naming struct {
-	RenameEpisodes           types.Bool   `tfsdk:"rename_episodes"`
-	ReplaceIllegalCharacters types.Bool   `tfsdk:"replace_illegal_characters"`
-	ID                       types.Int64  `tfsdk:"id"`
-	MultiEpisodeStyle        types.Int64  `tfsdk:"multi_episode_style"`
 	DailyEpisodeFormat       types.String `tfsdk:"daily_episode_format"`
 	AnimeEpisodeFormat       types.String `tfsdk:"anime_episode_format"`
 	SeriesFolderFormat       types.String `tfsdk:"series_folder_format"`
 	SeasonFolderFormat       types.String `tfsdk:"season_folder_format"`
 	SpecialsFolderFormat     types.String `tfsdk:"specials_folder_format"`
 	StandardEpisodeFormat    types.String `tfsdk:"standard_episode_format"`
+	ID                       types.Int64  `tfsdk:"id"`
+	MultiEpisodeStyle        types.Int64  `tfsdk:"multi_episode_style"`
+	RenameEpisodes           types.Bool   `tfsdk:"rename_episodes"`
+	ReplaceIllegalCharacters types.Bool   `tfsdk:"replace_illegal_characters"`
 }
 
 func (r *NamingResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_naming"
+	resp.TypeName = req.ProviderTypeName + "_" + namingResourceName
 }
 
 func (r *NamingResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
@@ -115,7 +118,7 @@ func (r *NamingResource) Configure(ctx context.Context, req resource.ConfigureRe
 	client, ok := req.ProviderData.(*sonarr.Sonarr)
 	if !ok {
 		resp.Diagnostics.AddError(
-			UnexpectedResourceConfigureType,
+			helpers.UnexpectedResourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -137,7 +140,7 @@ func (r *NamingResource) Create(ctx context.Context, req resource.CreateRequest,
 
 	// Init call if we remove this it the very first update on a brand new instance will fail
 	if _, err := r.client.GetNamingContext(ctx); err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to init naming, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to init %s, got error: %s", namingResourceName, err))
 
 		return
 	}
@@ -149,12 +152,12 @@ func (r *NamingResource) Create(ctx context.Context, req resource.CreateRequest,
 	// Create new Naming
 	response, err := r.client.UpdateNamingContext(ctx, data)
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to create naming, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", namingResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "created naming: "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "created "+namingResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
 	result := writeNaming(response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
@@ -173,12 +176,12 @@ func (r *NamingResource) Read(ctx context.Context, req resource.ReadRequest, res
 	// Get naming current value
 	response, err := r.client.GetNamingContext(ctx)
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read namings, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", namingResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read naming: "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "read "+namingResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Map response body to resource schema attribute
 	result := writeNaming(response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
@@ -200,12 +203,12 @@ func (r *NamingResource) Update(ctx context.Context, req resource.UpdateRequest,
 	// Update Naming
 	response, err := r.client.UpdateNamingContext(ctx, data)
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to update naming, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", namingResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "updated naming: "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "updated "+namingResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
 	result := writeNaming(response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
@@ -213,13 +216,13 @@ func (r *NamingResource) Update(ctx context.Context, req resource.UpdateRequest,
 
 func (r *NamingResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	// Naming cannot be really deleted just removing configuration
-	tflog.Trace(ctx, "decoupled naming: 1")
+	tflog.Trace(ctx, "decoupled "+namingResourceName+": 1")
 	resp.State.RemoveResource(ctx)
 }
 
 func (r *NamingResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	// resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
-	tflog.Trace(ctx, "imported naming: 1")
+	tflog.Trace(ctx, "imported "+namingResourceName+": 1")
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), 1)...)
 }
 
