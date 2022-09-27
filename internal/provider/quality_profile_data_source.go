@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
@@ -11,6 +12,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr/sonarr"
 )
+
+const qualityProfileDataSourceName = "quality_profile"
 
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ datasource.DataSource = &QualityProfileDataSource{}
@@ -25,7 +28,7 @@ type QualityProfileDataSource struct {
 }
 
 func (d *QualityProfileDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_quality_profile"
+	resp.TypeName = req.ProviderTypeName + "_" + qualityProfileDataSourceName
 }
 
 func (d *QualityProfileDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
@@ -108,7 +111,7 @@ func (d *QualityProfileDataSource) Configure(ctx context.Context, req datasource
 	client, ok := req.ProviderData.(*sonarr.Sonarr)
 	if !ok {
 		resp.Diagnostics.AddError(
-			UnexpectedDataSourceConfigureType,
+			helpers.UnexpectedDataSourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -129,19 +132,19 @@ func (d *QualityProfileDataSource) Read(ctx context.Context, req datasource.Read
 	// Get qualityprofiles current value
 	response, err := d.client.GetQualityProfilesContext(ctx)
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read qualityprofiles, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", qualityProfileDataSourceName, err))
 
 		return
 	}
 
 	profile, err := findQualityProfile(data.Name.Value, response)
 	if err != nil {
-		resp.Diagnostics.AddError(DataSourceError, fmt.Sprintf("Unable to find qualityprofile, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", qualityProfileDataSourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read quality_profile")
+	tflog.Trace(ctx, "read "+qualityProfileDataSourceName)
 	result := writeQualityProfile(ctx, profile)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
 }
@@ -153,5 +156,5 @@ func findQualityProfile(name string, profiles []*sonarr.QualityProfile) (*sonarr
 		}
 	}
 
-	return nil, fmt.Errorf("no quality profile with name %s", name)
+	return nil, helpers.ErrDataNotFoundError(qualityProfileDataSourceName, "name", name)
 }

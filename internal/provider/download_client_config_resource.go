@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -13,6 +14,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr/sonarr"
 )
+
+const downloadClientConfigResourceName = "download_client_config"
 
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ resource.Resource = &DownloadClientConfigResource{}
@@ -29,14 +32,14 @@ type DownloadClientConfigResource struct {
 
 // DownloadClientConfig describes the download client config data model.
 type DownloadClientConfig struct {
+	DownloadClientWorkingFolders    types.String `tfsdk:"download_client_working_folders"`
+	ID                              types.Int64  `tfsdk:"id"`
 	EnableCompletedDownloadHandling types.Bool   `tfsdk:"enable_completed_download_handling"`
 	AutoRedownloadFailed            types.Bool   `tfsdk:"auto_redownload_failed"`
-	ID                              types.Int64  `tfsdk:"id"`
-	DownloadClientWorkingFolders    types.String `tfsdk:"download_client_working_folders"`
 }
 
 func (r *DownloadClientConfigResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_download_client_config"
+	resp.TypeName = req.ProviderTypeName + "_" + downloadClientConfigResourceName
 }
 
 func (r *DownloadClientConfigResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
@@ -79,7 +82,7 @@ func (r *DownloadClientConfigResource) Configure(ctx context.Context, req resour
 	client, ok := req.ProviderData.(*sonarr.Sonarr)
 	if !ok {
 		resp.Diagnostics.AddError(
-			UnexpectedResourceConfigureType,
+			helpers.UnexpectedResourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -106,12 +109,12 @@ func (r *DownloadClientConfigResource) Create(ctx context.Context, req resource.
 	// Create new DownloadClientConfig
 	response, err := r.client.UpdateDownloadClientConfigContext(ctx, data)
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to create downloadClientConfig, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", downloadClientConfigResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "created download_client_config: "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "created "+downloadClientConfigResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
 	result := writeDownloadClientConfig(response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
@@ -130,12 +133,12 @@ func (r *DownloadClientConfigResource) Read(ctx context.Context, req resource.Re
 	// Get downloadClientConfig current value
 	response, err := r.client.GetDownloadClientConfigContext(ctx)
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read downloadClientConfig, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", downloadClientConfigResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read download_client_config: "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "read "+downloadClientConfigResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Map response body to resource schema attribute
 	result := writeDownloadClientConfig(response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
@@ -157,12 +160,12 @@ func (r *DownloadClientConfigResource) Update(ctx context.Context, req resource.
 	// Update DownloadClientConfig
 	response, err := r.client.UpdateDownloadClientConfigContext(ctx, data)
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to update downloadClientConfig, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", downloadClientConfigResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "updated download_client_config: "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "updated "+downloadClientConfigResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
 	result := writeDownloadClientConfig(response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
@@ -170,13 +173,13 @@ func (r *DownloadClientConfigResource) Update(ctx context.Context, req resource.
 
 func (r *DownloadClientConfigResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	// DownloadClientConfig cannot be really deleted just removing configuration
-	tflog.Trace(ctx, "decoupled download_client_config: 1")
+	tflog.Trace(ctx, "decoupled "+downloadClientConfigResourceName+": 1")
 	resp.State.RemoveResource(ctx)
 }
 
 func (r *DownloadClientConfigResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	// resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
-	tflog.Trace(ctx, "imported download_client_config: 1")
+	tflog.Trace(ctx, "imported "+downloadClientConfigResourceName+": 1")
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), 1)...)
 }
 

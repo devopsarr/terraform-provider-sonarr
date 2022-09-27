@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
@@ -11,6 +12,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr/sonarr"
 )
+
+const indexerConfigDataSourceName = "indexer_config"
 
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ datasource.DataSource = &IndexerConfigDataSource{}
@@ -25,7 +28,7 @@ type IndexerConfigDataSource struct {
 }
 
 func (d *IndexerConfigDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_indexer_config"
+	resp.TypeName = req.ProviderTypeName + "_" + indexerConfigDataSourceName
 }
 
 func (d *IndexerConfigDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
@@ -71,7 +74,7 @@ func (d *IndexerConfigDataSource) Configure(ctx context.Context, req datasource.
 	client, ok := req.ProviderData.(*sonarr.Sonarr)
 	if !ok {
 		resp.Diagnostics.AddError(
-			UnexpectedDataSourceConfigureType,
+			helpers.UnexpectedDataSourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -85,12 +88,12 @@ func (d *IndexerConfigDataSource) Read(ctx context.Context, req datasource.ReadR
 	// Get indexer config current value
 	response, err := d.client.GetIndexerConfigContext(ctx)
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read indexer cofig, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", downloadClientsDataSourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read indexer_config")
+	tflog.Trace(ctx, "read "+downloadClientsDataSourceName)
 
 	result := writeIndexerConfig(response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)

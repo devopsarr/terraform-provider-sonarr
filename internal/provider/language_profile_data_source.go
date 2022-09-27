@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
@@ -11,6 +12,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr/sonarr"
 )
+
+const languageProfileDataSourceName = "language_profile"
 
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ datasource.DataSource = &LanguageProfileDataSource{}
@@ -25,7 +28,7 @@ type LanguageProfileDataSource struct {
 }
 
 func (d *LanguageProfileDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_language_profile"
+	resp.TypeName = req.ProviderTypeName + "_" + languageProfileDataSourceName
 }
 
 func (d *LanguageProfileDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
@@ -71,7 +74,7 @@ func (d *LanguageProfileDataSource) Configure(ctx context.Context, req datasourc
 	client, ok := req.ProviderData.(*sonarr.Sonarr)
 	if !ok {
 		resp.Diagnostics.AddError(
-			UnexpectedDataSourceConfigureType,
+			helpers.UnexpectedDataSourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -92,19 +95,19 @@ func (d *LanguageProfileDataSource) Read(ctx context.Context, req datasource.Rea
 	// Get languageprofiles current value
 	response, err := d.client.GetLanguageProfilesContext(ctx)
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read languageprofiles, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", languageProfileDataSourceName, err))
 
 		return
 	}
 
 	profile, err := findLanguageProfile(data.Name.Value, response)
 	if err != nil {
-		resp.Diagnostics.AddError(DataSourceError, fmt.Sprintf("Unable to find languageprofile, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", languageProfileDataSourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read language_profile")
+	tflog.Trace(ctx, "read "+languageProfileDataSourceName)
 	result := writeLanguageProfile(ctx, profile)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
 }
@@ -116,5 +119,5 @@ func findLanguageProfile(name string, profiles []*sonarr.LanguageProfile) (*sona
 		}
 	}
 
-	return nil, fmt.Errorf("no language profile with name %s", name)
+	return nil, helpers.ErrDataNotFoundError(languageProfileDataSourceName, "name", name)
 }

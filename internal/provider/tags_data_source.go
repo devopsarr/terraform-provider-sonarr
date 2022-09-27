@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
@@ -13,6 +14,8 @@ import (
 	"golift.io/starr"
 	"golift.io/starr/sonarr"
 )
+
+const tagsDataSourceName = "tags"
 
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ datasource.DataSource = &TagsDataSource{}
@@ -28,13 +31,12 @@ type TagsDataSource struct {
 
 // Tags describes the tags data model.
 type Tags struct {
-	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
-	ID   types.String `tfsdk:"id"`
 	Tags types.Set    `tfsdk:"tags"`
+	ID   types.String `tfsdk:"id"`
 }
 
 func (d *TagsDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_tags"
+	resp.TypeName = req.ProviderTypeName + "_" + tagsDataSourceName
 }
 
 func (d *TagsDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
@@ -76,7 +78,7 @@ func (d *TagsDataSource) Configure(ctx context.Context, req datasource.Configure
 	client, ok := req.ProviderData.(*sonarr.Sonarr)
 	if !ok {
 		resp.Diagnostics.AddError(
-			UnexpectedDataSourceConfigureType,
+			helpers.UnexpectedDataSourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -98,12 +100,12 @@ func (d *TagsDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 	// Get tags current value
 	response, err := d.client.GetTagsContext(ctx)
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read tags, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", tagsDataSourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read tags")
+	tflog.Trace(ctx, "read "+tagsDataSourceName)
 	// Map response body to resource schema attribute
 	tags := *writeTags(response)
 	tfsdk.ValueFrom(ctx, tags, data.Tags.Type(context.Background()), &data.Tags)

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
@@ -11,6 +12,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr/sonarr"
 )
+
+const indexerDataSourceName = "indexer"
 
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ datasource.DataSource = &IndexerDataSource{}
@@ -25,7 +28,7 @@ type IndexerDataSource struct {
 }
 
 func (d *IndexerDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_indexer"
+	resp.TypeName = req.ProviderTypeName + "_" + indexerDataSourceName
 }
 
 func (d *IndexerDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
@@ -198,7 +201,7 @@ func (d *IndexerDataSource) Configure(ctx context.Context, req datasource.Config
 	client, ok := req.ProviderData.(*sonarr.Sonarr)
 	if !ok {
 		resp.Diagnostics.AddError(
-			UnexpectedDataSourceConfigureType,
+			helpers.UnexpectedDataSourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -219,19 +222,19 @@ func (d *IndexerDataSource) Read(ctx context.Context, req datasource.ReadRequest
 	// Get indexer current value
 	response, err := d.client.GetIndexersContext(ctx)
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read indexer, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerDataSourceName, err))
 
 		return
 	}
 
 	indexer, err := findIndexer(data.Name.Value, response)
 	if err != nil {
-		resp.Diagnostics.AddError(DataSourceError, fmt.Sprintf("Unable to find indexer, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", indexerDataSourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read indexer")
+	tflog.Trace(ctx, "read "+indexerDataSourceName)
 	result := writeIndexer(ctx, indexer)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
 }
@@ -243,5 +246,5 @@ func findIndexer(name string, indexers []*sonarr.IndexerOutput) (*sonarr.Indexer
 		}
 	}
 
-	return nil, fmt.Errorf("no indexer with name %s", name)
+	return nil, helpers.ErrDataNotFoundError(indexerDataSourceName, "name", name)
 }

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
@@ -12,6 +13,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr/sonarr"
 )
+
+const languageProfilesDataSourceName = "language_profiles"
 
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ datasource.DataSource = &LanguageProfilesDataSource{}
@@ -27,13 +30,12 @@ type LanguageProfilesDataSource struct {
 
 // LanguageProfiles is a list of Languag profile.
 type LanguageProfiles struct {
-	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
-	ID               types.String `tfsdk:"id"`
 	LanguageProfiles types.Set    `tfsdk:"language_profiles"`
+	ID               types.String `tfsdk:"id"`
 }
 
 func (d *LanguageProfilesDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_language_profiles"
+	resp.TypeName = req.ProviderTypeName + "_" + languageProfilesDataSourceName
 }
 
 func (d *LanguageProfilesDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
@@ -90,7 +92,7 @@ func (d *LanguageProfilesDataSource) Configure(ctx context.Context, req datasour
 	client, ok := req.ProviderData.(*sonarr.Sonarr)
 	if !ok {
 		resp.Diagnostics.AddError(
-			UnexpectedDataSourceConfigureType,
+			helpers.UnexpectedDataSourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -111,12 +113,12 @@ func (d *LanguageProfilesDataSource) Read(ctx context.Context, req datasource.Re
 	// Get languageprofiles current value
 	response, err := d.client.GetLanguageProfilesContext(ctx)
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read languageprofiles, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", languageProfilesDataSourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read language_profiles")
+	tflog.Trace(ctx, "read "+languageProfilesDataSourceName)
 	// Map response body to resource schema attribute
 	profiles := *writeLanguageprofiles(ctx, response)
 	tfsdk.ValueFrom(ctx, profiles, data.LanguageProfiles.Type(context.Background()), &data.LanguageProfiles)

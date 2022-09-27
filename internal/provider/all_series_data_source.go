@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
@@ -12,6 +13,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr/sonarr"
 )
+
+const allSeriesDataSourceName = "all_series"
 
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ datasource.DataSource = &AllSeriessDataSource{}
@@ -27,13 +30,12 @@ type AllSeriessDataSource struct {
 
 // AllSeriess describes the series(es) data model.
 type SeriesList struct {
-	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
-	ID     types.String `tfsdk:"id"`
 	Series types.Set    `tfsdk:"series"`
+	ID     types.String `tfsdk:"id"`
 }
 
 func (d *AllSeriessDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_all_series"
+	resp.TypeName = req.ProviderTypeName + "_" + allSeriesDataSourceName
 }
 
 func (d *AllSeriessDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
@@ -127,7 +129,7 @@ func (d *AllSeriessDataSource) Configure(ctx context.Context, req datasource.Con
 	client, ok := req.ProviderData.(*sonarr.Sonarr)
 	if !ok {
 		resp.Diagnostics.AddError(
-			UnexpectedDataSourceConfigureType,
+			helpers.UnexpectedDataSourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -148,12 +150,12 @@ func (d *AllSeriessDataSource) Read(ctx context.Context, req datasource.ReadRequ
 	// Get series current value
 	response, err := d.client.GetAllSeriesContext(ctx)
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read series, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", allSeriesDataSourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read series")
+	tflog.Trace(ctx, "read "+allSeriesDataSourceName)
 	// Map response body to resource schema attribute
 	series := *writeSeriesList(ctx, response)
 	tfsdk.ValueFrom(ctx, series, data.Series.Type(context.Background()), &data.Series)

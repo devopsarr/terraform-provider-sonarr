@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
@@ -11,6 +12,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr/sonarr"
 )
+
+const rootFolderDataSourceName = "root_folder"
 
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ datasource.DataSource = &RootFolderDataSource{}
@@ -25,7 +28,7 @@ type RootFolderDataSource struct {
 }
 
 func (d *RootFolderDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_root_folder"
+	resp.TypeName = req.ProviderTypeName + "_" + rootFolderDataSourceName
 }
 
 func (d *RootFolderDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
@@ -77,7 +80,7 @@ func (d *RootFolderDataSource) Configure(ctx context.Context, req datasource.Con
 	client, ok := req.ProviderData.(*sonarr.Sonarr)
 	if !ok {
 		resp.Diagnostics.AddError(
-			UnexpectedDataSourceConfigureType,
+			helpers.UnexpectedDataSourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -98,7 +101,7 @@ func (d *RootFolderDataSource) Read(ctx context.Context, req datasource.ReadRequ
 	// Get rootfolders current value
 	response, err := d.client.GetRootFoldersContext(ctx)
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read root folders, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", rootFolderDataSourceName, err))
 
 		return
 	}
@@ -106,12 +109,12 @@ func (d *RootFolderDataSource) Read(ctx context.Context, req datasource.ReadRequ
 	// Map response body to resource schema attribute
 	rootFolder, err := findRootFolder(data.Path.Value, response)
 	if err != nil {
-		resp.Diagnostics.AddError(DataSourceError, fmt.Sprintf("Unable to find root folders, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", rootFolderDataSourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read root_folder")
+	tflog.Trace(ctx, "read "+rootFolderDataSourceName)
 	result := writeRootFolder(ctx, rootFolder)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
 }
@@ -123,5 +126,5 @@ func findRootFolder(path string, folders []*sonarr.RootFolder) (*sonarr.RootFold
 		}
 	}
 
-	return nil, fmt.Errorf("no rootfolder with path %s", path)
+	return nil, helpers.ErrDataNotFoundError(rootFolderDataSourceName, "path", path)
 }

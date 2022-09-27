@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -14,6 +15,8 @@ import (
 	"golift.io/starr"
 	"golift.io/starr/sonarr"
 )
+
+const qualityProfileResourceName = "quality_profile"
 
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ resource.Resource = &QualityProfileResource{}
@@ -30,30 +33,30 @@ type QualityProfileResource struct {
 
 // QualityProfile describes the quality profile data model.
 type QualityProfile struct {
-	UpgradeAllowed types.Bool   `tfsdk:"upgrade_allowed"`
+	QualityGroups  types.Set    `tfsdk:"quality_groups"`
+	Name           types.String `tfsdk:"name"`
 	ID             types.Int64  `tfsdk:"id"`
 	Cutoff         types.Int64  `tfsdk:"cutoff"`
-	Name           types.String `tfsdk:"name"`
-	QualityGroups  types.Set    `tfsdk:"quality_groups"`
+	UpgradeAllowed types.Bool   `tfsdk:"upgrade_allowed"`
 }
 
 // QualityGroup is part of QualityProfile.
 type QualityGroup struct {
-	ID        types.Int64  `tfsdk:"id"`
-	Name      types.String `tfsdk:"name"`
 	Qualities types.Set    `tfsdk:"qualities"`
+	Name      types.String `tfsdk:"name"`
+	ID        types.Int64  `tfsdk:"id"`
 }
 
 // Quality is part of QualityGroup.
 type Quality struct {
-	ID         types.Int64  `tfsdk:"id"`
-	Resolution types.Int64  `tfsdk:"resolution"`
 	Name       types.String `tfsdk:"name"`
 	Source     types.String `tfsdk:"source"`
+	ID         types.Int64  `tfsdk:"id"`
+	Resolution types.Int64  `tfsdk:"resolution"`
 }
 
 func (r *QualityProfileResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_quality_profile"
+	resp.TypeName = req.ProviderTypeName + "_" + qualityProfileResourceName
 }
 
 func (r *QualityProfileResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
@@ -158,7 +161,7 @@ func (r *QualityProfileResource) Configure(ctx context.Context, req resource.Con
 	client, ok := req.ProviderData.(*sonarr.Sonarr)
 	if !ok {
 		resp.Diagnostics.AddError(
-			UnexpectedResourceConfigureType,
+			helpers.UnexpectedResourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -184,12 +187,12 @@ func (r *QualityProfileResource) Create(ctx context.Context, req resource.Create
 	// Create new QualityProfile
 	response, err := r.client.AddQualityProfileContext(ctx, data)
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to create qualityprofile, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", qualityProfileResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "created quality_profile: "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "created "+qualityProfileResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
 	result := writeQualityProfile(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
@@ -208,12 +211,12 @@ func (r *QualityProfileResource) Read(ctx context.Context, req resource.ReadRequ
 	// Get qualityprofile current value
 	response, err := r.client.GetQualityProfileContext(ctx, int(state.ID.Value))
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read qualityprofiles, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", qualityProfileResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read quality_profile: "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "read "+qualityProfileResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Map response body to resource schema attribute
 	result := writeQualityProfile(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
@@ -235,12 +238,12 @@ func (r *QualityProfileResource) Update(ctx context.Context, req resource.Update
 	// Update QualityProfile
 	response, err := r.client.UpdateQualityProfileContext(ctx, data)
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to update qualityprofile, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", qualityProfileResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "updated quality_profile: "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "updated "+qualityProfileResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
 	result := writeQualityProfile(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
@@ -258,12 +261,12 @@ func (r *QualityProfileResource) Delete(ctx context.Context, req resource.Delete
 	// Delete qualityprofile current value
 	err := r.client.DeleteQualityProfileContext(ctx, int(state.ID.Value))
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read qualityprofiles, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", qualityProfileResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted quality_profile: "+strconv.Itoa(int(state.ID.Value)))
+	tflog.Trace(ctx, "deleted "+qualityProfileResourceName+": "+strconv.Itoa(int(state.ID.Value)))
 	resp.State.RemoveResource(ctx)
 }
 
@@ -272,14 +275,14 @@ func (r *QualityProfileResource) ImportState(ctx context.Context, req resource.I
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			UnexpectedImportIdentifier,
+			helpers.UnexpectedImportIdentifier,
 			fmt.Sprintf("Expected import identifier with format: ID. Got: %q", req.ID),
 		)
 
 		return
 	}
 
-	tflog.Trace(ctx, "imported quality_profile: "+strconv.Itoa(id))
+	tflog.Trace(ctx, "imported "+qualityProfileResourceName+": "+strconv.Itoa(id))
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 

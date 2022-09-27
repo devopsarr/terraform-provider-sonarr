@@ -520,6 +520,9 @@ func writeDownloadClient(ctx context.Context, downloadClient *sonarr.DownloadCli
 		Name:                     types.String{Value: downloadClient.Name},
 		Protocol:                 types.String{Value: downloadClient.Protocol},
 		Tags:                     types.Set{ElemType: types.Int64Type},
+		AdditionalTags:           types.Set{ElemType: types.Int64Type},
+		FieldTags:                types.Set{ElemType: types.StringType},
+		PostImTags:               types.Set{ElemType: types.StringType},
 	}
 	tfsdk.ValueFrom(ctx, downloadClient.Tags, output.Tags.Type(ctx), &output.Tags)
 

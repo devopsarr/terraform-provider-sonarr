@@ -15,6 +15,8 @@ import (
 	"golift.io/starr/sonarr"
 )
 
+const mediaManagementResourceName = "media_management"
+
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ resource.Resource = &MediaManagementResource{}
 var _ resource.ResourceWithImportState = &MediaManagementResource{}
@@ -30,29 +32,29 @@ type MediaManagementResource struct {
 
 // MediaManagement describes the media management data model.
 type MediaManagement struct {
-	UnmonitorPreviousEpisodes types.Bool   `tfsdk:"unmonitor_previous_episodes"`
-	HardlinksCopy             types.Bool   `tfsdk:"hardlinks_copy"`
-	CreateEmptyFolders        types.Bool   `tfsdk:"create_empty_folders"`
-	DeleteEmptyFolders        types.Bool   `tfsdk:"delete_empty_folders"`
-	EnableMediaInfo           types.Bool   `tfsdk:"enable_media_info"`
-	ImportExtraFiles          types.Bool   `tfsdk:"import_extra_files"`
-	SetPermissions            types.Bool   `tfsdk:"set_permissions"`
-	SkipFreeSpaceCheck        types.Bool   `tfsdk:"skip_free_space_check"`
+	ChmodFolder               types.String `tfsdk:"chmod_folder"`
+	RescanAfterRefresh        types.String `tfsdk:"rescan_after_refresh"`
+	RecycleBinPath            types.String `tfsdk:"recycle_bin_path"`
+	FileDate                  types.String `tfsdk:"file_date"`
+	ExtraFileExtensions       types.String `tfsdk:"extra_file_extensions"`
+	EpisodeTitleRequired      types.String `tfsdk:"episode_title_required"`
+	DownloadPropersRepacks    types.String `tfsdk:"download_propers_repacks"`
+	ChownGroup                types.String `tfsdk:"chown_group"`
 	ID                        types.Int64  `tfsdk:"id"`
 	MinimumFreeSpace          types.Int64  `tfsdk:"minimum_free_space"`
 	RecycleBinDays            types.Int64  `tfsdk:"recycle_bin_days"`
-	ChmodFolder               types.String `tfsdk:"chmod_folder"`
-	ChownGroup                types.String `tfsdk:"chown_group"`
-	DownloadPropersRepacks    types.String `tfsdk:"download_propers_repacks"`
-	EpisodeTitleRequired      types.String `tfsdk:"episode_title_required"`
-	ExtraFileExtensions       types.String `tfsdk:"extra_file_extensions"`
-	FileDate                  types.String `tfsdk:"file_date"`
-	RecycleBinPath            types.String `tfsdk:"recycle_bin_path"`
-	RescanAfterRefresh        types.String `tfsdk:"rescan_after_refresh"`
+	UnmonitorPreviousEpisodes types.Bool   `tfsdk:"unmonitor_previous_episodes"`
+	SkipFreeSpaceCheck        types.Bool   `tfsdk:"skip_free_space_check"`
+	SetPermissions            types.Bool   `tfsdk:"set_permissions"`
+	ImportExtraFiles          types.Bool   `tfsdk:"import_extra_files"`
+	EnableMediaInfo           types.Bool   `tfsdk:"enable_media_info"`
+	DeleteEmptyFolders        types.Bool   `tfsdk:"delete_empty_folders"`
+	CreateEmptyFolders        types.Bool   `tfsdk:"create_empty_folders"`
+	HardlinksCopy             types.Bool   `tfsdk:"hardlinks_copy"`
 }
 
 func (r *MediaManagementResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_media_management"
+	resp.TypeName = req.ProviderTypeName + "_" + mediaManagementResourceName
 }
 
 func (r *MediaManagementResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
@@ -182,7 +184,7 @@ func (r *MediaManagementResource) Configure(ctx context.Context, req resource.Co
 	client, ok := req.ProviderData.(*sonarr.Sonarr)
 	if !ok {
 		resp.Diagnostics.AddError(
-			UnexpectedResourceConfigureType,
+			helpers.UnexpectedResourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -209,7 +211,7 @@ func (r *MediaManagementResource) Create(ctx context.Context, req resource.Creat
 	// Create new MediaManagement
 	response, err := r.client.UpdateMediaManagementContext(ctx, data)
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to create mediamanagement, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to create mediamanagement, got error: %s", err))
 
 		return
 	}
@@ -233,12 +235,12 @@ func (r *MediaManagementResource) Read(ctx context.Context, req resource.ReadReq
 	// Get mediamanagement current value
 	response, err := r.client.GetMediaManagementContext(ctx)
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read mediamanagements, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", mediaManagementResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read media_management: "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "read "+mediaManagementResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Map response body to resource schema attribute
 	result := writeMediaManagement(response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
@@ -260,12 +262,12 @@ func (r *MediaManagementResource) Update(ctx context.Context, req resource.Updat
 	// Update MediaManagement
 	response, err := r.client.UpdateMediaManagementContext(ctx, data)
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to update mediamanagement, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", mediaManagementResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "updated media_management: "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "updated "+mediaManagementResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
 	result := writeMediaManagement(response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
@@ -273,13 +275,13 @@ func (r *MediaManagementResource) Update(ctx context.Context, req resource.Updat
 
 func (r *MediaManagementResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
 	// Mediamanagement cannot be really deleted just removing configuration
-	tflog.Trace(ctx, "decoupled media_management: 1")
+	tflog.Trace(ctx, "decoupled "+mediaManagementResourceName+": 1")
 	resp.State.RemoveResource(ctx)
 }
 
 func (r *MediaManagementResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	// resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
-	tflog.Trace(ctx, "imported media_management: 1")
+	tflog.Trace(ctx, "imported "+mediaManagementResourceName+": 1")
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), 1)...)
 }
 

@@ -413,7 +413,7 @@ func writeIndexer(ctx context.Context, indexer *sonarr.IndexerOutput) *Indexer {
 		Protocol:                types.String{Value: indexer.Protocol},
 		Tags:                    types.Set{ElemType: types.Int64Type},
 		AnimeCategories:         types.Set{ElemType: types.Int64Type},
-		// Categories:              types.Set{ElemType: types.Int64Type},
+		Categories:              types.Set{ElemType: types.Int64Type},
 	}
 	tfsdk.ValueFrom(ctx, indexer.Tags, output.Tags.Type(ctx), &output.Tags)
 

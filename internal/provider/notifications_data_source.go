@@ -15,6 +15,8 @@ import (
 	"golift.io/starr/sonarr"
 )
 
+const notificationsDataSourceName = "notifications"
+
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ datasource.DataSource = &NotificationsDataSource{}
 
@@ -29,13 +31,12 @@ type NotificationsDataSource struct {
 
 // Notifications describes the notifications data model.
 type Notifications struct {
-	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
-	ID            types.String `tfsdk:"id"`
 	Notifications types.Set    `tfsdk:"notifications"`
+	ID            types.String `tfsdk:"id"`
 }
 
 func (d *NotificationsDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_notifications"
+	resp.TypeName = req.ProviderTypeName + "_" + notificationsDataSourceName
 }
 
 func (d *NotificationsDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
@@ -444,7 +445,7 @@ func (d *NotificationsDataSource) Configure(ctx context.Context, req datasource.
 	client, ok := req.ProviderData.(*sonarr.Sonarr)
 	if !ok {
 		resp.Diagnostics.AddError(
-			UnexpectedDataSourceConfigureType,
+			helpers.UnexpectedDataSourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -465,12 +466,12 @@ func (d *NotificationsDataSource) Read(ctx context.Context, req datasource.ReadR
 	// Get notifications current value
 	response, err := d.client.GetNotificationsContext(ctx)
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read notifications, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", notificationsDataSourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read notifications")
+	tflog.Trace(ctx, "read "+notificationsDataSourceName)
 	// Map response body to resource schema attribute
 	profiles := *writeNotifications(ctx, response)
 	tfsdk.ValueFrom(ctx, profiles, data.Notifications.Type(context.Background()), &data.Notifications)

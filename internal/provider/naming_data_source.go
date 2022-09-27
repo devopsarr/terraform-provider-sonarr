@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
@@ -11,6 +12,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr/sonarr"
 )
+
+const namingDataSourceName = "naming"
 
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ datasource.DataSource = &NamingDataSource{}
@@ -25,7 +28,7 @@ type NamingDataSource struct {
 }
 
 func (d *NamingDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_naming"
+	resp.TypeName = req.ProviderTypeName + "_" + namingDataSourceName
 }
 
 func (d *NamingDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
@@ -96,7 +99,7 @@ func (d *NamingDataSource) Configure(ctx context.Context, req datasource.Configu
 	client, ok := req.ProviderData.(*sonarr.Sonarr)
 	if !ok {
 		resp.Diagnostics.AddError(
-			UnexpectedDataSourceConfigureType,
+			helpers.UnexpectedDataSourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -110,12 +113,12 @@ func (d *NamingDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 	// Get naming current value
 	response, err := d.client.GetNamingContext(ctx)
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read naming, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", namingDataSourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read naming")
+	tflog.Trace(ctx, "read "+namingDataSourceName)
 
 	result := writeNaming(response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)

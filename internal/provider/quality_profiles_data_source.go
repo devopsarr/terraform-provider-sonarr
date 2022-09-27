@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
@@ -12,6 +13,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr/sonarr"
 )
+
+const qualityProfilesDataSourceName = "quality_profiles"
 
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ datasource.DataSource = &QualityProfilesDataSource{}
@@ -27,13 +30,12 @@ type QualityProfilesDataSource struct {
 
 // QualityProfiles describes the qyality profiles data model.
 type QualityProfiles struct {
-	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
-	ID              types.String `tfsdk:"id"`
 	QualityProfiles types.Set    `tfsdk:"quality_profiles"`
+	ID              types.String `tfsdk:"id"`
 }
 
 func (d *QualityProfilesDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_quality_profiles"
+	resp.TypeName = req.ProviderTypeName + "_" + qualityProfilesDataSourceName
 }
 
 func (d *QualityProfilesDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
@@ -127,7 +129,7 @@ func (d *QualityProfilesDataSource) Configure(ctx context.Context, req datasourc
 	client, ok := req.ProviderData.(*sonarr.Sonarr)
 	if !ok {
 		resp.Diagnostics.AddError(
-			UnexpectedDataSourceConfigureType,
+			helpers.UnexpectedDataSourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -148,12 +150,12 @@ func (d *QualityProfilesDataSource) Read(ctx context.Context, req datasource.Rea
 	// Get qualityprofiles current value
 	response, err := d.client.GetQualityProfilesContext(ctx)
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read qualityprofiles, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", qualityProfilesDataSourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read quality_profiles")
+	tflog.Trace(ctx, "read "+qualityProfilesDataSourceName)
 	// Map response body to resource schema attribute
 	profiles := *writeQualitiyprofiles(ctx, response)
 	tfsdk.ValueFrom(ctx, profiles, data.QualityProfiles.Type(context.Background()), &data.QualityProfiles)

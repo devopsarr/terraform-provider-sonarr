@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
@@ -11,6 +12,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr/sonarr"
 )
+
+const seriesDataSourceName = "series"
 
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ datasource.DataSource = &SeriesDataSource{}
@@ -25,7 +28,7 @@ type SeriesDataSource struct {
 }
 
 func (d *SeriesDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_series"
+	resp.TypeName = req.ProviderTypeName + "_" + seriesDataSourceName
 }
 
 func (d *SeriesDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
@@ -108,7 +111,7 @@ func (d *SeriesDataSource) Configure(ctx context.Context, req datasource.Configu
 	client, ok := req.ProviderData.(*sonarr.Sonarr)
 	if !ok {
 		resp.Diagnostics.AddError(
-			UnexpectedDataSourceConfigureType,
+			helpers.UnexpectedDataSourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -129,19 +132,19 @@ func (d *SeriesDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 	// Get series current value
 	response, err := d.client.GetAllSeriesContext(ctx)
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read series, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", seriesDataSourceName, err))
 
 		return
 	}
 
 	series, err := findSeries(data.Title.Value, response)
 	if err != nil {
-		resp.Diagnostics.AddError(DataSourceError, fmt.Sprintf("Unable to find series, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", seriesDataSourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read series")
+	tflog.Trace(ctx, "read "+seriesDataSourceName)
 	result := writeSeries(ctx, series)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
 }
@@ -153,5 +156,5 @@ func findSeries(title string, series []*sonarr.Series) (*sonarr.Series, error) {
 		}
 	}
 
-	return nil, fmt.Errorf("no series with title %s", title)
+	return nil, helpers.ErrDataNotFoundError(seriesDataSourceName, "title", title)
 }
