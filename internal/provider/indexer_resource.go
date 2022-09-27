@@ -12,13 +12,24 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
+	"golang.org/x/exp/slices"
 	"golift.io/starr"
 	"golift.io/starr/sonarr"
 )
 
+const indexerResourceName = "indexer"
+
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ resource.Resource = &IndexerResource{}
 var _ resource.ResourceWithImportState = &IndexerResource{}
+
+var (
+	indexerIntSliceFields = []string{"categories", "animeCategories"}
+	indexerBoolFields     = []string{"allowZeroSize", "animeStandardFormatSearch", "rankedOnly"}
+	indexerIntFields      = []string{"delay", "minimumSeeders", "seasonPackSeedTime", "seedTime"}
+	indexerStringFields   = []string{"additionalParameters", "apiKey", "apiPath", "baseUrl", "captchaToken", "cookie", "passkey", "username"}
+	indexerFloatFields    = []string{"seedRatio"}
+)
 
 func NewIndexerResource() resource.Resource {
 	return &IndexerResource{}
@@ -31,40 +42,39 @@ type IndexerResource struct {
 
 // Indexer describes the indexer data model.
 type Indexer struct {
-	EnableAutomaticSearch   types.Bool   `tfsdk:"enable_automatic_search"`
-	EnableInteractiveSearch types.Bool   `tfsdk:"enable_interactive_search"`
-	EnableRss               types.Bool   `tfsdk:"enable_rss"`
-	Priority                types.Int64  `tfsdk:"priority"`
-	DownloadClientID        types.Int64  `tfsdk:"download_client_id"`
-	ID                      types.Int64  `tfsdk:"id"`
-	ConfigContract          types.String `tfsdk:"config_contract"`
-	Implementation          types.String `tfsdk:"implementation"`
-	Name                    types.String `tfsdk:"name"`
-	Protocol                types.String `tfsdk:"protocol"`
-	Tags                    types.Set    `tfsdk:"tags"`
-	// Fields values
-	AllowZeroSize             types.Bool    `tfsdk:"allow_zero_size"`
-	AnimeStandardFormatSearch types.Bool    `tfsdk:"anime_standard_format_search"`
-	RankedOnly                types.Bool    `tfsdk:"ranked_only"`
-	Delay                     types.Int64   `tfsdk:"delay"`
-	MinimumSeeders            types.Int64   `tfsdk:"minimum_seeders"`
-	SeasonPackSeedTime        types.Int64   `tfsdk:"season_pack_seed_time"`
+	Tags                      types.Set     `tfsdk:"tags"`
+	Categories                types.Set     `tfsdk:"categories"`
+	AnimeCategories           types.Set     `tfsdk:"anime_categories"`
+	APIPath                   types.String  `tfsdk:"api_path"`
+	AdditionalParameters      types.String  `tfsdk:"additional_parameters"`
+	Username                  types.String  `tfsdk:"username"`
+	ConfigContract            types.String  `tfsdk:"config_contract"`
+	Implementation            types.String  `tfsdk:"implementation"`
+	Name                      types.String  `tfsdk:"name"`
+	Protocol                  types.String  `tfsdk:"protocol"`
+	Passkey                   types.String  `tfsdk:"passkey"`
+	Cookie                    types.String  `tfsdk:"cookie"`
+	CaptchaToken              types.String  `tfsdk:"captcha_token"`
+	BaseURL                   types.String  `tfsdk:"base_url"`
+	APIKey                    types.String  `tfsdk:"api_key"`
+	Priority                  types.Int64   `tfsdk:"priority"`
+	DownloadClientID          types.Int64   `tfsdk:"download_client_id"`
 	SeedTime                  types.Int64   `tfsdk:"seed_time"`
 	SeedRatio                 types.Float64 `tfsdk:"seed_ratio"`
-	AdditionalParameters      types.String  `tfsdk:"additional_parameters"`
-	APIKey                    types.String  `tfsdk:"api_key"`
-	APIPath                   types.String  `tfsdk:"api_path"`
-	BaseURL                   types.String  `tfsdk:"base_url"`
-	CaptchaToken              types.String  `tfsdk:"captcha_token"`
-	Cookie                    types.String  `tfsdk:"cookie"`
-	Passkey                   types.String  `tfsdk:"passkey"`
-	Username                  types.String  `tfsdk:"username"`
-	AnimeCategories           types.Set     `tfsdk:"anime_categories"`
-	Categories                types.Set     `tfsdk:"categories"`
+	MinimumSeeders            types.Int64   `tfsdk:"minimum_seeders"`
+	Delay                     types.Int64   `tfsdk:"delay"`
+	ID                        types.Int64   `tfsdk:"id"`
+	SeasonPackSeedTime        types.Int64   `tfsdk:"season_pack_seed_time"`
+	AnimeStandardFormatSearch types.Bool    `tfsdk:"anime_standard_format_search"`
+	AllowZeroSize             types.Bool    `tfsdk:"allow_zero_size"`
+	RankedOnly                types.Bool    `tfsdk:"ranked_only"`
+	EnableAutomaticSearch     types.Bool    `tfsdk:"enable_automatic_search"`
+	EnableRss                 types.Bool    `tfsdk:"enable_rss"`
+	EnableInteractiveSearch   types.Bool    `tfsdk:"enable_interactive_search"`
 }
 
 func (r *IndexerResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_indexer"
+	resp.TypeName = req.ProviderTypeName + "_" + indexerResourceName
 }
 
 func (r *IndexerResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
@@ -266,7 +276,7 @@ func (r *IndexerResource) Configure(ctx context.Context, req resource.ConfigureR
 	client, ok := req.ProviderData.(*sonarr.Sonarr)
 	if !ok {
 		resp.Diagnostics.AddError(
-			UnexpectedResourceConfigureType,
+			helpers.UnexpectedResourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -291,12 +301,12 @@ func (r *IndexerResource) Create(ctx context.Context, req resource.CreateRequest
 
 	response, err := r.client.AddIndexerContext(ctx, request)
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to create Indexer, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", indexerResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "created indexer: "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "created "+indexerResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
 	result := writeIndexer(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
@@ -315,12 +325,12 @@ func (r *IndexerResource) Read(ctx context.Context, req resource.ReadRequest, re
 	// Get Indexer current value
 	response, err := r.client.GetIndexerContext(ctx, int(state.ID.Value))
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read Indexers, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read indexer: "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "read "+indexerResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Map response body to resource schema attribute
 	result := writeIndexer(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
@@ -341,12 +351,12 @@ func (r *IndexerResource) Update(ctx context.Context, req resource.UpdateRequest
 
 	response, err := r.client.UpdateIndexerContext(ctx, request)
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to update Indexer, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", indexerResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "updated indexer: "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "updated "+indexerResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
 	result := writeIndexer(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
@@ -364,12 +374,12 @@ func (r *IndexerResource) Delete(ctx context.Context, req resource.DeleteRequest
 	// Delete Indexer current value
 	err := r.client.DeleteIndexerContext(ctx, int(state.ID.Value))
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read Indexers, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted indexer: "+strconv.Itoa(int(state.ID.Value)))
+	tflog.Trace(ctx, "deleted "+indexerResourceName+": "+strconv.Itoa(int(state.ID.Value)))
 	resp.State.RemoveResource(ctx)
 }
 
@@ -378,14 +388,14 @@ func (r *IndexerResource) ImportState(ctx context.Context, req resource.ImportSt
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			UnexpectedImportIdentifier,
+			helpers.UnexpectedImportIdentifier,
 			fmt.Sprintf("Expected import identifier with format: ID. Got: %q", req.ID),
 		)
 
 		return
 	}
 
-	tflog.Trace(ctx, "imported indexer: "+strconv.Itoa(id))
+	tflog.Trace(ctx, "imported "+indexerResourceName+": "+strconv.Itoa(id))
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 
@@ -403,52 +413,41 @@ func writeIndexer(ctx context.Context, indexer *sonarr.IndexerOutput) *Indexer {
 		Protocol:                types.String{Value: indexer.Protocol},
 		Tags:                    types.Set{ElemType: types.Int64Type},
 		AnimeCategories:         types.Set{ElemType: types.Int64Type},
-		Categories:              types.Set{ElemType: types.Int64Type},
+		// Categories:              types.Set{ElemType: types.Int64Type},
 	}
 	tfsdk.ValueFrom(ctx, indexer.Tags, output.Tags.Type(ctx), &output.Tags)
 
 	for _, f := range indexer.Fields {
-		if f.Value != nil {
-			switch f.Name {
-			case "allowZeroSize":
-				output.AllowZeroSize = types.Bool{Value: f.Value.(bool)}
-			case "animeStandardFormatSearch":
-				output.AnimeStandardFormatSearch = types.Bool{Value: f.Value.(bool)}
-			case "rankedOnly":
-				output.RankedOnly = types.Bool{Value: f.Value.(bool)}
-			case "delay":
-				output.Delay = types.Int64{Value: int64(f.Value.(float64))}
-			case "minimumSeeders":
-				output.MinimumSeeders = types.Int64{Value: int64(f.Value.(float64))}
-			case "seasonPackSeedTime":
-				output.SeasonPackSeedTime = types.Int64{Value: int64(f.Value.(float64))}
-			case "seedTime":
-				output.SeedTime = types.Int64{Value: int64(f.Value.(float64))}
-			case "seedRatio":
-				output.SeedRatio = types.Float64{Value: f.Value.(float64)}
-			case "additionalParameters":
-				output.AdditionalParameters = types.String{Value: f.Value.(string)}
-			case "apiKey":
-				output.APIKey = types.String{Value: f.Value.(string)}
-			case "apiPath":
-				output.APIPath = types.String{Value: f.Value.(string)}
-			case "baseUrl":
-				output.BaseURL = types.String{Value: f.Value.(string)}
-			case "captchaToken":
-				output.CaptchaToken = types.String{Value: f.Value.(string)}
-			case "cookie":
-				output.Cookie = types.String{Value: f.Value.(string)}
-			case "passkey":
-				output.Passkey = types.String{Value: f.Value.(string)}
-			case "username":
-				output.Username = types.String{Value: f.Value.(string)}
-			case "animeCategories":
-				tfsdk.ValueFrom(ctx, f.Value, output.AnimeCategories.Type(ctx), &output.AnimeCategories)
-			case "categories":
-				tfsdk.ValueFrom(ctx, f.Value, output.Categories.Type(ctx), &output.Categories)
-			// TODO: manage unknown values
-			default:
-			}
+		if f.Value == nil {
+			continue
+		}
+
+		if slices.Contains(indexerStringFields, f.Name) {
+			helpers.WriteStringField(f, &output)
+
+			continue
+		}
+
+		if slices.Contains(indexerBoolFields, f.Name) {
+			helpers.WriteBoolField(f, &output)
+
+			continue
+		}
+
+		if slices.Contains(indexerIntFields, f.Name) {
+			helpers.WriteIntField(f, &output)
+
+			continue
+		}
+
+		if slices.Contains(indexerFloatFields, f.Name) {
+			helpers.WriteFloatField(f, &output)
+
+			continue
+		}
+
+		if slices.Contains(indexerIntSliceFields, f.Name) {
+			helpers.WriteIntSliceField(ctx, f, &output)
 		}
 	}
 
@@ -478,136 +477,35 @@ func readIndexer(ctx context.Context, indexer *Indexer) *sonarr.IndexerInput {
 
 func readIndexerFields(ctx context.Context, indexer *Indexer) []*starr.FieldInput {
 	var output []*starr.FieldInput
-	if !indexer.AllowZeroSize.IsNull() && !indexer.AllowZeroSize.IsUnknown() {
-		output = append(output, &starr.FieldInput{
-			Name:  "allowZeroSize",
-			Value: indexer.AllowZeroSize.Value,
-		})
+
+	for _, b := range indexerBoolFields {
+		if field := helpers.ReadBoolField(b, indexer); field != nil {
+			output = append(output, field)
+		}
 	}
 
-	if !indexer.AnimeStandardFormatSearch.IsNull() && !indexer.AnimeStandardFormatSearch.IsUnknown() {
-		output = append(output, &starr.FieldInput{
-			Name:  "animeStandardFormatSearch",
-			Value: indexer.AnimeStandardFormatSearch.Value,
-		})
+	for _, i := range indexerIntFields {
+		if field := helpers.ReadIntField(i, indexer); field != nil {
+			output = append(output, field)
+		}
 	}
 
-	if !indexer.RankedOnly.IsNull() && !indexer.RankedOnly.IsUnknown() {
-		output = append(output, &starr.FieldInput{
-			Name:  "rankedOnly",
-			Value: indexer.RankedOnly.Value,
-		})
+	for _, f := range indexerFloatFields {
+		if field := helpers.ReadFloatField(f, indexer); field != nil {
+			output = append(output, field)
+		}
 	}
 
-	if !indexer.Delay.IsNull() && !indexer.Delay.IsUnknown() {
-		output = append(output, &starr.FieldInput{
-			Name:  "delay",
-			Value: indexer.Delay.Value,
-		})
+	for _, s := range indexerStringFields {
+		if field := helpers.ReadStringField(s, indexer); field != nil {
+			output = append(output, field)
+		}
 	}
 
-	if !indexer.MinimumSeeders.IsNull() && !indexer.MinimumSeeders.IsUnknown() {
-		output = append(output, &starr.FieldInput{
-			Name:  "minimumSeeders",
-			Value: indexer.MinimumSeeders.Value,
-		})
-	}
-
-	if !indexer.SeasonPackSeedTime.IsNull() && !indexer.SeasonPackSeedTime.IsUnknown() {
-		output = append(output, &starr.FieldInput{
-			Name:  "seasonPackSeedTime",
-			Value: indexer.SeasonPackSeedTime.Value,
-		})
-	}
-
-	if !indexer.SeedTime.IsNull() && !indexer.SeedTime.IsUnknown() {
-		output = append(output, &starr.FieldInput{
-			Name:  "seedTime",
-			Value: indexer.SeedTime.Value,
-		})
-	}
-
-	if !indexer.SeedRatio.IsNull() && !indexer.SeedRatio.IsUnknown() {
-		output = append(output, &starr.FieldInput{
-			Name:  "seedRatio",
-			Value: indexer.SeedRatio.Value,
-		})
-	}
-
-	if !indexer.AdditionalParameters.IsNull() && !indexer.AdditionalParameters.IsUnknown() {
-		output = append(output, &starr.FieldInput{
-			Name:  "additionalParameters",
-			Value: indexer.AdditionalParameters.Value,
-		})
-	}
-
-	if !indexer.APIKey.IsNull() && !indexer.APIKey.IsUnknown() {
-		output = append(output, &starr.FieldInput{
-			Name:  "apiKey",
-			Value: indexer.APIKey.Value,
-		})
-	}
-
-	if !indexer.APIPath.IsNull() && !indexer.APIPath.IsUnknown() {
-		output = append(output, &starr.FieldInput{
-			Name:  "apiPath",
-			Value: indexer.APIPath.Value,
-		})
-	}
-
-	if !indexer.BaseURL.IsNull() && !indexer.BaseURL.IsUnknown() {
-		output = append(output, &starr.FieldInput{
-			Name:  "baseUrl",
-			Value: indexer.BaseURL.Value,
-		})
-	}
-
-	if !indexer.CaptchaToken.IsNull() && !indexer.CaptchaToken.IsUnknown() {
-		output = append(output, &starr.FieldInput{
-			Name:  "captchaToken",
-			Value: indexer.CaptchaToken.Value,
-		})
-	}
-
-	if !indexer.Cookie.IsNull() && !indexer.Cookie.IsUnknown() {
-		output = append(output, &starr.FieldInput{
-			Name:  "cookie",
-			Value: indexer.Cookie.Value,
-		})
-	}
-
-	if !indexer.Passkey.IsNull() && !indexer.Passkey.IsUnknown() {
-		output = append(output, &starr.FieldInput{
-			Name:  "passkey",
-			Value: indexer.Passkey.Value,
-		})
-	}
-
-	if !indexer.Username.IsNull() && !indexer.Username.IsUnknown() {
-		output = append(output, &starr.FieldInput{
-			Name:  "username",
-			Value: indexer.Username.Value,
-		})
-	}
-
-	if len(indexer.Categories.Elems) != 0 {
-		cat := make([]int64, len(indexer.Categories.Elems))
-		tfsdk.ValueAs(ctx, indexer.Categories, &cat)
-
-		output = append(output, &starr.FieldInput{
-			Name:  "categories",
-			Value: cat,
-		})
-	}
-
-	if len(indexer.AnimeCategories.Elems) != 0 {
-		cat := make([]int64, len(indexer.AnimeCategories.Elems))
-		tfsdk.ValueAs(ctx, indexer.AnimeCategories, &cat)
-
-		output = append(output, &starr.FieldInput{
-			Name:  "animeCategories",
-			Value: cat,
-		})
+	for _, s := range indexerIntSliceFields {
+		if field := helpers.ReadIntSliceField(ctx, s, indexer); field != nil {
+			output = append(output, field)
+		}
 	}
 
 	return output
