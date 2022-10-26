@@ -219,16 +219,16 @@ func (r *IndexerRarbgResource) Configure(ctx context.Context, req resource.Confi
 
 func (r *IndexerRarbgResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	// Retrieve values from plan
-	var plan IndexerRarbg
+	var indexer *IndexerRarbg
 
-	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &indexer)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Create new IndexerRarbg
-	request := readIndexerRarbg(ctx, &plan)
+	request := indexer.read(ctx)
 
 	response, err := r.client.AddIndexerContext(ctx, request)
 	if err != nil {
@@ -239,22 +239,22 @@ func (r *IndexerRarbgResource) Create(ctx context.Context, req resource.CreateRe
 
 	tflog.Trace(ctx, "created "+indexerRarbgResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
-	result := writeIndexerRarbg(ctx, response)
-	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
+	indexer.write(ctx, response)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &indexer)...)
 }
 
 func (r *IndexerRarbgResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	// Get current state
-	var state IndexerRarbg
+	var indexer *IndexerRarbg
 
-	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
+	resp.Diagnostics.Append(req.State.Get(ctx, &indexer)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Get IndexerRarbg current value
-	response, err := r.client.GetIndexerContext(ctx, int(state.ID.Value))
+	response, err := r.client.GetIndexerContext(ctx, int(indexer.ID.Value))
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerRarbgResourceName, err))
 
@@ -263,22 +263,22 @@ func (r *IndexerRarbgResource) Read(ctx context.Context, req resource.ReadReques
 
 	tflog.Trace(ctx, "read "+indexerRarbgResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Map response body to resource schema attribute
-	result := writeIndexerRarbg(ctx, response)
-	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
+	indexer.write(ctx, response)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &indexer)...)
 }
 
 func (r *IndexerRarbgResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	// Get plan values
-	var plan IndexerRarbg
+	var indexer IndexerRarbg
 
-	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &indexer)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Update IndexerRarbg
-	request := readIndexerRarbg(ctx, &plan)
+	request := indexer.read(ctx)
 
 	response, err := r.client.UpdateIndexerContext(ctx, request)
 	if err != nil {
@@ -289,28 +289,28 @@ func (r *IndexerRarbgResource) Update(ctx context.Context, req resource.UpdateRe
 
 	tflog.Trace(ctx, "updated "+indexerRarbgResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
-	result := writeIndexerRarbg(ctx, response)
-	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
+	indexer.write(ctx, response)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &indexer)...)
 }
 
 func (r *IndexerRarbgResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var state IndexerRarbg
+	var indexer *IndexerRarbg
 
-	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
+	resp.Diagnostics.Append(req.State.Get(ctx, &indexer)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Delete IndexerRarbg current value
-	err := r.client.DeleteIndexerContext(ctx, int(state.ID.Value))
+	err := r.client.DeleteIndexerContext(ctx, int(indexer.ID.Value))
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerRarbgResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted "+indexerRarbgResourceName+": "+strconv.Itoa(int(state.ID.Value)))
+	tflog.Trace(ctx, "deleted "+indexerRarbgResourceName+": "+strconv.Itoa(int(indexer.ID.Value)))
 	resp.State.RemoveResource(ctx)
 }
 
@@ -330,9 +330,7 @@ func (r *IndexerRarbgResource) ImportState(ctx context.Context, req resource.Imp
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 
-func writeIndexerRarbg(ctx context.Context, indexer *sonarr.IndexerOutput) *IndexerRarbg {
-	var output IndexerRarbg
-
+func (i *IndexerRarbg) write(ctx context.Context, indexer *sonarr.IndexerOutput) {
 	genericIndexer := Indexer{
 		EnableAutomaticSearch:   types.Bool{Value: indexer.EnableAutomaticSearch},
 		EnableInteractiveSearch: types.Bool{Value: indexer.EnableInteractiveSearch},
@@ -344,29 +342,27 @@ func writeIndexerRarbg(ctx context.Context, indexer *sonarr.IndexerOutput) *Inde
 		Tags:                    types.Set{ElemType: types.Int64Type},
 	}
 	tfsdk.ValueFrom(ctx, indexer.Tags, genericIndexer.Tags.Type(ctx), &genericIndexer.Tags)
-	genericIndexer.writeIndexerFields(ctx, indexer.Fields)
-	output.fromIndexer(&genericIndexer)
-
-	return &output
+	genericIndexer.writeFields(ctx, indexer.Fields)
+	i.fromIndexer(&genericIndexer)
 }
 
-func readIndexerRarbg(ctx context.Context, indexer *IndexerRarbg) *sonarr.IndexerInput {
+func (i *IndexerRarbg) read(ctx context.Context) *sonarr.IndexerInput {
 	var tags []int
 
-	tfsdk.ValueAs(ctx, indexer.Tags, &tags)
+	tfsdk.ValueAs(ctx, i.Tags, &tags)
 
 	return &sonarr.IndexerInput{
-		EnableAutomaticSearch:   indexer.EnableAutomaticSearch.Value,
-		EnableInteractiveSearch: indexer.EnableInteractiveSearch.Value,
-		EnableRss:               indexer.EnableRss.Value,
-		Priority:                indexer.Priority.Value,
-		DownloadClientID:        indexer.DownloadClientID.Value,
-		ID:                      indexer.ID.Value,
+		EnableAutomaticSearch:   i.EnableAutomaticSearch.Value,
+		EnableInteractiveSearch: i.EnableInteractiveSearch.Value,
+		EnableRss:               i.EnableRss.Value,
+		Priority:                i.Priority.Value,
+		DownloadClientID:        i.DownloadClientID.Value,
+		ID:                      i.ID.Value,
 		ConfigContract:          IndexerRarbgConfigContrat,
 		Implementation:          IndexerRarbgImplementation,
-		Name:                    indexer.Name.Value,
+		Name:                    i.Name.Value,
 		Protocol:                IndexerRarbgProtocol,
 		Tags:                    tags,
-		Fields:                  readIndexerFields(ctx, indexer.toIndexer()),
+		Fields:                  i.toIndexer().readFields(ctx),
 	}
 }

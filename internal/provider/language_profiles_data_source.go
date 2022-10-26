@@ -103,7 +103,7 @@ func (d *LanguageProfilesDataSource) Configure(ctx context.Context, req datasour
 }
 
 func (d *LanguageProfilesDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var data LanguageProfiles
+	var data *LanguageProfiles
 
 	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
 
@@ -120,18 +120,13 @@ func (d *LanguageProfilesDataSource) Read(ctx context.Context, req datasource.Re
 
 	tflog.Trace(ctx, "read "+languageProfilesDataSourceName)
 	// Map response body to resource schema attribute
-	profiles := *writeLanguageprofiles(ctx, response)
+	profiles := make([]LanguageProfile, len(response))
+	for i, p := range response {
+		profiles[i].write(ctx, p)
+	}
+
 	tfsdk.ValueFrom(ctx, profiles, data.LanguageProfiles.Type(context.Background()), &data.LanguageProfiles)
 	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 	data.ID = types.String{Value: strconv.Itoa(len(response))}
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
-}
-
-func writeLanguageprofiles(ctx context.Context, languages []*sonarr.LanguageProfile) *[]LanguageProfile {
-	output := make([]LanguageProfile, len(languages))
-	for i, p := range languages {
-		output[i] = *writeLanguageProfile(ctx, p)
-	}
-
-	return &output
 }

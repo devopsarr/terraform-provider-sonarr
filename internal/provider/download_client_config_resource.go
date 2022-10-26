@@ -94,16 +94,16 @@ func (r *DownloadClientConfigResource) Configure(ctx context.Context, req resour
 
 func (r *DownloadClientConfigResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	// Retrieve values from plan
-	var plan DownloadClientConfig
+	var config *DownloadClientConfig
 
-	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &config)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Build Create resource
-	data := readDownloadClientConfig(&plan)
+	data := config.read()
 	data.ID = 1
 
 	// Create new DownloadClientConfig
@@ -116,15 +116,15 @@ func (r *DownloadClientConfigResource) Create(ctx context.Context, req resource.
 
 	tflog.Trace(ctx, "created "+downloadClientConfigResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
-	result := writeDownloadClientConfig(response)
-	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
+	config.write(response)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &config)...)
 }
 
 func (r *DownloadClientConfigResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	// Get current state
-	var state DownloadClientConfig
+	var config *DownloadClientConfig
 
-	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
+	resp.Diagnostics.Append(req.State.Get(ctx, &config)...)
 
 	if resp.Diagnostics.HasError() {
 		return
@@ -140,22 +140,22 @@ func (r *DownloadClientConfigResource) Read(ctx context.Context, req resource.Re
 
 	tflog.Trace(ctx, "read "+downloadClientConfigResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Map response body to resource schema attribute
-	result := writeDownloadClientConfig(response)
-	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
+	config.write(response)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &config)...)
 }
 
 func (r *DownloadClientConfigResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	// Get plan values
-	var plan DownloadClientConfig
+	var config *DownloadClientConfig
 
-	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &config)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Build Update resource
-	data := readDownloadClientConfig(&plan)
+	data := config.read()
 
 	// Update DownloadClientConfig
 	response, err := r.client.UpdateDownloadClientConfigContext(ctx, data)
@@ -167,8 +167,8 @@ func (r *DownloadClientConfigResource) Update(ctx context.Context, req resource.
 
 	tflog.Trace(ctx, "updated "+downloadClientConfigResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
-	result := writeDownloadClientConfig(response)
-	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
+	config.write(response)
+	resp.Diagnostics.Append(resp.State.Set(ctx, config)...)
 }
 
 func (r *DownloadClientConfigResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
@@ -183,20 +183,18 @@ func (r *DownloadClientConfigResource) ImportState(ctx context.Context, req reso
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), 1)...)
 }
 
-func writeDownloadClientConfig(downloadClientConfig *sonarr.DownloadClientConfig) *DownloadClientConfig {
-	return &DownloadClientConfig{
-		EnableCompletedDownloadHandling: types.Bool{Value: downloadClientConfig.EnableCompletedDownloadHandling},
-		AutoRedownloadFailed:            types.Bool{Value: downloadClientConfig.AutoRedownloadFailed},
-		ID:                              types.Int64{Value: downloadClientConfig.ID},
-		DownloadClientWorkingFolders:    types.String{Value: downloadClientConfig.DownloadClientWorkingFolders},
-	}
+func (c *DownloadClientConfig) write(downloadClientConfig *sonarr.DownloadClientConfig) {
+	c.EnableCompletedDownloadHandling = types.Bool{Value: downloadClientConfig.EnableCompletedDownloadHandling}
+	c.AutoRedownloadFailed = types.Bool{Value: downloadClientConfig.AutoRedownloadFailed}
+	c.ID = types.Int64{Value: downloadClientConfig.ID}
+	c.DownloadClientWorkingFolders = types.String{Value: downloadClientConfig.DownloadClientWorkingFolders}
 }
 
-func readDownloadClientConfig(downloadClientConfig *DownloadClientConfig) *sonarr.DownloadClientConfig {
+func (c *DownloadClientConfig) read() *sonarr.DownloadClientConfig {
 	return &sonarr.DownloadClientConfig{
-		EnableCompletedDownloadHandling: downloadClientConfig.EnableCompletedDownloadHandling.Value,
-		AutoRedownloadFailed:            downloadClientConfig.AutoRedownloadFailed.Value,
-		ID:                              downloadClientConfig.ID.Value,
-		DownloadClientWorkingFolders:    downloadClientConfig.DownloadClientWorkingFolders.Value,
+		EnableCompletedDownloadHandling: c.EnableCompletedDownloadHandling.Value,
+		AutoRedownloadFailed:            c.AutoRedownloadFailed.Value,
+		ID:                              c.ID.Value,
+		DownloadClientWorkingFolders:    c.DownloadClientWorkingFolders.Value,
 	}
 }

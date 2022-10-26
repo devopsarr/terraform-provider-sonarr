@@ -173,16 +173,16 @@ func (r *QualityProfileResource) Configure(ctx context.Context, req resource.Con
 
 func (r *QualityProfileResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	// Retrieve values from plan
-	var plan QualityProfile
+	var profile *QualityProfile
 
-	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &profile)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Build Create resource
-	data := readQualityProfile(ctx, &plan)
+	data := profile.read(ctx)
 
 	// Create new QualityProfile
 	response, err := r.client.AddQualityProfileContext(ctx, data)
@@ -194,22 +194,22 @@ func (r *QualityProfileResource) Create(ctx context.Context, req resource.Create
 
 	tflog.Trace(ctx, "created "+qualityProfileResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
-	result := writeQualityProfile(ctx, response)
-	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
+	profile.write(ctx, response)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &profile)...)
 }
 
 func (r *QualityProfileResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	// Get current state
-	var state QualityProfile
+	var profile *QualityProfile
 
-	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
+	resp.Diagnostics.Append(req.State.Get(ctx, &profile)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Get qualityprofile current value
-	response, err := r.client.GetQualityProfileContext(ctx, int(state.ID.Value))
+	response, err := r.client.GetQualityProfileContext(ctx, int(profile.ID.Value))
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", qualityProfileResourceName, err))
 
@@ -218,22 +218,22 @@ func (r *QualityProfileResource) Read(ctx context.Context, req resource.ReadRequ
 
 	tflog.Trace(ctx, "read "+qualityProfileResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Map response body to resource schema attribute
-	result := writeQualityProfile(ctx, response)
-	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
+	profile.write(ctx, response)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &profile)...)
 }
 
 func (r *QualityProfileResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	// Get plan values
-	var plan QualityProfile
+	var profile *QualityProfile
 
-	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &profile)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Build Update resource
-	data := readQualityProfile(ctx, &plan)
+	data := profile.read(ctx)
 
 	// Update QualityProfile
 	response, err := r.client.UpdateQualityProfileContext(ctx, data)
@@ -245,28 +245,28 @@ func (r *QualityProfileResource) Update(ctx context.Context, req resource.Update
 
 	tflog.Trace(ctx, "updated "+qualityProfileResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
-	result := writeQualityProfile(ctx, response)
-	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
+	profile.write(ctx, response)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &profile)...)
 }
 
 func (r *QualityProfileResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var state QualityProfile
+	var profile *QualityProfile
 
-	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
+	resp.Diagnostics.Append(req.State.Get(ctx, &profile)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Delete qualityprofile current value
-	err := r.client.DeleteQualityProfileContext(ctx, int(state.ID.Value))
+	err := r.client.DeleteQualityProfileContext(ctx, int(profile.ID.Value))
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", qualityProfileResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted "+qualityProfileResourceName+": "+strconv.Itoa(int(state.ID.Value)))
+	tflog.Trace(ctx, "deleted "+qualityProfileResourceName+": "+strconv.Itoa(int(profile.ID.Value)))
 	resp.State.RemoveResource(ctx)
 }
 
@@ -286,73 +286,63 @@ func (r *QualityProfileResource) ImportState(ctx context.Context, req resource.I
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 
-func writeQualityProfile(ctx context.Context, profile *sonarr.QualityProfile) *QualityProfile {
-	output := QualityProfile{
-		UpgradeAllowed: types.Bool{Value: profile.UpgradeAllowed},
-		ID:             types.Int64{Value: profile.ID},
-		Name:           types.String{Value: profile.Name},
-		Cutoff:         types.Int64{Value: profile.Cutoff},
-		QualityGroups:  types.Set{ElemType: QualityProfileResource{}.getQualityGroupSchema().Type()},
-	}
-	qualityGroups := *writeQualityGroups(ctx, profile.Qualities)
-	tfsdk.ValueFrom(ctx, qualityGroups, output.QualityGroups.Type(ctx), &output.QualityGroups)
+func (p *QualityProfile) write(ctx context.Context, profile *sonarr.QualityProfile) {
+	p.UpgradeAllowed = types.Bool{Value: profile.UpgradeAllowed}
+	p.ID = types.Int64{Value: profile.ID}
+	p.Name = types.String{Value: profile.Name}
+	p.Cutoff = types.Int64{Value: profile.Cutoff}
+	p.QualityGroups = types.Set{ElemType: QualityProfileResource{}.getQualityGroupSchema().Type()}
 
-	return &output
-}
-
-func writeQualityGroups(ctx context.Context, groups []*starr.Quality) *[]QualityGroup {
-	qualityGroups := make([]QualityGroup, len(groups))
-
-	for n, g := range groups {
-		var (
-			name      string
-			id        int64
-			qualities []Quality
-		)
-
-		if len(g.Items) == 0 {
-			name = g.Quality.Name
-			id = g.Quality.ID
-			qualities = []Quality{{
-				ID:         types.Int64{Value: g.Quality.ID},
-				Name:       types.String{Value: g.Quality.Name},
-				Source:     types.String{Value: g.Quality.Source},
-				Resolution: types.Int64{Value: int64(g.Quality.Resolution)},
-			}}
-		} else {
-			name = g.Name
-			id = int64(g.ID)
-			qualities = *writeQualities(g.Items)
-		}
-
-		qualityGroups[n] = QualityGroup{
-			Name:      types.String{Value: name},
-			ID:        types.Int64{Value: id},
-			Qualities: types.Set{ElemType: QualityProfileResource{}.getQualitySchema().Type()},
-		}
-		tfsdk.ValueFrom(ctx, qualities, qualityGroups[n].Qualities.Type(ctx), &qualityGroups[n].Qualities)
+	qualityGroups := make([]QualityGroup, len(profile.Qualities))
+	for n, g := range profile.Qualities {
+		qualityGroups[n].write(ctx, g)
 	}
 
-	return &qualityGroups
+	tfsdk.ValueFrom(ctx, qualityGroups, p.QualityGroups.Type(ctx), &p.QualityGroups)
 }
 
-func writeQualities(qualities []*starr.Quality) *[]Quality {
-	output := make([]Quality, len(qualities))
-	for m, q := range qualities {
-		output[m] = Quality{
-			ID:         types.Int64{Value: q.Quality.ID},
-			Name:       types.String{Value: q.Quality.Name},
-			Source:     types.String{Value: q.Quality.Source},
-			Resolution: types.Int64{Value: int64(q.Quality.Resolution)},
+func (q *QualityGroup) write(ctx context.Context, group *starr.Quality) {
+	var (
+		name      string
+		id        int64
+		qualities []Quality
+	)
+
+	if len(group.Items) == 0 {
+		name = group.Quality.Name
+		id = group.Quality.ID
+		qualities = []Quality{{
+			ID:         types.Int64{Value: group.Quality.ID},
+			Name:       types.String{Value: group.Quality.Name},
+			Source:     types.String{Value: group.Quality.Source},
+			Resolution: types.Int64{Value: int64(group.Quality.Resolution)},
+		}}
+	} else {
+		name = group.Name
+		id = int64(group.ID)
+		qualities = make([]Quality, len(group.Items))
+		for m, q := range group.Items {
+			qualities[m].write(q)
 		}
 	}
 
-	return &output
+	q.Name = types.String{Value: name}
+	q.ID = types.Int64{Value: id}
+	q.Qualities = types.Set{ElemType: QualityProfileResource{}.getQualitySchema().Type()}
+
+	tfsdk.ValueFrom(ctx, qualities, q.Qualities.Type(ctx), &q.Qualities)
 }
 
-func readQualityProfile(ctx context.Context, profile *QualityProfile) *sonarr.QualityProfile {
-	groups := make([]QualityGroup, len(profile.QualityGroups.Elems))
-	tfsdk.ValueAs(ctx, profile.QualityGroups, &groups)
+func (q *Quality) write(quality *starr.Quality) {
+	q.ID = types.Int64{Value: quality.Quality.ID}
+	q.Name = types.String{Value: quality.Quality.Name}
+	q.Source = types.String{Value: quality.Quality.Source}
+	q.Resolution = types.Int64{Value: int64(quality.Quality.Resolution)}
+}
+
+func (p *QualityProfile) read(ctx context.Context) *sonarr.QualityProfile {
+	groups := make([]QualityGroup, len(p.QualityGroups.Elems))
+	tfsdk.ValueAs(ctx, p.QualityGroups, &groups)
 	qualities := make([]*starr.Quality, len(groups))
 
 	for n, g := range groups {
@@ -371,7 +361,10 @@ func readQualityProfile(ctx context.Context, profile *QualityProfile) *sonarr.Qu
 			continue
 		}
 
-		items := readQualities(&q)
+		items := make([]*starr.Quality, len(q))
+		for m, q := range q {
+			items[m] = q.read()
+		}
 
 		qualities[n] = &starr.Quality{
 			Name:    g.Name.Value,
@@ -382,27 +375,22 @@ func readQualityProfile(ctx context.Context, profile *QualityProfile) *sonarr.Qu
 	}
 
 	return &sonarr.QualityProfile{
-		UpgradeAllowed: profile.UpgradeAllowed.Value,
-		ID:             profile.ID.Value,
-		Cutoff:         profile.Cutoff.Value,
-		Name:           profile.Name.Value,
+		UpgradeAllowed: p.UpgradeAllowed.Value,
+		ID:             p.ID.Value,
+		Cutoff:         p.Cutoff.Value,
+		Name:           p.Name.Value,
 		Qualities:      qualities,
 	}
 }
 
-func readQualities(qualities *[]Quality) []*starr.Quality {
-	output := make([]*starr.Quality, len(*qualities))
-	for m, q := range *qualities {
-		output[m] = &starr.Quality{
-			Allowed: true,
-			Quality: &starr.BaseQuality{
-				Name:       q.Name.Value,
-				ID:         q.ID.Value,
-				Source:     q.Source.Value,
-				Resolution: int(q.Resolution.Value),
-			},
-		}
+func (q *Quality) read() *starr.Quality {
+	return &starr.Quality{
+		Allowed: true,
+		Quality: &starr.BaseQuality{
+			Name:       q.Name.Value,
+			ID:         q.ID.Value,
+			Source:     q.Source.Value,
+			Resolution: int(q.Resolution.Value),
+		},
 	}
-
-	return output
 }

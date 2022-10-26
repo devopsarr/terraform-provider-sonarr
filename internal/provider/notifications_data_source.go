@@ -456,7 +456,7 @@ func (d *NotificationsDataSource) Configure(ctx context.Context, req datasource.
 }
 
 func (d *NotificationsDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var data Notifications
+	var data *Notifications
 
 	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
 
@@ -473,18 +473,13 @@ func (d *NotificationsDataSource) Read(ctx context.Context, req datasource.ReadR
 
 	tflog.Trace(ctx, "read "+notificationsDataSourceName)
 	// Map response body to resource schema attribute
-	profiles := *writeNotifications(ctx, response)
+	profiles := make([]Notification, len(response))
+	for i, p := range response {
+		profiles[i].write(ctx, p)
+	}
+
 	tfsdk.ValueFrom(ctx, profiles, data.Notifications.Type(context.Background()), &data.Notifications)
 	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 	data.ID = types.String{Value: strconv.Itoa(len(response))}
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
-}
-
-func writeNotifications(ctx context.Context, delays []*sonarr.NotificationOutput) *[]Notification {
-	output := make([]Notification, len(delays))
-	for i, p := range delays {
-		output[i] = *writeNotification(ctx, p)
-	}
-
-	return &output
 }

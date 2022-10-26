@@ -122,7 +122,7 @@ func (d *SeriesDataSource) Configure(ctx context.Context, req datasource.Configu
 }
 
 func (d *SeriesDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var data Series
+	var data *Series
 
 	resp.Diagnostics.Append(resp.State.Get(ctx, &data)...)
 
@@ -145,8 +145,8 @@ func (d *SeriesDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 	}
 
 	tflog.Trace(ctx, "read "+seriesDataSourceName)
-	result := writeSeries(ctx, series)
-	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
+	data.write(ctx, series)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
 func findSeries(title string, series []*sonarr.Series) (*sonarr.Series, error) {

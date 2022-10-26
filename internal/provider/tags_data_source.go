@@ -11,7 +11,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"golift.io/starr"
 	"golift.io/starr/sonarr"
 )
 
@@ -89,7 +88,7 @@ func (d *TagsDataSource) Configure(ctx context.Context, req datasource.Configure
 }
 
 func (d *TagsDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var data Tags
+	var data *Tags
 
 	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
 
@@ -107,18 +106,13 @@ func (d *TagsDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 
 	tflog.Trace(ctx, "read "+tagsDataSourceName)
 	// Map response body to resource schema attribute
-	tags := *writeTags(response)
+	tags := make([]Tag, len(response))
+	for i, t := range response {
+		tags[i].write(t)
+	}
+
 	tfsdk.ValueFrom(ctx, tags, data.Tags.Type(context.Background()), &data.Tags)
 	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 	data.ID = types.String{Value: strconv.Itoa(len(response))}
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
-}
-
-func writeTags(tags []*starr.Tag) *[]Tag {
-	output := make([]Tag, len(tags))
-	for i, t := range tags {
-		output[i] = *writeTag(t)
-	}
-
-	return &output
 }

@@ -90,6 +90,7 @@ func (d *DownloadClientConfigDataSource) Read(ctx context.Context, req datasourc
 
 	tflog.Trace(ctx, "read "+downloadClientConfigDataSourceName)
 
-	result := writeDownloadClientConfig(response)
-	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
+	config := DownloadClientConfig{}
+	config.write(response)
+	resp.Diagnostics.Append(resp.State.Set(ctx, config)...)
 }

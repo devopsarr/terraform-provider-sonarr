@@ -91,9 +91,9 @@ func (d *RootFolderDataSource) Configure(ctx context.Context, req datasource.Con
 }
 
 func (d *RootFolderDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var data RootFolder
+	var folder *RootFolder
 
-	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
+	resp.Diagnostics.Append(req.Config.Get(ctx, &folder)...)
 
 	if resp.Diagnostics.HasError() {
 		return
@@ -107,7 +107,7 @@ func (d *RootFolderDataSource) Read(ctx context.Context, req datasource.ReadRequ
 	}
 
 	// Map response body to resource schema attribute
-	rootFolder, err := findRootFolder(data.Path.Value, response)
+	rootFolder, err := findRootFolder(folder.Path.Value, response)
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", rootFolderDataSourceName, err))
 
@@ -115,8 +115,8 @@ func (d *RootFolderDataSource) Read(ctx context.Context, req datasource.ReadRequ
 	}
 
 	tflog.Trace(ctx, "read "+rootFolderDataSourceName)
-	result := writeRootFolder(ctx, rootFolder)
-	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
+	folder.write(ctx, rootFolder)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &folder)...)
 }
 
 func findRootFolder(path string, folders []*sonarr.RootFolder) (*sonarr.RootFolder, error) {

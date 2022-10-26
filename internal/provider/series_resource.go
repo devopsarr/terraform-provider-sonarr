@@ -167,16 +167,16 @@ func (r *SeriesResource) Configure(ctx context.Context, req resource.ConfigureRe
 
 func (r *SeriesResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	// Retrieve values from plan
-	var plan Series
+	var series *Series
 
-	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &series)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Create new Series
-	request := readSeries(ctx, &plan)
+	request := series.read(ctx)
 	// TODO: can parametrize AddSeriesOptions
 	request.AddOptions = &sonarr.AddSeriesOptions{
 		SearchForMissingEpisodes:     true,
@@ -194,22 +194,22 @@ func (r *SeriesResource) Create(ctx context.Context, req resource.CreateRequest,
 
 	tflog.Trace(ctx, "created "+seriesResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
-	result := *writeSeries(ctx, response)
-	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
+	series.write(ctx, response)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &series)...)
 }
 
 func (r *SeriesResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	// Get current state
-	var state Series
+	var series *Series
 
-	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
+	resp.Diagnostics.Append(req.State.Get(ctx, &series)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Get series current value
-	response, err := r.client.GetSeriesByIDContext(ctx, state.ID.Value)
+	response, err := r.client.GetSeriesByIDContext(ctx, series.ID.Value)
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", seriesResourceName, err))
 
@@ -218,24 +218,24 @@ func (r *SeriesResource) Read(ctx context.Context, req resource.ReadRequest, res
 
 	tflog.Trace(ctx, "read "+seriesResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Map response body to resource schema attribute
-	result := *writeSeries(ctx, response)
-	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
+	series.write(ctx, response)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &series)...)
 }
 
 func (r *SeriesResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	// Get plan values
-	var plan Series
+	var series *Series
 
-	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &series)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Update Series
-	request := *readSeries(ctx, &plan)
+	request := series.read(ctx)
 
-	response, err := r.client.UpdateSeriesContext(ctx, &request)
+	response, err := r.client.UpdateSeriesContext(ctx, request)
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", seriesResourceName, err))
 
@@ -244,28 +244,28 @@ func (r *SeriesResource) Update(ctx context.Context, req resource.UpdateRequest,
 
 	tflog.Trace(ctx, "updated "+seriesResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Map response body to resource schema attribute
-	result := writeSeries(ctx, response)
-	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
+	series.write(ctx, response)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &series)...)
 }
 
 func (r *SeriesResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var state Series
+	var series *Series
 
-	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
+	resp.Diagnostics.Append(req.State.Get(ctx, &series)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Delete series current value
-	err := r.client.DeleteSeriesContext(ctx, int(state.ID.Value), true, false)
+	err := r.client.DeleteSeriesContext(ctx, int(series.ID.Value), true, false)
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to delete %s, got error: %s", seriesResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted "+seriesResourceName+": "+strconv.Itoa(int(state.ID.Value)))
+	tflog.Trace(ctx, "deleted "+seriesResourceName+": "+strconv.Itoa(int(series.ID.Value)))
 	resp.State.RemoveResource(ctx)
 }
 
@@ -285,42 +285,38 @@ func (r *SeriesResource) ImportState(ctx context.Context, req resource.ImportSta
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 
-func writeSeries(ctx context.Context, series *sonarr.Series) *Series {
-	output := Series{
-		Monitored:         types.Bool{Value: series.Monitored},
-		SeasonFolder:      types.Bool{Value: series.SeasonFolder},
-		UseSceneNumbering: types.Bool{Value: series.UseSceneNumbering},
-		ID:                types.Int64{Value: series.ID},
-		LanguageProfileID: types.Int64{Value: series.LanguageProfileID},
-		QualityProfileID:  types.Int64{Value: series.QualityProfileID},
-		TvdbID:            types.Int64{Value: series.TvdbID},
-		Path:              types.String{Value: series.Path},
-		Title:             types.String{Value: series.Title},
-		TitleSlug:         types.String{Value: series.TitleSlug},
-		RootFolderPath:    types.String{Value: series.RootFolderPath},
-		Tags:              types.Set{ElemType: types.Int64Type},
-	}
-	tfsdk.ValueFrom(ctx, series.Tags, output.Tags.Type(ctx), &output.Tags)
-
-	return &output
+func (s *Series) write(ctx context.Context, series *sonarr.Series) {
+	s.Monitored = types.Bool{Value: series.Monitored}
+	s.SeasonFolder = types.Bool{Value: series.SeasonFolder}
+	s.UseSceneNumbering = types.Bool{Value: series.UseSceneNumbering}
+	s.ID = types.Int64{Value: series.ID}
+	s.LanguageProfileID = types.Int64{Value: series.LanguageProfileID}
+	s.QualityProfileID = types.Int64{Value: series.QualityProfileID}
+	s.TvdbID = types.Int64{Value: series.TvdbID}
+	s.Path = types.String{Value: series.Path}
+	s.Title = types.String{Value: series.Title}
+	s.TitleSlug = types.String{Value: series.TitleSlug}
+	s.RootFolderPath = types.String{Value: series.RootFolderPath}
+	s.Tags = types.Set{ElemType: types.Int64Type}
+	tfsdk.ValueFrom(ctx, series.Tags, s.Tags.Type(ctx), &s.Tags)
 }
 
-func readSeries(ctx context.Context, series *Series) *sonarr.AddSeriesInput {
-	tags := make([]int, len(series.Tags.Elems))
-	tfsdk.ValueAs(ctx, series.Tags, &tags)
+func (s *Series) read(ctx context.Context) *sonarr.AddSeriesInput {
+	tags := make([]int, len(s.Tags.Elems))
+	tfsdk.ValueAs(ctx, s.Tags, &tags)
 
 	return &sonarr.AddSeriesInput{
-		ID:                series.ID.Value,
-		TvdbID:            series.TvdbID.Value,
-		Title:             series.Title.Value,
-		TitleSlug:         series.TitleSlug.Value,
-		QualityProfileID:  series.QualityProfileID.Value,
-		LanguageProfileID: series.LanguageProfileID.Value,
-		Monitored:         series.Monitored.Value,
-		SeasonFolder:      series.SeasonFolder.Value,
-		Path:              series.Path.Value,
-		RootFolderPath:    series.Path.Value,
-		UseSceneNumbering: series.UseSceneNumbering.Value,
+		ID:                s.ID.Value,
+		TvdbID:            s.TvdbID.Value,
+		Title:             s.Title.Value,
+		TitleSlug:         s.TitleSlug.Value,
+		QualityProfileID:  s.QualityProfileID.Value,
+		LanguageProfileID: s.LanguageProfileID.Value,
+		Monitored:         s.Monitored.Value,
+		SeasonFolder:      s.SeasonFolder.Value,
+		Path:              s.Path.Value,
+		RootFolderPath:    s.Path.Value,
+		UseSceneNumbering: s.UseSceneNumbering.Value,
 		Tags:              tags,
 	}
 }

@@ -108,9 +108,9 @@ func (d *DelayProfileDataSource) Configure(ctx context.Context, req datasource.C
 }
 
 func (d *DelayProfileDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var data DelayProfile
+	var delayProfile *DelayProfile
 
-	resp.Diagnostics.Append(resp.State.Get(ctx, &data)...)
+	resp.Diagnostics.Append(resp.State.Get(ctx, &delayProfile)...)
 
 	if resp.Diagnostics.HasError() {
 		return
@@ -123,7 +123,7 @@ func (d *DelayProfileDataSource) Read(ctx context.Context, req datasource.ReadRe
 		return
 	}
 
-	profile, err := findDelayProfile(data.ID.Value, response)
+	profile, err := findDelayProfile(delayProfile.ID.Value, response)
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", delayProfileDataSourceName, err))
 
@@ -131,8 +131,8 @@ func (d *DelayProfileDataSource) Read(ctx context.Context, req datasource.ReadRe
 	}
 
 	tflog.Trace(ctx, "read "+delayProfileDataSourceName)
-	result := writeDelayProfile(ctx, profile)
-	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
+	delayProfile.write(ctx, profile)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &delayProfile)...)
 }
 
 func findDelayProfile(id int64, profiles []*sonarr.DelayProfile) (*sonarr.DelayProfile, error) {

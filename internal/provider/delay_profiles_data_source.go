@@ -125,7 +125,7 @@ func (d *DelayProfilesDataSource) Configure(ctx context.Context, req datasource.
 }
 
 func (d *DelayProfilesDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var data DelayProfiles
+	var data *DelayProfiles
 
 	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
 
@@ -142,18 +142,13 @@ func (d *DelayProfilesDataSource) Read(ctx context.Context, req datasource.ReadR
 
 	tflog.Trace(ctx, "read "+delayProfileResourceName)
 	// Map response body to resource schema attribute
-	profiles := *writeDelayprofiles(ctx, response)
+	profiles := make([]DelayProfile, len(response))
+	for i, p := range response {
+		profiles[i].write(ctx, p)
+	}
+
 	tfsdk.ValueFrom(ctx, profiles, data.DelayProfiles.Type(context.Background()), &data.DelayProfiles)
 	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 	data.ID = types.String{Value: strconv.Itoa(len(response))}
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
-}
-
-func writeDelayprofiles(ctx context.Context, delays []*sonarr.DelayProfile) *[]DelayProfile {
-	output := make([]DelayProfile, len(delays))
-	for i, p := range delays {
-		output[i] = *writeDelayProfile(ctx, p)
-	}
-
-	return &output
 }

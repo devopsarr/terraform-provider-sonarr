@@ -86,9 +86,9 @@ func (r *TagResource) Configure(ctx context.Context, req resource.ConfigureReque
 
 func (r *TagResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	// Retrieve values from plan
-	var plan Tag
+	var tag *Tag
 
-	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &tag)...)
 
 	if resp.Diagnostics.HasError() {
 		return
@@ -96,7 +96,7 @@ func (r *TagResource) Create(ctx context.Context, req resource.CreateRequest, re
 
 	// Create new Tag
 	request := starr.Tag{
-		Label: plan.Label.Value,
+		Label: tag.Label.Value,
 	}
 
 	response, err := r.client.AddTagContext(ctx, &request)
@@ -108,22 +108,22 @@ func (r *TagResource) Create(ctx context.Context, req resource.CreateRequest, re
 
 	tflog.Trace(ctx, "created tag: "+strconv.Itoa(response.ID))
 	// Generate resource state struct
-	result := writeTag(response)
-	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
+	tag.write(response)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &tag)...)
 }
 
 func (r *TagResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	// Get current state
-	var state Tag
+	var tag *Tag
 
-	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
+	resp.Diagnostics.Append(req.State.Get(ctx, &tag)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Get tag current value
-	response, err := r.client.GetTagContext(ctx, int(state.ID.Value))
+	response, err := r.client.GetTagContext(ctx, int(tag.ID.Value))
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", tagResourceName, err))
 
@@ -132,15 +132,15 @@ func (r *TagResource) Read(ctx context.Context, req resource.ReadRequest, resp *
 
 	tflog.Trace(ctx, "read "+tagResourceName+": "+strconv.Itoa(response.ID))
 	// Map response body to resource schema attribute
-	result := writeTag(response)
-	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
+	tag.write(response)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &tag)...)
 }
 
 func (r *TagResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	// Get plan values
-	var plan Tag
+	var tag *Tag
 
-	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &tag)...)
 
 	if resp.Diagnostics.HasError() {
 		return
@@ -148,8 +148,8 @@ func (r *TagResource) Update(ctx context.Context, req resource.UpdateRequest, re
 
 	// Update Tag
 	request := starr.Tag{
-		Label: plan.Label.Value,
-		ID:    int(plan.ID.Value),
+		Label: tag.Label.Value,
+		ID:    int(tag.ID.Value),
 	}
 
 	response, err := r.client.UpdateTagContext(ctx, &request)
@@ -161,28 +161,28 @@ func (r *TagResource) Update(ctx context.Context, req resource.UpdateRequest, re
 
 	tflog.Trace(ctx, "updated "+tagResourceName+": "+strconv.Itoa(response.ID))
 	// Generate resource state struct
-	result := writeTag(response)
-	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
+	tag.write(response)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &tag)...)
 }
 
 func (r *TagResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var state Tag
+	var tag *Tag
 
-	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
+	resp.Diagnostics.Append(req.State.Get(ctx, &tag)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Delete tag current value
-	err := r.client.DeleteTagContext(ctx, int(state.ID.Value))
+	err := r.client.DeleteTagContext(ctx, int(tag.ID.Value))
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", tagResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted "+tagResourceName+": "+strconv.Itoa(int(state.ID.Value)))
+	tflog.Trace(ctx, "deleted "+tagResourceName+": "+strconv.Itoa(int(tag.ID.Value)))
 	resp.State.RemoveResource(ctx)
 }
 
@@ -202,9 +202,7 @@ func (r *TagResource) ImportState(ctx context.Context, req resource.ImportStateR
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 
-func writeTag(tag *starr.Tag) *Tag {
-	return &Tag{
-		ID:    types.Int64{Value: int64(tag.ID)},
-		Label: types.String{Value: tag.Label},
-	}
+func (t *Tag) write(tag *starr.Tag) {
+	t.ID = types.Int64{Value: int64(tag.ID)}
+	t.Label = types.String{Value: tag.Label}
 }

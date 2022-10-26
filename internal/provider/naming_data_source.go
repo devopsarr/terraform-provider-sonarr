@@ -120,6 +120,7 @@ func (d *NamingDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 
 	tflog.Trace(ctx, "read "+namingDataSourceName)
 
-	result := writeNaming(response)
-	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
+	state := Naming{}
+	state.write(response)
+	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }

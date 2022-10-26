@@ -113,7 +113,7 @@ func (d *RootFoldersDataSource) Configure(ctx context.Context, req datasource.Co
 }
 
 func (d *RootFoldersDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var data RootFolders
+	var data *RootFolders
 
 	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
 
@@ -130,17 +130,17 @@ func (d *RootFoldersDataSource) Read(ctx context.Context, req datasource.ReadReq
 
 	tflog.Trace(ctx, "read "+rootFoldersDataSourceName)
 	// Map response body to resource schema attribute
-	rootFolders := *writeRootFolders(ctx, response)
+	rootFolders := *writes(ctx, response)
 	tfsdk.ValueFrom(ctx, rootFolders, data.RootFolders.Type(context.Background()), &data.RootFolders)
 	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 	data.ID = types.String{Value: strconv.Itoa(len(response))}
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func writeRootFolders(ctx context.Context, folders []*sonarr.RootFolder) *[]RootFolder {
+func writes(ctx context.Context, folders []*sonarr.RootFolder) *[]RootFolder {
 	output := make([]RootFolder, len(folders))
 	for i, f := range folders {
-		output[i] = *writeRootFolder(ctx, f)
+		output[i].write(ctx, f)
 	}
 
 	return &output

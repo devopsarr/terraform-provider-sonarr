@@ -100,16 +100,16 @@ func (r *IndexerConfigResource) Configure(ctx context.Context, req resource.Conf
 
 func (r *IndexerConfigResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	// Retrieve values from plan
-	var plan IndexerConfig
+	var config *IndexerConfig
 
-	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &config)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Build Create resource
-	data := readIndexerConfig(&plan)
+	data := config.read()
 	data.ID = 1
 
 	// Create new IndexerConfig
@@ -122,15 +122,15 @@ func (r *IndexerConfigResource) Create(ctx context.Context, req resource.CreateR
 
 	tflog.Trace(ctx, "created "+indexerConfigResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
-	result := writeIndexerConfig(response)
-	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
+	config.write(response)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &config)...)
 }
 
 func (r *IndexerConfigResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	// Get current state
-	var state IndexerConfig
+	var config *IndexerConfig
 
-	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
+	resp.Diagnostics.Append(req.State.Get(ctx, &config)...)
 
 	if resp.Diagnostics.HasError() {
 		return
@@ -146,22 +146,22 @@ func (r *IndexerConfigResource) Read(ctx context.Context, req resource.ReadReque
 
 	tflog.Trace(ctx, "read "+indexerConfigResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Map response body to resource schema attribute
-	result := writeIndexerConfig(response)
-	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
+	config.write(response)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &config)...)
 }
 
 func (r *IndexerConfigResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	// Get plan values
-	var plan IndexerConfig
+	var config *IndexerConfig
 
-	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &config)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Build Update resource
-	data := readIndexerConfig(&plan)
+	data := config.read()
 
 	// Update IndexerConfig
 	response, err := r.client.UpdateIndexerConfigContext(ctx, data)
@@ -173,8 +173,8 @@ func (r *IndexerConfigResource) Update(ctx context.Context, req resource.UpdateR
 
 	tflog.Trace(ctx, "updated "+indexerConfigResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
-	result := writeIndexerConfig(response)
-	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
+	config.write(response)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &config)...)
 }
 
 func (r *IndexerConfigResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
@@ -189,22 +189,20 @@ func (r *IndexerConfigResource) ImportState(ctx context.Context, req resource.Im
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), 1)...)
 }
 
-func writeIndexerConfig(indexerConfig *sonarr.IndexerConfig) *IndexerConfig {
-	return &IndexerConfig{
-		ID:              types.Int64{Value: indexerConfig.ID},
-		MaximumSize:     types.Int64{Value: indexerConfig.MaximumSize},
-		MinimumAge:      types.Int64{Value: indexerConfig.MinimumAge},
-		Retention:       types.Int64{Value: indexerConfig.Retention},
-		RssSyncInterval: types.Int64{Value: indexerConfig.RssSyncInterval},
-	}
+func (c *IndexerConfig) write(indexerConfig *sonarr.IndexerConfig) {
+	c.ID = types.Int64{Value: indexerConfig.ID}
+	c.MaximumSize = types.Int64{Value: indexerConfig.MaximumSize}
+	c.MinimumAge = types.Int64{Value: indexerConfig.MinimumAge}
+	c.Retention = types.Int64{Value: indexerConfig.Retention}
+	c.RssSyncInterval = types.Int64{Value: indexerConfig.RssSyncInterval}
 }
 
-func readIndexerConfig(indexerConfig *IndexerConfig) *sonarr.IndexerConfig {
+func (c *IndexerConfig) read() *sonarr.IndexerConfig {
 	return &sonarr.IndexerConfig{
-		ID:              indexerConfig.ID.Value,
-		MaximumSize:     indexerConfig.MaximumSize.Value,
-		MinimumAge:      indexerConfig.MinimumAge.Value,
-		Retention:       indexerConfig.Retention.Value,
-		RssSyncInterval: indexerConfig.RssSyncInterval.Value,
+		ID:              c.ID.Value,
+		MaximumSize:     c.MaximumSize.Value,
+		MinimumAge:      c.MinimumAge.Value,
+		Retention:       c.Retention.Value,
+		RssSyncInterval: c.RssSyncInterval.Value,
 	}
 }

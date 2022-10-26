@@ -397,16 +397,16 @@ func (r *DownloadClientResource) Configure(ctx context.Context, req resource.Con
 
 func (r *DownloadClientResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	// Retrieve values from plan
-	var plan DownloadClient
+	var client *DownloadClient
 
-	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &client)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Create new DownloadClient
-	request := readDownloadClient(ctx, &plan)
+	request := client.read(ctx)
 
 	response, err := r.client.AddDownloadClientContext(ctx, request)
 	if err != nil {
@@ -417,22 +417,25 @@ func (r *DownloadClientResource) Create(ctx context.Context, req resource.Create
 
 	tflog.Trace(ctx, "created "+downloadClientResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
-	result := writeDownloadClient(ctx, response)
-	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
+	// this is needed because of many empty fields are unknown in both plan and read
+	var state DownloadClient
+
+	state.write(ctx, response)
+	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
 
 func (r *DownloadClientResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	// Get current state
-	var state DownloadClient
+	var client DownloadClient
 
-	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
+	resp.Diagnostics.Append(req.State.Get(ctx, &client)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Get DownloadClient current value
-	response, err := r.client.GetDownloadClientContext(ctx, int(state.ID.Value))
+	response, err := r.client.GetDownloadClientContext(ctx, int(client.ID.Value))
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", downloadClientResourceName, err))
 
@@ -441,22 +444,25 @@ func (r *DownloadClientResource) Read(ctx context.Context, req resource.ReadRequ
 
 	tflog.Trace(ctx, "read "+downloadClientResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Map response body to resource schema attribute
-	result := writeDownloadClient(ctx, response)
-	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
+	// this is needed because of many empty fields are unknown in both plan and read
+	var state DownloadClient
+
+	state.write(ctx, response)
+	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
 
 func (r *DownloadClientResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	// Get plan values
-	var plan DownloadClient
+	var client *DownloadClient
 
-	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &client)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Update DownloadClient
-	request := readDownloadClient(ctx, &plan)
+	request := client.read(ctx)
 
 	response, err := r.client.UpdateDownloadClientContext(ctx, request)
 	if err != nil {
@@ -467,28 +473,31 @@ func (r *DownloadClientResource) Update(ctx context.Context, req resource.Update
 
 	tflog.Trace(ctx, "updated "+downloadClientResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
-	result := writeDownloadClient(ctx, response)
-	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
+	// this is needed because of many empty fields are unknown in both plan and read
+	var state DownloadClient
+
+	state.write(ctx, response)
+	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
 
 func (r *DownloadClientResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var state DownloadClient
+	var client *DownloadClient
 
-	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
+	resp.Diagnostics.Append(req.State.Get(ctx, &client)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Delete DownloadClient current value
-	err := r.client.DeleteDownloadClientContext(ctx, int(state.ID.Value))
+	err := r.client.DeleteDownloadClientContext(ctx, int(client.ID.Value))
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", downloadClientResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted "+downloadClientResourceName+": "+strconv.Itoa(int(state.ID.Value)))
+	tflog.Trace(ctx, "deleted "+downloadClientResourceName+": "+strconv.Itoa(int(client.ID.Value)))
 	resp.State.RemoveResource(ctx)
 }
 
@@ -508,110 +517,109 @@ func (r *DownloadClientResource) ImportState(ctx context.Context, req resource.I
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 
-func writeDownloadClient(ctx context.Context, downloadClient *sonarr.DownloadClientOutput) *DownloadClient {
-	output := DownloadClient{
-		Enable:                   types.Bool{Value: downloadClient.Enable},
-		RemoveCompletedDownloads: types.Bool{Value: downloadClient.RemoveCompletedDownloads},
-		RemoveFailedDownloads:    types.Bool{Value: downloadClient.RemoveFailedDownloads},
-		Priority:                 types.Int64{Value: int64(downloadClient.Priority)},
-		ID:                       types.Int64{Value: downloadClient.ID},
-		ConfigContract:           types.String{Value: downloadClient.ConfigContract},
-		Implementation:           types.String{Value: downloadClient.Implementation},
-		Name:                     types.String{Value: downloadClient.Name},
-		Protocol:                 types.String{Value: downloadClient.Protocol},
-		Tags:                     types.Set{ElemType: types.Int64Type},
-		AdditionalTags:           types.Set{ElemType: types.Int64Type},
-		FieldTags:                types.Set{ElemType: types.StringType},
-		PostImTags:               types.Set{ElemType: types.StringType},
-	}
-	tfsdk.ValueFrom(ctx, downloadClient.Tags, output.Tags.Type(ctx), &output.Tags)
+func (d *DownloadClient) write(ctx context.Context, downloadClient *sonarr.DownloadClientOutput) {
+	d.Enable = types.Bool{Value: downloadClient.Enable}
+	d.RemoveCompletedDownloads = types.Bool{Value: downloadClient.RemoveCompletedDownloads}
+	d.RemoveFailedDownloads = types.Bool{Value: downloadClient.RemoveFailedDownloads}
+	d.Priority = types.Int64{Value: int64(downloadClient.Priority)}
+	d.ID = types.Int64{Value: downloadClient.ID}
+	d.ConfigContract = types.String{Value: downloadClient.ConfigContract}
+	d.Implementation = types.String{Value: downloadClient.Implementation}
+	d.Name = types.String{Value: downloadClient.Name}
+	d.Protocol = types.String{Value: downloadClient.Protocol}
+	d.Tags = types.Set{ElemType: types.Int64Type}
+	d.AdditionalTags = types.Set{ElemType: types.Int64Type}
+	d.FieldTags = types.Set{ElemType: types.StringType}
+	d.PostImTags = types.Set{ElemType: types.StringType}
+	tfsdk.ValueFrom(ctx, downloadClient.Tags, d.Tags.Type(ctx), &d.Tags)
+	d.writeFields(ctx, downloadClient.Fields)
+}
 
-	for _, f := range downloadClient.Fields {
+func (d *DownloadClient) writeFields(ctx context.Context, fields []*starr.FieldOutput) {
+	for _, f := range fields {
 		if f.Value == nil {
 			continue
 		}
 
 		if slices.Contains(downloadClientStringFields, f.Name) {
-			helpers.WriteStringField(f, &output)
+			helpers.WriteStringField(f, d)
 
 			continue
 		}
 
 		if slices.Contains(downloadClientBoolFields, f.Name) {
-			helpers.WriteBoolField(f, &output)
+			helpers.WriteBoolField(f, d)
 
 			continue
 		}
 
 		if slices.Contains(downloadClientIntFields, f.Name) {
-			helpers.WriteIntField(f, &output)
+			helpers.WriteIntField(f, d)
 
 			continue
 		}
 
 		if slices.Contains(downloadClientIntSliceFields, f.Name) {
-			helpers.WriteIntSliceField(ctx, f, &output)
+			helpers.WriteIntSliceField(ctx, f, d)
 
 			continue
 		}
 
 		if slices.Contains(downloadClientStringSliceFields, f.Name) {
-			helpers.WriteStringSliceField(ctx, f, &output)
+			helpers.WriteStringSliceField(ctx, f, d)
 		}
 	}
-
-	return &output
 }
 
-func readDownloadClient(ctx context.Context, downloadClient *DownloadClient) *sonarr.DownloadClientInput {
+func (d *DownloadClient) read(ctx context.Context) *sonarr.DownloadClientInput {
 	var tags []int
 
-	tfsdk.ValueAs(ctx, downloadClient.Tags, &tags)
+	tfsdk.ValueAs(ctx, d.Tags, &tags)
 
 	return &sonarr.DownloadClientInput{
-		Enable:                   downloadClient.Enable.Value,
-		RemoveCompletedDownloads: downloadClient.RemoveCompletedDownloads.Value,
-		RemoveFailedDownloads:    downloadClient.RemoveFailedDownloads.Value,
-		Priority:                 int(downloadClient.Priority.Value),
-		ID:                       downloadClient.ID.Value,
-		ConfigContract:           downloadClient.ConfigContract.Value,
-		Implementation:           downloadClient.Implementation.Value,
-		Name:                     downloadClient.Name.Value,
-		Protocol:                 downloadClient.Protocol.Value,
+		Enable:                   d.Enable.Value,
+		RemoveCompletedDownloads: d.RemoveCompletedDownloads.Value,
+		RemoveFailedDownloads:    d.RemoveFailedDownloads.Value,
+		Priority:                 int(d.Priority.Value),
+		ID:                       d.ID.Value,
+		ConfigContract:           d.ConfigContract.Value,
+		Implementation:           d.Implementation.Value,
+		Name:                     d.Name.Value,
+		Protocol:                 d.Protocol.Value,
 		Tags:                     tags,
-		Fields:                   readDownloadClientFields(ctx, downloadClient),
+		Fields:                   d.readFields(ctx),
 	}
 }
 
-func readDownloadClientFields(ctx context.Context, downloadClient *DownloadClient) []*starr.FieldInput {
+func (d *DownloadClient) readFields(ctx context.Context) []*starr.FieldInput {
 	var output []*starr.FieldInput
 
 	for _, b := range downloadClientBoolFields {
-		if field := helpers.ReadBoolField(b, downloadClient); field != nil {
+		if field := helpers.ReadBoolField(b, d); field != nil {
 			output = append(output, field)
 		}
 	}
 
 	for _, i := range downloadClientIntFields {
-		if field := helpers.ReadIntField(i, downloadClient); field != nil {
+		if field := helpers.ReadIntField(i, d); field != nil {
 			output = append(output, field)
 		}
 	}
 
 	for _, s := range downloadClientStringFields {
-		if field := helpers.ReadStringField(s, downloadClient); field != nil {
+		if field := helpers.ReadStringField(s, d); field != nil {
 			output = append(output, field)
 		}
 	}
 
 	for _, s := range downloadClientStringSliceFields {
-		if field := helpers.ReadStringSliceField(ctx, s, downloadClient); field != nil {
+		if field := helpers.ReadStringSliceField(ctx, s, d); field != nil {
 			output = append(output, field)
 		}
 	}
 
 	for _, s := range downloadClientIntSliceFields {
-		if field := helpers.ReadIntSliceField(ctx, s, downloadClient); field != nil {
+		if field := helpers.ReadIntSliceField(ctx, s, d); field != nil {
 			output = append(output, field)
 		}
 	}

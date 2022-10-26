@@ -230,7 +230,7 @@ func (d *IndexersDataSource) Configure(ctx context.Context, req datasource.Confi
 }
 
 func (d *IndexersDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var data Indexers
+	var data *Indexers
 
 	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
 
@@ -247,18 +247,13 @@ func (d *IndexersDataSource) Read(ctx context.Context, req datasource.ReadReques
 
 	tflog.Trace(ctx, "read "+indexersDataSourceName)
 	// Map response body to resource schema attribute
-	profiles := *writeIndexers(ctx, response)
+	profiles := make([]Indexer, len(response))
+	for i, p := range response {
+		profiles[i].write(ctx, p)
+	}
+
 	tfsdk.ValueFrom(ctx, profiles, data.Indexers.Type(context.Background()), &data.Indexers)
 	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 	data.ID = types.String{Value: strconv.Itoa(len(response))}
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
-}
-
-func writeIndexers(ctx context.Context, delays []*sonarr.IndexerOutput) *[]Indexer {
-	output := make([]Indexer, len(delays))
-	for i, p := range delays {
-		output[i] = *writeIndexer(ctx, p)
-	}
-
-	return &output
 }

@@ -140,7 +140,7 @@ func (d *AllSeriessDataSource) Configure(ctx context.Context, req datasource.Con
 }
 
 func (d *AllSeriessDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var data SeriesList
+	var data *SeriesList
 
 	resp.Diagnostics.Append(resp.State.Get(ctx, &data)...)
 
@@ -157,19 +157,13 @@ func (d *AllSeriessDataSource) Read(ctx context.Context, req datasource.ReadRequ
 
 	tflog.Trace(ctx, "read "+allSeriesDataSourceName)
 	// Map response body to resource schema attribute
-	series := *writeSeriesList(ctx, response)
-	tfsdk.ValueFrom(ctx, series, data.Series.Type(context.Background()), &data.Series)
+	series := make([]Series, len(response))
+	for i, t := range response {
+		series[i].write(ctx, t)
+	}
 
+	tfsdk.ValueFrom(ctx, series, data.Series.Type(context.Background()), &data.Series)
 	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 	data.ID = types.String{Value: strconv.Itoa(len(response))}
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
-}
-
-func writeSeriesList(ctx context.Context, series []*sonarr.Series) *[]Series {
-	output := make([]Series, len(series))
-	for i, t := range series {
-		output[i] = *writeSeries(ctx, t)
-	}
-
-	return &output
 }

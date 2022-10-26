@@ -288,16 +288,16 @@ func (r *IndexerResource) Configure(ctx context.Context, req resource.ConfigureR
 
 func (r *IndexerResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	// Retrieve values from plan
-	var plan Indexer
+	var indexer *Indexer
 
-	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &indexer)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Create new Indexer
-	request := readIndexer(ctx, &plan)
+	request := indexer.read(ctx)
 
 	response, err := r.client.AddIndexerContext(ctx, request)
 	if err != nil {
@@ -307,23 +307,26 @@ func (r *IndexerResource) Create(ctx context.Context, req resource.CreateRequest
 	}
 
 	tflog.Trace(ctx, "created "+indexerResourceName+": "+strconv.Itoa(int(response.ID)))
-	// Generate resource state struct
-	result := writeIndexer(ctx, response)
-	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
+	// Generate resource state struct.
+	// this is needed because of many empty fields are unknown in both plan and read
+	var state Indexer
+
+	state.write(ctx, response)
+	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
 
 func (r *IndexerResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	// Get current state
-	var state Indexer
+	var indexer *Indexer
 
-	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
+	resp.Diagnostics.Append(req.State.Get(ctx, &indexer)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Get Indexer current value
-	response, err := r.client.GetIndexerContext(ctx, int(state.ID.Value))
+	response, err := r.client.GetIndexerContext(ctx, int(indexer.ID.Value))
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerResourceName, err))
 
@@ -331,23 +334,26 @@ func (r *IndexerResource) Read(ctx context.Context, req resource.ReadRequest, re
 	}
 
 	tflog.Trace(ctx, "read "+indexerResourceName+": "+strconv.Itoa(int(response.ID)))
-	// Map response body to resource schema attribute
-	result := writeIndexer(ctx, response)
-	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
+	// Generate resource state struct.
+	// this is needed because of many empty fields are unknown in both plan and read
+	var state Indexer
+
+	state.write(ctx, response)
+	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
 
 func (r *IndexerResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	// Get plan values
-	var plan Indexer
+	var indexer *Indexer
 
-	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &indexer)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Update Indexer
-	request := readIndexer(ctx, &plan)
+	request := indexer.read(ctx)
 
 	response, err := r.client.UpdateIndexerContext(ctx, request)
 	if err != nil {
@@ -357,29 +363,32 @@ func (r *IndexerResource) Update(ctx context.Context, req resource.UpdateRequest
 	}
 
 	tflog.Trace(ctx, "updated "+indexerResourceName+": "+strconv.Itoa(int(response.ID)))
-	// Generate resource state struct
-	result := writeIndexer(ctx, response)
-	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
+	// Generate resource state struct.
+	// this is needed because of many empty fields are unknown in both plan and read
+	var state Indexer
+
+	state.write(ctx, response)
+	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
 
 func (r *IndexerResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var state Indexer
+	var indexer Indexer
 
-	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
+	resp.Diagnostics.Append(req.State.Get(ctx, &indexer)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Delete Indexer current value
-	err := r.client.DeleteIndexerContext(ctx, int(state.ID.Value))
+	err := r.client.DeleteIndexerContext(ctx, int(indexer.ID.Value))
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted "+indexerResourceName+": "+strconv.Itoa(int(state.ID.Value)))
+	tflog.Trace(ctx, "deleted "+indexerResourceName+": "+strconv.Itoa(int(indexer.ID.Value)))
 	resp.State.RemoveResource(ctx)
 }
 
@@ -399,30 +408,25 @@ func (r *IndexerResource) ImportState(ctx context.Context, req resource.ImportSt
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 
-func writeIndexer(ctx context.Context, indexer *sonarr.IndexerOutput) *Indexer {
-	output := Indexer{
-		EnableAutomaticSearch:   types.Bool{Value: indexer.EnableAutomaticSearch},
-		EnableInteractiveSearch: types.Bool{Value: indexer.EnableInteractiveSearch},
-		EnableRss:               types.Bool{Value: indexer.EnableRss},
-		Priority:                types.Int64{Value: indexer.Priority},
-		DownloadClientID:        types.Int64{Value: indexer.DownloadClientID},
-		ID:                      types.Int64{Value: indexer.ID},
-		ConfigContract:          types.String{Value: indexer.ConfigContract},
-		Implementation:          types.String{Value: indexer.Implementation},
-		Name:                    types.String{Value: indexer.Name},
-		Protocol:                types.String{Value: indexer.Protocol},
-		Tags:                    types.Set{ElemType: types.Int64Type},
-		AnimeCategories:         types.Set{ElemType: types.Int64Type},
-		Categories:              types.Set{ElemType: types.Int64Type},
-	}
-	tfsdk.ValueFrom(ctx, indexer.Tags, output.Tags.Type(ctx), &output.Tags)
-
-	output.writeIndexerFields(ctx, indexer.Fields)
-
-	return &output
+func (i *Indexer) write(ctx context.Context, indexer *sonarr.IndexerOutput) {
+	i.EnableAutomaticSearch = types.Bool{Value: indexer.EnableAutomaticSearch}
+	i.EnableInteractiveSearch = types.Bool{Value: indexer.EnableInteractiveSearch}
+	i.EnableRss = types.Bool{Value: indexer.EnableRss}
+	i.Priority = types.Int64{Value: indexer.Priority}
+	i.DownloadClientID = types.Int64{Value: indexer.DownloadClientID}
+	i.ID = types.Int64{Value: indexer.ID}
+	i.ConfigContract = types.String{Value: indexer.ConfigContract}
+	i.Implementation = types.String{Value: indexer.Implementation}
+	i.Name = types.String{Value: indexer.Name}
+	i.Protocol = types.String{Value: indexer.Protocol}
+	i.Tags = types.Set{ElemType: types.Int64Type}
+	i.AnimeCategories = types.Set{ElemType: types.Int64Type}
+	i.Categories = types.Set{ElemType: types.Int64Type}
+	tfsdk.ValueFrom(ctx, indexer.Tags, i.Tags.Type(ctx), &i.Tags)
+	i.writeFields(ctx, indexer.Fields)
 }
 
-func (i *Indexer) writeIndexerFields(ctx context.Context, fields []*starr.FieldOutput) {
+func (i *Indexer) writeFields(ctx context.Context, fields []*starr.FieldOutput) {
 	for _, f := range fields {
 		if f.Value == nil {
 			continue
@@ -458,56 +462,56 @@ func (i *Indexer) writeIndexerFields(ctx context.Context, fields []*starr.FieldO
 	}
 }
 
-func readIndexer(ctx context.Context, indexer *Indexer) *sonarr.IndexerInput {
+func (i *Indexer) read(ctx context.Context) *sonarr.IndexerInput {
 	var tags []int
 
-	tfsdk.ValueAs(ctx, indexer.Tags, &tags)
+	tfsdk.ValueAs(ctx, i.Tags, &tags)
 
 	return &sonarr.IndexerInput{
-		EnableAutomaticSearch:   indexer.EnableAutomaticSearch.Value,
-		EnableInteractiveSearch: indexer.EnableInteractiveSearch.Value,
-		EnableRss:               indexer.EnableRss.Value,
-		Priority:                indexer.Priority.Value,
-		DownloadClientID:        indexer.DownloadClientID.Value,
-		ID:                      indexer.ID.Value,
-		ConfigContract:          indexer.ConfigContract.Value,
-		Implementation:          indexer.Implementation.Value,
-		Name:                    indexer.Name.Value,
-		Protocol:                indexer.Protocol.Value,
+		EnableAutomaticSearch:   i.EnableAutomaticSearch.Value,
+		EnableInteractiveSearch: i.EnableInteractiveSearch.Value,
+		EnableRss:               i.EnableRss.Value,
+		Priority:                i.Priority.Value,
+		DownloadClientID:        i.DownloadClientID.Value,
+		ID:                      i.ID.Value,
+		ConfigContract:          i.ConfigContract.Value,
+		Implementation:          i.Implementation.Value,
+		Name:                    i.Name.Value,
+		Protocol:                i.Protocol.Value,
 		Tags:                    tags,
-		Fields:                  readIndexerFields(ctx, indexer),
+		Fields:                  i.readFields(ctx),
 	}
 }
 
-func readIndexerFields(ctx context.Context, indexer *Indexer) []*starr.FieldInput {
+func (i *Indexer) readFields(ctx context.Context) []*starr.FieldInput {
 	var output []*starr.FieldInput
 
 	for _, b := range indexerBoolFields {
-		if field := helpers.ReadBoolField(b, indexer); field != nil {
+		if field := helpers.ReadBoolField(b, i); field != nil {
 			output = append(output, field)
 		}
 	}
 
-	for _, i := range indexerIntFields {
-		if field := helpers.ReadIntField(i, indexer); field != nil {
+	for _, n := range indexerIntFields {
+		if field := helpers.ReadIntField(n, i); field != nil {
 			output = append(output, field)
 		}
 	}
 
 	for _, f := range indexerFloatFields {
-		if field := helpers.ReadFloatField(f, indexer); field != nil {
+		if field := helpers.ReadFloatField(f, i); field != nil {
 			output = append(output, field)
 		}
 	}
 
 	for _, s := range indexerStringFields {
-		if field := helpers.ReadStringField(s, indexer); field != nil {
+		if field := helpers.ReadStringField(s, i); field != nil {
 			output = append(output, field)
 		}
 	}
 
 	for _, s := range indexerIntSliceFields {
-		if field := helpers.ReadIntSliceField(ctx, s, indexer); field != nil {
+		if field := helpers.ReadIntSliceField(ctx, s, i); field != nil {
 			output = append(output, field)
 		}
 	}
