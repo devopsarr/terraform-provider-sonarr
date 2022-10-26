@@ -417,41 +417,45 @@ func writeIndexer(ctx context.Context, indexer *sonarr.IndexerOutput) *Indexer {
 	}
 	tfsdk.ValueFrom(ctx, indexer.Tags, output.Tags.Type(ctx), &output.Tags)
 
-	for _, f := range indexer.Fields {
+	output.writeIndexerFields(ctx, indexer.Fields)
+
+	return &output
+}
+
+func (i *Indexer) writeIndexerFields(ctx context.Context, fields []*starr.FieldOutput) {
+	for _, f := range fields {
 		if f.Value == nil {
 			continue
 		}
 
 		if slices.Contains(indexerStringFields, f.Name) {
-			helpers.WriteStringField(f, &output)
+			helpers.WriteStringField(f, i)
 
 			continue
 		}
 
 		if slices.Contains(indexerBoolFields, f.Name) {
-			helpers.WriteBoolField(f, &output)
+			helpers.WriteBoolField(f, i)
 
 			continue
 		}
 
 		if slices.Contains(indexerIntFields, f.Name) {
-			helpers.WriteIntField(f, &output)
+			helpers.WriteIntField(f, i)
 
 			continue
 		}
 
 		if slices.Contains(indexerFloatFields, f.Name) {
-			helpers.WriteFloatField(f, &output)
+			helpers.WriteFloatField(f, i)
 
 			continue
 		}
 
 		if slices.Contains(indexerIntSliceFields, f.Name) {
-			helpers.WriteIntSliceField(ctx, f, &output)
+			helpers.WriteIntSliceField(ctx, f, i)
 		}
 	}
-
-	return &output
 }
 
 func readIndexer(ctx context.Context, indexer *Indexer) *sonarr.IndexerInput {
