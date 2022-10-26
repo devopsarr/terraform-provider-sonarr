@@ -91,6 +91,7 @@ func (r *DelayProfileResource) GetSchema(ctx context.Context) (tfsdk.Schema, dia
 			},
 			"order": {
 				MarkdownDescription: "Order.",
+				Optional:            true,
 				Computed:            true,
 				Type:                types.Int64Type,
 			},
