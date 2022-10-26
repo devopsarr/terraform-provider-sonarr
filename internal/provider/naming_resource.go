@@ -130,9 +130,9 @@ func (r *NamingResource) Configure(ctx context.Context, req resource.ConfigureRe
 
 func (r *NamingResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	// Retrieve values from plan
-	var plan Naming
+	var naming *Naming
 
-	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &naming)...)
 
 	if resp.Diagnostics.HasError() {
 		return
@@ -146,7 +146,7 @@ func (r *NamingResource) Create(ctx context.Context, req resource.CreateRequest,
 	}
 
 	// Build Create resource
-	data := readNaming(&plan)
+	data := naming.read()
 	data.ID = 1
 
 	// Create new Naming
@@ -159,15 +159,15 @@ func (r *NamingResource) Create(ctx context.Context, req resource.CreateRequest,
 
 	tflog.Trace(ctx, "created "+namingResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
-	result := writeNaming(response)
-	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
+	naming.write(response)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &naming)...)
 }
 
 func (r *NamingResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	// Get current state
-	var state Naming
+	var naming *Naming
 
-	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
+	resp.Diagnostics.Append(req.State.Get(ctx, &naming)...)
 
 	if resp.Diagnostics.HasError() {
 		return
@@ -183,22 +183,22 @@ func (r *NamingResource) Read(ctx context.Context, req resource.ReadRequest, res
 
 	tflog.Trace(ctx, "read "+namingResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Map response body to resource schema attribute
-	result := writeNaming(response)
-	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
+	naming.write(response)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &naming)...)
 }
 
 func (r *NamingResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	// Get plan values
-	var plan Naming
+	var naming *Naming
 
-	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &naming)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Build Update resource
-	data := readNaming(&plan)
+	data := naming.read()
 
 	// Update Naming
 	response, err := r.client.UpdateNamingContext(ctx, data)
@@ -210,8 +210,8 @@ func (r *NamingResource) Update(ctx context.Context, req resource.UpdateRequest,
 
 	tflog.Trace(ctx, "updated "+namingResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
-	result := writeNaming(response)
-	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
+	naming.write(response)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &naming)...)
 }
 
 func (r *NamingResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
@@ -226,32 +226,30 @@ func (r *NamingResource) ImportState(ctx context.Context, req resource.ImportSta
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), 1)...)
 }
 
-func writeNaming(naming *sonarr.Naming) *Naming {
-	return &Naming{
-		RenameEpisodes:           types.Bool{Value: naming.RenameEpisodes},
-		ReplaceIllegalCharacters: types.Bool{Value: naming.ReplaceIllegalCharacters},
-		ID:                       types.Int64{Value: naming.ID},
-		MultiEpisodeStyle:        types.Int64{Value: naming.MultiEpisodeStyle},
-		DailyEpisodeFormat:       types.String{Value: naming.DailyEpisodeFormat},
-		AnimeEpisodeFormat:       types.String{Value: naming.AnimeEpisodeFormat},
-		SeriesFolderFormat:       types.String{Value: naming.SeriesFolderFormat},
-		SeasonFolderFormat:       types.String{Value: naming.SeasonFolderFormat},
-		SpecialsFolderFormat:     types.String{Value: naming.SpecialsFolderFormat},
-		StandardEpisodeFormat:    types.String{Value: naming.StandardEpisodeFormat},
-	}
+func (n *Naming) write(naming *sonarr.Naming) {
+	n.RenameEpisodes = types.Bool{Value: naming.RenameEpisodes}
+	n.ReplaceIllegalCharacters = types.Bool{Value: naming.ReplaceIllegalCharacters}
+	n.ID = types.Int64{Value: naming.ID}
+	n.MultiEpisodeStyle = types.Int64{Value: naming.MultiEpisodeStyle}
+	n.DailyEpisodeFormat = types.String{Value: naming.DailyEpisodeFormat}
+	n.AnimeEpisodeFormat = types.String{Value: naming.AnimeEpisodeFormat}
+	n.SeriesFolderFormat = types.String{Value: naming.SeriesFolderFormat}
+	n.SeasonFolderFormat = types.String{Value: naming.SeasonFolderFormat}
+	n.SpecialsFolderFormat = types.String{Value: naming.SpecialsFolderFormat}
+	n.StandardEpisodeFormat = types.String{Value: naming.StandardEpisodeFormat}
 }
 
-func readNaming(naming *Naming) *sonarr.Naming {
+func (n *Naming) read() *sonarr.Naming {
 	return &sonarr.Naming{
-		RenameEpisodes:           naming.RenameEpisodes.Value,
-		ReplaceIllegalCharacters: naming.ReplaceIllegalCharacters.Value,
-		ID:                       naming.ID.Value,
-		MultiEpisodeStyle:        naming.MultiEpisodeStyle.Value,
-		DailyEpisodeFormat:       naming.DailyEpisodeFormat.Value,
-		AnimeEpisodeFormat:       naming.AnimeEpisodeFormat.Value,
-		SeriesFolderFormat:       naming.SeriesFolderFormat.Value,
-		SeasonFolderFormat:       naming.SeasonFolderFormat.Value,
-		SpecialsFolderFormat:     naming.SpecialsFolderFormat.Value,
-		StandardEpisodeFormat:    naming.StandardEpisodeFormat.Value,
+		RenameEpisodes:           n.RenameEpisodes.Value,
+		ReplaceIllegalCharacters: n.ReplaceIllegalCharacters.Value,
+		ID:                       n.ID.Value,
+		MultiEpisodeStyle:        n.MultiEpisodeStyle.Value,
+		DailyEpisodeFormat:       n.DailyEpisodeFormat.Value,
+		AnimeEpisodeFormat:       n.AnimeEpisodeFormat.Value,
+		SeriesFolderFormat:       n.SeriesFolderFormat.Value,
+		SeasonFolderFormat:       n.SeasonFolderFormat.Value,
+		SpecialsFolderFormat:     n.SpecialsFolderFormat.Value,
+		StandardEpisodeFormat:    n.StandardEpisodeFormat.Value,
 	}
 }

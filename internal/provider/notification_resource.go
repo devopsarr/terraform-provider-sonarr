@@ -592,16 +592,16 @@ func (r *NotificationResource) Configure(ctx context.Context, req resource.Confi
 
 func (r *NotificationResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	// Retrieve values from plan
-	var plan Notification
+	var notification *Notification
 
-	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &notification)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Create new Notification
-	request := readNotification(ctx, &plan)
+	request := notification.read(ctx)
 
 	response, err := r.client.AddNotificationContext(ctx, request)
 	if err != nil {
@@ -612,22 +612,25 @@ func (r *NotificationResource) Create(ctx context.Context, req resource.CreateRe
 
 	tflog.Trace(ctx, "created "+notificationResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
-	result := writeNotification(ctx, response)
-	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
+	// this is needed because of many empty fields are unknown in both plan and read
+	var state Notification
+
+	state.write(ctx, response)
+	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
 
 func (r *NotificationResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	// Get current state
-	var state Notification
+	var notification *Notification
 
-	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
+	resp.Diagnostics.Append(req.State.Get(ctx, &notification)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Get Notification current value
-	response, err := r.client.GetNotificationContext(ctx, int(state.ID.Value))
+	response, err := r.client.GetNotificationContext(ctx, int(notification.ID.Value))
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", notificationResourceName, err))
 
@@ -636,22 +639,25 @@ func (r *NotificationResource) Read(ctx context.Context, req resource.ReadReques
 
 	tflog.Trace(ctx, "read "+notificationResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Map response body to resource schema attribute
-	result := writeNotification(ctx, response)
-	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
+	// this is needed because of many empty fields are unknown in both plan and read
+	var state Notification
+
+	state.write(ctx, response)
+	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
 
 func (r *NotificationResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	// Get plan values
-	var plan Notification
+	var notification *Notification
 
-	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &notification)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Update Notification
-	request := readNotification(ctx, &plan)
+	request := notification.read(ctx)
 
 	response, err := r.client.UpdateNotificationContext(ctx, request)
 	if err != nil {
@@ -662,28 +668,31 @@ func (r *NotificationResource) Update(ctx context.Context, req resource.UpdateRe
 
 	tflog.Trace(ctx, "updated "+notificationResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
-	result := writeNotification(ctx, response)
-	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
+	// this is needed because of many empty fields are unknown in both plan and read
+	var state Notification
+
+	state.write(ctx, response)
+	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
 
 func (r *NotificationResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var state Notification
+	var notification *Notification
 
-	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
+	resp.Diagnostics.Append(req.State.Get(ctx, &notification)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Delete Notification current value
-	err := r.client.DeleteNotificationContext(ctx, int(state.ID.Value))
+	err := r.client.DeleteNotificationContext(ctx, int(notification.ID.Value))
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", notificationResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted "+notificationResourceName+": "+strconv.Itoa(int(state.ID.Value)))
+	tflog.Trace(ctx, "deleted "+notificationResourceName+": "+strconv.Itoa(int(notification.ID.Value)))
 	resp.State.RemoveResource(ctx)
 }
 
@@ -703,109 +712,108 @@ func (r *NotificationResource) ImportState(ctx context.Context, req resource.Imp
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 
-func writeNotification(ctx context.Context, notification *sonarr.NotificationOutput) *Notification {
-	output := Notification{
-		OnGrab:                        types.Bool{Value: notification.OnGrab},
-		OnDownload:                    types.Bool{Value: notification.OnDownload},
-		OnUpgrade:                     types.Bool{Value: notification.OnUpgrade},
-		OnRename:                      types.Bool{Value: notification.OnRename},
-		OnSeriesDelete:                types.Bool{Value: notification.OnSeriesDelete},
-		OnEpisodeFileDelete:           types.Bool{Value: notification.OnEpisodeFileDelete},
-		OnEpisodeFileDeleteForUpgrade: types.Bool{Value: notification.OnEpisodeFileDeleteForUpgrade},
-		OnHealthIssue:                 types.Bool{Value: notification.OnHealthIssue},
-		OnApplicationUpdate:           types.Bool{Value: notification.OnApplicationUpdate},
-		IncludeHealthWarnings:         types.Bool{Value: notification.IncludeHealthWarnings},
-		ID:                            types.Int64{Value: notification.ID},
-		Name:                          types.String{Value: notification.Name},
-		Implementation:                types.String{Value: notification.Implementation},
-		ConfigContract:                types.String{Value: notification.ConfigContract},
-		Tags:                          types.Set{ElemType: types.Int64Type},
-		ChannelTags:                   types.Set{ElemType: types.StringType},
-		DeviceIds:                     types.Set{ElemType: types.StringType},
-		Devices:                       types.Set{ElemType: types.StringType},
-		Recipients:                    types.Set{ElemType: types.StringType},
-	}
-	tfsdk.ValueFrom(ctx, notification.Tags, output.Tags.Type(ctx), &output.Tags)
+func (n *Notification) write(ctx context.Context, notification *sonarr.NotificationOutput) {
+	n.OnGrab = types.Bool{Value: notification.OnGrab}
+	n.OnDownload = types.Bool{Value: notification.OnDownload}
+	n.OnUpgrade = types.Bool{Value: notification.OnUpgrade}
+	n.OnRename = types.Bool{Value: notification.OnRename}
+	n.OnSeriesDelete = types.Bool{Value: notification.OnSeriesDelete}
+	n.OnEpisodeFileDelete = types.Bool{Value: notification.OnEpisodeFileDelete}
+	n.OnEpisodeFileDeleteForUpgrade = types.Bool{Value: notification.OnEpisodeFileDeleteForUpgrade}
+	n.OnHealthIssue = types.Bool{Value: notification.OnHealthIssue}
+	n.OnApplicationUpdate = types.Bool{Value: notification.OnApplicationUpdate}
+	n.IncludeHealthWarnings = types.Bool{Value: notification.IncludeHealthWarnings}
+	n.ID = types.Int64{Value: notification.ID}
+	n.Name = types.String{Value: notification.Name}
+	n.Implementation = types.String{Value: notification.Implementation}
+	n.ConfigContract = types.String{Value: notification.ConfigContract}
+	n.Tags = types.Set{ElemType: types.Int64Type}
+	n.ChannelTags = types.Set{ElemType: types.StringType}
+	n.DeviceIds = types.Set{ElemType: types.StringType}
+	n.Devices = types.Set{ElemType: types.StringType}
+	n.Recipients = types.Set{ElemType: types.StringType}
+	tfsdk.ValueFrom(ctx, notification.Tags, n.Tags.Type(ctx), &n.Tags)
+	n.writeFields(ctx, notification.Fields)
+}
 
-	for _, f := range notification.Fields {
+func (n *Notification) writeFields(ctx context.Context, fields []*starr.FieldOutput) {
+	for _, f := range fields {
 		if f.Value == nil {
 			continue
 		}
 
 		if slices.Contains(notificationStringFields, f.Name) {
-			helpers.WriteStringField(f, &output)
+			helpers.WriteStringField(f, n)
 
 			continue
 		}
 
 		if slices.Contains(notificationBoolFields, f.Name) {
-			helpers.WriteBoolField(f, &output)
+			helpers.WriteBoolField(f, n)
 
 			continue
 		}
 
 		if slices.Contains(notificationIntFields, f.Name) {
-			helpers.WriteIntField(f, &output)
+			helpers.WriteIntField(f, n)
 
 			continue
 		}
 
 		if slices.Contains(notificationStringSliceFields, f.Name) {
-			helpers.WriteStringSliceField(ctx, f, &output)
+			helpers.WriteStringSliceField(ctx, f, n)
 		}
 	}
-
-	return &output
 }
 
-func readNotification(ctx context.Context, notification *Notification) *sonarr.NotificationInput {
+func (n *Notification) read(ctx context.Context) *sonarr.NotificationInput {
 	var tags []int
 
-	tfsdk.ValueAs(ctx, notification.Tags, &tags)
+	tfsdk.ValueAs(ctx, n.Tags, &tags)
 
 	return &sonarr.NotificationInput{
-		OnGrab:                        notification.OnGrab.Value,
-		OnDownload:                    notification.OnDownload.Value,
-		OnUpgrade:                     notification.OnUpgrade.Value,
-		OnRename:                      notification.OnRename.Value,
-		OnSeriesDelete:                notification.OnSeriesDelete.Value,
-		OnEpisodeFileDelete:           notification.OnEpisodeFileDelete.Value,
-		OnEpisodeFileDeleteForUpgrade: notification.OnEpisodeFileDeleteForUpgrade.Value,
-		OnHealthIssue:                 notification.OnHealthIssue.Value,
-		OnApplicationUpdate:           notification.OnApplicationUpdate.Value,
-		IncludeHealthWarnings:         notification.IncludeHealthWarnings.Value,
-		ID:                            notification.ID.Value,
-		Name:                          notification.Name.Value,
-		Implementation:                notification.Implementation.Value,
-		ConfigContract:                notification.ConfigContract.Value,
+		OnGrab:                        n.OnGrab.Value,
+		OnDownload:                    n.OnDownload.Value,
+		OnUpgrade:                     n.OnUpgrade.Value,
+		OnRename:                      n.OnRename.Value,
+		OnSeriesDelete:                n.OnSeriesDelete.Value,
+		OnEpisodeFileDelete:           n.OnEpisodeFileDelete.Value,
+		OnEpisodeFileDeleteForUpgrade: n.OnEpisodeFileDeleteForUpgrade.Value,
+		OnHealthIssue:                 n.OnHealthIssue.Value,
+		OnApplicationUpdate:           n.OnApplicationUpdate.Value,
+		IncludeHealthWarnings:         n.IncludeHealthWarnings.Value,
+		ID:                            n.ID.Value,
+		Name:                          n.Name.Value,
+		Implementation:                n.Implementation.Value,
+		ConfigContract:                n.ConfigContract.Value,
 		Tags:                          tags,
-		Fields:                        readNotificationFields(ctx, notification),
+		Fields:                        n.readFields(ctx),
 	}
 }
 
-func readNotificationFields(ctx context.Context, notification *Notification) []*starr.FieldInput {
+func (n *Notification) readFields(ctx context.Context) []*starr.FieldInput {
 	var output []*starr.FieldInput
 
 	for _, b := range notificationBoolFields {
-		if field := helpers.ReadBoolField(b, notification); field != nil {
+		if field := helpers.ReadBoolField(b, n); field != nil {
 			output = append(output, field)
 		}
 	}
 
 	for _, i := range notificationIntFields {
-		if field := helpers.ReadIntField(i, notification); field != nil {
+		if field := helpers.ReadIntField(i, n); field != nil {
 			output = append(output, field)
 		}
 	}
 
 	for _, s := range notificationStringFields {
-		if field := helpers.ReadStringField(s, notification); field != nil {
+		if field := helpers.ReadStringField(s, n); field != nil {
 			output = append(output, field)
 		}
 	}
 
 	for _, s := range notificationStringSliceFields {
-		if field := helpers.ReadStringSliceField(ctx, s, notification); field != nil {
+		if field := helpers.ReadStringSliceField(ctx, s, n); field != nil {
 			output = append(output, field)
 		}
 	}

@@ -196,16 +196,16 @@ func (r *MediaManagementResource) Configure(ctx context.Context, req resource.Co
 
 func (r *MediaManagementResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	// Retrieve values from plan
-	var plan MediaManagement
+	var management *MediaManagement
 
-	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &management)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Build Create resource
-	data := readMediaManagement(&plan)
+	data := management.read()
 	data.ID = 1
 
 	// Create new MediaManagement
@@ -218,15 +218,15 @@ func (r *MediaManagementResource) Create(ctx context.Context, req resource.Creat
 
 	tflog.Trace(ctx, "created media_management: "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
-	result := writeMediaManagement(response)
-	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
+	management.write(response)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &management)...)
 }
 
 func (r *MediaManagementResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	// Get current state
-	var state MediaManagement
+	var management *MediaManagement
 
-	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
+	resp.Diagnostics.Append(req.State.Get(ctx, &management)...)
 
 	if resp.Diagnostics.HasError() {
 		return
@@ -242,22 +242,22 @@ func (r *MediaManagementResource) Read(ctx context.Context, req resource.ReadReq
 
 	tflog.Trace(ctx, "read "+mediaManagementResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Map response body to resource schema attribute
-	result := writeMediaManagement(response)
-	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
+	management.write(response)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &management)...)
 }
 
 func (r *MediaManagementResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	// Get plan values
-	var plan MediaManagement
+	var management *MediaManagement
 
-	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &management)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Build Update resource
-	data := readMediaManagement(&plan)
+	data := management.read()
 
 	// Update MediaManagement
 	response, err := r.client.UpdateMediaManagementContext(ctx, data)
@@ -269,8 +269,8 @@ func (r *MediaManagementResource) Update(ctx context.Context, req resource.Updat
 
 	tflog.Trace(ctx, "updated "+mediaManagementResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
-	result := writeMediaManagement(response)
-	resp.Diagnostics.Append(resp.State.Set(ctx, result)...)
+	management.write(response)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &management)...)
 }
 
 func (r *MediaManagementResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
@@ -285,50 +285,48 @@ func (r *MediaManagementResource) ImportState(ctx context.Context, req resource.
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), 1)...)
 }
 
-func writeMediaManagement(mediaMgt *sonarr.MediaManagement) *MediaManagement {
-	return &MediaManagement{
-		UnmonitorPreviousEpisodes: types.Bool{Value: mediaMgt.AutoUnmonitorPreviouslyDownloadedEpisodes},
-		HardlinksCopy:             types.Bool{Value: mediaMgt.CopyUsingHardlinks},
-		CreateEmptyFolders:        types.Bool{Value: mediaMgt.CreateEmptySeriesFolders},
-		DeleteEmptyFolders:        types.Bool{Value: mediaMgt.DeleteEmptyFolders},
-		EnableMediaInfo:           types.Bool{Value: mediaMgt.EnableMediaInfo},
-		ImportExtraFiles:          types.Bool{Value: mediaMgt.ImportExtraFiles},
-		SetPermissions:            types.Bool{Value: mediaMgt.SetPermissionsLinux},
-		SkipFreeSpaceCheck:        types.Bool{Value: mediaMgt.SkipFreeSpaceCheckWhenImporting},
-		ID:                        types.Int64{Value: mediaMgt.ID},
-		MinimumFreeSpace:          types.Int64{Value: mediaMgt.MinimumFreeSpaceWhenImporting},
-		RecycleBinDays:            types.Int64{Value: mediaMgt.RecycleBinCleanupDays},
-		ChmodFolder:               types.String{Value: mediaMgt.ChmodFolder},
-		ChownGroup:                types.String{Value: mediaMgt.ChownGroup},
-		DownloadPropersRepacks:    types.String{Value: mediaMgt.DownloadPropersAndRepacks},
-		EpisodeTitleRequired:      types.String{Value: mediaMgt.EpisodeTitleRequired},
-		ExtraFileExtensions:       types.String{Value: mediaMgt.ExtraFileExtensions},
-		FileDate:                  types.String{Value: mediaMgt.FileDate},
-		RecycleBinPath:            types.String{Value: mediaMgt.RecycleBin},
-		RescanAfterRefresh:        types.String{Value: mediaMgt.RescanAfterRefresh},
-	}
+func (m *MediaManagement) write(mediaMgt *sonarr.MediaManagement) {
+	m.UnmonitorPreviousEpisodes = types.Bool{Value: mediaMgt.AutoUnmonitorPreviouslyDownloadedEpisodes}
+	m.HardlinksCopy = types.Bool{Value: mediaMgt.CopyUsingHardlinks}
+	m.CreateEmptyFolders = types.Bool{Value: mediaMgt.CreateEmptySeriesFolders}
+	m.DeleteEmptyFolders = types.Bool{Value: mediaMgt.DeleteEmptyFolders}
+	m.EnableMediaInfo = types.Bool{Value: mediaMgt.EnableMediaInfo}
+	m.ImportExtraFiles = types.Bool{Value: mediaMgt.ImportExtraFiles}
+	m.SetPermissions = types.Bool{Value: mediaMgt.SetPermissionsLinux}
+	m.SkipFreeSpaceCheck = types.Bool{Value: mediaMgt.SkipFreeSpaceCheckWhenImporting}
+	m.ID = types.Int64{Value: mediaMgt.ID}
+	m.MinimumFreeSpace = types.Int64{Value: mediaMgt.MinimumFreeSpaceWhenImporting}
+	m.RecycleBinDays = types.Int64{Value: mediaMgt.RecycleBinCleanupDays}
+	m.ChmodFolder = types.String{Value: mediaMgt.ChmodFolder}
+	m.ChownGroup = types.String{Value: mediaMgt.ChownGroup}
+	m.DownloadPropersRepacks = types.String{Value: mediaMgt.DownloadPropersAndRepacks}
+	m.EpisodeTitleRequired = types.String{Value: mediaMgt.EpisodeTitleRequired}
+	m.ExtraFileExtensions = types.String{Value: mediaMgt.ExtraFileExtensions}
+	m.FileDate = types.String{Value: mediaMgt.FileDate}
+	m.RecycleBinPath = types.String{Value: mediaMgt.RecycleBin}
+	m.RescanAfterRefresh = types.String{Value: mediaMgt.RescanAfterRefresh}
 }
 
-func readMediaManagement(mediaMgt *MediaManagement) *sonarr.MediaManagement {
+func (m *MediaManagement) read() *sonarr.MediaManagement {
 	return &sonarr.MediaManagement{
-		AutoUnmonitorPreviouslyDownloadedEpisodes: mediaMgt.UnmonitorPreviousEpisodes.Value,
-		CopyUsingHardlinks:                        mediaMgt.HardlinksCopy.Value,
-		CreateEmptySeriesFolders:                  mediaMgt.CreateEmptyFolders.Value,
-		DeleteEmptyFolders:                        mediaMgt.DeleteEmptyFolders.Value,
-		EnableMediaInfo:                           mediaMgt.EnableMediaInfo.Value,
-		ImportExtraFiles:                          mediaMgt.ImportExtraFiles.Value,
-		SetPermissionsLinux:                       mediaMgt.SetPermissions.Value,
-		SkipFreeSpaceCheckWhenImporting:           mediaMgt.SkipFreeSpaceCheck.Value,
-		ID:                                        mediaMgt.ID.Value,
-		MinimumFreeSpaceWhenImporting:             mediaMgt.MinimumFreeSpace.Value,
-		RecycleBinCleanupDays:                     mediaMgt.RecycleBinDays.Value,
-		ChmodFolder:                               mediaMgt.ChmodFolder.Value,
-		ChownGroup:                                mediaMgt.ChownGroup.Value,
-		DownloadPropersAndRepacks:                 mediaMgt.DownloadPropersRepacks.Value,
-		EpisodeTitleRequired:                      mediaMgt.EpisodeTitleRequired.Value,
-		ExtraFileExtensions:                       mediaMgt.ExtraFileExtensions.Value,
-		FileDate:                                  mediaMgt.FileDate.Value,
-		RecycleBin:                                mediaMgt.RecycleBinPath.Value,
-		RescanAfterRefresh:                        mediaMgt.RescanAfterRefresh.Value,
+		AutoUnmonitorPreviouslyDownloadedEpisodes: m.UnmonitorPreviousEpisodes.Value,
+		CopyUsingHardlinks:                        m.HardlinksCopy.Value,
+		CreateEmptySeriesFolders:                  m.CreateEmptyFolders.Value,
+		DeleteEmptyFolders:                        m.DeleteEmptyFolders.Value,
+		EnableMediaInfo:                           m.EnableMediaInfo.Value,
+		ImportExtraFiles:                          m.ImportExtraFiles.Value,
+		SetPermissionsLinux:                       m.SetPermissions.Value,
+		SkipFreeSpaceCheckWhenImporting:           m.SkipFreeSpaceCheck.Value,
+		ID:                                        m.ID.Value,
+		MinimumFreeSpaceWhenImporting:             m.MinimumFreeSpace.Value,
+		RecycleBinCleanupDays:                     m.RecycleBinDays.Value,
+		ChmodFolder:                               m.ChmodFolder.Value,
+		ChownGroup:                                m.ChownGroup.Value,
+		DownloadPropersAndRepacks:                 m.DownloadPropersRepacks.Value,
+		EpisodeTitleRequired:                      m.EpisodeTitleRequired.Value,
+		ExtraFileExtensions:                       m.ExtraFileExtensions.Value,
+		FileDate:                                  m.FileDate.Value,
+		RecycleBin:                                m.RecycleBinPath.Value,
+		RescanAfterRefresh:                        m.RescanAfterRefresh.Value,
 	}
 }

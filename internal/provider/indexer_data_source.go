@@ -212,7 +212,7 @@ func (d *IndexerDataSource) Configure(ctx context.Context, req datasource.Config
 }
 
 func (d *IndexerDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var data Indexer
+	var data *Indexer
 
 	resp.Diagnostics.Append(resp.State.Get(ctx, &data)...)
 
@@ -235,8 +235,8 @@ func (d *IndexerDataSource) Read(ctx context.Context, req datasource.ReadRequest
 	}
 
 	tflog.Trace(ctx, "read "+indexerDataSourceName)
-	result := writeIndexer(ctx, indexer)
-	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
+	data.write(ctx, indexer)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
 func findIndexer(name string, indexers []*sonarr.IndexerOutput) (*sonarr.IndexerOutput, error) {

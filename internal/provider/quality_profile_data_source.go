@@ -122,7 +122,7 @@ func (d *QualityProfileDataSource) Configure(ctx context.Context, req datasource
 }
 
 func (d *QualityProfileDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var data QualityProfile
+	var data *QualityProfile
 
 	resp.Diagnostics.Append(resp.State.Get(ctx, &data)...)
 
@@ -145,8 +145,8 @@ func (d *QualityProfileDataSource) Read(ctx context.Context, req datasource.Read
 	}
 
 	tflog.Trace(ctx, "read "+qualityProfileDataSourceName)
-	result := writeQualityProfile(ctx, profile)
-	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
+	data.write(ctx, profile)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
 func findQualityProfile(name string, profiles []*sonarr.QualityProfile) (*sonarr.QualityProfile, error) {

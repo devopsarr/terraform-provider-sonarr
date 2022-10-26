@@ -140,7 +140,7 @@ func (d *QualityProfilesDataSource) Configure(ctx context.Context, req datasourc
 }
 
 func (d *QualityProfilesDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var data QualityProfiles
+	var data *QualityProfiles
 
 	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
 
@@ -168,7 +168,7 @@ func (d *QualityProfilesDataSource) Read(ctx context.Context, req datasource.Rea
 func writeQualitiyprofiles(ctx context.Context, qualities []*sonarr.QualityProfile) *[]QualityProfile {
 	output := make([]QualityProfile, len(qualities))
 	for i, p := range qualities {
-		output[i] = *writeQualityProfile(ctx, p)
+		output[i].write(ctx, p)
 	}
 
 	return &output

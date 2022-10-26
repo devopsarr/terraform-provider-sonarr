@@ -98,7 +98,7 @@ func (d *RemotePathMappingsDataSource) Configure(ctx context.Context, req dataso
 }
 
 func (d *RemotePathMappingsDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var data RemotePathMappings
+	var data *RemotePathMappings
 
 	resp.Diagnostics.Append(resp.State.Get(ctx, &data)...)
 
@@ -115,18 +115,13 @@ func (d *RemotePathMappingsDataSource) Read(ctx context.Context, req datasource.
 
 	tflog.Trace(ctx, "read "+remotePathMappingsDataSourceName)
 	// Map response body to resource schema attribute
-	profiles := *writeRemotePathMappings(response)
-	tfsdk.ValueFrom(ctx, profiles, data.RemotePathMappings.Type(context.Background()), &data.RemotePathMappings)
+	mappings := make([]RemotePathMapping, len(response))
+	for i, p := range response {
+		mappings[i].write(p)
+	}
+
+	tfsdk.ValueFrom(ctx, mappings, data.RemotePathMappings.Type(context.Background()), &data.RemotePathMappings)
 	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 	data.ID = types.String{Value: strconv.Itoa(len(response))}
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
-}
-
-func writeRemotePathMappings(mappings []*sonarr.RemotePathMapping) *[]RemotePathMapping {
-	output := make([]RemotePathMapping, len(mappings))
-	for i, p := range mappings {
-		output[i] = *writeRemotePathMapping(p)
-	}
-
-	return &output
 }

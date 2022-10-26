@@ -165,6 +165,7 @@ func (d *MediaManagementDataSource) Read(ctx context.Context, req datasource.Rea
 
 	tflog.Trace(ctx, "read "+mediaManagementDataSourceName)
 
-	result := writeMediaManagement(response)
-	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
+	state := MediaManagement{}
+	state.write(response)
+	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }

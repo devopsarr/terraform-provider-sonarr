@@ -95,6 +95,7 @@ func (d *IndexerConfigDataSource) Read(ctx context.Context, req datasource.ReadR
 
 	tflog.Trace(ctx, "read "+downloadClientsDataSourceName)
 
-	result := writeIndexerConfig(response)
-	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
+	status := IndexerConfig{}
+	status.write(response)
+	resp.Diagnostics.Append(resp.State.Set(ctx, status)...)
 }

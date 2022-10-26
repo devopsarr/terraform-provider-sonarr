@@ -438,7 +438,7 @@ func (d *NotificationDataSource) Configure(ctx context.Context, req datasource.C
 }
 
 func (d *NotificationDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var data Notification
+	var data *Notification
 
 	resp.Diagnostics.Append(resp.State.Get(ctx, &data)...)
 
@@ -461,8 +461,8 @@ func (d *NotificationDataSource) Read(ctx context.Context, req datasource.ReadRe
 	}
 
 	tflog.Trace(ctx, "read "+notificationDataSourceName)
-	result := writeNotification(ctx, notification)
-	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
+	data.write(ctx, notification)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
 func findNotification(name string, notifications []*sonarr.NotificationOutput) (*sonarr.NotificationOutput, error) {

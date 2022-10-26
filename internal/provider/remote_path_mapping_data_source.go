@@ -81,9 +81,9 @@ func (d *RemotePathMappingDataSource) Configure(ctx context.Context, req datasou
 }
 
 func (d *RemotePathMappingDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var data RemotePathMapping
+	var remoteMapping *RemotePathMapping
 
-	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
+	resp.Diagnostics.Append(req.Config.Get(ctx, &remoteMapping)...)
 
 	if resp.Diagnostics.HasError() {
 		return
@@ -97,7 +97,7 @@ func (d *RemotePathMappingDataSource) Read(ctx context.Context, req datasource.R
 	}
 
 	// Map response body to resource schema attribute
-	mapping, err := findRemotePathMapping(data.ID.Value, response)
+	mapping, err := findRemotePathMapping(remoteMapping.ID.Value, response)
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", remotePathMappingDataSourceName, err))
 
@@ -106,8 +106,8 @@ func (d *RemotePathMappingDataSource) Read(ctx context.Context, req datasource.R
 
 	tflog.Trace(ctx, "read "+remotePathMappingDataSourceName)
 
-	result := writeRemotePathMapping(mapping)
-	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
+	remoteMapping.write(mapping)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &remoteMapping)...)
 }
 
 func findRemotePathMapping(id int64, mappings []*sonarr.RemotePathMapping) (*sonarr.RemotePathMapping, error) {

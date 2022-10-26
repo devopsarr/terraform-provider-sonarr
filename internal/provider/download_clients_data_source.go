@@ -306,7 +306,7 @@ func (d *DownloadClientsDataSource) Configure(ctx context.Context, req datasourc
 }
 
 func (d *DownloadClientsDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var data DownloadClients
+	var data *DownloadClients
 
 	resp.Diagnostics.Append(resp.State.Get(ctx, &data)...)
 
@@ -323,18 +323,13 @@ func (d *DownloadClientsDataSource) Read(ctx context.Context, req datasource.Rea
 
 	tflog.Trace(ctx, "read "+downloadClientsDataSourceName)
 	// Map response body to resource schema attribute
-	profiles := *writeDownloadClients(ctx, response)
+	profiles := make([]DownloadClient, len(response))
+	for i, p := range response {
+		profiles[i].write(ctx, p)
+	}
+
 	tfsdk.ValueFrom(ctx, profiles, data.DownloadClients.Type(context.Background()), &data.DownloadClients)
 	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 	data.ID = types.String{Value: strconv.Itoa(len(response))}
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
-}
-
-func writeDownloadClients(ctx context.Context, clients []*sonarr.DownloadClientOutput) *[]DownloadClient {
-	output := make([]DownloadClient, len(clients))
-	for i, p := range clients {
-		output[i] = *writeDownloadClient(ctx, p)
-	}
-
-	return &output
 }

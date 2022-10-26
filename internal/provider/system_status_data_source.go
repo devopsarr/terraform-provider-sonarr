@@ -237,38 +237,37 @@ func (d *SystemStatusDataSource) Read(ctx context.Context, req datasource.ReadRe
 
 	tflog.Trace(ctx, "read "+systemStatusDataSourceName)
 
-	result := writeSystemStatus(response)
-	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
+	status := SystemStatus{}
+	status.write(response)
+	resp.Diagnostics.Append(resp.State.Set(ctx, status)...)
 }
 
-func writeSystemStatus(status *sonarr.SystemStatus) *SystemStatus {
-	return &SystemStatus{
-		IsDebug:                types.Bool{Value: status.IsDebug},
-		IsProduction:           types.Bool{Value: status.IsProduction},
-		IsAdmin:                types.Bool{Value: status.IsProduction},
-		IsUserInteractive:      types.Bool{Value: status.IsUserInteractive},
-		IsMonoRuntime:          types.Bool{Value: status.IsMonoRuntime},
-		IsMono:                 types.Bool{Value: status.IsMono},
-		IsLinux:                types.Bool{Value: status.IsLinux},
-		IsOsx:                  types.Bool{Value: status.IsOsx},
-		IsWindows:              types.Bool{Value: status.IsWindows},
-		ID:                     types.Int64{Value: int64(1)},
-		Version:                types.String{Value: status.Version},
-		StartupPath:            types.String{Value: status.StartupPath},
-		AppData:                types.String{Value: status.AppData},
-		OsName:                 types.String{Value: status.OsName},
-		OsVersion:              types.String{Value: status.OsVersion},
-		Mode:                   types.String{Value: status.Mode},
-		Branch:                 types.String{Value: status.Branch},
-		Authentication:         types.String{Value: status.Authentication},
-		SqliteVersion:          types.String{Value: status.SqliteVersion},
-		URLBase:                types.String{Value: status.URLBase},
-		RuntimeVersion:         types.String{Value: status.RuntimeVersion},
-		RuntimeName:            types.String{Value: status.RuntimeName},
-		PackageVersion:         types.String{Value: status.PackageVersion},
-		PackageAuthor:          types.String{Value: status.PackageAuthor},
-		PackageUpdateMechanism: types.String{Value: status.PackageUpdateMechanism},
-		BuildTime:              types.String{Value: status.BuildTime.String()},
-		StartTime:              types.String{Value: status.StartTime.String()},
-	}
+func (s *SystemStatus) write(status *sonarr.SystemStatus) {
+	s.IsDebug = types.Bool{Value: status.IsDebug}
+	s.IsProduction = types.Bool{Value: status.IsProduction}
+	s.IsAdmin = types.Bool{Value: status.IsProduction}
+	s.IsUserInteractive = types.Bool{Value: status.IsUserInteractive}
+	s.IsMonoRuntime = types.Bool{Value: status.IsMonoRuntime}
+	s.IsMono = types.Bool{Value: status.IsMono}
+	s.IsLinux = types.Bool{Value: status.IsLinux}
+	s.IsOsx = types.Bool{Value: status.IsOsx}
+	s.IsWindows = types.Bool{Value: status.IsWindows}
+	s.ID = types.Int64{Value: int64(1)}
+	s.Version = types.String{Value: status.Version}
+	s.StartupPath = types.String{Value: status.StartupPath}
+	s.AppData = types.String{Value: status.AppData}
+	s.OsName = types.String{Value: status.OsName}
+	s.OsVersion = types.String{Value: status.OsVersion}
+	s.Mode = types.String{Value: status.Mode}
+	s.Branch = types.String{Value: status.Branch}
+	s.Authentication = types.String{Value: status.Authentication}
+	s.SqliteVersion = types.String{Value: status.SqliteVersion}
+	s.URLBase = types.String{Value: status.URLBase}
+	s.RuntimeVersion = types.String{Value: status.RuntimeVersion}
+	s.RuntimeName = types.String{Value: status.RuntimeName}
+	s.PackageVersion = types.String{Value: status.PackageVersion}
+	s.PackageAuthor = types.String{Value: status.PackageAuthor}
+	s.PackageUpdateMechanism = types.String{Value: status.PackageUpdateMechanism}
+	s.BuildTime = types.String{Value: status.BuildTime.String()}
+	s.StartTime = types.String{Value: status.StartTime.String()}
 }

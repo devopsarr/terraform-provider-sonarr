@@ -71,9 +71,9 @@ func (d *TagDataSource) Configure(ctx context.Context, req datasource.ConfigureR
 }
 
 func (d *TagDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var data Tag
+	var tag *Tag
 
-	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
+	resp.Diagnostics.Append(req.Config.Get(ctx, &tag)...)
 
 	if resp.Diagnostics.HasError() {
 		return
@@ -87,18 +87,17 @@ func (d *TagDataSource) Read(ctx context.Context, req datasource.ReadRequest, re
 		return
 	}
 
-	tag, err := findTag(data.Label.Value, response)
+	value, err := findTag(tag.Label.Value, response)
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", tagDataSourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read tag")
-
-	result := writeTag(tag)
+	tflog.Trace(ctx, "read "+tagDataSourceName)
+	tag.write(value)
 	// Map response body to resource schema attribute
-	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &tag)...)
 }
 
 func findTag(label string, tags []*starr.Tag) (*starr.Tag, error) {

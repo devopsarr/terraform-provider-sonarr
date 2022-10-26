@@ -94,16 +94,16 @@ func (r *RemotePathMappingResource) Configure(ctx context.Context, req resource.
 
 func (r *RemotePathMappingResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	// Retrieve values from plan
-	var plan RemotePathMapping
+	var mapping *RemotePathMapping
 
-	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &mapping)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Create new RemotePathMapping
-	request := readRemotePathMapping(&plan)
+	request := mapping.read()
 
 	response, err := r.client.AddRemotePathMappingContext(ctx, request)
 	if err != nil {
@@ -114,22 +114,22 @@ func (r *RemotePathMappingResource) Create(ctx context.Context, req resource.Cre
 
 	tflog.Trace(ctx, "created "+remotePathMappingResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
-	result := writeRemotePathMapping(response)
-	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
+	mapping.write(response)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &mapping)...)
 }
 
 func (r *RemotePathMappingResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	// Get current state
-	var state RemotePathMapping
+	var mapping *RemotePathMapping
 
-	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
+	resp.Diagnostics.Append(req.State.Get(ctx, &mapping)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Get remotePathMapping current value
-	response, err := r.client.GetRemotePathMappingContext(ctx, int(state.ID.Value))
+	response, err := r.client.GetRemotePathMappingContext(ctx, int(mapping.ID.Value))
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", remotePathMappingResourceName, err))
 
@@ -138,22 +138,22 @@ func (r *RemotePathMappingResource) Read(ctx context.Context, req resource.ReadR
 
 	tflog.Trace(ctx, "read "+remotePathMappingResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Map response body to resource schema attribute
-	result := writeRemotePathMapping(response)
-	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
+	mapping.write(response)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &mapping)...)
 }
 
 func (r *RemotePathMappingResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	// Get plan values
-	var plan RemotePathMapping
+	var mapping *RemotePathMapping
 
-	resp.Diagnostics.Append(req.Plan.Get(ctx, &plan)...)
+	resp.Diagnostics.Append(req.Plan.Get(ctx, &mapping)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Update RemotePathMapping
-	request := readRemotePathMapping(&plan)
+	request := mapping.read()
 
 	response, err := r.client.UpdateRemotePathMappingContext(ctx, request)
 	if err != nil {
@@ -164,12 +164,12 @@ func (r *RemotePathMappingResource) Update(ctx context.Context, req resource.Upd
 
 	tflog.Trace(ctx, "updated "+remotePathMappingResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
-	result := writeRemotePathMapping(response)
-	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
+	mapping.write(response)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &mapping)...)
 }
 
 func (r *RemotePathMappingResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var state RemotePathMapping
+	var state *RemotePathMapping
 
 	diags := req.State.Get(ctx, &state)
 	resp.Diagnostics.Append(diags...)
@@ -206,20 +206,18 @@ func (r *RemotePathMappingResource) ImportState(ctx context.Context, req resourc
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 
-func writeRemotePathMapping(remotePathMapping *sonarr.RemotePathMapping) *RemotePathMapping {
-	return &RemotePathMapping{
-		ID:         types.Int64{Value: remotePathMapping.ID},
-		Host:       types.String{Value: remotePathMapping.Host},
-		RemotePath: types.String{Value: remotePathMapping.RemotePath},
-		LocalPath:  types.String{Value: remotePathMapping.LocalPath},
-	}
+func (r *RemotePathMapping) write(remotePathMapping *sonarr.RemotePathMapping) {
+	r.ID = types.Int64{Value: remotePathMapping.ID}
+	r.Host = types.String{Value: remotePathMapping.Host}
+	r.RemotePath = types.String{Value: remotePathMapping.RemotePath}
+	r.LocalPath = types.String{Value: remotePathMapping.LocalPath}
 }
 
-func readRemotePathMapping(mapping *RemotePathMapping) *sonarr.RemotePathMapping {
+func (r *RemotePathMapping) read() *sonarr.RemotePathMapping {
 	return &sonarr.RemotePathMapping{
-		ID:         mapping.ID.Value,
-		Host:       mapping.Host.Value,
-		RemotePath: mapping.RemotePath.Value,
-		LocalPath:  mapping.LocalPath.Value,
+		ID:         r.ID.Value,
+		Host:       r.Host.Value,
+		RemotePath: r.RemotePath.Value,
+		LocalPath:  r.LocalPath.Value,
 	}
 }

@@ -85,7 +85,7 @@ func (d *LanguageProfileDataSource) Configure(ctx context.Context, req datasourc
 }
 
 func (d *LanguageProfileDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var data LanguageProfile
+	var data *LanguageProfile
 
 	resp.Diagnostics.Append(resp.State.Get(ctx, &data)...)
 
@@ -108,8 +108,8 @@ func (d *LanguageProfileDataSource) Read(ctx context.Context, req datasource.Rea
 	}
 
 	tflog.Trace(ctx, "read "+languageProfileDataSourceName)
-	result := writeLanguageProfile(ctx, profile)
-	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
+	data.write(ctx, profile)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
 func findLanguageProfile(name string, profiles []*sonarr.LanguageProfile) (*sonarr.LanguageProfile, error) {

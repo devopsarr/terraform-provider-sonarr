@@ -287,7 +287,7 @@ func (d *DownloadClientDataSource) Configure(ctx context.Context, req datasource
 }
 
 func (d *DownloadClientDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var data DownloadClient
+	var data *DownloadClient
 
 	resp.Diagnostics.Append(resp.State.Get(ctx, &data)...)
 
@@ -310,8 +310,8 @@ func (d *DownloadClientDataSource) Read(ctx context.Context, req datasource.Read
 	}
 
 	tflog.Trace(ctx, "read "+downloadClientDataSourceName)
-	result := writeDownloadClient(ctx, downloadClient)
-	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
+	data.write(ctx, downloadClient)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
 func findDownloadClient(name string, downloadClients []*sonarr.DownloadClientOutput) (*sonarr.DownloadClientOutput, error) {
