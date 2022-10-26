@@ -5,14 +5,21 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"golift.io/starr"
 	"golift.io/starr/sonarr"
+)
+
+const (
+	indexerRarbgResourceName   = "indexer_rarbg"
+	IndexerRarbgImplementation = "Rarbg"
+	IndexerRarbgConfigContrat  = "RarbgSettings"
+	IndexerRarbgProtocol       = "torrent"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -28,39 +35,70 @@ type IndexerRarbgResource struct {
 	client *sonarr.Sonarr
 }
 
-const (
-	IndexerRarbgImplementation = "Rarbg"
-	IndexerRarbgConfigContrat  = "RarbgSettings"
-	IndexerRarbgProtocol       = "torrent"
-)
-
 // IndexerRarbg describes the Rarbg indexer data model.
 type IndexerRarbg struct {
-	EnableAutomaticSearch   types.Bool   `tfsdk:"enable_automatic_search"`
-	EnableInteractiveSearch types.Bool   `tfsdk:"enable_interactive_search"`
-	EnableRss               types.Bool   `tfsdk:"enable_rss"`
-	Priority                types.Int64  `tfsdk:"priority"`
-	DownloadClientID        types.Int64  `tfsdk:"download_client_id"`
-	ID                      types.Int64  `tfsdk:"id"`
-	Name                    types.String `tfsdk:"name"`
-	Tags                    types.Set    `tfsdk:"tags"`
-	// Fields values
-	RankedOnly         types.Bool    `tfsdk:"ranked_only"`
-	MinimumSeeders     types.Int64   `tfsdk:"minimum_seeders"`
-	SeasonPackSeedTime types.Int64   `tfsdk:"season_pack_seed_time"`
-	SeedTime           types.Int64   `tfsdk:"seed_time"`
-	SeedRatio          types.Float64 `tfsdk:"seed_ratio"`
-	BaseURL            types.String  `tfsdk:"base_url"`
-	CaptchaToken       types.String  `tfsdk:"captcha_token"`
+	Tags                    types.Set     `tfsdk:"tags"`
+	Name                    types.String  `tfsdk:"name"`
+	CaptchaToken            types.String  `tfsdk:"captcha_token"`
+	BaseURL                 types.String  `tfsdk:"base_url"`
+	Priority                types.Int64   `tfsdk:"priority"`
+	ID                      types.Int64   `tfsdk:"id"`
+	DownloadClientID        types.Int64   `tfsdk:"download_client_id"`
+	MinimumSeeders          types.Int64   `tfsdk:"minimum_seeders"`
+	SeasonPackSeedTime      types.Int64   `tfsdk:"season_pack_seed_time"`
+	SeedTime                types.Int64   `tfsdk:"seed_time"`
+	SeedRatio               types.Float64 `tfsdk:"seed_ratio"`
+	EnableAutomaticSearch   types.Bool    `tfsdk:"enable_automatic_search"`
+	RankedOnly              types.Bool    `tfsdk:"ranked_only"`
+	EnableRss               types.Bool    `tfsdk:"enable_rss"`
+	EnableInteractiveSearch types.Bool    `tfsdk:"enable_interactive_search"`
+}
+
+func (i IndexerRarbg) toIndexer() *Indexer {
+	return &Indexer{
+		EnableAutomaticSearch:   i.EnableAutomaticSearch,
+		EnableInteractiveSearch: i.EnableInteractiveSearch,
+		EnableRss:               i.EnableRss,
+		Priority:                i.Priority,
+		DownloadClientID:        i.DownloadClientID,
+		ID:                      i.ID,
+		Name:                    i.Name,
+		RankedOnly:              i.RankedOnly,
+		MinimumSeeders:          i.MinimumSeeders,
+		SeasonPackSeedTime:      i.SeasonPackSeedTime,
+		SeedTime:                i.SeedTime,
+		SeedRatio:               i.SeedRatio,
+		CaptchaToken:            i.CaptchaToken,
+		BaseURL:                 i.BaseURL,
+		Tags:                    i.Tags,
+	}
+}
+
+func (i *IndexerRarbg) fromIndexer(indexer *Indexer) {
+	i.EnableAutomaticSearch = indexer.EnableAutomaticSearch
+	i.EnableInteractiveSearch = indexer.EnableInteractiveSearch
+	i.EnableRss = indexer.EnableRss
+	i.Priority = indexer.Priority
+	i.DownloadClientID = indexer.DownloadClientID
+	i.ID = indexer.ID
+	i.Name = indexer.Name
+	i.RankedOnly = indexer.RankedOnly
+	i.MinimumSeeders = indexer.MinimumSeeders
+	i.SeasonPackSeedTime = indexer.SeasonPackSeedTime
+	i.SeedTime = indexer.SeedTime
+	i.SeedRatio = indexer.SeedRatio
+	i.CaptchaToken = indexer.CaptchaToken
+	i.BaseURL = indexer.BaseURL
+	i.Tags = indexer.Tags
 }
 
 func (r *IndexerRarbgResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_indexer_rarbg"
+	resp.TypeName = req.ProviderTypeName + "_" + indexerRarbgResourceName
 }
 
 func (r *IndexerRarbgResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		MarkdownDescription: "Indexer resource.<br/>For more information refer to [Indexer](https://wiki.servarr.com/sonarr/settings#indexers) documentation.",
+		MarkdownDescription: "[subcategory:Indexers]: #\nIndexerRarbg resource.\nFor more information refer to [Indexer](https://wiki.servarr.com/sonarr/settings#indexers) documentation.",
 		Attributes: map[string]tfsdk.Attribute{
 			"enable_automatic_search": {
 				MarkdownDescription: "Enable automatic search flag.",
@@ -93,7 +131,7 @@ func (r *IndexerRarbgResource) GetSchema(ctx context.Context) (tfsdk.Schema, dia
 				Type:                types.Int64Type,
 			},
 			"name": {
-				MarkdownDescription: "Indexer name.",
+				MarkdownDescription: "IndexerRarbg name.",
 				Required:            true,
 				Type:                types.StringType,
 			},
@@ -106,7 +144,7 @@ func (r *IndexerRarbgResource) GetSchema(ctx context.Context) (tfsdk.Schema, dia
 				},
 			},
 			"id": {
-				MarkdownDescription: "Indexer ID.",
+				MarkdownDescription: "IndexerRarbg ID.",
 				Computed:            true,
 				Type:                types.Int64Type,
 				PlanModifiers: tfsdk.AttributePlanModifiers{
@@ -169,7 +207,7 @@ func (r *IndexerRarbgResource) Configure(ctx context.Context, req resource.Confi
 	client, ok := req.ProviderData.(*sonarr.Sonarr)
 	if !ok {
 		resp.Diagnostics.AddError(
-			UnexpectedResourceConfigureType,
+			helpers.UnexpectedResourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -194,12 +232,12 @@ func (r *IndexerRarbgResource) Create(ctx context.Context, req resource.CreateRe
 
 	response, err := r.client.AddIndexerContext(ctx, request)
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to create IndexerRarbg, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", indexerRarbgResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "created indexer: "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "created "+indexerRarbgResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
 	result := writeIndexerRarbg(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
@@ -218,12 +256,12 @@ func (r *IndexerRarbgResource) Read(ctx context.Context, req resource.ReadReques
 	// Get IndexerRarbg current value
 	response, err := r.client.GetIndexerContext(ctx, int(state.ID.Value))
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read IndexerRarbgs, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerRarbgResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read indexer: "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "read "+indexerRarbgResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Map response body to resource schema attribute
 	result := writeIndexerRarbg(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
@@ -244,12 +282,12 @@ func (r *IndexerRarbgResource) Update(ctx context.Context, req resource.UpdateRe
 
 	response, err := r.client.UpdateIndexerContext(ctx, request)
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to update IndexerRarbg, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to update "+indexerRarbgResourceName+", got error: %s", err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "updated indexer: "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "updated "+indexerRarbgResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
 	result := writeIndexerRarbg(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &result)...)
@@ -267,12 +305,12 @@ func (r *IndexerRarbgResource) Delete(ctx context.Context, req resource.DeleteRe
 	// Delete IndexerRarbg current value
 	err := r.client.DeleteIndexerContext(ctx, int(state.ID.Value))
 	if err != nil {
-		resp.Diagnostics.AddError(ClientError, fmt.Sprintf("Unable to read IndexerRarbgs, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerRarbgResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted indexer: "+strconv.Itoa(int(state.ID.Value)))
+	tflog.Trace(ctx, "deleted "+indexerRarbgResourceName+": "+strconv.Itoa(int(state.ID.Value)))
 	resp.State.RemoveResource(ctx)
 }
 
@@ -281,19 +319,21 @@ func (r *IndexerRarbgResource) ImportState(ctx context.Context, req resource.Imp
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			UnexpectedImportIdentifier,
+			helpers.UnexpectedImportIdentifier,
 			fmt.Sprintf("Expected import identifier with format: ID. Got: %q", req.ID),
 		)
 
 		return
 	}
 
-	tflog.Trace(ctx, "imported indexer: "+strconv.Itoa(id))
+	tflog.Trace(ctx, "imported "+indexerRarbgResourceName+": "+strconv.Itoa(id))
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 
 func writeIndexerRarbg(ctx context.Context, indexer *sonarr.IndexerOutput) *IndexerRarbg {
-	output := IndexerRarbg{
+	var output IndexerRarbg
+
+	genericIndexer := Indexer{
 		EnableAutomaticSearch:   types.Bool{Value: indexer.EnableAutomaticSearch},
 		EnableInteractiveSearch: types.Bool{Value: indexer.EnableInteractiveSearch},
 		EnableRss:               types.Bool{Value: indexer.EnableRss},
@@ -303,30 +343,9 @@ func writeIndexerRarbg(ctx context.Context, indexer *sonarr.IndexerOutput) *Inde
 		Name:                    types.String{Value: indexer.Name},
 		Tags:                    types.Set{ElemType: types.Int64Type},
 	}
-	tfsdk.ValueFrom(ctx, indexer.Tags, output.Tags.Type(ctx), &output.Tags)
-
-	for _, f := range indexer.Fields {
-		if f.Value != nil {
-			switch f.Name {
-			case "rankedOnly":
-				output.RankedOnly = types.Bool{Value: f.Value.(bool)}
-			case "minimumSeeders":
-				output.MinimumSeeders = types.Int64{Value: int64(f.Value.(float64))}
-			case "seasonPackSeedTime":
-				output.SeasonPackSeedTime = types.Int64{Value: int64(f.Value.(float64))}
-			case "seedTime":
-				output.SeedTime = types.Int64{Value: int64(f.Value.(float64))}
-			case "seedRatio":
-				output.SeedRatio = types.Float64{Value: f.Value.(float64)}
-			case "baseUrl":
-				output.BaseURL = types.String{Value: f.Value.(string)}
-			case "captchaToken":
-				output.CaptchaToken = types.String{Value: f.Value.(string)}
-			// TODO: manage unknown values
-			default:
-			}
-		}
-	}
+	tfsdk.ValueFrom(ctx, indexer.Tags, genericIndexer.Tags.Type(ctx), &genericIndexer.Tags)
+	genericIndexer.writeIndexerFields(ctx, indexer.Fields)
+	output.fromIndexer(&genericIndexer)
 
 	return &output
 }
@@ -348,61 +367,6 @@ func readIndexerRarbg(ctx context.Context, indexer *IndexerRarbg) *sonarr.Indexe
 		Name:                    indexer.Name.Value,
 		Protocol:                IndexerRarbgProtocol,
 		Tags:                    tags,
-		Fields:                  readIndexerRarbgFields(indexer),
+		Fields:                  readIndexerFields(ctx, indexer.toIndexer()),
 	}
-}
-
-func readIndexerRarbgFields(indexer *IndexerRarbg) []*starr.FieldInput {
-	var output []*starr.FieldInput
-
-	if !indexer.RankedOnly.IsNull() && !indexer.RankedOnly.IsUnknown() {
-		output = append(output, &starr.FieldInput{
-			Name:  "rankedOnly",
-			Value: indexer.RankedOnly.Value,
-		})
-	}
-
-	if !indexer.MinimumSeeders.IsNull() && !indexer.MinimumSeeders.IsUnknown() {
-		output = append(output, &starr.FieldInput{
-			Name:  "minimumSeeders",
-			Value: indexer.MinimumSeeders.Value,
-		})
-	}
-
-	if !indexer.SeasonPackSeedTime.IsNull() && !indexer.SeasonPackSeedTime.IsUnknown() {
-		output = append(output, &starr.FieldInput{
-			Name:  "seasonPackSeedTime",
-			Value: indexer.SeasonPackSeedTime.Value,
-		})
-	}
-
-	if !indexer.SeedTime.IsNull() && !indexer.SeedTime.IsUnknown() {
-		output = append(output, &starr.FieldInput{
-			Name:  "seedTime",
-			Value: indexer.SeedTime.Value,
-		})
-	}
-
-	if !indexer.SeedRatio.IsNull() && !indexer.SeedRatio.IsUnknown() {
-		output = append(output, &starr.FieldInput{
-			Name:  "seedRatio",
-			Value: indexer.SeedRatio.Value,
-		})
-	}
-
-	if !indexer.BaseURL.IsNull() && !indexer.BaseURL.IsUnknown() {
-		output = append(output, &starr.FieldInput{
-			Name:  "baseUrl",
-			Value: indexer.BaseURL.Value,
-		})
-	}
-
-	if !indexer.CaptchaToken.IsNull() && !indexer.CaptchaToken.IsUnknown() {
-		output = append(output, &starr.FieldInput{
-			Name:  "captchaToken",
-			Value: indexer.CaptchaToken.Value,
-		})
-	}
-
-	return output
 }
