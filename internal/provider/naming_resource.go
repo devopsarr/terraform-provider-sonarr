@@ -227,29 +227,29 @@ func (r *NamingResource) ImportState(ctx context.Context, req resource.ImportSta
 }
 
 func (n *Naming) write(naming *sonarr.Naming) {
-	n.RenameEpisodes = types.Bool{Value: naming.RenameEpisodes}
-	n.ReplaceIllegalCharacters = types.Bool{Value: naming.ReplaceIllegalCharacters}
-	n.ID = types.Int64{Value: naming.ID}
-	n.MultiEpisodeStyle = types.Int64{Value: naming.MultiEpisodeStyle}
-	n.DailyEpisodeFormat = types.String{Value: naming.DailyEpisodeFormat}
-	n.AnimeEpisodeFormat = types.String{Value: naming.AnimeEpisodeFormat}
-	n.SeriesFolderFormat = types.String{Value: naming.SeriesFolderFormat}
-	n.SeasonFolderFormat = types.String{Value: naming.SeasonFolderFormat}
-	n.SpecialsFolderFormat = types.String{Value: naming.SpecialsFolderFormat}
-	n.StandardEpisodeFormat = types.String{Value: naming.StandardEpisodeFormat}
+	n.RenameEpisodes = types.BoolValue(naming.RenameEpisodes)
+	n.ReplaceIllegalCharacters = types.BoolValue(naming.ReplaceIllegalCharacters)
+	n.ID = types.Int64Value(naming.ID)
+	n.MultiEpisodeStyle = types.Int64Value(naming.MultiEpisodeStyle)
+	n.DailyEpisodeFormat = types.StringValue(naming.DailyEpisodeFormat)
+	n.AnimeEpisodeFormat = types.StringValue(naming.AnimeEpisodeFormat)
+	n.SeriesFolderFormat = types.StringValue(naming.SeriesFolderFormat)
+	n.SeasonFolderFormat = types.StringValue(naming.SeasonFolderFormat)
+	n.SpecialsFolderFormat = types.StringValue(naming.SpecialsFolderFormat)
+	n.StandardEpisodeFormat = types.StringValue(naming.StandardEpisodeFormat)
 }
 
 func (n *Naming) read() *sonarr.Naming {
 	return &sonarr.Naming{
-		RenameEpisodes:           n.RenameEpisodes.Value,
-		ReplaceIllegalCharacters: n.ReplaceIllegalCharacters.Value,
-		ID:                       n.ID.Value,
-		MultiEpisodeStyle:        n.MultiEpisodeStyle.Value,
-		DailyEpisodeFormat:       n.DailyEpisodeFormat.Value,
-		AnimeEpisodeFormat:       n.AnimeEpisodeFormat.Value,
-		SeriesFolderFormat:       n.SeriesFolderFormat.Value,
-		SeasonFolderFormat:       n.SeasonFolderFormat.Value,
-		SpecialsFolderFormat:     n.SpecialsFolderFormat.Value,
-		StandardEpisodeFormat:    n.StandardEpisodeFormat.Value,
+		RenameEpisodes:           n.RenameEpisodes.ValueBool(),
+		ReplaceIllegalCharacters: n.ReplaceIllegalCharacters.ValueBool(),
+		ID:                       n.ID.ValueInt64(),
+		MultiEpisodeStyle:        n.MultiEpisodeStyle.ValueInt64(),
+		DailyEpisodeFormat:       n.DailyEpisodeFormat.ValueString(),
+		AnimeEpisodeFormat:       n.AnimeEpisodeFormat.ValueString(),
+		SeriesFolderFormat:       n.SeriesFolderFormat.ValueString(),
+		SeasonFolderFormat:       n.SeasonFolderFormat.ValueString(),
+		SpecialsFolderFormat:     n.SpecialsFolderFormat.ValueString(),
+		StandardEpisodeFormat:    n.StandardEpisodeFormat.ValueString(),
 	}
 }

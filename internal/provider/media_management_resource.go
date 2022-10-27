@@ -286,47 +286,47 @@ func (r *MediaManagementResource) ImportState(ctx context.Context, req resource.
 }
 
 func (m *MediaManagement) write(mediaMgt *sonarr.MediaManagement) {
-	m.UnmonitorPreviousEpisodes = types.Bool{Value: mediaMgt.AutoUnmonitorPreviouslyDownloadedEpisodes}
-	m.HardlinksCopy = types.Bool{Value: mediaMgt.CopyUsingHardlinks}
-	m.CreateEmptyFolders = types.Bool{Value: mediaMgt.CreateEmptySeriesFolders}
-	m.DeleteEmptyFolders = types.Bool{Value: mediaMgt.DeleteEmptyFolders}
-	m.EnableMediaInfo = types.Bool{Value: mediaMgt.EnableMediaInfo}
-	m.ImportExtraFiles = types.Bool{Value: mediaMgt.ImportExtraFiles}
-	m.SetPermissions = types.Bool{Value: mediaMgt.SetPermissionsLinux}
-	m.SkipFreeSpaceCheck = types.Bool{Value: mediaMgt.SkipFreeSpaceCheckWhenImporting}
-	m.ID = types.Int64{Value: mediaMgt.ID}
-	m.MinimumFreeSpace = types.Int64{Value: mediaMgt.MinimumFreeSpaceWhenImporting}
-	m.RecycleBinDays = types.Int64{Value: mediaMgt.RecycleBinCleanupDays}
-	m.ChmodFolder = types.String{Value: mediaMgt.ChmodFolder}
-	m.ChownGroup = types.String{Value: mediaMgt.ChownGroup}
-	m.DownloadPropersRepacks = types.String{Value: mediaMgt.DownloadPropersAndRepacks}
-	m.EpisodeTitleRequired = types.String{Value: mediaMgt.EpisodeTitleRequired}
-	m.ExtraFileExtensions = types.String{Value: mediaMgt.ExtraFileExtensions}
-	m.FileDate = types.String{Value: mediaMgt.FileDate}
-	m.RecycleBinPath = types.String{Value: mediaMgt.RecycleBin}
-	m.RescanAfterRefresh = types.String{Value: mediaMgt.RescanAfterRefresh}
+	m.UnmonitorPreviousEpisodes = types.BoolValue(mediaMgt.AutoUnmonitorPreviouslyDownloadedEpisodes)
+	m.HardlinksCopy = types.BoolValue(mediaMgt.CopyUsingHardlinks)
+	m.CreateEmptyFolders = types.BoolValue(mediaMgt.CreateEmptySeriesFolders)
+	m.DeleteEmptyFolders = types.BoolValue(mediaMgt.DeleteEmptyFolders)
+	m.EnableMediaInfo = types.BoolValue(mediaMgt.EnableMediaInfo)
+	m.ImportExtraFiles = types.BoolValue(mediaMgt.ImportExtraFiles)
+	m.SetPermissions = types.BoolValue(mediaMgt.SetPermissionsLinux)
+	m.SkipFreeSpaceCheck = types.BoolValue(mediaMgt.SkipFreeSpaceCheckWhenImporting)
+	m.ID = types.Int64Value(mediaMgt.ID)
+	m.MinimumFreeSpace = types.Int64Value(mediaMgt.MinimumFreeSpaceWhenImporting)
+	m.RecycleBinDays = types.Int64Value(mediaMgt.RecycleBinCleanupDays)
+	m.ChmodFolder = types.StringValue(mediaMgt.ChmodFolder)
+	m.ChownGroup = types.StringValue(mediaMgt.ChownGroup)
+	m.DownloadPropersRepacks = types.StringValue(mediaMgt.DownloadPropersAndRepacks)
+	m.EpisodeTitleRequired = types.StringValue(mediaMgt.EpisodeTitleRequired)
+	m.ExtraFileExtensions = types.StringValue(mediaMgt.ExtraFileExtensions)
+	m.FileDate = types.StringValue(mediaMgt.FileDate)
+	m.RecycleBinPath = types.StringValue(mediaMgt.RecycleBin)
+	m.RescanAfterRefresh = types.StringValue(mediaMgt.RescanAfterRefresh)
 }
 
 func (m *MediaManagement) read() *sonarr.MediaManagement {
 	return &sonarr.MediaManagement{
-		AutoUnmonitorPreviouslyDownloadedEpisodes: m.UnmonitorPreviousEpisodes.Value,
-		CopyUsingHardlinks:                        m.HardlinksCopy.Value,
-		CreateEmptySeriesFolders:                  m.CreateEmptyFolders.Value,
-		DeleteEmptyFolders:                        m.DeleteEmptyFolders.Value,
-		EnableMediaInfo:                           m.EnableMediaInfo.Value,
-		ImportExtraFiles:                          m.ImportExtraFiles.Value,
-		SetPermissionsLinux:                       m.SetPermissions.Value,
-		SkipFreeSpaceCheckWhenImporting:           m.SkipFreeSpaceCheck.Value,
-		ID:                                        m.ID.Value,
-		MinimumFreeSpaceWhenImporting:             m.MinimumFreeSpace.Value,
-		RecycleBinCleanupDays:                     m.RecycleBinDays.Value,
-		ChmodFolder:                               m.ChmodFolder.Value,
-		ChownGroup:                                m.ChownGroup.Value,
-		DownloadPropersAndRepacks:                 m.DownloadPropersRepacks.Value,
-		EpisodeTitleRequired:                      m.EpisodeTitleRequired.Value,
-		ExtraFileExtensions:                       m.ExtraFileExtensions.Value,
-		FileDate:                                  m.FileDate.Value,
-		RecycleBin:                                m.RecycleBinPath.Value,
-		RescanAfterRefresh:                        m.RescanAfterRefresh.Value,
+		AutoUnmonitorPreviouslyDownloadedEpisodes: m.UnmonitorPreviousEpisodes.ValueBool(),
+		CopyUsingHardlinks:                        m.HardlinksCopy.ValueBool(),
+		CreateEmptySeriesFolders:                  m.CreateEmptyFolders.ValueBool(),
+		DeleteEmptyFolders:                        m.DeleteEmptyFolders.ValueBool(),
+		EnableMediaInfo:                           m.EnableMediaInfo.ValueBool(),
+		ImportExtraFiles:                          m.ImportExtraFiles.ValueBool(),
+		SetPermissionsLinux:                       m.SetPermissions.ValueBool(),
+		SkipFreeSpaceCheckWhenImporting:           m.SkipFreeSpaceCheck.ValueBool(),
+		ID:                                        m.ID.ValueInt64(),
+		MinimumFreeSpaceWhenImporting:             m.MinimumFreeSpace.ValueInt64(),
+		RecycleBinCleanupDays:                     m.RecycleBinDays.ValueInt64(),
+		ChmodFolder:                               m.ChmodFolder.ValueString(),
+		ChownGroup:                                m.ChownGroup.ValueString(),
+		DownloadPropersAndRepacks:                 m.DownloadPropersRepacks.ValueString(),
+		EpisodeTitleRequired:                      m.EpisodeTitleRequired.ValueString(),
+		ExtraFileExtensions:                       m.ExtraFileExtensions.ValueString(),
+		FileDate:                                  m.FileDate.ValueString(),
+		RecycleBin:                                m.RecycleBinPath.ValueString(),
+		RescanAfterRefresh:                        m.RescanAfterRefresh.ValueString(),
 	}
 }

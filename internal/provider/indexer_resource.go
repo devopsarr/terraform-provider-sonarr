@@ -326,7 +326,7 @@ func (r *IndexerResource) Read(ctx context.Context, req resource.ReadRequest, re
 	}
 
 	// Get Indexer current value
-	response, err := r.client.GetIndexerContext(ctx, int(indexer.ID.Value))
+	response, err := r.client.GetIndexerContext(ctx, int(indexer.ID.ValueInt64()))
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerResourceName, err))
 
@@ -381,14 +381,14 @@ func (r *IndexerResource) Delete(ctx context.Context, req resource.DeleteRequest
 	}
 
 	// Delete Indexer current value
-	err := r.client.DeleteIndexerContext(ctx, int(indexer.ID.Value))
+	err := r.client.DeleteIndexerContext(ctx, int(indexer.ID.ValueInt64()))
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted "+indexerResourceName+": "+strconv.Itoa(int(indexer.ID.Value)))
+	tflog.Trace(ctx, "deleted "+indexerResourceName+": "+strconv.Itoa(int(indexer.ID.ValueInt64())))
 	resp.State.RemoveResource(ctx)
 }
 
@@ -409,19 +409,19 @@ func (r *IndexerResource) ImportState(ctx context.Context, req resource.ImportSt
 }
 
 func (i *Indexer) write(ctx context.Context, indexer *sonarr.IndexerOutput) {
-	i.EnableAutomaticSearch = types.Bool{Value: indexer.EnableAutomaticSearch}
-	i.EnableInteractiveSearch = types.Bool{Value: indexer.EnableInteractiveSearch}
-	i.EnableRss = types.Bool{Value: indexer.EnableRss}
-	i.Priority = types.Int64{Value: indexer.Priority}
-	i.DownloadClientID = types.Int64{Value: indexer.DownloadClientID}
-	i.ID = types.Int64{Value: indexer.ID}
-	i.ConfigContract = types.String{Value: indexer.ConfigContract}
-	i.Implementation = types.String{Value: indexer.Implementation}
-	i.Name = types.String{Value: indexer.Name}
-	i.Protocol = types.String{Value: indexer.Protocol}
-	i.Tags = types.Set{ElemType: types.Int64Type}
-	i.AnimeCategories = types.Set{ElemType: types.Int64Type}
-	i.Categories = types.Set{ElemType: types.Int64Type}
+	i.EnableAutomaticSearch = types.BoolValue(indexer.EnableAutomaticSearch)
+	i.EnableInteractiveSearch = types.BoolValue(indexer.EnableInteractiveSearch)
+	i.EnableRss = types.BoolValue(indexer.EnableRss)
+	i.Priority = types.Int64Value(indexer.Priority)
+	i.DownloadClientID = types.Int64Value(indexer.DownloadClientID)
+	i.ID = types.Int64Value(indexer.ID)
+	i.ConfigContract = types.StringValue(indexer.ConfigContract)
+	i.Implementation = types.StringValue(indexer.Implementation)
+	i.Name = types.StringValue(indexer.Name)
+	i.Protocol = types.StringValue(indexer.Protocol)
+	i.Tags = types.SetValueMust(types.Int64Type, nil)
+	i.AnimeCategories = types.SetValueMust(types.Int64Type, nil)
+	i.Categories = types.SetValueMust(types.Int64Type, nil)
 	tfsdk.ValueFrom(ctx, indexer.Tags, i.Tags.Type(ctx), &i.Tags)
 	i.writeFields(ctx, indexer.Fields)
 }
@@ -468,16 +468,16 @@ func (i *Indexer) read(ctx context.Context) *sonarr.IndexerInput {
 	tfsdk.ValueAs(ctx, i.Tags, &tags)
 
 	return &sonarr.IndexerInput{
-		EnableAutomaticSearch:   i.EnableAutomaticSearch.Value,
-		EnableInteractiveSearch: i.EnableInteractiveSearch.Value,
-		EnableRss:               i.EnableRss.Value,
-		Priority:                i.Priority.Value,
-		DownloadClientID:        i.DownloadClientID.Value,
-		ID:                      i.ID.Value,
-		ConfigContract:          i.ConfigContract.Value,
-		Implementation:          i.Implementation.Value,
-		Name:                    i.Name.Value,
-		Protocol:                i.Protocol.Value,
+		EnableAutomaticSearch:   i.EnableAutomaticSearch.ValueBool(),
+		EnableInteractiveSearch: i.EnableInteractiveSearch.ValueBool(),
+		EnableRss:               i.EnableRss.ValueBool(),
+		Priority:                i.Priority.ValueInt64(),
+		DownloadClientID:        i.DownloadClientID.ValueInt64(),
+		ID:                      i.ID.ValueInt64(),
+		ConfigContract:          i.ConfigContract.ValueString(),
+		Implementation:          i.Implementation.ValueString(),
+		Name:                    i.Name.ValueString(),
+		Protocol:                i.Protocol.ValueString(),
 		Tags:                    tags,
 		Fields:                  i.readFields(ctx),
 	}

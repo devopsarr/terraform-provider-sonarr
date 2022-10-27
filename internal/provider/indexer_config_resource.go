@@ -190,19 +190,19 @@ func (r *IndexerConfigResource) ImportState(ctx context.Context, req resource.Im
 }
 
 func (c *IndexerConfig) write(indexerConfig *sonarr.IndexerConfig) {
-	c.ID = types.Int64{Value: indexerConfig.ID}
-	c.MaximumSize = types.Int64{Value: indexerConfig.MaximumSize}
-	c.MinimumAge = types.Int64{Value: indexerConfig.MinimumAge}
-	c.Retention = types.Int64{Value: indexerConfig.Retention}
-	c.RssSyncInterval = types.Int64{Value: indexerConfig.RssSyncInterval}
+	c.ID = types.Int64Value(indexerConfig.ID)
+	c.MaximumSize = types.Int64Value(indexerConfig.MaximumSize)
+	c.MinimumAge = types.Int64Value(indexerConfig.MinimumAge)
+	c.Retention = types.Int64Value(indexerConfig.Retention)
+	c.RssSyncInterval = types.Int64Value(indexerConfig.RssSyncInterval)
 }
 
 func (c *IndexerConfig) read() *sonarr.IndexerConfig {
 	return &sonarr.IndexerConfig{
-		ID:              c.ID.Value,
-		MaximumSize:     c.MaximumSize.Value,
-		MinimumAge:      c.MinimumAge.Value,
-		Retention:       c.Retention.Value,
-		RssSyncInterval: c.RssSyncInterval.Value,
+		ID:              c.ID.ValueInt64(),
+		MaximumSize:     c.MaximumSize.ValueInt64(),
+		MinimumAge:      c.MinimumAge.ValueInt64(),
+		Retention:       c.Retention.ValueInt64(),
+		RssSyncInterval: c.RssSyncInterval.ValueInt64(),
 	}
 }

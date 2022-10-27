@@ -209,7 +209,7 @@ func (r *SeriesResource) Read(ctx context.Context, req resource.ReadRequest, res
 	}
 
 	// Get series current value
-	response, err := r.client.GetSeriesByIDContext(ctx, series.ID.Value)
+	response, err := r.client.GetSeriesByIDContext(ctx, series.ID.ValueInt64())
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", seriesResourceName, err))
 
@@ -258,14 +258,14 @@ func (r *SeriesResource) Delete(ctx context.Context, req resource.DeleteRequest,
 	}
 
 	// Delete series current value
-	err := r.client.DeleteSeriesContext(ctx, int(series.ID.Value), true, false)
+	err := r.client.DeleteSeriesContext(ctx, int(series.ID.ValueInt64()), true, false)
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to delete %s, got error: %s", seriesResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted "+seriesResourceName+": "+strconv.Itoa(int(series.ID.Value)))
+	tflog.Trace(ctx, "deleted "+seriesResourceName+": "+strconv.Itoa(int(series.ID.ValueInt64())))
 	resp.State.RemoveResource(ctx)
 }
 
@@ -286,37 +286,37 @@ func (r *SeriesResource) ImportState(ctx context.Context, req resource.ImportSta
 }
 
 func (s *Series) write(ctx context.Context, series *sonarr.Series) {
-	s.Monitored = types.Bool{Value: series.Monitored}
-	s.SeasonFolder = types.Bool{Value: series.SeasonFolder}
-	s.UseSceneNumbering = types.Bool{Value: series.UseSceneNumbering}
-	s.ID = types.Int64{Value: series.ID}
-	s.LanguageProfileID = types.Int64{Value: series.LanguageProfileID}
-	s.QualityProfileID = types.Int64{Value: series.QualityProfileID}
-	s.TvdbID = types.Int64{Value: series.TvdbID}
-	s.Path = types.String{Value: series.Path}
-	s.Title = types.String{Value: series.Title}
-	s.TitleSlug = types.String{Value: series.TitleSlug}
-	s.RootFolderPath = types.String{Value: series.RootFolderPath}
-	s.Tags = types.Set{ElemType: types.Int64Type}
+	s.Monitored = types.BoolValue(series.Monitored)
+	s.SeasonFolder = types.BoolValue(series.SeasonFolder)
+	s.UseSceneNumbering = types.BoolValue(series.UseSceneNumbering)
+	s.ID = types.Int64Value(series.ID)
+	s.LanguageProfileID = types.Int64Value(series.LanguageProfileID)
+	s.QualityProfileID = types.Int64Value(series.QualityProfileID)
+	s.TvdbID = types.Int64Value(series.TvdbID)
+	s.Path = types.StringValue(series.Path)
+	s.Title = types.StringValue(series.Title)
+	s.TitleSlug = types.StringValue(series.TitleSlug)
+	s.RootFolderPath = types.StringValue(series.RootFolderPath)
+	s.Tags = types.SetValueMust(types.Int64Type, nil)
 	tfsdk.ValueFrom(ctx, series.Tags, s.Tags.Type(ctx), &s.Tags)
 }
 
 func (s *Series) read(ctx context.Context) *sonarr.AddSeriesInput {
-	tags := make([]int, len(s.Tags.Elems))
+	tags := make([]int, len(s.Tags.Elements()))
 	tfsdk.ValueAs(ctx, s.Tags, &tags)
 
 	return &sonarr.AddSeriesInput{
-		ID:                s.ID.Value,
-		TvdbID:            s.TvdbID.Value,
-		Title:             s.Title.Value,
-		TitleSlug:         s.TitleSlug.Value,
-		QualityProfileID:  s.QualityProfileID.Value,
-		LanguageProfileID: s.LanguageProfileID.Value,
-		Monitored:         s.Monitored.Value,
-		SeasonFolder:      s.SeasonFolder.Value,
-		Path:              s.Path.Value,
-		RootFolderPath:    s.Path.Value,
-		UseSceneNumbering: s.UseSceneNumbering.Value,
+		ID:                s.ID.ValueInt64(),
+		TvdbID:            s.TvdbID.ValueInt64(),
+		Title:             s.Title.ValueString(),
+		TitleSlug:         s.TitleSlug.ValueString(),
+		QualityProfileID:  s.QualityProfileID.ValueInt64(),
+		LanguageProfileID: s.LanguageProfileID.ValueInt64(),
+		Monitored:         s.Monitored.ValueBool(),
+		SeasonFolder:      s.SeasonFolder.ValueBool(),
+		Path:              s.Path.ValueString(),
+		RootFolderPath:    s.Path.ValueString(),
+		UseSceneNumbering: s.UseSceneNumbering.ValueBool(),
 		Tags:              tags,
 	}
 }

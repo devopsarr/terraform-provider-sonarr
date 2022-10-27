@@ -32,12 +32,12 @@ func (v StringMatchValidator) Validate(ctx context.Context, req tfsdk.ValidateAt
 		return
 	}
 
-	if str.Unknown || str.Null {
+	if str.IsUnknown() || str.IsNull() {
 		return
 	}
 
 	for _, s := range v.Slice {
-		if str.Value == s {
+		if str.ValueString() == s {
 			return
 		}
 	}

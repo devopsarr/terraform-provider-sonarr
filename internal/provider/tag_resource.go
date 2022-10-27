@@ -96,7 +96,7 @@ func (r *TagResource) Create(ctx context.Context, req resource.CreateRequest, re
 
 	// Create new Tag
 	request := starr.Tag{
-		Label: tag.Label.Value,
+		Label: tag.Label.ValueString(),
 	}
 
 	response, err := r.client.AddTagContext(ctx, &request)
@@ -123,7 +123,7 @@ func (r *TagResource) Read(ctx context.Context, req resource.ReadRequest, resp *
 	}
 
 	// Get tag current value
-	response, err := r.client.GetTagContext(ctx, int(tag.ID.Value))
+	response, err := r.client.GetTagContext(ctx, int(tag.ID.ValueInt64()))
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", tagResourceName, err))
 
@@ -148,8 +148,8 @@ func (r *TagResource) Update(ctx context.Context, req resource.UpdateRequest, re
 
 	// Update Tag
 	request := starr.Tag{
-		Label: tag.Label.Value,
-		ID:    int(tag.ID.Value),
+		Label: tag.Label.ValueString(),
+		ID:    int(tag.ID.ValueInt64()),
 	}
 
 	response, err := r.client.UpdateTagContext(ctx, &request)
@@ -175,14 +175,14 @@ func (r *TagResource) Delete(ctx context.Context, req resource.DeleteRequest, re
 	}
 
 	// Delete tag current value
-	err := r.client.DeleteTagContext(ctx, int(tag.ID.Value))
+	err := r.client.DeleteTagContext(ctx, int(tag.ID.ValueInt64()))
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", tagResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted "+tagResourceName+": "+strconv.Itoa(int(tag.ID.Value)))
+	tflog.Trace(ctx, "deleted "+tagResourceName+": "+strconv.Itoa(int(tag.ID.ValueInt64())))
 	resp.State.RemoveResource(ctx)
 }
 
@@ -203,6 +203,6 @@ func (r *TagResource) ImportState(ctx context.Context, req resource.ImportStateR
 }
 
 func (t *Tag) write(tag *starr.Tag) {
-	t.ID = types.Int64{Value: int64(tag.ID)}
-	t.Label = types.String{Value: tag.Label}
+	t.ID = types.Int64Value(int64(tag.ID))
+	t.Label = types.StringValue(tag.Label)
 }

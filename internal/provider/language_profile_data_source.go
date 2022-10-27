@@ -100,7 +100,7 @@ func (d *LanguageProfileDataSource) Read(ctx context.Context, req datasource.Rea
 		return
 	}
 
-	profile, err := findLanguageProfile(data.Name.Value, response)
+	profile, err := findLanguageProfile(data.Name.ValueString(), response)
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", languageProfileDataSourceName, err))
 

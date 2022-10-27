@@ -127,6 +127,6 @@ func (d *LanguageProfilesDataSource) Read(ctx context.Context, req datasource.Re
 
 	tfsdk.ValueFrom(ctx, profiles, data.LanguageProfiles.Type(context.Background()), &data.LanguageProfiles)
 	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
-	data.ID = types.String{Value: strconv.Itoa(len(response))}
+	data.ID = types.StringValue(strconv.Itoa(len(response)))
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }

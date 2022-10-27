@@ -129,7 +129,7 @@ func (r *RemotePathMappingResource) Read(ctx context.Context, req resource.ReadR
 	}
 
 	// Get remotePathMapping current value
-	response, err := r.client.GetRemotePathMappingContext(ctx, int(mapping.ID.Value))
+	response, err := r.client.GetRemotePathMappingContext(ctx, int(mapping.ID.ValueInt64()))
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", remotePathMappingResourceName, err))
 
@@ -179,14 +179,14 @@ func (r *RemotePathMappingResource) Delete(ctx context.Context, req resource.Del
 	}
 
 	// Delete remotePathMapping current value
-	err := r.client.DeleteRemotePathMappingContext(ctx, int(state.ID.Value))
+	err := r.client.DeleteRemotePathMappingContext(ctx, int(state.ID.ValueInt64()))
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", remotePathMappingResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted "+remotePathMappingResourceName+": "+strconv.Itoa(int(state.ID.Value)))
+	tflog.Trace(ctx, "deleted "+remotePathMappingResourceName+": "+strconv.Itoa(int(state.ID.ValueInt64())))
 	resp.State.RemoveResource(ctx)
 }
 
@@ -207,17 +207,17 @@ func (r *RemotePathMappingResource) ImportState(ctx context.Context, req resourc
 }
 
 func (r *RemotePathMapping) write(remotePathMapping *sonarr.RemotePathMapping) {
-	r.ID = types.Int64{Value: remotePathMapping.ID}
-	r.Host = types.String{Value: remotePathMapping.Host}
-	r.RemotePath = types.String{Value: remotePathMapping.RemotePath}
-	r.LocalPath = types.String{Value: remotePathMapping.LocalPath}
+	r.ID = types.Int64Value(remotePathMapping.ID)
+	r.Host = types.StringValue(remotePathMapping.Host)
+	r.RemotePath = types.StringValue(remotePathMapping.RemotePath)
+	r.LocalPath = types.StringValue(remotePathMapping.LocalPath)
 }
 
 func (r *RemotePathMapping) read() *sonarr.RemotePathMapping {
 	return &sonarr.RemotePathMapping{
-		ID:         r.ID.Value,
-		Host:       r.Host.Value,
-		RemotePath: r.RemotePath.Value,
-		LocalPath:  r.LocalPath.Value,
+		ID:         r.ID.ValueInt64(),
+		Host:       r.Host.ValueString(),
+		RemotePath: r.RemotePath.ValueString(),
+		LocalPath:  r.LocalPath.ValueString(),
 	}
 }

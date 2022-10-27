@@ -123,7 +123,7 @@ func (d *DelayProfileDataSource) Read(ctx context.Context, req datasource.ReadRe
 		return
 	}
 
-	profile, err := findDelayProfile(delayProfile.ID.Value, response)
+	profile, err := findDelayProfile(delayProfile.ID.ValueInt64(), response)
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", delayProfileDataSourceName, err))
 

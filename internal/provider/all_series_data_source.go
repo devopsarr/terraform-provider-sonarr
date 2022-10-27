@@ -164,6 +164,6 @@ func (d *AllSeriessDataSource) Read(ctx context.Context, req datasource.ReadRequ
 
 	tfsdk.ValueFrom(ctx, series, data.Series.Type(context.Background()), &data.Series)
 	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
-	data.ID = types.String{Value: strconv.Itoa(len(response))}
+	data.ID = types.StringValue(strconv.Itoa(len(response)))
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }

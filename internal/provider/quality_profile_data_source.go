@@ -137,7 +137,7 @@ func (d *QualityProfileDataSource) Read(ctx context.Context, req datasource.Read
 		return
 	}
 
-	profile, err := findQualityProfile(data.Name.Value, response)
+	profile, err := findQualityProfile(data.Name.ValueString(), response)
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", qualityProfileDataSourceName, err))
 
