@@ -141,7 +141,7 @@ func (r *LanguageProfileResource) Read(ctx context.Context, req resource.ReadReq
 	}
 
 	// Get languageprofile current value
-	response, err := r.client.GetLanguageProfileContext(ctx, int(profile.ID.Value))
+	response, err := r.client.GetLanguageProfileContext(ctx, int(profile.ID.ValueInt64()))
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", languageProfileResourceName, err))
 
@@ -191,14 +191,14 @@ func (r *LanguageProfileResource) Delete(ctx context.Context, req resource.Delet
 	}
 
 	// Delete languageprofile current value
-	err := r.client.DeleteLanguageProfileContext(ctx, int(profile.ID.Value))
+	err := r.client.DeleteLanguageProfileContext(ctx, int(profile.ID.ValueInt64()))
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", languageProfileResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted "+languageProfileResourceName+": "+strconv.Itoa(int(profile.ID.Value)))
+	tflog.Trace(ctx, "deleted "+languageProfileResourceName+": "+strconv.Itoa(int(profile.ID.ValueInt64())))
 	resp.State.RemoveResource(ctx)
 }
 
@@ -219,11 +219,11 @@ func (r *LanguageProfileResource) ImportState(ctx context.Context, req resource.
 }
 
 func (p *LanguageProfile) write(ctx context.Context, profile *sonarr.LanguageProfile) {
-	p.UpgradeAllowed = types.Bool{Value: profile.UpgradeAllowed}
-	p.ID = types.Int64{Value: profile.ID}
-	p.Name = types.String{Value: profile.Name}
-	p.CutoffLanguage = types.String{Value: profile.Cutoff.Name}
-	p.Languages = types.Set{ElemType: types.StringType}
+	p.UpgradeAllowed = types.BoolValue(profile.UpgradeAllowed)
+	p.ID = types.Int64Value(profile.ID)
+	p.Name = types.StringValue(profile.Name)
+	p.CutoffLanguage = types.StringValue(profile.Cutoff.Name)
+	p.Languages = types.SetValueMust(types.StringType, nil)
 
 	languages := make([]string, len(profile.Languages))
 	for i, l := range profile.Languages {
@@ -234,7 +234,7 @@ func (p *LanguageProfile) write(ctx context.Context, profile *sonarr.LanguagePro
 }
 
 func (p *LanguageProfile) read(ctx context.Context) *sonarr.LanguageProfile {
-	langs := make([]string, len(p.Languages.Elems))
+	langs := make([]string, len(p.Languages.Elements()))
 	tfsdk.ValueAs(ctx, p.Languages, &langs)
 
 	languages := make([]sonarr.Language, len(langs))
@@ -249,13 +249,13 @@ func (p *LanguageProfile) read(ctx context.Context) *sonarr.LanguageProfile {
 	}
 
 	return &sonarr.LanguageProfile{
-		Name:           p.Name.Value,
-		UpgradeAllowed: p.UpgradeAllowed.Value,
+		Name:           p.Name.ValueString(),
+		UpgradeAllowed: p.UpgradeAllowed.ValueBool(),
 		Cutoff: &starr.Value{
-			Name: p.CutoffLanguage.Value,
-			ID:   helpers.GetLanguageID(p.CutoffLanguage.Value),
+			Name: p.CutoffLanguage.ValueString(),
+			ID:   helpers.GetLanguageID(p.CutoffLanguage.ValueString()),
 		},
 		Languages: languages,
-		ID:        p.ID.Value,
+		ID:        p.ID.ValueInt64(),
 	}
 }

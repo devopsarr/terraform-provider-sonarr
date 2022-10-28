@@ -172,7 +172,7 @@ func (r *DelayProfileResource) Read(ctx context.Context, req resource.ReadReques
 	}
 
 	// Get delayprofile current value
-	response, err := r.client.GetDelayProfileContext(ctx, int(profile.ID.Value))
+	response, err := r.client.GetDelayProfileContext(ctx, int(profile.ID.ValueInt64()))
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", delayProfileResourceName, err))
 
@@ -222,14 +222,14 @@ func (r *DelayProfileResource) Delete(ctx context.Context, req resource.DeleteRe
 	}
 
 	// Delete delayprofile current value
-	err := r.client.DeleteDelayProfileContext(ctx, int(profile.ID.Value))
+	err := r.client.DeleteDelayProfileContext(ctx, int(profile.ID.ValueInt64()))
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", delayProfileResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted "+delayProfileResourceName+": "+strconv.Itoa(int(profile.ID.Value)))
+	tflog.Trace(ctx, "deleted "+delayProfileResourceName+": "+strconv.Itoa(int(profile.ID.ValueInt64())))
 	resp.State.RemoveResource(ctx)
 }
 
@@ -250,31 +250,31 @@ func (r *DelayProfileResource) ImportState(ctx context.Context, req resource.Imp
 }
 
 func (p *DelayProfile) write(ctx context.Context, profile *sonarr.DelayProfile) {
-	p.ID = types.Int64{Value: profile.ID}
-	p.EnableUsenet = types.Bool{Value: profile.EnableUsenet}
-	p.EnableTorrent = types.Bool{Value: profile.EnableTorrent}
-	p.BypassIfHighestQuality = types.Bool{Value: profile.BypassIfHighestQuality}
-	p.UsenetDelay = types.Int64{Value: profile.UsenetDelay}
-	p.TorrentDelay = types.Int64{Value: profile.TorrentDelay}
-	p.Order = types.Int64{Value: profile.Order}
-	p.PreferredProtocol = types.String{Value: profile.PreferredProtocol}
-	p.Tags = types.Set{ElemType: types.Int64Type}
+	p.ID = types.Int64Value(profile.ID)
+	p.EnableUsenet = types.BoolValue(profile.EnableUsenet)
+	p.EnableTorrent = types.BoolValue(profile.EnableTorrent)
+	p.BypassIfHighestQuality = types.BoolValue(profile.BypassIfHighestQuality)
+	p.UsenetDelay = types.Int64Value(profile.UsenetDelay)
+	p.TorrentDelay = types.Int64Value(profile.TorrentDelay)
+	p.Order = types.Int64Value(profile.Order)
+	p.PreferredProtocol = types.StringValue(profile.PreferredProtocol)
+	p.Tags = types.SetValueMust(types.Int64Type, nil)
 	tfsdk.ValueFrom(ctx, profile.Tags, p.Tags.Type(ctx), &p.Tags)
 }
 
 func (p *DelayProfile) read(ctx context.Context) *sonarr.DelayProfile {
-	tags := make([]int, len(p.Tags.Elems))
+	tags := make([]int, len(p.Tags.Elements()))
 	tfsdk.ValueAs(ctx, p.Tags, &tags)
 
 	return &sonarr.DelayProfile{
-		ID:                     p.ID.Value,
-		EnableUsenet:           p.EnableUsenet.Value,
-		EnableTorrent:          p.EnableTorrent.Value,
-		BypassIfHighestQuality: p.BypassIfHighestQuality.Value,
-		UsenetDelay:            p.UsenetDelay.Value,
-		TorrentDelay:           p.TorrentDelay.Value,
-		Order:                  p.Order.Value,
-		PreferredProtocol:      p.PreferredProtocol.Value,
+		ID:                     p.ID.ValueInt64(),
+		EnableUsenet:           p.EnableUsenet.ValueBool(),
+		EnableTorrent:          p.EnableTorrent.ValueBool(),
+		BypassIfHighestQuality: p.BypassIfHighestQuality.ValueBool(),
+		UsenetDelay:            p.UsenetDelay.ValueInt64(),
+		TorrentDelay:           p.TorrentDelay.ValueInt64(),
+		Order:                  p.Order.ValueInt64(),
+		PreferredProtocol:      p.PreferredProtocol.ValueString(),
 		Tags:                   tags,
 	}
 }

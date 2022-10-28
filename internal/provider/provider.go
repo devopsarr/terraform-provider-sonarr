@@ -69,7 +69,7 @@ func (p *SonarrProvider) Configure(ctx context.Context, req provider.ConfigureRe
 	}
 
 	// User must provide URL to the provider
-	if data.URL.Unknown {
+	if data.URL.IsUnknown() {
 		// Cannot connect to client with an unknown value
 		resp.Diagnostics.AddWarning(
 			"Unable to create client",
@@ -80,10 +80,10 @@ func (p *SonarrProvider) Configure(ctx context.Context, req provider.ConfigureRe
 	}
 
 	var url string
-	if data.URL.Null {
+	if data.URL.IsNull() {
 		url = os.Getenv("SONARR_URL")
 	} else {
-		url = data.URL.Value
+		url = data.URL.ValueString()
 	}
 
 	if url == "" {
@@ -97,7 +97,7 @@ func (p *SonarrProvider) Configure(ctx context.Context, req provider.ConfigureRe
 	}
 
 	// User must provide API key to the provider
-	if data.APIKey.Unknown {
+	if data.APIKey.IsUnknown() {
 		// Cannot connect to client with an unknown value
 		resp.Diagnostics.AddWarning(
 			"Unable to create client",
@@ -108,10 +108,10 @@ func (p *SonarrProvider) Configure(ctx context.Context, req provider.ConfigureRe
 	}
 
 	var key string
-	if data.APIKey.Null {
+	if data.APIKey.IsNull() {
 		key = os.Getenv("SONARR_API_KEY")
 	} else {
-		key = data.APIKey.Value
+		key = data.APIKey.ValueString()
 	}
 
 	if key == "" {

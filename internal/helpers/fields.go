@@ -15,7 +15,7 @@ func WriteStringField(fieldOutput *starr.FieldOutput, fieldCase interface{}) {
 	value := reflect.ValueOf(fieldCase)
 	value = value.Elem()
 	field := value.FieldByNameFunc(func(n string) bool { return strings.EqualFold(n, strings.ToLower(fieldOutput.Name)) })
-	v := reflect.ValueOf(types.String{Value: stringValue})
+	v := reflect.ValueOf(types.StringValue(stringValue))
 	field.Set(v)
 }
 
@@ -24,7 +24,7 @@ func WriteBoolField(fieldOutput *starr.FieldOutput, fieldCase interface{}) {
 	value := reflect.ValueOf(fieldCase)
 	value = value.Elem()
 	field := value.FieldByNameFunc(func(n string) bool { return strings.EqualFold(n, strings.ToLower(fieldOutput.Name)) })
-	v := reflect.ValueOf(types.Bool{Value: boolValue})
+	v := reflect.ValueOf(types.BoolValue(boolValue))
 	field.Set(v)
 }
 
@@ -33,7 +33,7 @@ func WriteIntField(fieldOutput *starr.FieldOutput, fieldCase interface{}) {
 	value := reflect.ValueOf(fieldCase)
 	value = value.Elem()
 	field := value.FieldByNameFunc(func(n string) bool { return strings.EqualFold(n, strings.ToLower(fieldOutput.Name)) })
-	v := reflect.ValueOf(types.Int64{Value: int64(intValue)})
+	v := reflect.ValueOf(types.Int64Value(int64(intValue)))
 	field.Set(v)
 }
 
@@ -50,7 +50,7 @@ func WriteStringSliceField(ctx context.Context, fieldOutput *starr.FieldOutput, 
 	sliceValue, _ := fieldOutput.Value.([]interface{})
 	value := reflect.ValueOf(fieldCase)
 	value = value.Elem()
-	setValue := types.Set{ElemType: types.StringType}
+	setValue := types.SetValueMust(types.StringType, nil)
 	tfsdk.ValueFrom(ctx, sliceValue, setValue.Type(ctx), &setValue)
 
 	field := value.FieldByNameFunc(func(n string) bool { return strings.EqualFold(n, strings.ToLower(fieldOutput.Name)) })
@@ -62,7 +62,7 @@ func WriteIntSliceField(ctx context.Context, fieldOutput *starr.FieldOutput, fie
 	sliceValue, _ := fieldOutput.Value.([]interface{})
 	value := reflect.ValueOf(fieldCase)
 	value = value.Elem()
-	setValue := types.Set{ElemType: types.Int64Type}
+	setValue := types.SetValueMust(types.Int64Type, nil)
 	tfsdk.ValueFrom(ctx, sliceValue, setValue.Type(ctx), &setValue)
 
 	field := value.FieldByNameFunc(func(n string) bool { return strings.EqualFold(n, strings.ToLower(fieldOutput.Name)) })
@@ -79,7 +79,7 @@ func ReadStringField(name string, fieldCase interface{}) *starr.FieldInput {
 	if !stringField.IsNull() && !stringField.IsUnknown() {
 		return &starr.FieldInput{
 			Name:  name,
-			Value: stringField.Value,
+			Value: stringField.ValueString(),
 		}
 	}
 
@@ -95,7 +95,7 @@ func ReadBoolField(name string, fieldCase interface{}) *starr.FieldInput {
 	if !boolField.IsNull() && !boolField.IsUnknown() {
 		return &starr.FieldInput{
 			Name:  name,
-			Value: boolField.Value,
+			Value: boolField.ValueBool(),
 		}
 	}
 
@@ -111,7 +111,7 @@ func ReadIntField(name string, fieldCase interface{}) *starr.FieldInput {
 	if !intField.IsNull() && !intField.IsUnknown() {
 		return &starr.FieldInput{
 			Name:  name,
-			Value: intField.Value,
+			Value: intField.ValueInt64(),
 		}
 	}
 
@@ -127,7 +127,7 @@ func ReadFloatField(name string, fieldCase interface{}) *starr.FieldInput {
 	if !intField.IsNull() && !intField.IsUnknown() {
 		return &starr.FieldInput{
 			Name:  name,
-			Value: intField.Value,
+			Value: intField.ValueFloat64(),
 		}
 	}
 
@@ -140,8 +140,8 @@ func ReadStringSliceField(ctx context.Context, name string, fieldCase interface{
 	field := value.FieldByNameFunc(func(n string) bool { return strings.EqualFold(n, strings.ToLower(name)) })
 	sliceField := (*types.Set)(field.Addr().UnsafePointer())
 
-	if len(sliceField.Elems) != 0 {
-		slice := make([]string, len(sliceField.Elems))
+	if len(sliceField.Elements()) != 0 {
+		slice := make([]string, len(sliceField.Elements()))
 		tfsdk.ValueAs(ctx, sliceField, &slice)
 
 		return &starr.FieldInput{
@@ -159,8 +159,8 @@ func ReadIntSliceField(ctx context.Context, name string, fieldCase interface{}) 
 	field := value.FieldByNameFunc(func(n string) bool { return strings.EqualFold(n, strings.ToLower(name)) })
 	sliceField := (*types.Set)(field.Addr().UnsafePointer())
 
-	if len(sliceField.Elems) != 0 {
-		slice := make([]int64, len(sliceField.Elems))
+	if len(sliceField.Elements()) != 0 {
+		slice := make([]int64, len(sliceField.Elements()))
 		tfsdk.ValueAs(ctx, sliceField, &slice)
 
 		return &starr.FieldInput{

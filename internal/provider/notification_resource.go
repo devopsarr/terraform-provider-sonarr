@@ -630,7 +630,7 @@ func (r *NotificationResource) Read(ctx context.Context, req resource.ReadReques
 	}
 
 	// Get Notification current value
-	response, err := r.client.GetNotificationContext(ctx, int(notification.ID.Value))
+	response, err := r.client.GetNotificationContext(ctx, int(notification.ID.ValueInt64()))
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", notificationResourceName, err))
 
@@ -685,14 +685,14 @@ func (r *NotificationResource) Delete(ctx context.Context, req resource.DeleteRe
 	}
 
 	// Delete Notification current value
-	err := r.client.DeleteNotificationContext(ctx, int(notification.ID.Value))
+	err := r.client.DeleteNotificationContext(ctx, int(notification.ID.ValueInt64()))
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", notificationResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted "+notificationResourceName+": "+strconv.Itoa(int(notification.ID.Value)))
+	tflog.Trace(ctx, "deleted "+notificationResourceName+": "+strconv.Itoa(int(notification.ID.ValueInt64())))
 	resp.State.RemoveResource(ctx)
 }
 
@@ -713,25 +713,25 @@ func (r *NotificationResource) ImportState(ctx context.Context, req resource.Imp
 }
 
 func (n *Notification) write(ctx context.Context, notification *sonarr.NotificationOutput) {
-	n.OnGrab = types.Bool{Value: notification.OnGrab}
-	n.OnDownload = types.Bool{Value: notification.OnDownload}
-	n.OnUpgrade = types.Bool{Value: notification.OnUpgrade}
-	n.OnRename = types.Bool{Value: notification.OnRename}
-	n.OnSeriesDelete = types.Bool{Value: notification.OnSeriesDelete}
-	n.OnEpisodeFileDelete = types.Bool{Value: notification.OnEpisodeFileDelete}
-	n.OnEpisodeFileDeleteForUpgrade = types.Bool{Value: notification.OnEpisodeFileDeleteForUpgrade}
-	n.OnHealthIssue = types.Bool{Value: notification.OnHealthIssue}
-	n.OnApplicationUpdate = types.Bool{Value: notification.OnApplicationUpdate}
-	n.IncludeHealthWarnings = types.Bool{Value: notification.IncludeHealthWarnings}
-	n.ID = types.Int64{Value: notification.ID}
-	n.Name = types.String{Value: notification.Name}
-	n.Implementation = types.String{Value: notification.Implementation}
-	n.ConfigContract = types.String{Value: notification.ConfigContract}
-	n.Tags = types.Set{ElemType: types.Int64Type}
-	n.ChannelTags = types.Set{ElemType: types.StringType}
-	n.DeviceIds = types.Set{ElemType: types.StringType}
-	n.Devices = types.Set{ElemType: types.StringType}
-	n.Recipients = types.Set{ElemType: types.StringType}
+	n.OnGrab = types.BoolValue(notification.OnGrab)
+	n.OnDownload = types.BoolValue(notification.OnDownload)
+	n.OnUpgrade = types.BoolValue(notification.OnUpgrade)
+	n.OnRename = types.BoolValue(notification.OnRename)
+	n.OnSeriesDelete = types.BoolValue(notification.OnSeriesDelete)
+	n.OnEpisodeFileDelete = types.BoolValue(notification.OnEpisodeFileDelete)
+	n.OnEpisodeFileDeleteForUpgrade = types.BoolValue(notification.OnEpisodeFileDeleteForUpgrade)
+	n.OnHealthIssue = types.BoolValue(notification.OnHealthIssue)
+	n.OnApplicationUpdate = types.BoolValue(notification.OnApplicationUpdate)
+	n.IncludeHealthWarnings = types.BoolValue(notification.IncludeHealthWarnings)
+	n.ID = types.Int64Value(notification.ID)
+	n.Name = types.StringValue(notification.Name)
+	n.Implementation = types.StringValue(notification.Implementation)
+	n.ConfigContract = types.StringValue(notification.ConfigContract)
+	n.Tags = types.SetValueMust(types.Int64Type, nil)
+	n.ChannelTags = types.SetValueMust(types.StringType, nil)
+	n.DeviceIds = types.SetValueMust(types.StringType, nil)
+	n.Devices = types.SetValueMust(types.StringType, nil)
+	n.Recipients = types.SetValueMust(types.StringType, nil)
 	tfsdk.ValueFrom(ctx, notification.Tags, n.Tags.Type(ctx), &n.Tags)
 	n.writeFields(ctx, notification.Fields)
 }
@@ -772,20 +772,20 @@ func (n *Notification) read(ctx context.Context) *sonarr.NotificationInput {
 	tfsdk.ValueAs(ctx, n.Tags, &tags)
 
 	return &sonarr.NotificationInput{
-		OnGrab:                        n.OnGrab.Value,
-		OnDownload:                    n.OnDownload.Value,
-		OnUpgrade:                     n.OnUpgrade.Value,
-		OnRename:                      n.OnRename.Value,
-		OnSeriesDelete:                n.OnSeriesDelete.Value,
-		OnEpisodeFileDelete:           n.OnEpisodeFileDelete.Value,
-		OnEpisodeFileDeleteForUpgrade: n.OnEpisodeFileDeleteForUpgrade.Value,
-		OnHealthIssue:                 n.OnHealthIssue.Value,
-		OnApplicationUpdate:           n.OnApplicationUpdate.Value,
-		IncludeHealthWarnings:         n.IncludeHealthWarnings.Value,
-		ID:                            n.ID.Value,
-		Name:                          n.Name.Value,
-		Implementation:                n.Implementation.Value,
-		ConfigContract:                n.ConfigContract.Value,
+		OnGrab:                        n.OnGrab.ValueBool(),
+		OnDownload:                    n.OnDownload.ValueBool(),
+		OnUpgrade:                     n.OnUpgrade.ValueBool(),
+		OnRename:                      n.OnRename.ValueBool(),
+		OnSeriesDelete:                n.OnSeriesDelete.ValueBool(),
+		OnEpisodeFileDelete:           n.OnEpisodeFileDelete.ValueBool(),
+		OnEpisodeFileDeleteForUpgrade: n.OnEpisodeFileDeleteForUpgrade.ValueBool(),
+		OnHealthIssue:                 n.OnHealthIssue.ValueBool(),
+		OnApplicationUpdate:           n.OnApplicationUpdate.ValueBool(),
+		IncludeHealthWarnings:         n.IncludeHealthWarnings.ValueBool(),
+		ID:                            n.ID.ValueInt64(),
+		Name:                          n.Name.ValueString(),
+		Implementation:                n.Implementation.ValueString(),
+		ConfigContract:                n.ConfigContract.ValueString(),
 		Tags:                          tags,
 		Fields:                        n.readFields(ctx),
 	}

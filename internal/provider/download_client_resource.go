@@ -435,7 +435,7 @@ func (r *DownloadClientResource) Read(ctx context.Context, req resource.ReadRequ
 	}
 
 	// Get DownloadClient current value
-	response, err := r.client.GetDownloadClientContext(ctx, int(client.ID.Value))
+	response, err := r.client.GetDownloadClientContext(ctx, int(client.ID.ValueInt64()))
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", downloadClientResourceName, err))
 
@@ -490,14 +490,14 @@ func (r *DownloadClientResource) Delete(ctx context.Context, req resource.Delete
 	}
 
 	// Delete DownloadClient current value
-	err := r.client.DeleteDownloadClientContext(ctx, int(client.ID.Value))
+	err := r.client.DeleteDownloadClientContext(ctx, int(client.ID.ValueInt64()))
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", downloadClientResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted "+downloadClientResourceName+": "+strconv.Itoa(int(client.ID.Value)))
+	tflog.Trace(ctx, "deleted "+downloadClientResourceName+": "+strconv.Itoa(int(client.ID.ValueInt64())))
 	resp.State.RemoveResource(ctx)
 }
 
@@ -518,19 +518,19 @@ func (r *DownloadClientResource) ImportState(ctx context.Context, req resource.I
 }
 
 func (d *DownloadClient) write(ctx context.Context, downloadClient *sonarr.DownloadClientOutput) {
-	d.Enable = types.Bool{Value: downloadClient.Enable}
-	d.RemoveCompletedDownloads = types.Bool{Value: downloadClient.RemoveCompletedDownloads}
-	d.RemoveFailedDownloads = types.Bool{Value: downloadClient.RemoveFailedDownloads}
-	d.Priority = types.Int64{Value: int64(downloadClient.Priority)}
-	d.ID = types.Int64{Value: downloadClient.ID}
-	d.ConfigContract = types.String{Value: downloadClient.ConfigContract}
-	d.Implementation = types.String{Value: downloadClient.Implementation}
-	d.Name = types.String{Value: downloadClient.Name}
-	d.Protocol = types.String{Value: downloadClient.Protocol}
-	d.Tags = types.Set{ElemType: types.Int64Type}
-	d.AdditionalTags = types.Set{ElemType: types.Int64Type}
-	d.FieldTags = types.Set{ElemType: types.StringType}
-	d.PostImTags = types.Set{ElemType: types.StringType}
+	d.Enable = types.BoolValue(downloadClient.Enable)
+	d.RemoveCompletedDownloads = types.BoolValue(downloadClient.RemoveCompletedDownloads)
+	d.RemoveFailedDownloads = types.BoolValue(downloadClient.RemoveFailedDownloads)
+	d.Priority = types.Int64Value(int64(downloadClient.Priority))
+	d.ID = types.Int64Value(downloadClient.ID)
+	d.ConfigContract = types.StringValue(downloadClient.ConfigContract)
+	d.Implementation = types.StringValue(downloadClient.Implementation)
+	d.Name = types.StringValue(downloadClient.Name)
+	d.Protocol = types.StringValue(downloadClient.Protocol)
+	d.Tags = types.SetValueMust(types.Int64Type, nil)
+	d.AdditionalTags = types.SetValueMust(types.Int64Type, nil)
+	d.FieldTags = types.SetValueMust(types.StringType, nil)
+	d.PostImTags = types.SetValueMust(types.StringType, nil)
 	tfsdk.ValueFrom(ctx, downloadClient.Tags, d.Tags.Type(ctx), &d.Tags)
 	d.writeFields(ctx, downloadClient.Fields)
 }
@@ -577,15 +577,15 @@ func (d *DownloadClient) read(ctx context.Context) *sonarr.DownloadClientInput {
 	tfsdk.ValueAs(ctx, d.Tags, &tags)
 
 	return &sonarr.DownloadClientInput{
-		Enable:                   d.Enable.Value,
-		RemoveCompletedDownloads: d.RemoveCompletedDownloads.Value,
-		RemoveFailedDownloads:    d.RemoveFailedDownloads.Value,
-		Priority:                 int(d.Priority.Value),
-		ID:                       d.ID.Value,
-		ConfigContract:           d.ConfigContract.Value,
-		Implementation:           d.Implementation.Value,
-		Name:                     d.Name.Value,
-		Protocol:                 d.Protocol.Value,
+		Enable:                   d.Enable.ValueBool(),
+		RemoveCompletedDownloads: d.RemoveCompletedDownloads.ValueBool(),
+		RemoveFailedDownloads:    d.RemoveFailedDownloads.ValueBool(),
+		Priority:                 int(d.Priority.ValueInt64()),
+		ID:                       d.ID.ValueInt64(),
+		ConfigContract:           d.ConfigContract.ValueString(),
+		Implementation:           d.Implementation.ValueString(),
+		Name:                     d.Name.ValueString(),
+		Protocol:                 d.Protocol.ValueString(),
 		Tags:                     tags,
 		Fields:                   d.readFields(ctx),
 	}

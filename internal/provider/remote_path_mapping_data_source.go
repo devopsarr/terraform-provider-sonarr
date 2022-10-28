@@ -97,7 +97,7 @@ func (d *RemotePathMappingDataSource) Read(ctx context.Context, req datasource.R
 	}
 
 	// Map response body to resource schema attribute
-	mapping, err := findRemotePathMapping(remoteMapping.ID.Value, response)
+	mapping, err := findRemotePathMapping(remoteMapping.ID.ValueInt64(), response)
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", remotePathMappingDataSourceName, err))
 

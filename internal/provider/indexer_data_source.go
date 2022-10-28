@@ -227,7 +227,7 @@ func (d *IndexerDataSource) Read(ctx context.Context, req datasource.ReadRequest
 		return
 	}
 
-	indexer, err := findIndexer(data.Name.Value, response)
+	indexer, err := findIndexer(data.Name.ValueString(), response)
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", indexerDataSourceName, err))
 

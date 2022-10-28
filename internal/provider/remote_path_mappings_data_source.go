@@ -122,6 +122,6 @@ func (d *RemotePathMappingsDataSource) Read(ctx context.Context, req datasource.
 
 	tfsdk.ValueFrom(ctx, mappings, data.RemotePathMappings.Type(context.Background()), &data.RemotePathMappings)
 	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
-	data.ID = types.String{Value: strconv.Itoa(len(response))}
+	data.ID = types.StringValue(strconv.Itoa(len(response)))
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }

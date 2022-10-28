@@ -132,7 +132,7 @@ func (r *RootFolderResource) Create(ctx context.Context, req resource.CreateRequ
 
 	// Create new RootFolder
 	request := sonarr.RootFolder{
-		Path: folder.Path.Value,
+		Path: folder.Path.ValueString(),
 	}
 
 	response, err := r.client.AddRootFolderContext(ctx, &request)
@@ -159,7 +159,7 @@ func (r *RootFolderResource) Read(ctx context.Context, req resource.ReadRequest,
 	}
 
 	// Get rootFolder current value
-	response, err := r.client.GetRootFolderContext(ctx, int(folder.ID.Value))
+	response, err := r.client.GetRootFolderContext(ctx, int(folder.ID.ValueInt64()))
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", rootFolderResourceName, err))
 
@@ -186,14 +186,14 @@ func (r *RootFolderResource) Delete(ctx context.Context, req resource.DeleteRequ
 	}
 
 	// Delete rootFolder current value
-	err := r.client.DeleteRootFolderContext(ctx, int(state.ID.Value))
+	err := r.client.DeleteRootFolderContext(ctx, int(state.ID.ValueInt64()))
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", rootFolderResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted "+rootFolderResourceName+": "+strconv.Itoa(int(state.ID.Value)))
+	tflog.Trace(ctx, "deleted "+rootFolderResourceName+": "+strconv.Itoa(int(state.ID.ValueInt64())))
 	resp.State.RemoveResource(ctx)
 }
 
@@ -214,10 +214,10 @@ func (r *RootFolderResource) ImportState(ctx context.Context, req resource.Impor
 }
 
 func (r *RootFolder) write(ctx context.Context, rootFolder *sonarr.RootFolder) {
-	r.Accessible = types.Bool{Value: rootFolder.Accessible}
-	r.ID = types.Int64{Value: rootFolder.ID}
-	r.Path = types.String{Value: rootFolder.Path}
-	r.UnmappedFolders = types.Set{ElemType: RootFolderResource{}.getUnmappedFolderSchema().Type()}
+	r.Accessible = types.BoolValue(rootFolder.Accessible)
+	r.ID = types.Int64Value(rootFolder.ID)
+	r.Path = types.StringValue(rootFolder.Path)
+	r.UnmappedFolders = types.SetValueMust(RootFolderResource{}.getUnmappedFolderSchema().Type(), nil)
 
 	unmapped := make([]Path, len(rootFolder.UnmappedFolders))
 	for i, f := range rootFolder.UnmappedFolders {
@@ -228,6 +228,6 @@ func (r *RootFolder) write(ctx context.Context, rootFolder *sonarr.RootFolder) {
 }
 
 func (p *Path) write(folder *starr.Path) {
-	p.Name = types.String{Value: folder.Name}
-	p.Path = types.String{Value: folder.Path}
+	p.Name = types.StringValue(folder.Name)
+	p.Path = types.StringValue(folder.Path)
 }

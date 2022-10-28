@@ -30,11 +30,11 @@ func (v StringLowercaseValidator) Validate(ctx context.Context, req tfsdk.Valida
 		return
 	}
 
-	if str.Unknown || str.Null {
+	if str.IsUnknown() || str.IsNull() {
 		return
 	}
 
-	upper, _ := regexp.Match(`^.*[A-Z]+.*$`, []byte(str.Value))
+	upper, _ := regexp.Match(`^.*[A-Z]+.*$`, []byte(str.ValueString()))
 	if upper {
 		resp.Diagnostics.AddAttributeError(
 			req.AttributePath,

@@ -184,17 +184,17 @@ func (r *DownloadClientConfigResource) ImportState(ctx context.Context, req reso
 }
 
 func (c *DownloadClientConfig) write(downloadClientConfig *sonarr.DownloadClientConfig) {
-	c.EnableCompletedDownloadHandling = types.Bool{Value: downloadClientConfig.EnableCompletedDownloadHandling}
-	c.AutoRedownloadFailed = types.Bool{Value: downloadClientConfig.AutoRedownloadFailed}
-	c.ID = types.Int64{Value: downloadClientConfig.ID}
-	c.DownloadClientWorkingFolders = types.String{Value: downloadClientConfig.DownloadClientWorkingFolders}
+	c.EnableCompletedDownloadHandling = types.BoolValue(downloadClientConfig.EnableCompletedDownloadHandling)
+	c.AutoRedownloadFailed = types.BoolValue(downloadClientConfig.AutoRedownloadFailed)
+	c.ID = types.Int64Value(downloadClientConfig.ID)
+	c.DownloadClientWorkingFolders = types.StringValue(downloadClientConfig.DownloadClientWorkingFolders)
 }
 
 func (c *DownloadClientConfig) read() *sonarr.DownloadClientConfig {
 	return &sonarr.DownloadClientConfig{
-		EnableCompletedDownloadHandling: c.EnableCompletedDownloadHandling.Value,
-		AutoRedownloadFailed:            c.AutoRedownloadFailed.Value,
-		ID:                              c.ID.Value,
-		DownloadClientWorkingFolders:    c.DownloadClientWorkingFolders.Value,
+		EnableCompletedDownloadHandling: c.EnableCompletedDownloadHandling.ValueBool(),
+		AutoRedownloadFailed:            c.AutoRedownloadFailed.ValueBool(),
+		ID:                              c.ID.ValueInt64(),
+		DownloadClientWorkingFolders:    c.DownloadClientWorkingFolders.ValueString(),
 	}
 }

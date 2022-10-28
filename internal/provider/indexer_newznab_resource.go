@@ -258,7 +258,7 @@ func (r *IndexerNewznabResource) Read(ctx context.Context, req resource.ReadRequ
 	}
 
 	// Get IndexerNewznab current value
-	response, err := r.client.GetIndexerContext(ctx, int(indexer.ID.Value))
+	response, err := r.client.GetIndexerContext(ctx, int(indexer.ID.ValueInt64()))
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerNewznabResourceName, err))
 
@@ -307,14 +307,14 @@ func (r *IndexerNewznabResource) Delete(ctx context.Context, req resource.Delete
 	}
 
 	// Delete IndexerNewznab current value
-	err := r.client.DeleteIndexerContext(ctx, int(indexer.ID.Value))
+	err := r.client.DeleteIndexerContext(ctx, int(indexer.ID.ValueInt64()))
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerNewznabResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted "+indexerNewznabResourceName+": "+strconv.Itoa(int(indexer.ID.Value)))
+	tflog.Trace(ctx, "deleted "+indexerNewznabResourceName+": "+strconv.Itoa(int(indexer.ID.ValueInt64())))
 	resp.State.RemoveResource(ctx)
 }
 
@@ -336,16 +336,16 @@ func (r *IndexerNewznabResource) ImportState(ctx context.Context, req resource.I
 
 func (i *IndexerNewznab) write(ctx context.Context, indexer *sonarr.IndexerOutput) {
 	genericIndexer := Indexer{
-		EnableAutomaticSearch:   types.Bool{Value: indexer.EnableAutomaticSearch},
-		EnableInteractiveSearch: types.Bool{Value: indexer.EnableInteractiveSearch},
-		EnableRss:               types.Bool{Value: indexer.EnableRss},
-		Priority:                types.Int64{Value: indexer.Priority},
-		DownloadClientID:        types.Int64{Value: indexer.DownloadClientID},
-		ID:                      types.Int64{Value: indexer.ID},
-		Name:                    types.String{Value: indexer.Name},
-		Tags:                    types.Set{ElemType: types.Int64Type},
-		AnimeCategories:         types.Set{ElemType: types.Int64Type},
-		Categories:              types.Set{ElemType: types.Int64Type},
+		EnableAutomaticSearch:   types.BoolValue(indexer.EnableAutomaticSearch),
+		EnableInteractiveSearch: types.BoolValue(indexer.EnableInteractiveSearch),
+		EnableRss:               types.BoolValue(indexer.EnableRss),
+		Priority:                types.Int64Value(indexer.Priority),
+		DownloadClientID:        types.Int64Value(indexer.DownloadClientID),
+		ID:                      types.Int64Value(indexer.ID),
+		Name:                    types.StringValue(indexer.Name),
+		Tags:                    types.SetValueMust(types.Int64Type, nil),
+		AnimeCategories:         types.SetValueMust(types.Int64Type, nil),
+		Categories:              types.SetValueMust(types.Int64Type, nil),
 	}
 	tfsdk.ValueFrom(ctx, indexer.Tags, genericIndexer.Tags.Type(ctx), &genericIndexer.Tags)
 	genericIndexer.writeFields(ctx, indexer.Fields)
@@ -358,15 +358,15 @@ func (i *IndexerNewznab) read(ctx context.Context) *sonarr.IndexerInput {
 	tfsdk.ValueAs(ctx, i.Tags, &tags)
 
 	return &sonarr.IndexerInput{
-		EnableAutomaticSearch:   i.EnableAutomaticSearch.Value,
-		EnableInteractiveSearch: i.EnableInteractiveSearch.Value,
-		EnableRss:               i.EnableRss.Value,
-		Priority:                i.Priority.Value,
-		DownloadClientID:        i.DownloadClientID.Value,
-		ID:                      i.ID.Value,
+		EnableAutomaticSearch:   i.EnableAutomaticSearch.ValueBool(),
+		EnableInteractiveSearch: i.EnableInteractiveSearch.ValueBool(),
+		EnableRss:               i.EnableRss.ValueBool(),
+		Priority:                i.Priority.ValueInt64(),
+		DownloadClientID:        i.DownloadClientID.ValueInt64(),
+		ID:                      i.ID.ValueInt64(),
 		ConfigContract:          IndexerNewznabConfigContrat,
 		Implementation:          IndexerNewznabImplementation,
-		Name:                    i.Name.Value,
+		Name:                    i.Name.ValueString(),
 		Protocol:                IndexerNewznabProtocol,
 		Tags:                    tags,
 		Fields:                  i.toIndexer().readFields(ctx),
