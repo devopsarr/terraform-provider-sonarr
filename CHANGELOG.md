@@ -1,5 +1,24 @@
 # Changelog
 
+## [2.2.0](https://github.com/devopsarr/terraform-provider-sonarr/compare/v2.1.0...v2.2.0) (2022-11-02)
+
+
+### Features
+
+* add download client transmission ([07c14f3](https://github.com/devopsarr/terraform-provider-sonarr/commit/07c14f313f62103a5825dad824014913f7b1ea68))
+* add field helpers ([7502cb1](https://github.com/devopsarr/terraform-provider-sonarr/commit/7502cb167717d116a944ee2e0c3d42870a369b66))
+* add notification custom script ([3325ff5](https://github.com/devopsarr/terraform-provider-sonarr/commit/3325ff5cbd39b21c679fe3f7891a3235818bc8dd))
+* add rarbg indexer resource ([e69d9be](https://github.com/devopsarr/terraform-provider-sonarr/commit/e69d9be2c0694d0fbac530c221b6e2c3f116039a))
+* add release profile datasource ([891dc5c](https://github.com/devopsarr/terraform-provider-sonarr/commit/891dc5cf005743c86ef955b690b627fd97912cba))
+* add release profile resource ([388db30](https://github.com/devopsarr/terraform-provider-sonarr/commit/388db302572a7c2866b412ffa0fa80ac0f0e19e5))
+* add release profiles datasource ([bbdc254](https://github.com/devopsarr/terraform-provider-sonarr/commit/bbdc2544f093389df19e59704371077be5323795))
+* add zewznab indexer ([760cef7](https://github.com/devopsarr/terraform-provider-sonarr/commit/760cef744745984a31458836c418996ccd711d23))
+
+
+### Bug Fixes
+
+* remove useless init calls ([71fa6de](https://github.com/devopsarr/terraform-provider-sonarr/commit/71fa6defed5bc5c731be2d4b6e5ef107465a0b80))
+
 ## [2.1.0](https://github.com/devopsarr/terraform-provider-sonarr/compare/v2.0.0...v2.1.0) (2022-09-22)
 
 
