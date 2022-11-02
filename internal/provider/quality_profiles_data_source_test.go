@@ -37,6 +37,6 @@ func qualityprofilesDSInit() {
 	// keep only first two profiles to avoid longer tests
 	client := *sonarr.New(starr.New(os.Getenv("SONARR_API_KEY"), os.Getenv("SONARR_URL"), 0))
 	for i := 3; i < 7; i++ {
-		_ = client.DeleteQualityProfile(i)
+		_ = client.DeleteQualityProfile(int64(i))
 	}
 }

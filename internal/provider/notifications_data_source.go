@@ -126,7 +126,7 @@ func (d *NotificationsDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, 
 						},
 					},
 					"id": {
-						MarkdownDescription: "Download Client ID.",
+						MarkdownDescription: "Notification ID.",
 						Computed:            true,
 						Type:                types.Int64Type,
 						PlanModifiers: tfsdk.AttributePlanModifiers{

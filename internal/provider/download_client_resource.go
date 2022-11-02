@@ -435,7 +435,7 @@ func (r *DownloadClientResource) Read(ctx context.Context, req resource.ReadRequ
 	}
 
 	// Get DownloadClient current value
-	response, err := r.client.GetDownloadClientContext(ctx, int(client.ID.ValueInt64()))
+	response, err := r.client.GetDownloadClientContext(ctx, client.ID.ValueInt64())
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", downloadClientResourceName, err))
 
@@ -490,7 +490,7 @@ func (r *DownloadClientResource) Delete(ctx context.Context, req resource.Delete
 	}
 
 	// Delete DownloadClient current value
-	err := r.client.DeleteDownloadClientContext(ctx, int(client.ID.ValueInt64()))
+	err := r.client.DeleteDownloadClientContext(ctx, client.ID.ValueInt64())
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", downloadClientResourceName, err))
 

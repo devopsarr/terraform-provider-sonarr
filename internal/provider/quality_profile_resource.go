@@ -209,7 +209,7 @@ func (r *QualityProfileResource) Read(ctx context.Context, req resource.ReadRequ
 	}
 
 	// Get qualityprofile current value
-	response, err := r.client.GetQualityProfileContext(ctx, int(profile.ID.ValueInt64()))
+	response, err := r.client.GetQualityProfileContext(ctx, profile.ID.ValueInt64())
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", qualityProfileResourceName, err))
 
@@ -259,7 +259,7 @@ func (r *QualityProfileResource) Delete(ctx context.Context, req resource.Delete
 	}
 
 	// Delete qualityprofile current value
-	err := r.client.DeleteQualityProfileContext(ctx, int(profile.ID.ValueInt64()))
+	err := r.client.DeleteQualityProfileContext(ctx, profile.ID.ValueInt64())
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", qualityProfileResourceName, err))
 

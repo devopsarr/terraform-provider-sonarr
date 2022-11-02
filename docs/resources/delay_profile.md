@@ -39,6 +39,7 @@ resource "sonarr_delay_profile" "example" {
 - `bypass_if_highest_quality` (Boolean) Bypass for highest quality flag.
 - `enable_torrent` (Boolean) Torrent allowed flag at least one of `enable_usenet` and `enable_torrent` must be defined.
 - `enable_usenet` (Boolean) Usenet allowed flag at least one of `enable_usenet` and `enable_torrent` must be defined.
+- `order` (Number) Order.
 - `preferred_protocol` (String) Preferred protocol.
 - `torrent_delay` (Number) Torrent Delay.
 - `usenet_delay` (Number) Usenet delay.
@@ -46,7 +47,6 @@ resource "sonarr_delay_profile" "example" {
 ### Read-Only
 
 - `id` (Number) Delay Profile ID.
-- `order` (Number) Order.
 
 ## Import
 

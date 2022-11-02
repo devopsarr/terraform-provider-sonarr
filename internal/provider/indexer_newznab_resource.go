@@ -258,7 +258,7 @@ func (r *IndexerNewznabResource) Read(ctx context.Context, req resource.ReadRequ
 	}
 
 	// Get IndexerNewznab current value
-	response, err := r.client.GetIndexerContext(ctx, int(indexer.ID.ValueInt64()))
+	response, err := r.client.GetIndexerContext(ctx, indexer.ID.ValueInt64())
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerNewznabResourceName, err))
 
@@ -307,7 +307,7 @@ func (r *IndexerNewznabResource) Delete(ctx context.Context, req resource.Delete
 	}
 
 	// Delete IndexerNewznab current value
-	err := r.client.DeleteIndexerContext(ctx, int(indexer.ID.ValueInt64()))
+	err := r.client.DeleteIndexerContext(ctx, indexer.ID.ValueInt64())
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerNewznabResourceName, err))
 
