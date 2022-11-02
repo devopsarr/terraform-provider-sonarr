@@ -16,7 +16,7 @@ func TestAccNotificationCustomScriptResource(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Create and Read testing
 			{
-				Config: testAccNotificationCustomScriptResourceConfig("resourceTest", "false"),
+				Config: testAccNotificationCustomScriptResourceConfig("resourceScriptTest", "false"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("sonarr_notification_custom_script.test", "on_upgrade", "false"),
 					resource.TestCheckResourceAttrSet("sonarr_notification_custom_script.test", "id"),
@@ -24,7 +24,7 @@ func TestAccNotificationCustomScriptResource(t *testing.T) {
 			},
 			// Update and Read testing
 			{
-				Config: testAccNotificationCustomScriptResourceConfig("resourceTest", "true"),
+				Config: testAccNotificationCustomScriptResourceConfig("resourceScriptTest", "true"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("sonarr_notification_custom_script.test", "on_upgrade", "true"),
 				),
