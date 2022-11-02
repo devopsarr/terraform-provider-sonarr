@@ -254,7 +254,7 @@ func (r *IndexerRarbgResource) Read(ctx context.Context, req resource.ReadReques
 	}
 
 	// Get IndexerRarbg current value
-	response, err := r.client.GetIndexerContext(ctx, int(indexer.ID.ValueInt64()))
+	response, err := r.client.GetIndexerContext(ctx, indexer.ID.ValueInt64())
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerRarbgResourceName, err))
 
@@ -269,7 +269,7 @@ func (r *IndexerRarbgResource) Read(ctx context.Context, req resource.ReadReques
 
 func (r *IndexerRarbgResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	// Get plan values
-	var indexer IndexerRarbg
+	var indexer *IndexerRarbg
 
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &indexer)...)
 
@@ -303,7 +303,7 @@ func (r *IndexerRarbgResource) Delete(ctx context.Context, req resource.DeleteRe
 	}
 
 	// Delete IndexerRarbg current value
-	err := r.client.DeleteIndexerContext(ctx, int(indexer.ID.ValueInt64()))
+	err := r.client.DeleteIndexerContext(ctx, indexer.ID.ValueInt64())
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerRarbgResourceName, err))
 

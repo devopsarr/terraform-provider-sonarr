@@ -119,7 +119,7 @@ resource "sonarr_notification" "example" {
 
 ### Read-Only
 
-- `id` (Number) Download Client ID.
+- `id` (Number) Notification ID.
 
 ## Import
 

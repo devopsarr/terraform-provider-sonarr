@@ -64,7 +64,7 @@ require (
 	github.com/zclconf/go-cty v1.11.0 // indirect
 	golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d // indirect
 	golang.org/x/exp v0.0.0-20220921164117-439092de6870
-	golang.org/x/net v0.0.0-20220826154423-83b083e8dc8b // indirect
+	golang.org/x/net v0.0.0-20221004154528-8021a29435af // indirect
 	golang.org/x/sys v0.0.0-20220811171246-fbc7d0a398ab // indirect
 	golang.org/x/text v0.3.7 // indirect
 	google.golang.org/appengine v1.6.6 // indirect
@@ -75,7 +75,7 @@ require (
 )
 
 // To be removed with next starr update
-replace golift.io/starr => github.com/golift/starr v0.14.1-0.20220922042356-7a7120d548d4
+replace golift.io/starr => github.com/golift/starr v0.14.1-0.20221023033111-1e9c48e68b30
 
 // To be removed once terraform docs allows subcategories
 replace github.com/hashicorp/terraform-plugin-docs => github.com/fuochi/terraform-plugin-docs v0.0.0-20220906113117-f9846067801d

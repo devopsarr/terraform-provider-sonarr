@@ -172,7 +172,7 @@ func (r *DelayProfileResource) Read(ctx context.Context, req resource.ReadReques
 	}
 
 	// Get delayprofile current value
-	response, err := r.client.GetDelayProfileContext(ctx, int(profile.ID.ValueInt64()))
+	response, err := r.client.GetDelayProfileContext(ctx, profile.ID.ValueInt64())
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", delayProfileResourceName, err))
 
@@ -222,7 +222,7 @@ func (r *DelayProfileResource) Delete(ctx context.Context, req resource.DeleteRe
 	}
 
 	// Delete delayprofile current value
-	err := r.client.DeleteDelayProfileContext(ctx, int(profile.ID.ValueInt64()))
+	err := r.client.DeleteDelayProfileContext(ctx, profile.ID.ValueInt64())
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", delayProfileResourceName, err))
 

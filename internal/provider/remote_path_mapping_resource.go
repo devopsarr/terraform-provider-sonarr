@@ -129,7 +129,7 @@ func (r *RemotePathMappingResource) Read(ctx context.Context, req resource.ReadR
 	}
 
 	// Get remotePathMapping current value
-	response, err := r.client.GetRemotePathMappingContext(ctx, int(mapping.ID.ValueInt64()))
+	response, err := r.client.GetRemotePathMappingContext(ctx, mapping.ID.ValueInt64())
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", remotePathMappingResourceName, err))
 
@@ -179,7 +179,7 @@ func (r *RemotePathMappingResource) Delete(ctx context.Context, req resource.Del
 	}
 
 	// Delete remotePathMapping current value
-	err := r.client.DeleteRemotePathMappingContext(ctx, int(state.ID.ValueInt64()))
+	err := r.client.DeleteRemotePathMappingContext(ctx, state.ID.ValueInt64())
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", remotePathMappingResourceName, err))
 

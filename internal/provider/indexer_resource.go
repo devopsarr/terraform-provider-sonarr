@@ -326,7 +326,7 @@ func (r *IndexerResource) Read(ctx context.Context, req resource.ReadRequest, re
 	}
 
 	// Get Indexer current value
-	response, err := r.client.GetIndexerContext(ctx, int(indexer.ID.ValueInt64()))
+	response, err := r.client.GetIndexerContext(ctx, indexer.ID.ValueInt64())
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerResourceName, err))
 
@@ -381,7 +381,7 @@ func (r *IndexerResource) Delete(ctx context.Context, req resource.DeleteRequest
 	}
 
 	// Delete Indexer current value
-	err := r.client.DeleteIndexerContext(ctx, int(indexer.ID.ValueInt64()))
+	err := r.client.DeleteIndexerContext(ctx, indexer.ID.ValueInt64())
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerResourceName, err))
 

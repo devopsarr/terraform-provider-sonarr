@@ -197,7 +197,7 @@ func (r *NotificationResource) GetSchema(ctx context.Context) (tfsdk.Schema, dia
 				},
 			},
 			"id": {
-				MarkdownDescription: "Download Client ID.",
+				MarkdownDescription: "Notification ID.",
 				Computed:            true,
 				Type:                types.Int64Type,
 				PlanModifiers: tfsdk.AttributePlanModifiers{
@@ -685,7 +685,7 @@ func (r *NotificationResource) Delete(ctx context.Context, req resource.DeleteRe
 	}
 
 	// Delete Notification current value
-	err := r.client.DeleteNotificationContext(ctx, int(notification.ID.ValueInt64()))
+	err := r.client.DeleteNotificationContext(ctx, notification.ID.ValueInt64())
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", notificationResourceName, err))
 
