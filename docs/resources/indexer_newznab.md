@@ -3,14 +3,14 @@
 page_title: "sonarr_indexer_newznab Resource - terraform-provider-sonarr"
 subcategory: "Indexers"
 description: |-
-  IndexerNewznab resource.
-  For more information refer to Indexer https://wiki.servarr.com/sonarr/settings#indexers documentation.
+  Indexer Newznab resource.
+  For more information refer to Indexer https://wiki.servarr.com/sonarr/settings#indexers and Newznab https://wiki.servarr.com/sonarr/supported#newznab.
 ---
 
 # sonarr_indexer_newznab (Resource)
 
-<!-- subcategory:Indexers -->IndexerNewznab resource.
-For more information refer to [Indexer](https://wiki.servarr.com/sonarr/settings#indexers) documentation.
+<!-- subcategory:Indexers -->Indexer Newznab resource.
+For more information refer to [Indexer](https://wiki.servarr.com/sonarr/settings#indexers) and [Newznab](https://wiki.servarr.com/sonarr/supported#newznab).
 
 ## Example Usage
 

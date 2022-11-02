@@ -4,13 +4,13 @@ page_title: "sonarr_notification_custom_script Resource - terraform-provider-son
 subcategory: "Notifications"
 description: |-
   Notification Custom Script resource.
-  For more information refer to Notification https://wiki.servarr.com/sonarr/settings#connect.
+  For more information refer to Notification https://wiki.servarr.com/sonarr/settings#connect and Custom Script https://wiki.servarr.com/sonarr/supported#customscript.
 ---
 
 # sonarr_notification_custom_script (Resource)
 
 <!-- subcategory:Notifications -->Notification Custom Script resource.
-For more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect).
+For more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect) and [Custom Script](https://wiki.servarr.com/sonarr/supported#customscript).
 
 ## Example Usage
 
