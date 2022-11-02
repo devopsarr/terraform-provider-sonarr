@@ -143,6 +143,7 @@ func (p *SonarrProvider) Resources(ctx context.Context) []func() resource.Resour
 		NewMediaManagementResource,
 		NewNamingResource,
 		NewNotificationResource,
+		NewNotificationCustomScriptResource,
 		NewQualityProfileResource,
 		NewRemotePathMappingResource,
 		NewRootFolderResource,
