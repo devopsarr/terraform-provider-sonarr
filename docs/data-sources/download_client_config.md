@@ -8,8 +8,7 @@ description: |-
 
 # sonarr_download_client_config (Data Source)
 
-[subcategory:Download Clients]: #
-[Download Client Config](../resources/download_client_config).
+<!-- subcategory:Download Clients -->[Download Client Config](../resources/download_client_config).
 
 ## Example Usage
 

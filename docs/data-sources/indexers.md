@@ -8,8 +8,7 @@ description: |-
 
 # sonarr_indexers (Data Source)
 
-[subcategory:Indexers]: #
-List all available [Indexers](../resources/indexer).
+<!-- subcategory:Indexers -->List all available [Indexers](../resources/indexer).
 
 ## Example Usage
 

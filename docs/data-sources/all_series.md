@@ -8,8 +8,7 @@ description: |-
 
 # sonarr_all_series (Data Source)
 
-[subcategory:Series]: #
-List all available [Series](../resources/series).
+<!-- subcategory:Series -->List all available [Series](../resources/series).
 
 ## Example Usage
 

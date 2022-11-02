@@ -9,8 +9,7 @@ description: |-
 
 # sonarr_system_status (Data Source)
 
-[subcategory:Status]: #
-System Status resource. User must have rights to read `config.xml`.
+<!-- subcategory:Status -->System Status resource. User must have rights to read `config.xml`.
 For more information refer to [System Status](https://wiki.servarr.com/sonarr/system#status) documentation.
 
 ## Example Usage

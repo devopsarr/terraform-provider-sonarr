@@ -8,8 +8,7 @@ description: |-
 
 # sonarr_release_profiles (Data Source)
 
-[subcategory:Profiles]: #
-List all available [Release Profiles](../resources/release_profile).
+<!-- subcategory:Profiles -->List all available [Release Profiles](../resources/release_profile).
 
 ## Example Usage
 

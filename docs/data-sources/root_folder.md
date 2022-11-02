@@ -8,8 +8,7 @@ description: |-
 
 # sonarr_root_folder (Data Source)
 
-[subcategory:Media Management]: #
-Single [Root Folder](../resources/root_folder).
+<!-- subcategory:Media Management -->Single [Root Folder](../resources/root_folder).
 
 ## Example Usage
 

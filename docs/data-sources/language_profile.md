@@ -8,8 +8,7 @@ description: |-
 
 # sonarr_language_profile (Data Source)
 
-[subcategory:Profiles]: #
-Single [Language Profile](../resources/language_profile).
+<!-- subcategory:Profiles -->Single [Language Profile](../resources/language_profile).
 
 ## Example Usage
 

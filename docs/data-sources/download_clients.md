@@ -8,8 +8,7 @@ description: |-
 
 # sonarr_download_clients (Data Source)
 
-[subcategory:Download Clients]: #
-List all available [DownloadClients](../resources/download_client).
+<!-- subcategory:Download Clients -->List all available [DownloadClients](../resources/download_client).
 
 ## Example Usage
 

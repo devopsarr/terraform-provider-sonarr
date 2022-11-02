@@ -35,7 +35,7 @@ func (d *NotificationDataSource) Metadata(ctx context.Context, req datasource.Me
 func (d *NotificationDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		// This description is used by the documentation generator and the delay server.
-		MarkdownDescription: "[subcategory:Notifications]: #\nSingle [Notification](../resources/notification).",
+		MarkdownDescription: "<!-- subcategory:Notifications -->Single [Notification](../resources/notification).",
 		Attributes: map[string]tfsdk.Attribute{
 			"on_grab": {
 				MarkdownDescription: "On grab flag.",

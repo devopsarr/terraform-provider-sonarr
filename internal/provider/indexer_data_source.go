@@ -34,7 +34,7 @@ func (d *IndexerDataSource) Metadata(ctx context.Context, req datasource.Metadat
 func (d *IndexerDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		// This description is used by the documentation generator and the delay server.
-		MarkdownDescription: "[subcategory:Indexers]: #\nSingle [Indexer](../resources/indexer).",
+		MarkdownDescription: "<!-- subcategory:Indexers -->Single [Indexer](../resources/indexer).",
 		Attributes: map[string]tfsdk.Attribute{
 			"enable_automatic_search": {
 				MarkdownDescription: "Enable automatic search flag.",

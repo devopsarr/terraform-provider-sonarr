@@ -9,8 +9,7 @@ description: |-
 
 # sonarr_download_client_config (Resource)
 
-[subcategory:Download Clients]: #
-Download Client Config resource.
+<!-- subcategory:Download Clients -->Download Client Config resource.
 For more information refer to [Download Client](https://wiki.servarr.com/sonarr/settings#completed-download-handling) documentation.
 
 ## Example Usage

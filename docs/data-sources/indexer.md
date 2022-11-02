@@ -8,8 +8,7 @@ description: |-
 
 # sonarr_indexer (Data Source)
 
-[subcategory:Indexers]: #
-Single [Indexer](../resources/indexer).
+<!-- subcategory:Indexers -->Single [Indexer](../resources/indexer).
 
 ## Example Usage
 

@@ -8,8 +8,7 @@ description: |-
 
 # sonarr_remote_path_mapping (Data Source)
 
-[subcategory:Download Clients]: #
-Single [Remote Path Mapping](../resources/remote_path_mapping).
+<!-- subcategory:Download Clients -->Single [Remote Path Mapping](../resources/remote_path_mapping).
 
 ## Example Usage
 

@@ -8,8 +8,7 @@ description: |-
 
 # sonarr_series (Data Source)
 
-[subcategory:Series]: #
-Single [Series](../resources/series).
+<!-- subcategory:Series -->Single [Series](../resources/series).
 
 ## Example Usage
 
