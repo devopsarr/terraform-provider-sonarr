@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.3.0](https://github.com/devopsarr/terraform-provider-sonarr/compare/v2.2.0...v2.3.0) (2022-11-03)
+
+
+### Features
+
+* add notification webhook resource ([114a34e](https://github.com/devopsarr/terraform-provider-sonarr/commit/114a34ecd3c3c47e5eba5dbf91b75d099a8929e3))
+
+
+### Bug Fixes
+
+* delayprofile order on resource creation ([a64a48e](https://github.com/devopsarr/terraform-provider-sonarr/commit/a64a48e9676eeda13fd6ffab2933fdcfb656eae1))
+
 ## [2.2.0](https://github.com/devopsarr/terraform-provider-sonarr/compare/v2.1.0...v2.2.0) (2022-11-02)
 
 
