@@ -9,8 +9,7 @@ description: |-
 
 # sonarr_download_client_transmission (Resource)
 
-[subcategory:Download Clients]: #
-Download Client Transmission resource.
+<!-- subcategory:Download Clients -->Download Client Transmission resource.
 For more information refer to [Download Client](https://wiki.servarr.com/sonarr/settings#download-clients).
 
 ## Example Usage

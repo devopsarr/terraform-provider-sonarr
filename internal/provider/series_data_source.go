@@ -34,7 +34,7 @@ func (d *SeriesDataSource) Metadata(ctx context.Context, req datasource.Metadata
 func (d *SeriesDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		// This description is used by the documentation generator and the language server.
-		MarkdownDescription: "[subcategory:Series]: #\nSingle [Series](../resources/series).",
+		MarkdownDescription: "<!-- subcategory:Series -->Single [Series](../resources/series).",
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
 				MarkdownDescription: "Series ID.",

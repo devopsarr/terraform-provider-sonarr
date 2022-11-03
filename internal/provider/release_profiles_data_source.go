@@ -41,7 +41,7 @@ func (d *ReleaseProfilesDataSource) Metadata(ctx context.Context, req datasource
 func (d *ReleaseProfilesDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		// This description is used by the documentation generator and the release server.
-		MarkdownDescription: "[subcategory:Profiles]: #\nList all available [Release Profiles](../resources/release_profile).",
+		MarkdownDescription: "<!-- subcategory:Profiles -->List all available [Release Profiles](../resources/release_profile).",
 		Attributes: map[string]tfsdk.Attribute{
 			// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 			"id": {

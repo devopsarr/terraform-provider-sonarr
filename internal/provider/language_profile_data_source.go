@@ -34,7 +34,7 @@ func (d *LanguageProfileDataSource) Metadata(ctx context.Context, req datasource
 func (d *LanguageProfileDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		// This description is used by the documentation generator and the language server.
-		MarkdownDescription: "[subcategory:Profiles]: #\nSingle [Language Profile](../resources/language_profile).",
+		MarkdownDescription: "<!-- subcategory:Profiles -->Single [Language Profile](../resources/language_profile).",
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
 				MarkdownDescription: "Language Profile ID.",

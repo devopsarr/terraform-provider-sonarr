@@ -41,7 +41,7 @@ func (d *DelayProfilesDataSource) Metadata(ctx context.Context, req datasource.M
 func (d *DelayProfilesDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		// This description is used by the documentation generator and the delay server.
-		MarkdownDescription: "[subcategory:Profiles]: #\nList all available [Delay Profiles](../resources/delay_profile).",
+		MarkdownDescription: "<!-- subcategory:Profiles -->List all available [Delay Profiles](../resources/delay_profile).",
 		Attributes: map[string]tfsdk.Attribute{
 			// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 			"id": {

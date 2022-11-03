@@ -97,7 +97,7 @@ func (r *NotificationCustomScriptResource) Metadata(ctx context.Context, req res
 
 func (r *NotificationCustomScriptResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		MarkdownDescription: "[subcategory:Notifications]: #\nNotification Custom Script resource.\nFor more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect).",
+		MarkdownDescription: "<!-- subcategory:Notifications -->Notification Custom Script resource.\nFor more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect).",
 		Attributes: map[string]tfsdk.Attribute{
 			"on_grab": {
 				MarkdownDescription: "On grab flag.",

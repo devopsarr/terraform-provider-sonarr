@@ -47,7 +47,7 @@ func (r *ReleaseProfileResource) Metadata(ctx context.Context, req resource.Meta
 
 func (r *ReleaseProfileResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		MarkdownDescription: "[subcategory:Profiles]: #\nRelease Profile resource.\nFor more information refer to [Release Profiles](https://wiki.servarr.com/sonarr/settings#release-profiles) documentation.",
+		MarkdownDescription: "<!-- subcategory:Profiles -->Release Profile resource.\nFor more information refer to [Release Profiles](https://wiki.servarr.com/sonarr/settings#release-profiles) documentation.",
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
 				MarkdownDescription: "Release Profile ID.",

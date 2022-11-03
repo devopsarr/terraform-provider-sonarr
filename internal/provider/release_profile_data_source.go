@@ -35,7 +35,7 @@ func (d *ReleaseProfileDataSource) Metadata(ctx context.Context, req datasource.
 func (d *ReleaseProfileDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		// This description is used by the documentation generator and the release server.
-		MarkdownDescription: "[subcategory:Profiles]: #\nSingle [Release Profile](../resources/release_profile).",
+		MarkdownDescription: "<!-- subcategory:Profiles -->Single [Release Profile](../resources/release_profile).",
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
 				MarkdownDescription: "Release Profile ID.",

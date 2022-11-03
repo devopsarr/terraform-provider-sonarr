@@ -121,7 +121,7 @@ func (r *NotificationResource) Metadata(ctx context.Context, req resource.Metada
 
 func (r *NotificationResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		MarkdownDescription: "[subcategory:Notifications]: #\nNotification resource.\nFor more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect).",
+		MarkdownDescription: "<!-- subcategory:Notifications -->Notification resource.\nFor more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect).",
 		Attributes: map[string]tfsdk.Attribute{
 			"on_grab": {
 				MarkdownDescription: "On grab flag.",

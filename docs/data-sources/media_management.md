@@ -8,8 +8,7 @@ description: |-
 
 # sonarr_media_management (Data Source)
 
-[subcategory:Media Management]: #
-[Media Management](../resources/media_management).
+<!-- subcategory:Media Management -->[Media Management](../resources/media_management).
 
 ## Example Usage
 

@@ -79,7 +79,7 @@ func (r *IndexerResource) Metadata(ctx context.Context, req resource.MetadataReq
 
 func (r *IndexerResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		MarkdownDescription: "[subcategory:Indexers]: #\nIndexer resource.\nFor more information refer to [Indexer](https://wiki.servarr.com/sonarr/settings#indexers) documentation.",
+		MarkdownDescription: "<!-- subcategory:Indexers -->Indexer resource.\nFor more information refer to [Indexer](https://wiki.servarr.com/sonarr/settings#indexers) documentation.",
 		Attributes: map[string]tfsdk.Attribute{
 			"enable_automatic_search": {
 				MarkdownDescription: "Enable automatic search flag.",

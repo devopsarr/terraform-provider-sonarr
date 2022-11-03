@@ -8,8 +8,7 @@ description: |-
 
 # sonarr_delay_profile (Data Source)
 
-[subcategory:Profiles]: #
-Single [Delay Profile](../resources/delay_profile).
+<!-- subcategory:Profiles -->Single [Delay Profile](../resources/delay_profile).
 
 ## Example Usage
 

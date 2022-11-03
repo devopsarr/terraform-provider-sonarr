@@ -41,7 +41,7 @@ func (d *AllSeriessDataSource) Metadata(ctx context.Context, req datasource.Meta
 func (d *AllSeriessDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		// This description is used by the documentation generator and the language server.
-		MarkdownDescription: "[subcategory:Series]: #\nList all available [Series](../resources/series).",
+		MarkdownDescription: "<!-- subcategory:Series -->List all available [Series](../resources/series).",
 		Attributes: map[string]tfsdk.Attribute{
 			// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 			"id": {

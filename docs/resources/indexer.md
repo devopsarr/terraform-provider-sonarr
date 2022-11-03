@@ -9,8 +9,7 @@ description: |-
 
 # sonarr_indexer (Resource)
 
-[subcategory:Indexers]: #
-Indexer resource.
+<!-- subcategory:Indexers -->Indexer resource.
 For more information refer to [Indexer](https://wiki.servarr.com/sonarr/settings#indexers) documentation.
 
 ## Example Usage

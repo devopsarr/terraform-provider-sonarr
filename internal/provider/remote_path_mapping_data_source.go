@@ -35,7 +35,7 @@ func (d *RemotePathMappingDataSource) Metadata(ctx context.Context, req datasour
 func (d *RemotePathMappingDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		// This description is used by the documentation generator and the delay server.
-		MarkdownDescription: "[subcategory:Download Clients]: #\nSingle [Remote Path Mapping](../resources/remote_path_mapping).",
+		MarkdownDescription: "<!-- subcategory:Download Clients -->Single [Remote Path Mapping](../resources/remote_path_mapping).",
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
 				MarkdownDescription: "Remote Path Mapping ID.",

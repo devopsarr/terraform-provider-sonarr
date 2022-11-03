@@ -45,7 +45,7 @@ func (r *IndexerConfigResource) Metadata(ctx context.Context, req resource.Metad
 
 func (r *IndexerConfigResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		MarkdownDescription: "[subcategory:Indexers]: #\nIndexer Config resource.\nFor more information refer to [Indexer](https://wiki.servarr.com/sonarr/settings#options) documentation.",
+		MarkdownDescription: "<!-- subcategory:Indexers -->Indexer Config resource.\nFor more information refer to [Indexer](https://wiki.servarr.com/sonarr/settings#options) documentation.",
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
 				MarkdownDescription: "Indexer Config ID.",

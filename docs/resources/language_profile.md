@@ -9,8 +9,7 @@ description: |-
 
 # sonarr_language_profile (Resource)
 
-[subcategory:Profiles]: #
-Language Profile resource.
+<!-- subcategory:Profiles -->Language Profile resource.
 For more information refer to [Language Profile](https://wiki.servarr.com/sonarr/settings#language-profiles) documentation.
 
 ## Example Usage

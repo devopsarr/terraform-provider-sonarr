@@ -35,7 +35,7 @@ func (d *DelayProfileDataSource) Metadata(ctx context.Context, req datasource.Me
 func (d *DelayProfileDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		// This description is used by the documentation generator and the delay server.
-		MarkdownDescription: "[subcategory:Profiles]: #\nSingle [Delay Profile](../resources/delay_profile).",
+		MarkdownDescription: "<!-- subcategory:Profiles -->Single [Delay Profile](../resources/delay_profile).",
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
 				MarkdownDescription: "Delay Profile ID.",

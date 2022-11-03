@@ -8,8 +8,7 @@ description: |-
 
 # sonarr_notifications (Data Source)
 
-[subcategory:Notifications]: #
-List all available [Notifications](../resources/notification).
+<!-- subcategory:Notifications -->List all available [Notifications](../resources/notification).
 
 ## Example Usage
 

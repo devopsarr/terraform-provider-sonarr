@@ -78,4 +78,4 @@ require (
 replace golift.io/starr => github.com/golift/starr v0.14.1-0.20221023033111-1e9c48e68b30
 
 // To be removed once terraform docs allows subcategories
-replace github.com/hashicorp/terraform-plugin-docs => github.com/fuochi/terraform-plugin-docs v0.0.0-20220906113117-f9846067801d
+replace github.com/hashicorp/terraform-plugin-docs => github.com/fuochi/terraform-plugin-docs v0.0.0-20221102115635-d0b02bd5fc0f

@@ -8,8 +8,7 @@ description: |-
 
 # sonarr_quality_profile (Data Source)
 
-[subcategory:Profiles]: #
-Single [Quality Profile](../resources/quality_profile).
+<!-- subcategory:Profiles -->Single [Quality Profile](../resources/quality_profile).
 
 ## Example Usage
 

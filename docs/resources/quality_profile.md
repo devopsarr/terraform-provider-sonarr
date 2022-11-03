@@ -9,8 +9,7 @@ description: |-
 
 # sonarr_quality_profile (Resource)
 
-[subcategory:Profiles]: #
-Quality Profile resource.
+<!-- subcategory:Profiles -->Quality Profile resource.
 For more information refer to [Quality Profile](https://wiki.servarr.com/sonarr/settings#quality-profiles) documentation.
 
 ## Example Usage

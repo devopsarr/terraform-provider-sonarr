@@ -49,7 +49,7 @@ func (r *DelayProfileResource) Metadata(ctx context.Context, req resource.Metada
 
 func (r *DelayProfileResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		MarkdownDescription: "[subcategory:Profiles]: #\nDelay Profile resource.\nFor more information refer to [Delay Profiles](https://wiki.servarr.com/sonarr/settings#delay-profiles) documentation.",
+		MarkdownDescription: "<!-- subcategory:Profiles -->Delay Profile resource.\nFor more information refer to [Delay Profiles](https://wiki.servarr.com/sonarr/settings#delay-profiles) documentation.",
 		Attributes: map[string]tfsdk.Attribute{
 			"id": {
 				MarkdownDescription: "Delay Profile ID.",

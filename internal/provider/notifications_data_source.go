@@ -42,7 +42,7 @@ func (d *NotificationsDataSource) Metadata(ctx context.Context, req datasource.M
 func (d *NotificationsDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
 		// This description is used by the documentation generator and the delay server.
-		MarkdownDescription: "[subcategory:Notifications]: #\nList all available [Notifications](../resources/notification).",
+		MarkdownDescription: "<!-- subcategory:Notifications -->List all available [Notifications](../resources/notification).",
 		Attributes: map[string]tfsdk.Attribute{
 			// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 			"id": {

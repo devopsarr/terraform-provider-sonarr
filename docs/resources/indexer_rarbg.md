@@ -9,8 +9,7 @@ description: |-
 
 # sonarr_indexer_rarbg (Resource)
 
-[subcategory:Indexers]: #
-IndexerRarbg resource.
+<!-- subcategory:Indexers -->IndexerRarbg resource.
 For more information refer to [Indexer](https://wiki.servarr.com/sonarr/settings#indexers) documentation.
 
 ## Example Usage
