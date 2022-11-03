@@ -156,6 +156,18 @@ func (r *DelayProfileResource) Create(ctx context.Context, req resource.CreateRe
 	}
 
 	tflog.Trace(ctx, "created"+delayProfileResourceName+": "+strconv.Itoa(int(response.ID)))
+
+	if !profile.Order.IsUnknown() {
+		response.Order = data.Order
+
+		response, err = r.client.UpdateDelayProfileContext(ctx, response)
+		if err != nil {
+			resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", delayProfileResourceName, err))
+
+			return
+		}
+	}
+
 	// Generate resource state struct
 	profile.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &profile)...)
