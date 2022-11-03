@@ -17,7 +17,7 @@ func TestAccDelayProfilesDataSource(t *testing.T) {
 			{
 				Config: testAccDelayProfilesDataSourceConfig,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckTypeSetElemNestedAttrs("data.sonarr_delay_profiles.test", "delay_profiles.*", map[string]string{"preferred_protocol": "torrent"}),
+					resource.TestCheckTypeSetElemNestedAttrs("data.sonarr_delay_profiles.test", "delay_profiles.*", map[string]string{"enable_usenet": "true"}),
 				),
 			},
 		},
@@ -25,21 +25,6 @@ func TestAccDelayProfilesDataSource(t *testing.T) {
 }
 
 const testAccDelayProfilesDataSourceConfig = `
-resource "sonarr_tag" "test" {
-	label = "delay_profiles_datasource"
-}
-
-resource "sonarr_delay_profile" "test" {
-	enable_usenet = true
-	enable_torrent = true
-	bypass_if_highest_quality = true
-	usenet_delay = 0
-	torrent_delay = 0
-	preferred_protocol= "torrent"
-	tags = [sonarr_tag.test.id]
-}
-
 data "sonarr_delay_profiles" "test" {
-	depends_on = [sonarr_delay_profile.test]
 }
 `

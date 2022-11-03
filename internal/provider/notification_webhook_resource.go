@@ -16,31 +16,33 @@ import (
 )
 
 const (
-	notificationCustomScriptResourceName   = "notification_custom_script"
-	NotificationCustomScriptImplementation = "CustomScript"
-	NotificationCustomScriptConfigContrat  = "CustomScriptSettings"
+	notificationWebhookResourceName   = "notification_webhook"
+	NotificationWebhookImplementation = "Webhook"
+	NotificationWebhookConfigContrat  = "WebhookSettings"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ resource.Resource = &NotificationCustomScriptResource{}
-var _ resource.ResourceWithImportState = &NotificationCustomScriptResource{}
+var _ resource.Resource = &NotificationWebhookResource{}
+var _ resource.ResourceWithImportState = &NotificationWebhookResource{}
 
-func NewNotificationCustomScriptResource() resource.Resource {
-	return &NotificationCustomScriptResource{}
+func NewNotificationWebhookResource() resource.Resource {
+	return &NotificationWebhookResource{}
 }
 
-// NotificationCustomScriptResource defines the notification implementation.
-type NotificationCustomScriptResource struct {
+// NotificationWebhookResource defines the notification implementation.
+type NotificationWebhookResource struct {
 	client *sonarr.Sonarr
 }
 
-// NotificationCustomScript describes the notification data model.
-type NotificationCustomScript struct {
+// NotificationWebhook describes the notification data model.
+type NotificationWebhook struct {
 	Tags                          types.Set    `tfsdk:"tags"`
-	Arguments                     types.String `tfsdk:"arguments"`
-	Path                          types.String `tfsdk:"path"`
+	URL                           types.String `tfsdk:"url"`
 	Name                          types.String `tfsdk:"name"`
+	Username                      types.String `tfsdk:"username"`
+	Password                      types.String `tfsdk:"password"`
 	ID                            types.Int64  `tfsdk:"id"`
+	Method                        types.Int64  `tfsdk:"method"`
 	OnGrab                        types.Bool   `tfsdk:"on_grab"`
 	OnEpisodeFileDeleteForUpgrade types.Bool   `tfsdk:"on_episode_file_delete_for_upgrade"`
 	OnEpisodeFileDelete           types.Bool   `tfsdk:"on_episode_file_delete"`
@@ -53,11 +55,13 @@ type NotificationCustomScript struct {
 	OnDownload                    types.Bool   `tfsdk:"on_download"`
 }
 
-func (n NotificationCustomScript) toNotification() *Notification {
+func (n NotificationWebhook) toNotification() *Notification {
 	return &Notification{
 		Tags:                          n.Tags,
-		Path:                          n.Path,
-		Arguments:                     n.Arguments,
+		URL:                           n.URL,
+		Method:                        n.Method,
+		Username:                      n.Username,
+		Password:                      n.Password,
 		Name:                          n.Name,
 		ID:                            n.ID,
 		OnGrab:                        n.OnGrab,
@@ -73,10 +77,12 @@ func (n NotificationCustomScript) toNotification() *Notification {
 	}
 }
 
-func (n *NotificationCustomScript) fromNotification(notification *Notification) {
+func (n *NotificationWebhook) fromNotification(notification *Notification) {
 	n.Tags = notification.Tags
-	n.Path = notification.Path
-	n.Arguments = notification.Arguments
+	n.URL = notification.URL
+	n.Method = notification.Method
+	n.Username = notification.Username
+	n.Password = notification.Password
 	n.Name = notification.Name
 	n.ID = notification.ID
 	n.OnGrab = notification.OnGrab
@@ -91,13 +97,13 @@ func (n *NotificationCustomScript) fromNotification(notification *Notification) 
 	n.OnDownload = notification.OnDownload
 }
 
-func (r *NotificationCustomScriptResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_" + notificationCustomScriptResourceName
+func (r *NotificationWebhookResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+	resp.TypeName = req.ProviderTypeName + "_" + notificationWebhookResourceName
 }
 
-func (r *NotificationCustomScriptResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
+func (r *NotificationWebhookResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		MarkdownDescription: "<!-- subcategory:Notifications -->Notification Custom Script resource.\nFor more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect) and [Custom Script](https://wiki.servarr.com/sonarr/supported#customscript).",
+		MarkdownDescription: "<!-- subcategory:Notifications -->Notification Webhook resource.\nFor more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect) and [Webhook](https://wiki.servarr.com/sonarr/supported#webhook).",
 		Attributes: map[string]tfsdk.Attribute{
 			"on_grab": {
 				MarkdownDescription: "On grab flag.",
@@ -150,7 +156,7 @@ func (r *NotificationCustomScriptResource) GetSchema(ctx context.Context) (tfsdk
 				Type:                types.BoolType,
 			},
 			"name": {
-				MarkdownDescription: "NotificationCustomScript name.",
+				MarkdownDescription: "NotificationWebhook name.",
 				Required:            true,
 				Type:                types.StringType,
 			},
@@ -171,22 +177,36 @@ func (r *NotificationCustomScriptResource) GetSchema(ctx context.Context) (tfsdk
 				},
 			},
 			// Field values
-			"arguments": {
-				MarkdownDescription: "Arguments.",
+			"url": {
+				MarkdownDescription: "URL.",
+				Required:            true,
+				Type:                types.StringType,
+			},
+			"username": {
+				MarkdownDescription: "Username.",
 				Optional:            true,
 				Computed:            true,
 				Type:                types.StringType,
 			},
-			"path": {
-				MarkdownDescription: "Path.",
-				Required:            true,
+			"password": {
+				MarkdownDescription: "password.",
+				Optional:            true,
+				Computed:            true,
 				Type:                types.StringType,
+			},
+			"method": {
+				MarkdownDescription: "Method. `1` POST, `2` PUT.",
+				Required:            true,
+				Type:                types.Int64Type,
+				Validators: []tfsdk.AttributeValidator{
+					helpers.IntMatch([]int64{1, 2}),
+				},
 			},
 		},
 	}, nil
 }
 
-func (r *NotificationCustomScriptResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+func (r *NotificationWebhookResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
 	// Prevent panic if the provider has not been configured.
 	if req.ProviderData == nil {
 		return
@@ -205,9 +225,9 @@ func (r *NotificationCustomScriptResource) Configure(ctx context.Context, req re
 	r.client = client
 }
 
-func (r *NotificationCustomScriptResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
+func (r *NotificationWebhookResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	// Retrieve values from plan
-	var notification *NotificationCustomScript
+	var notification *NotificationWebhook
 
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &notification)...)
 
@@ -215,25 +235,25 @@ func (r *NotificationCustomScriptResource) Create(ctx context.Context, req resou
 		return
 	}
 
-	// Create new NotificationCustomScript
+	// Create new NotificationWebhook
 	request := notification.read(ctx)
 
 	response, err := r.client.AddNotificationContext(ctx, request)
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", notificationCustomScriptResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", notificationWebhookResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "created "+notificationCustomScriptResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "created "+notificationWebhookResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
 	notification.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &notification)...)
 }
 
-func (r *NotificationCustomScriptResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
+func (r *NotificationWebhookResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	// Get current state
-	var notification *NotificationCustomScript
+	var notification *NotificationWebhook
 
 	resp.Diagnostics.Append(req.State.Get(ctx, &notification)...)
 
@@ -241,23 +261,23 @@ func (r *NotificationCustomScriptResource) Read(ctx context.Context, req resourc
 		return
 	}
 
-	// Get NotificationCustomScript current value
+	// Get NotificationWebhook current value
 	response, err := r.client.GetNotificationContext(ctx, int(notification.ID.ValueInt64()))
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", notificationCustomScriptResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", notificationWebhookResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read "+notificationCustomScriptResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "read "+notificationWebhookResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Map response body to resource schema attribute
 	notification.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &notification)...)
 }
 
-func (r *NotificationCustomScriptResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+func (r *NotificationWebhookResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	// Get plan values
-	var notification *NotificationCustomScript
+	var notification *NotificationWebhook
 
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &notification)...)
 
@@ -265,24 +285,24 @@ func (r *NotificationCustomScriptResource) Update(ctx context.Context, req resou
 		return
 	}
 
-	// Update NotificationCustomScript
+	// Update NotificationWebhook
 	request := notification.read(ctx)
 
 	response, err := r.client.UpdateNotificationContext(ctx, request)
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", notificationCustomScriptResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", notificationWebhookResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "updated "+notificationCustomScriptResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "updated "+notificationWebhookResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
 	notification.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &notification)...)
 }
 
-func (r *NotificationCustomScriptResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var notification *NotificationCustomScript
+func (r *NotificationWebhookResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
+	var notification *NotificationWebhook
 
 	resp.Diagnostics.Append(req.State.Get(ctx, &notification)...)
 
@@ -290,19 +310,19 @@ func (r *NotificationCustomScriptResource) Delete(ctx context.Context, req resou
 		return
 	}
 
-	// Delete NotificationCustomScript current value
+	// Delete NotificationWebhook current value
 	err := r.client.DeleteNotificationContext(ctx, notification.ID.ValueInt64())
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", notificationCustomScriptResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", notificationWebhookResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted "+notificationCustomScriptResourceName+": "+strconv.Itoa(int(notification.ID.ValueInt64())))
+	tflog.Trace(ctx, "deleted "+notificationWebhookResourceName+": "+strconv.Itoa(int(notification.ID.ValueInt64())))
 	resp.State.RemoveResource(ctx)
 }
 
-func (r *NotificationCustomScriptResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+func (r *NotificationWebhookResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	// resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
@@ -314,11 +334,11 @@ func (r *NotificationCustomScriptResource) ImportState(ctx context.Context, req 
 		return
 	}
 
-	tflog.Trace(ctx, "imported "+notificationCustomScriptResourceName+": "+strconv.Itoa(id))
+	tflog.Trace(ctx, "imported "+notificationWebhookResourceName+": "+strconv.Itoa(id))
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 
-func (n *NotificationCustomScript) write(ctx context.Context, notification *sonarr.NotificationOutput) {
+func (n *NotificationWebhook) write(ctx context.Context, notification *sonarr.NotificationOutput) {
 	genericNotification := Notification{
 		OnGrab:                        types.BoolValue(notification.OnGrab),
 		OnDownload:                    types.BoolValue(notification.OnDownload),
@@ -339,7 +359,7 @@ func (n *NotificationCustomScript) write(ctx context.Context, notification *sona
 	n.fromNotification(&genericNotification)
 }
 
-func (n *NotificationCustomScript) read(ctx context.Context) *sonarr.NotificationInput {
+func (n *NotificationWebhook) read(ctx context.Context) *sonarr.NotificationInput {
 	var tags []int
 
 	tfsdk.ValueAs(ctx, n.Tags, &tags)
@@ -355,8 +375,8 @@ func (n *NotificationCustomScript) read(ctx context.Context) *sonarr.Notificatio
 		OnHealthIssue:                 n.OnHealthIssue.ValueBool(),
 		OnApplicationUpdate:           n.OnApplicationUpdate.ValueBool(),
 		IncludeHealthWarnings:         n.IncludeHealthWarnings.ValueBool(),
-		ConfigContract:                NotificationCustomScriptConfigContrat,
-		Implementation:                NotificationCustomScriptImplementation,
+		ConfigContract:                NotificationWebhookConfigContrat,
+		Implementation:                NotificationWebhookImplementation,
 		ID:                            n.ID.ValueInt64(),
 		Name:                          n.Name.ValueString(),
 		Tags:                          tags,

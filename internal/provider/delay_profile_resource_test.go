@@ -50,6 +50,7 @@ func testAccDelayProfileResourceConfig(protocol string) string {
 		enable_usenet = true
 		enable_torrent = true
 		bypass_if_highest_quality = true
+		order = 100
 		usenet_delay = 0
 		torrent_delay = 0
 		preferred_protocol= "%s"

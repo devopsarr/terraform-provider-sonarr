@@ -3,14 +3,14 @@
 page_title: "sonarr_indexer_rarbg Resource - terraform-provider-sonarr"
 subcategory: "Indexers"
 description: |-
-  IndexerRarbg resource.
-  For more information refer to Indexer https://wiki.servarr.com/sonarr/settings#indexers documentation.
+  Indexer Rarbg resource.
+  For more information refer to Indexer https://wiki.servarr.com/sonarr/settings#indexers and Rarbg https://wiki.servarr.com/sonarr/supported#rarbg.
 ---
 
 # sonarr_indexer_rarbg (Resource)
 
-<!-- subcategory:Indexers -->IndexerRarbg resource.
-For more information refer to [Indexer](https://wiki.servarr.com/sonarr/settings#indexers) documentation.
+<!-- subcategory:Indexers -->Indexer Rarbg resource.
+For more information refer to [Indexer](https://wiki.servarr.com/sonarr/settings#indexers) and [Rarbg](https://wiki.servarr.com/sonarr/supported#rarbg).
 
 ## Example Usage
 

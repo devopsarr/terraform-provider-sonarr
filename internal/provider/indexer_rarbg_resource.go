@@ -98,7 +98,7 @@ func (r *IndexerRarbgResource) Metadata(ctx context.Context, req resource.Metada
 
 func (r *IndexerRarbgResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		MarkdownDescription: "<!-- subcategory:Indexers -->IndexerRarbg resource.\nFor more information refer to [Indexer](https://wiki.servarr.com/sonarr/settings#indexers) documentation.",
+		MarkdownDescription: "<!-- subcategory:Indexers -->Indexer Rarbg resource.\nFor more information refer to [Indexer](https://wiki.servarr.com/sonarr/settings#indexers) and [Rarbg](https://wiki.servarr.com/sonarr/supported#rarbg).",
 		Attributes: map[string]tfsdk.Attribute{
 			"enable_automatic_search": {
 				MarkdownDescription: "Enable automatic search flag.",

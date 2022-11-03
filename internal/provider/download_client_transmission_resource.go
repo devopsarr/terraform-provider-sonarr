@@ -107,7 +107,7 @@ func (r *DownloadClientTransmissionResource) Metadata(ctx context.Context, req r
 
 func (r *DownloadClientTransmissionResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		MarkdownDescription: "<!-- subcategory:Download Clients -->Download Client Transmission resource.\nFor more information refer to [Download Client](https://wiki.servarr.com/sonarr/settings#download-clients).",
+		MarkdownDescription: "<!-- subcategory:Download Clients -->Download Client Transmission resource.\nFor more information refer to [Download Client](https://wiki.servarr.com/sonarr/settings#download-clients) and [Transmission](https://wiki.servarr.com/sonarr/supported#transmission).",
 		Attributes: map[string]tfsdk.Attribute{
 			"enable": {
 				MarkdownDescription: "Enable flag.",
