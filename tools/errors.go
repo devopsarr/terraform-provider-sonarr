@@ -1,4 +1,4 @@
-package helpers
+package tools
 
 import (
 	"errors"
@@ -25,6 +25,6 @@ func UnableToRead(name string, err error) string {
 	return fmt.Sprintf("Unable to read %s, got error: %s", name, err)
 }
 
-func WrongSonarrClient(providerData interface{}) string {
-	return fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", providerData)
+func WrongClient(clientType string, providerData interface{}) string {
+	return fmt.Sprintf("Expected %s, got: %T. Please report this issue to the provider developers.", clientType, providerData)
 }

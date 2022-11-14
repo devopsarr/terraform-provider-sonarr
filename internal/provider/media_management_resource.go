@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
+	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -134,7 +134,7 @@ func (r *MediaManagementResource) GetSchema(ctx context.Context) (tfsdk.Schema, 
 				Required:            true,
 				Type:                types.StringType,
 				Validators: []tfsdk.AttributeValidator{
-					helpers.StringMatch([]string{"preferAndUpgrade", "doNotUpgrade", "doNotPrefer"}),
+					tools.StringMatch([]string{"preferAndUpgrade", "doNotUpgrade", "doNotPrefer"}),
 				},
 			},
 			"episode_title_required": {
@@ -142,7 +142,7 @@ func (r *MediaManagementResource) GetSchema(ctx context.Context) (tfsdk.Schema, 
 				Required:            true,
 				Type:                types.StringType,
 				Validators: []tfsdk.AttributeValidator{
-					helpers.StringMatch([]string{"always", "bulkSeasonReleases", "never"}),
+					tools.StringMatch([]string{"always", "bulkSeasonReleases", "never"}),
 				},
 			},
 			"extra_file_extensions": {
@@ -155,7 +155,7 @@ func (r *MediaManagementResource) GetSchema(ctx context.Context) (tfsdk.Schema, 
 				Required:            true,
 				Type:                types.StringType,
 				Validators: []tfsdk.AttributeValidator{
-					helpers.StringMatch([]string{"none", "localAirDate", "utcAirDate"}),
+					tools.StringMatch([]string{"none", "localAirDate", "utcAirDate"}),
 				},
 			},
 			"recycle_bin_path": {
@@ -168,7 +168,7 @@ func (r *MediaManagementResource) GetSchema(ctx context.Context) (tfsdk.Schema, 
 				Required:            true,
 				Type:                types.StringType,
 				Validators: []tfsdk.AttributeValidator{
-					helpers.StringMatch([]string{"always", "afterManual", "never"}),
+					tools.StringMatch([]string{"always", "afterManual", "never"}),
 				},
 			},
 		},
@@ -184,7 +184,7 @@ func (r *MediaManagementResource) Configure(ctx context.Context, req resource.Co
 	client, ok := req.ProviderData.(*sonarr.Sonarr)
 	if !ok {
 		resp.Diagnostics.AddError(
-			helpers.UnexpectedResourceConfigureType,
+			tools.UnexpectedResourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -211,7 +211,7 @@ func (r *MediaManagementResource) Create(ctx context.Context, req resource.Creat
 	// Create new MediaManagement
 	response, err := r.client.UpdateMediaManagementContext(ctx, data)
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to create mediamanagement, got error: %s", err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create mediamanagement, got error: %s", err))
 
 		return
 	}
@@ -235,7 +235,7 @@ func (r *MediaManagementResource) Read(ctx context.Context, req resource.ReadReq
 	// Get mediamanagement current value
 	response, err := r.client.GetMediaManagementContext(ctx)
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", mediaManagementResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", mediaManagementResourceName, err))
 
 		return
 	}
@@ -262,7 +262,7 @@ func (r *MediaManagementResource) Update(ctx context.Context, req resource.Updat
 	// Update MediaManagement
 	response, err := r.client.UpdateMediaManagementContext(ctx, data)
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", mediaManagementResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", mediaManagementResourceName, err))
 
 		return
 	}

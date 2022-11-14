@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
+	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -108,7 +108,7 @@ func (r *DelayProfileResource) GetSchema(ctx context.Context) (tfsdk.Schema, dia
 				Computed:            true,
 				Type:                types.StringType,
 				Validators: []tfsdk.AttributeValidator{
-					helpers.StringMatch([]string{"usenet", "torrent"}),
+					tools.StringMatch([]string{"usenet", "torrent"}),
 				},
 			},
 		},
@@ -124,7 +124,7 @@ func (r *DelayProfileResource) Configure(ctx context.Context, req resource.Confi
 	client, ok := req.ProviderData.(*sonarr.Sonarr)
 	if !ok {
 		resp.Diagnostics.AddError(
-			helpers.UnexpectedResourceConfigureType,
+			tools.UnexpectedResourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -150,7 +150,7 @@ func (r *DelayProfileResource) Create(ctx context.Context, req resource.CreateRe
 	// Create new DelayProfile
 	response, err := r.client.AddDelayProfileContext(ctx, data)
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", delayProfileResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", delayProfileResourceName, err))
 
 		return
 	}
@@ -162,7 +162,7 @@ func (r *DelayProfileResource) Create(ctx context.Context, req resource.CreateRe
 
 		response, err = r.client.UpdateDelayProfileContext(ctx, response)
 		if err != nil {
-			resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", delayProfileResourceName, err))
+			resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", delayProfileResourceName, err))
 
 			return
 		}
@@ -186,7 +186,7 @@ func (r *DelayProfileResource) Read(ctx context.Context, req resource.ReadReques
 	// Get delayprofile current value
 	response, err := r.client.GetDelayProfileContext(ctx, profile.ID.ValueInt64())
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", delayProfileResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", delayProfileResourceName, err))
 
 		return
 	}
@@ -213,7 +213,7 @@ func (r *DelayProfileResource) Update(ctx context.Context, req resource.UpdateRe
 	// Update DelayProfile
 	response, err := r.client.UpdateDelayProfileContext(ctx, data)
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", delayProfileResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", delayProfileResourceName, err))
 
 		return
 	}
@@ -236,7 +236,7 @@ func (r *DelayProfileResource) Delete(ctx context.Context, req resource.DeleteRe
 	// Delete delayprofile current value
 	err := r.client.DeleteDelayProfileContext(ctx, profile.ID.ValueInt64())
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", delayProfileResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", delayProfileResourceName, err))
 
 		return
 	}
@@ -250,7 +250,7 @@ func (r *DelayProfileResource) ImportState(ctx context.Context, req resource.Imp
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			helpers.UnexpectedImportIdentifier,
+			tools.UnexpectedImportIdentifier,
 			fmt.Sprintf("Expected import identifier with format: ID. Got: %q", req.ID),
 		)
 

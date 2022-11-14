@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
+	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
@@ -91,7 +91,7 @@ func (d *ReleaseProfileDataSource) Configure(ctx context.Context, req datasource
 	client, ok := req.ProviderData.(*sonarr.Sonarr)
 	if !ok {
 		resp.Diagnostics.AddError(
-			helpers.UnexpectedDataSourceConfigureType,
+			tools.UnexpectedDataSourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -112,14 +112,14 @@ func (d *ReleaseProfileDataSource) Read(ctx context.Context, req datasource.Read
 	// Get releaseprofiles current value
 	response, err := d.client.GetReleaseProfilesContext(ctx)
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", releaseProfileDataSourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", releaseProfileDataSourceName, err))
 
 		return
 	}
 
 	profile, err := findReleaseProfile(releaseProfile.ID.ValueInt64(), response)
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", releaseProfileDataSourceName, err))
+		resp.Diagnostics.AddError(tools.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", releaseProfileDataSourceName, err))
 
 		return
 	}
@@ -136,5 +136,5 @@ func findReleaseProfile(id int64, profiles []*sonarr.ReleaseProfile) (*sonarr.Re
 		}
 	}
 
-	return nil, helpers.ErrDataNotFoundError(releaseProfileDataSourceName, "id", strconv.Itoa(int(id)))
+	return nil, tools.ErrDataNotFoundError(releaseProfileDataSourceName, "id", strconv.Itoa(int(id)))
 }

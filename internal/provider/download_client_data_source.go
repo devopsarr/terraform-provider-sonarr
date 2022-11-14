@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
+	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
@@ -149,7 +149,7 @@ func (d *DownloadClientDataSource) GetSchema(ctx context.Context) (tfsdk.Schema,
 				Computed:            true,
 				Type:                types.Int64Type,
 				Validators: []tfsdk.AttributeValidator{
-					helpers.IntMatch([]int64{0, 1}),
+					tools.IntMatch([]int64{0, 1}),
 				},
 			},
 			"initial_state": {
@@ -276,7 +276,7 @@ func (d *DownloadClientDataSource) Configure(ctx context.Context, req datasource
 	client, ok := req.ProviderData.(*sonarr.Sonarr)
 	if !ok {
 		resp.Diagnostics.AddError(
-			helpers.UnexpectedDataSourceConfigureType,
+			tools.UnexpectedDataSourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -297,14 +297,14 @@ func (d *DownloadClientDataSource) Read(ctx context.Context, req datasource.Read
 	// Get downloadClient current value
 	response, err := d.client.GetDownloadClientsContext(ctx)
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", downloadClientDataSourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", downloadClientDataSourceName, err))
 
 		return
 	}
 
 	downloadClient, err := findDownloadClient(data.Name.ValueString(), response)
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", downloadClientDataSourceName, err))
+		resp.Diagnostics.AddError(tools.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", downloadClientDataSourceName, err))
 
 		return
 	}
@@ -321,5 +321,5 @@ func findDownloadClient(name string, downloadClients []*sonarr.DownloadClientOut
 		}
 	}
 
-	return nil, helpers.ErrDataNotFoundError(downloadClientDataSourceName, "name", name)
+	return nil, tools.ErrDataNotFoundError(downloadClientDataSourceName, "name", name)
 }

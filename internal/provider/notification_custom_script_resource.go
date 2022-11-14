@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
+	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -195,7 +195,7 @@ func (r *NotificationCustomScriptResource) Configure(ctx context.Context, req re
 	client, ok := req.ProviderData.(*sonarr.Sonarr)
 	if !ok {
 		resp.Diagnostics.AddError(
-			helpers.UnexpectedResourceConfigureType,
+			tools.UnexpectedResourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -220,7 +220,7 @@ func (r *NotificationCustomScriptResource) Create(ctx context.Context, req resou
 
 	response, err := r.client.AddNotificationContext(ctx, request)
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", notificationCustomScriptResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", notificationCustomScriptResourceName, err))
 
 		return
 	}
@@ -244,7 +244,7 @@ func (r *NotificationCustomScriptResource) Read(ctx context.Context, req resourc
 	// Get NotificationCustomScript current value
 	response, err := r.client.GetNotificationContext(ctx, int(notification.ID.ValueInt64()))
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", notificationCustomScriptResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", notificationCustomScriptResourceName, err))
 
 		return
 	}
@@ -270,7 +270,7 @@ func (r *NotificationCustomScriptResource) Update(ctx context.Context, req resou
 
 	response, err := r.client.UpdateNotificationContext(ctx, request)
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", notificationCustomScriptResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", notificationCustomScriptResourceName, err))
 
 		return
 	}
@@ -293,7 +293,7 @@ func (r *NotificationCustomScriptResource) Delete(ctx context.Context, req resou
 	// Delete NotificationCustomScript current value
 	err := r.client.DeleteNotificationContext(ctx, notification.ID.ValueInt64())
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", notificationCustomScriptResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", notificationCustomScriptResourceName, err))
 
 		return
 	}
@@ -307,7 +307,7 @@ func (r *NotificationCustomScriptResource) ImportState(ctx context.Context, req 
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			helpers.UnexpectedImportIdentifier,
+			tools.UnexpectedImportIdentifier,
 			fmt.Sprintf("Expected import identifier with format: ID. Got: %q", req.ID),
 		)
 

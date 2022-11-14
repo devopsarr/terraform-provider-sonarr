@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
+	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -199,7 +199,7 @@ func (r *NotificationWebhookResource) GetSchema(ctx context.Context) (tfsdk.Sche
 				Required:            true,
 				Type:                types.Int64Type,
 				Validators: []tfsdk.AttributeValidator{
-					helpers.IntMatch([]int64{1, 2}),
+					tools.IntMatch([]int64{1, 2}),
 				},
 			},
 		},
@@ -215,7 +215,7 @@ func (r *NotificationWebhookResource) Configure(ctx context.Context, req resourc
 	client, ok := req.ProviderData.(*sonarr.Sonarr)
 	if !ok {
 		resp.Diagnostics.AddError(
-			helpers.UnexpectedResourceConfigureType,
+			tools.UnexpectedResourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -240,7 +240,7 @@ func (r *NotificationWebhookResource) Create(ctx context.Context, req resource.C
 
 	response, err := r.client.AddNotificationContext(ctx, request)
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", notificationWebhookResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", notificationWebhookResourceName, err))
 
 		return
 	}
@@ -264,7 +264,7 @@ func (r *NotificationWebhookResource) Read(ctx context.Context, req resource.Rea
 	// Get NotificationWebhook current value
 	response, err := r.client.GetNotificationContext(ctx, int(notification.ID.ValueInt64()))
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", notificationWebhookResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", notificationWebhookResourceName, err))
 
 		return
 	}
@@ -290,7 +290,7 @@ func (r *NotificationWebhookResource) Update(ctx context.Context, req resource.U
 
 	response, err := r.client.UpdateNotificationContext(ctx, request)
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", notificationWebhookResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", notificationWebhookResourceName, err))
 
 		return
 	}
@@ -313,7 +313,7 @@ func (r *NotificationWebhookResource) Delete(ctx context.Context, req resource.D
 	// Delete NotificationWebhook current value
 	err := r.client.DeleteNotificationContext(ctx, notification.ID.ValueInt64())
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", notificationWebhookResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", notificationWebhookResourceName, err))
 
 		return
 	}
@@ -327,7 +327,7 @@ func (r *NotificationWebhookResource) ImportState(ctx context.Context, req resou
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			helpers.UnexpectedImportIdentifier,
+			tools.UnexpectedImportIdentifier,
 			fmt.Sprintf("Expected import identifier with format: ID. Got: %q", req.ID),
 		)
 

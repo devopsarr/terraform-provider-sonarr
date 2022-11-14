@@ -1,4 +1,4 @@
-package helpers
+package tools
 
 import (
 	"context"
@@ -8,23 +8,23 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
-type IntMatchValidator struct {
-	Slice []int64
+type StringMatchValidator struct {
+	Slice []string
 }
 
 // Description returns a plain text description of the validator's behavior, suitable for a practitioner to understand its impact.
-func (v IntMatchValidator) Description(ctx context.Context) string {
-	return fmt.Sprintf("number must be one of %#v", v.Slice)
+func (v StringMatchValidator) Description(ctx context.Context) string {
+	return fmt.Sprintf("string must be one of %#v", v.Slice)
 }
 
 // MarkdownDescription returns a markdown formatted description of the validator's behavior, suitable for a practitioner to understand its impact.
-func (v IntMatchValidator) MarkdownDescription(ctx context.Context) string {
-	return fmt.Sprintf("number must be one of %#v", v.Slice)
+func (v StringMatchValidator) MarkdownDescription(ctx context.Context) string {
+	return fmt.Sprintf("string must be one of %#v", v.Slice)
 }
 
 // Validate runs the main validation logic of the validator, reading configuration data out of `req` and updating `resp` with diagnostics.
-func (v IntMatchValidator) Validate(ctx context.Context, req tfsdk.ValidateAttributeRequest, resp *tfsdk.ValidateAttributeResponse) {
-	var str types.Int64
+func (v StringMatchValidator) Validate(ctx context.Context, req tfsdk.ValidateAttributeRequest, resp *tfsdk.ValidateAttributeResponse) {
+	var str types.String
 	diags := tfsdk.ValueAs(ctx, req.AttributeConfig, &str)
 	resp.Diagnostics.Append(diags...)
 
@@ -37,21 +37,21 @@ func (v IntMatchValidator) Validate(ctx context.Context, req tfsdk.ValidateAttri
 	}
 
 	for _, s := range v.Slice {
-		if str.ValueInt64() == s {
+		if str.ValueString() == s {
 			return
 		}
 	}
 
 	resp.Diagnostics.AddAttributeError(
 		req.AttributePath,
-		"Invalid Int64 Content",
-		fmt.Sprintf("number must be one of %#v", v.Slice),
+		"Invalid String Content",
+		fmt.Sprintf("string must be one of %#v", v.Slice),
 	)
 }
 
-// IntMatch check that a string is contained in a given slice.
-func IntMatch(match []int64) IntMatchValidator {
-	return IntMatchValidator{
+// StringMatch check that a string is contained in a given slice.
+func StringMatch(match []string) StringMatchValidator {
+	return StringMatchValidator{
 		Slice: match,
 	}
 }
