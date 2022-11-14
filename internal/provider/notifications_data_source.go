@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
+	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -199,7 +199,7 @@ func (d *NotificationsDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, 
 						Computed:            true,
 						Type:                types.Int64Type,
 						Validators: []tfsdk.AttributeValidator{
-							helpers.IntMatch([]int64{1, 2}),
+							tools.IntMatch([]int64{1, 2}),
 						},
 					},
 					"priority": {
@@ -445,7 +445,7 @@ func (d *NotificationsDataSource) Configure(ctx context.Context, req datasource.
 	client, ok := req.ProviderData.(*sonarr.Sonarr)
 	if !ok {
 		resp.Diagnostics.AddError(
-			helpers.UnexpectedDataSourceConfigureType,
+			tools.UnexpectedDataSourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -466,7 +466,7 @@ func (d *NotificationsDataSource) Read(ctx context.Context, req datasource.ReadR
 	// Get notifications current value
 	response, err := d.client.GetNotificationsContext(ctx)
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", notificationsDataSourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", notificationsDataSourceName, err))
 
 		return
 	}

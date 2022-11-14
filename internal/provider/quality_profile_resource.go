@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
+	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -161,7 +161,7 @@ func (r *QualityProfileResource) Configure(ctx context.Context, req resource.Con
 	client, ok := req.ProviderData.(*sonarr.Sonarr)
 	if !ok {
 		resp.Diagnostics.AddError(
-			helpers.UnexpectedResourceConfigureType,
+			tools.UnexpectedResourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -187,7 +187,7 @@ func (r *QualityProfileResource) Create(ctx context.Context, req resource.Create
 	// Create new QualityProfile
 	response, err := r.client.AddQualityProfileContext(ctx, data)
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", qualityProfileResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", qualityProfileResourceName, err))
 
 		return
 	}
@@ -211,7 +211,7 @@ func (r *QualityProfileResource) Read(ctx context.Context, req resource.ReadRequ
 	// Get qualityprofile current value
 	response, err := r.client.GetQualityProfileContext(ctx, profile.ID.ValueInt64())
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", qualityProfileResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", qualityProfileResourceName, err))
 
 		return
 	}
@@ -238,7 +238,7 @@ func (r *QualityProfileResource) Update(ctx context.Context, req resource.Update
 	// Update QualityProfile
 	response, err := r.client.UpdateQualityProfileContext(ctx, data)
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", qualityProfileResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", qualityProfileResourceName, err))
 
 		return
 	}
@@ -261,7 +261,7 @@ func (r *QualityProfileResource) Delete(ctx context.Context, req resource.Delete
 	// Delete qualityprofile current value
 	err := r.client.DeleteQualityProfileContext(ctx, profile.ID.ValueInt64())
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", qualityProfileResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", qualityProfileResourceName, err))
 
 		return
 	}
@@ -275,7 +275,7 @@ func (r *QualityProfileResource) ImportState(ctx context.Context, req resource.I
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			helpers.UnexpectedImportIdentifier,
+			tools.UnexpectedImportIdentifier,
 			fmt.Sprintf("Expected import identifier with format: ID. Got: %q", req.ID),
 		)
 

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
+	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -88,7 +88,7 @@ func (r *IndexerConfigResource) Configure(ctx context.Context, req resource.Conf
 	client, ok := req.ProviderData.(*sonarr.Sonarr)
 	if !ok {
 		resp.Diagnostics.AddError(
-			helpers.UnexpectedResourceConfigureType,
+			tools.UnexpectedResourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -115,7 +115,7 @@ func (r *IndexerConfigResource) Create(ctx context.Context, req resource.CreateR
 	// Create new IndexerConfig
 	response, err := r.client.UpdateIndexerConfigContext(ctx, data)
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", indexerConfigResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", indexerConfigResourceName, err))
 
 		return
 	}
@@ -139,7 +139,7 @@ func (r *IndexerConfigResource) Read(ctx context.Context, req resource.ReadReque
 	// Get indexerConfig current value
 	response, err := r.client.GetIndexerConfigContext(ctx)
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerConfigResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerConfigResourceName, err))
 
 		return
 	}
@@ -166,7 +166,7 @@ func (r *IndexerConfigResource) Update(ctx context.Context, req resource.UpdateR
 	// Update IndexerConfig
 	response, err := r.client.UpdateIndexerConfigContext(ctx, data)
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", indexerConfigResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", indexerConfigResourceName, err))
 
 		return
 	}

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
+	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -271,7 +271,7 @@ func (r *NotificationResource) GetSchema(ctx context.Context) (tfsdk.Schema, dia
 				Computed:            true,
 				Type:                types.Int64Type,
 				Validators: []tfsdk.AttributeValidator{
-					helpers.IntMatch([]int64{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}),
+					tools.IntMatch([]int64{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}),
 				},
 			},
 			"import_fields": {
@@ -280,7 +280,7 @@ func (r *NotificationResource) GetSchema(ctx context.Context) (tfsdk.Schema, dia
 				Computed:            true,
 				Type:                types.Int64Type,
 				Validators: []tfsdk.AttributeValidator{
-					helpers.IntMatch([]int64{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}),
+					tools.IntMatch([]int64{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}),
 				},
 			},
 			"method": {
@@ -289,7 +289,7 @@ func (r *NotificationResource) GetSchema(ctx context.Context) (tfsdk.Schema, dia
 				Computed:            true,
 				Type:                types.Int64Type,
 				Validators: []tfsdk.AttributeValidator{
-					helpers.IntMatch([]int64{1, 2}),
+					tools.IntMatch([]int64{1, 2}),
 				},
 			},
 			"priority": {
@@ -298,7 +298,7 @@ func (r *NotificationResource) GetSchema(ctx context.Context) (tfsdk.Schema, dia
 				Computed:            true,
 				Type:                types.Int64Type,
 				Validators: []tfsdk.AttributeValidator{
-					helpers.IntMatch([]int64{-2, -1, 0, 1, 2, 3, 4, 5, 7}),
+					tools.IntMatch([]int64{-2, -1, 0, 1, 2, 3, 4, 5, 7}),
 				},
 			},
 			"access_token": {
@@ -580,7 +580,7 @@ func (r *NotificationResource) Configure(ctx context.Context, req resource.Confi
 	client, ok := req.ProviderData.(*sonarr.Sonarr)
 	if !ok {
 		resp.Diagnostics.AddError(
-			helpers.UnexpectedResourceConfigureType,
+			tools.UnexpectedResourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -605,7 +605,7 @@ func (r *NotificationResource) Create(ctx context.Context, req resource.CreateRe
 
 	response, err := r.client.AddNotificationContext(ctx, request)
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", notificationResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", notificationResourceName, err))
 
 		return
 	}
@@ -632,7 +632,7 @@ func (r *NotificationResource) Read(ctx context.Context, req resource.ReadReques
 	// Get Notification current value
 	response, err := r.client.GetNotificationContext(ctx, int(notification.ID.ValueInt64()))
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", notificationResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", notificationResourceName, err))
 
 		return
 	}
@@ -661,7 +661,7 @@ func (r *NotificationResource) Update(ctx context.Context, req resource.UpdateRe
 
 	response, err := r.client.UpdateNotificationContext(ctx, request)
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", notificationResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", notificationResourceName, err))
 
 		return
 	}
@@ -687,7 +687,7 @@ func (r *NotificationResource) Delete(ctx context.Context, req resource.DeleteRe
 	// Delete Notification current value
 	err := r.client.DeleteNotificationContext(ctx, notification.ID.ValueInt64())
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", notificationResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", notificationResourceName, err))
 
 		return
 	}
@@ -701,7 +701,7 @@ func (r *NotificationResource) ImportState(ctx context.Context, req resource.Imp
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			helpers.UnexpectedImportIdentifier,
+			tools.UnexpectedImportIdentifier,
 			fmt.Sprintf("Expected import identifier with format: ID. Got: %q", req.ID),
 		)
 
@@ -743,25 +743,25 @@ func (n *Notification) writeFields(ctx context.Context, fields []*starr.FieldOut
 		}
 
 		if slices.Contains(notificationStringFields, f.Name) {
-			helpers.WriteStringField(f, n)
+			tools.WriteStringField(f, n)
 
 			continue
 		}
 
 		if slices.Contains(notificationBoolFields, f.Name) {
-			helpers.WriteBoolField(f, n)
+			tools.WriteBoolField(f, n)
 
 			continue
 		}
 
 		if slices.Contains(notificationIntFields, f.Name) {
-			helpers.WriteIntField(f, n)
+			tools.WriteIntField(f, n)
 
 			continue
 		}
 
 		if slices.Contains(notificationStringSliceFields, f.Name) {
-			helpers.WriteStringSliceField(ctx, f, n)
+			tools.WriteStringSliceField(ctx, f, n)
 		}
 	}
 }
@@ -795,25 +795,25 @@ func (n *Notification) readFields(ctx context.Context) []*starr.FieldInput {
 	var output []*starr.FieldInput
 
 	for _, b := range notificationBoolFields {
-		if field := helpers.ReadBoolField(b, n); field != nil {
+		if field := tools.ReadBoolField(b, n); field != nil {
 			output = append(output, field)
 		}
 	}
 
 	for _, i := range notificationIntFields {
-		if field := helpers.ReadIntField(i, n); field != nil {
+		if field := tools.ReadIntField(i, n); field != nil {
 			output = append(output, field)
 		}
 	}
 
 	for _, s := range notificationStringFields {
-		if field := helpers.ReadStringField(s, n); field != nil {
+		if field := tools.ReadStringField(s, n); field != nil {
 			output = append(output, field)
 		}
 	}
 
 	for _, s := range notificationStringSliceFields {
-		if field := helpers.ReadStringSliceField(ctx, s, n); field != nil {
+		if field := tools.ReadStringSliceField(ctx, s, n); field != nil {
 			output = append(output, field)
 		}
 	}

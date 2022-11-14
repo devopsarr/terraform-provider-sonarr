@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
+	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -211,7 +211,7 @@ func (r *IndexerNewznabResource) Configure(ctx context.Context, req resource.Con
 	client, ok := req.ProviderData.(*sonarr.Sonarr)
 	if !ok {
 		resp.Diagnostics.AddError(
-			helpers.UnexpectedResourceConfigureType,
+			tools.UnexpectedResourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -236,7 +236,7 @@ func (r *IndexerNewznabResource) Create(ctx context.Context, req resource.Create
 
 	response, err := r.client.AddIndexerContext(ctx, request)
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", indexerNewznabResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", indexerNewznabResourceName, err))
 
 		return
 	}
@@ -260,7 +260,7 @@ func (r *IndexerNewznabResource) Read(ctx context.Context, req resource.ReadRequ
 	// Get IndexerNewznab current value
 	response, err := r.client.GetIndexerContext(ctx, indexer.ID.ValueInt64())
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerNewznabResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerNewznabResourceName, err))
 
 		return
 	}
@@ -286,7 +286,7 @@ func (r *IndexerNewznabResource) Update(ctx context.Context, req resource.Update
 
 	response, err := r.client.UpdateIndexerContext(ctx, request)
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", indexerNewznabResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", indexerNewznabResourceName, err))
 
 		return
 	}
@@ -309,7 +309,7 @@ func (r *IndexerNewznabResource) Delete(ctx context.Context, req resource.Delete
 	// Delete IndexerNewznab current value
 	err := r.client.DeleteIndexerContext(ctx, indexer.ID.ValueInt64())
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerNewznabResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerNewznabResourceName, err))
 
 		return
 	}
@@ -323,7 +323,7 @@ func (r *IndexerNewznabResource) ImportState(ctx context.Context, req resource.I
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			helpers.UnexpectedImportIdentifier,
+			tools.UnexpectedImportIdentifier,
 			fmt.Sprintf("Expected import identifier with format: ID. Got: %q", req.ID),
 		)
 

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
+	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -82,7 +82,7 @@ func (r *RemotePathMappingResource) Configure(ctx context.Context, req resource.
 	client, ok := req.ProviderData.(*sonarr.Sonarr)
 	if !ok {
 		resp.Diagnostics.AddError(
-			helpers.UnexpectedResourceConfigureType,
+			tools.UnexpectedResourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -107,7 +107,7 @@ func (r *RemotePathMappingResource) Create(ctx context.Context, req resource.Cre
 
 	response, err := r.client.AddRemotePathMappingContext(ctx, request)
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", remotePathMappingResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", remotePathMappingResourceName, err))
 
 		return
 	}
@@ -131,7 +131,7 @@ func (r *RemotePathMappingResource) Read(ctx context.Context, req resource.ReadR
 	// Get remotePathMapping current value
 	response, err := r.client.GetRemotePathMappingContext(ctx, mapping.ID.ValueInt64())
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", remotePathMappingResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", remotePathMappingResourceName, err))
 
 		return
 	}
@@ -157,7 +157,7 @@ func (r *RemotePathMappingResource) Update(ctx context.Context, req resource.Upd
 
 	response, err := r.client.UpdateRemotePathMappingContext(ctx, request)
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", remotePathMappingResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", remotePathMappingResourceName, err))
 
 		return
 	}
@@ -181,7 +181,7 @@ func (r *RemotePathMappingResource) Delete(ctx context.Context, req resource.Del
 	// Delete remotePathMapping current value
 	err := r.client.DeleteRemotePathMappingContext(ctx, state.ID.ValueInt64())
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", remotePathMappingResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", remotePathMappingResourceName, err))
 
 		return
 	}
@@ -195,7 +195,7 @@ func (r *RemotePathMappingResource) ImportState(ctx context.Context, req resourc
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			helpers.UnexpectedImportIdentifier,
+			tools.UnexpectedImportIdentifier,
 			fmt.Sprintf("Expected import identifier with format: ID. Got: %q", req.ID),
 		)
 

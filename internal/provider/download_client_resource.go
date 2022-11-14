@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
+	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -139,7 +139,7 @@ func (r *DownloadClientResource) GetSchema(ctx context.Context) (tfsdk.Schema, d
 				Required:            true,
 				Type:                types.StringType,
 				Validators: []tfsdk.AttributeValidator{
-					helpers.StringMatch([]string{"usenet", "torrent"}),
+					tools.StringMatch([]string{"usenet", "torrent"}),
 				},
 			},
 			"tags": {
@@ -225,7 +225,7 @@ func (r *DownloadClientResource) GetSchema(ctx context.Context) (tfsdk.Schema, d
 				Computed:            true,
 				Type:                types.Int64Type,
 				Validators: []tfsdk.AttributeValidator{
-					helpers.IntMatch([]int64{0, 1}),
+					tools.IntMatch([]int64{0, 1}),
 				},
 			},
 			"older_tv_priority": {
@@ -234,7 +234,7 @@ func (r *DownloadClientResource) GetSchema(ctx context.Context) (tfsdk.Schema, d
 				Computed:            true,
 				Type:                types.Int64Type,
 				Validators: []tfsdk.AttributeValidator{
-					helpers.IntMatch([]int64{0, 1}),
+					tools.IntMatch([]int64{0, 1}),
 				},
 			},
 			"initial_state": {
@@ -243,7 +243,7 @@ func (r *DownloadClientResource) GetSchema(ctx context.Context) (tfsdk.Schema, d
 				Computed:            true,
 				Type:                types.Int64Type,
 				Validators: []tfsdk.AttributeValidator{
-					helpers.IntMatch([]int64{0, 1}),
+					tools.IntMatch([]int64{0, 1}),
 				},
 			},
 			"intial_state": {
@@ -385,7 +385,7 @@ func (r *DownloadClientResource) Configure(ctx context.Context, req resource.Con
 	client, ok := req.ProviderData.(*sonarr.Sonarr)
 	if !ok {
 		resp.Diagnostics.AddError(
-			helpers.UnexpectedResourceConfigureType,
+			tools.UnexpectedResourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -410,7 +410,7 @@ func (r *DownloadClientResource) Create(ctx context.Context, req resource.Create
 
 	response, err := r.client.AddDownloadClientContext(ctx, request)
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", downloadClientResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", downloadClientResourceName, err))
 
 		return
 	}
@@ -437,7 +437,7 @@ func (r *DownloadClientResource) Read(ctx context.Context, req resource.ReadRequ
 	// Get DownloadClient current value
 	response, err := r.client.GetDownloadClientContext(ctx, client.ID.ValueInt64())
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", downloadClientResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", downloadClientResourceName, err))
 
 		return
 	}
@@ -466,7 +466,7 @@ func (r *DownloadClientResource) Update(ctx context.Context, req resource.Update
 
 	response, err := r.client.UpdateDownloadClientContext(ctx, request)
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", downloadClientResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", downloadClientResourceName, err))
 
 		return
 	}
@@ -492,7 +492,7 @@ func (r *DownloadClientResource) Delete(ctx context.Context, req resource.Delete
 	// Delete DownloadClient current value
 	err := r.client.DeleteDownloadClientContext(ctx, client.ID.ValueInt64())
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", downloadClientResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", downloadClientResourceName, err))
 
 		return
 	}
@@ -506,7 +506,7 @@ func (r *DownloadClientResource) ImportState(ctx context.Context, req resource.I
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			helpers.UnexpectedImportIdentifier,
+			tools.UnexpectedImportIdentifier,
 			fmt.Sprintf("Expected import identifier with format: ID. Got: %q", req.ID),
 		)
 
@@ -542,31 +542,31 @@ func (d *DownloadClient) writeFields(ctx context.Context, fields []*starr.FieldO
 		}
 
 		if slices.Contains(downloadClientStringFields, f.Name) {
-			helpers.WriteStringField(f, d)
+			tools.WriteStringField(f, d)
 
 			continue
 		}
 
 		if slices.Contains(downloadClientBoolFields, f.Name) {
-			helpers.WriteBoolField(f, d)
+			tools.WriteBoolField(f, d)
 
 			continue
 		}
 
 		if slices.Contains(downloadClientIntFields, f.Name) {
-			helpers.WriteIntField(f, d)
+			tools.WriteIntField(f, d)
 
 			continue
 		}
 
 		if slices.Contains(downloadClientIntSliceFields, f.Name) {
-			helpers.WriteIntSliceField(ctx, f, d)
+			tools.WriteIntSliceField(ctx, f, d)
 
 			continue
 		}
 
 		if slices.Contains(downloadClientStringSliceFields, f.Name) {
-			helpers.WriteStringSliceField(ctx, f, d)
+			tools.WriteStringSliceField(ctx, f, d)
 		}
 	}
 }
@@ -595,31 +595,31 @@ func (d *DownloadClient) readFields(ctx context.Context) []*starr.FieldInput {
 	var output []*starr.FieldInput
 
 	for _, b := range downloadClientBoolFields {
-		if field := helpers.ReadBoolField(b, d); field != nil {
+		if field := tools.ReadBoolField(b, d); field != nil {
 			output = append(output, field)
 		}
 	}
 
 	for _, i := range downloadClientIntFields {
-		if field := helpers.ReadIntField(i, d); field != nil {
+		if field := tools.ReadIntField(i, d); field != nil {
 			output = append(output, field)
 		}
 	}
 
 	for _, s := range downloadClientStringFields {
-		if field := helpers.ReadStringField(s, d); field != nil {
+		if field := tools.ReadStringField(s, d); field != nil {
 			output = append(output, field)
 		}
 	}
 
 	for _, s := range downloadClientStringSliceFields {
-		if field := helpers.ReadStringSliceField(ctx, s, d); field != nil {
+		if field := tools.ReadStringSliceField(ctx, s, d); field != nil {
 			output = append(output, field)
 		}
 	}
 
 	for _, s := range downloadClientIntSliceFields {
-		if field := helpers.ReadIntSliceField(ctx, s, d); field != nil {
+		if field := tools.ReadIntSliceField(ctx, s, d); field != nil {
 			output = append(output, field)
 		}
 	}

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
+	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -179,7 +179,7 @@ func (r *DownloadClientTransmissionResource) GetSchema(ctx context.Context) (tfs
 				Computed:            true,
 				Type:                types.Int64Type,
 				Validators: []tfsdk.AttributeValidator{
-					helpers.IntMatch([]int64{0, 1}),
+					tools.IntMatch([]int64{0, 1}),
 				},
 			},
 			"older_tv_priority": {
@@ -188,7 +188,7 @@ func (r *DownloadClientTransmissionResource) GetSchema(ctx context.Context) (tfs
 				Computed:            true,
 				Type:                types.Int64Type,
 				Validators: []tfsdk.AttributeValidator{
-					helpers.IntMatch([]int64{0, 1}),
+					tools.IntMatch([]int64{0, 1}),
 				},
 			},
 			"host": {
@@ -240,7 +240,7 @@ func (r *DownloadClientTransmissionResource) Configure(ctx context.Context, req 
 	client, ok := req.ProviderData.(*sonarr.Sonarr)
 	if !ok {
 		resp.Diagnostics.AddError(
-			helpers.UnexpectedResourceConfigureType,
+			tools.UnexpectedResourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -265,7 +265,7 @@ func (r *DownloadClientTransmissionResource) Create(ctx context.Context, req res
 
 	response, err := r.client.AddDownloadClientContext(ctx, request)
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", downloadClientTransmissionResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", downloadClientTransmissionResourceName, err))
 
 		return
 	}
@@ -289,7 +289,7 @@ func (r *DownloadClientTransmissionResource) Read(ctx context.Context, req resou
 	// Get DownloadClientTransmission current value
 	response, err := r.client.GetDownloadClientContext(ctx, client.ID.ValueInt64())
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", downloadClientTransmissionResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", downloadClientTransmissionResourceName, err))
 
 		return
 	}
@@ -315,7 +315,7 @@ func (r *DownloadClientTransmissionResource) Update(ctx context.Context, req res
 
 	response, err := r.client.UpdateDownloadClientContext(ctx, request)
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", downloadClientTransmissionResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", downloadClientTransmissionResourceName, err))
 
 		return
 	}
@@ -338,7 +338,7 @@ func (r *DownloadClientTransmissionResource) Delete(ctx context.Context, req res
 	// Delete DownloadClientTransmission current value
 	err := r.client.DeleteDownloadClientContext(ctx, client.ID.ValueInt64())
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", downloadClientTransmissionResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", downloadClientTransmissionResourceName, err))
 
 		return
 	}
@@ -352,7 +352,7 @@ func (r *DownloadClientTransmissionResource) ImportState(ctx context.Context, re
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			helpers.UnexpectedImportIdentifier,
+			tools.UnexpectedImportIdentifier,
 			fmt.Sprintf("Expected import identifier with format: ID. Got: %q", req.ID),
 		)
 

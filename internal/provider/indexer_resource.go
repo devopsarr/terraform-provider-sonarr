@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
+	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -131,7 +131,7 @@ func (r *IndexerResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Dia
 				Required:            true,
 				Type:                types.StringType,
 				Validators: []tfsdk.AttributeValidator{
-					helpers.StringMatch([]string{"usenet", "torrent"}),
+					tools.StringMatch([]string{"usenet", "torrent"}),
 				},
 			},
 			"tags": {
@@ -276,7 +276,7 @@ func (r *IndexerResource) Configure(ctx context.Context, req resource.ConfigureR
 	client, ok := req.ProviderData.(*sonarr.Sonarr)
 	if !ok {
 		resp.Diagnostics.AddError(
-			helpers.UnexpectedResourceConfigureType,
+			tools.UnexpectedResourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -301,7 +301,7 @@ func (r *IndexerResource) Create(ctx context.Context, req resource.CreateRequest
 
 	response, err := r.client.AddIndexerContext(ctx, request)
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", indexerResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", indexerResourceName, err))
 
 		return
 	}
@@ -328,7 +328,7 @@ func (r *IndexerResource) Read(ctx context.Context, req resource.ReadRequest, re
 	// Get Indexer current value
 	response, err := r.client.GetIndexerContext(ctx, indexer.ID.ValueInt64())
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerResourceName, err))
 
 		return
 	}
@@ -357,7 +357,7 @@ func (r *IndexerResource) Update(ctx context.Context, req resource.UpdateRequest
 
 	response, err := r.client.UpdateIndexerContext(ctx, request)
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", indexerResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", indexerResourceName, err))
 
 		return
 	}
@@ -383,7 +383,7 @@ func (r *IndexerResource) Delete(ctx context.Context, req resource.DeleteRequest
 	// Delete Indexer current value
 	err := r.client.DeleteIndexerContext(ctx, indexer.ID.ValueInt64())
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerResourceName, err))
 
 		return
 	}
@@ -397,7 +397,7 @@ func (r *IndexerResource) ImportState(ctx context.Context, req resource.ImportSt
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			helpers.UnexpectedImportIdentifier,
+			tools.UnexpectedImportIdentifier,
 			fmt.Sprintf("Expected import identifier with format: ID. Got: %q", req.ID),
 		)
 
@@ -433,31 +433,31 @@ func (i *Indexer) writeFields(ctx context.Context, fields []*starr.FieldOutput) 
 		}
 
 		if slices.Contains(indexerStringFields, f.Name) {
-			helpers.WriteStringField(f, i)
+			tools.WriteStringField(f, i)
 
 			continue
 		}
 
 		if slices.Contains(indexerBoolFields, f.Name) {
-			helpers.WriteBoolField(f, i)
+			tools.WriteBoolField(f, i)
 
 			continue
 		}
 
 		if slices.Contains(indexerIntFields, f.Name) {
-			helpers.WriteIntField(f, i)
+			tools.WriteIntField(f, i)
 
 			continue
 		}
 
 		if slices.Contains(indexerFloatFields, f.Name) {
-			helpers.WriteFloatField(f, i)
+			tools.WriteFloatField(f, i)
 
 			continue
 		}
 
 		if slices.Contains(indexerIntSliceFields, f.Name) {
-			helpers.WriteIntSliceField(ctx, f, i)
+			tools.WriteIntSliceField(ctx, f, i)
 		}
 	}
 }
@@ -487,31 +487,31 @@ func (i *Indexer) readFields(ctx context.Context) []*starr.FieldInput {
 	var output []*starr.FieldInput
 
 	for _, b := range indexerBoolFields {
-		if field := helpers.ReadBoolField(b, i); field != nil {
+		if field := tools.ReadBoolField(b, i); field != nil {
 			output = append(output, field)
 		}
 	}
 
 	for _, n := range indexerIntFields {
-		if field := helpers.ReadIntField(n, i); field != nil {
+		if field := tools.ReadIntField(n, i); field != nil {
 			output = append(output, field)
 		}
 	}
 
 	for _, f := range indexerFloatFields {
-		if field := helpers.ReadFloatField(f, i); field != nil {
+		if field := tools.ReadFloatField(f, i); field != nil {
 			output = append(output, field)
 		}
 	}
 
 	for _, s := range indexerStringFields {
-		if field := helpers.ReadStringField(s, i); field != nil {
+		if field := tools.ReadStringField(s, i); field != nil {
 			output = append(output, field)
 		}
 	}
 
 	for _, s := range indexerIntSliceFields {
-		if field := helpers.ReadIntSliceField(ctx, s, i); field != nil {
+		if field := tools.ReadIntSliceField(ctx, s, i); field != nil {
 			output = append(output, field)
 		}
 	}

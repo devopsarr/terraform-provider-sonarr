@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
+	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -110,7 +110,7 @@ func (r *RootFolderResource) Configure(ctx context.Context, req resource.Configu
 	client, ok := req.ProviderData.(*sonarr.Sonarr)
 	if !ok {
 		resp.Diagnostics.AddError(
-			helpers.UnexpectedResourceConfigureType,
+			tools.UnexpectedResourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -137,7 +137,7 @@ func (r *RootFolderResource) Create(ctx context.Context, req resource.CreateRequ
 
 	response, err := r.client.AddRootFolderContext(ctx, &request)
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", rootFolderResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", rootFolderResourceName, err))
 
 		return
 	}
@@ -161,7 +161,7 @@ func (r *RootFolderResource) Read(ctx context.Context, req resource.ReadRequest,
 	// Get rootFolder current value
 	response, err := r.client.GetRootFolderContext(ctx, folder.ID.ValueInt64())
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", rootFolderResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", rootFolderResourceName, err))
 
 		return
 	}
@@ -188,7 +188,7 @@ func (r *RootFolderResource) Delete(ctx context.Context, req resource.DeleteRequ
 	// Delete rootFolder current value
 	err := r.client.DeleteRootFolderContext(ctx, state.ID.ValueInt64())
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", rootFolderResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", rootFolderResourceName, err))
 
 		return
 	}
@@ -202,7 +202,7 @@ func (r *RootFolderResource) ImportState(ctx context.Context, req resource.Impor
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			helpers.UnexpectedImportIdentifier,
+			tools.UnexpectedImportIdentifier,
 			fmt.Sprintf("Expected import identifier with format: ID. Got: %q", req.ID),
 		)
 

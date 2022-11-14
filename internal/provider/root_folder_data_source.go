@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
+	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
@@ -80,7 +80,7 @@ func (d *RootFolderDataSource) Configure(ctx context.Context, req datasource.Con
 	client, ok := req.ProviderData.(*sonarr.Sonarr)
 	if !ok {
 		resp.Diagnostics.AddError(
-			helpers.UnexpectedDataSourceConfigureType,
+			tools.UnexpectedDataSourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -101,7 +101,7 @@ func (d *RootFolderDataSource) Read(ctx context.Context, req datasource.ReadRequ
 	// Get rootfolders current value
 	response, err := d.client.GetRootFoldersContext(ctx)
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", rootFolderDataSourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", rootFolderDataSourceName, err))
 
 		return
 	}
@@ -109,7 +109,7 @@ func (d *RootFolderDataSource) Read(ctx context.Context, req datasource.ReadRequ
 	// Map response body to resource schema attribute
 	rootFolder, err := findRootFolder(folder.Path.ValueString(), response)
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", rootFolderDataSourceName, err))
+		resp.Diagnostics.AddError(tools.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", rootFolderDataSourceName, err))
 
 		return
 	}
@@ -126,5 +126,5 @@ func findRootFolder(path string, folders []*sonarr.RootFolder) (*sonarr.RootFold
 		}
 	}
 
-	return nil, helpers.ErrDataNotFoundError(rootFolderDataSourceName, "path", path)
+	return nil, tools.ErrDataNotFoundError(rootFolderDataSourceName, "path", path)
 }
