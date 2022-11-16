@@ -88,12 +88,12 @@ func (d *IndexerConfigDataSource) Read(ctx context.Context, req datasource.ReadR
 	// Get indexer config current value
 	response, err := d.client.GetIndexerConfigContext(ctx)
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", downloadClientsDataSourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerConfigDataSourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read "+downloadClientsDataSourceName)
+	tflog.Trace(ctx, "read "+indexerConfigDataSourceName)
 
 	status := IndexerConfig{}
 	status.write(response)

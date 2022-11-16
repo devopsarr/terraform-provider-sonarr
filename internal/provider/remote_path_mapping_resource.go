@@ -169,9 +169,9 @@ func (r *RemotePathMappingResource) Update(ctx context.Context, req resource.Upd
 }
 
 func (r *RemotePathMappingResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var state *RemotePathMapping
+	var mapping *RemotePathMapping
 
-	diags := req.State.Get(ctx, &state)
+	diags := req.State.Get(ctx, &mapping)
 	resp.Diagnostics.Append(diags...)
 
 	if resp.Diagnostics.HasError() {
@@ -179,14 +179,14 @@ func (r *RemotePathMappingResource) Delete(ctx context.Context, req resource.Del
 	}
 
 	// Delete remotePathMapping current value
-	err := r.client.DeleteRemotePathMappingContext(ctx, state.ID.ValueInt64())
+	err := r.client.DeleteRemotePathMappingContext(ctx, mapping.ID.ValueInt64())
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", remotePathMappingResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted "+remotePathMappingResourceName+": "+strconv.Itoa(int(state.ID.ValueInt64())))
+	tflog.Trace(ctx, "deleted "+remotePathMappingResourceName+": "+strconv.Itoa(int(mapping.ID.ValueInt64())))
 	resp.State.RemoveResource(ctx)
 }
 
