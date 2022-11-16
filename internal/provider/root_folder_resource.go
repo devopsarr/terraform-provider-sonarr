@@ -177,23 +177,23 @@ func (r *RootFolderResource) Update(ctx context.Context, req resource.UpdateRequ
 }
 
 func (r *RootFolderResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var state *RootFolder
+	var folder *RootFolder
 
-	resp.Diagnostics.Append(req.State.Get(ctx, &state)...)
+	resp.Diagnostics.Append(req.State.Get(ctx, &folder)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Delete rootFolder current value
-	err := r.client.DeleteRootFolderContext(ctx, state.ID.ValueInt64())
+	err := r.client.DeleteRootFolderContext(ctx, folder.ID.ValueInt64())
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", rootFolderResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted "+rootFolderResourceName+": "+strconv.Itoa(int(state.ID.ValueInt64())))
+	tflog.Trace(ctx, "deleted "+rootFolderResourceName+": "+strconv.Itoa(int(folder.ID.ValueInt64())))
 	resp.State.RemoveResource(ctx)
 }
 

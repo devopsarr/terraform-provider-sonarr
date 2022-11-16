@@ -42,7 +42,7 @@ func WriteFloatField(fieldOutput *starr.FieldOutput, fieldCase interface{}) {
 	value := reflect.ValueOf(fieldCase)
 	value = value.Elem()
 	field := value.FieldByNameFunc(func(n string) bool { return strings.EqualFold(n, strings.ToLower(fieldOutput.Name)) })
-	v := reflect.ValueOf(types.Float64{Value: floatValue})
+	v := reflect.ValueOf(types.Float64Value(floatValue))
 	field.Set(v)
 }
 
