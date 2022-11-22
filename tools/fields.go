@@ -2,6 +2,7 @@ package tools
 
 import (
 	"context"
+	"fmt"
 	"reflect"
 	"strings"
 
@@ -11,7 +12,7 @@ import (
 )
 
 func WriteStringField(fieldOutput *starr.FieldOutput, fieldCase interface{}) {
-	stringValue, _ := fieldOutput.Value.(string)
+	stringValue := fmt.Sprint(fieldOutput.Value)
 	value := reflect.ValueOf(fieldCase)
 	value = value.Elem()
 	field := value.FieldByNameFunc(func(n string) bool { return strings.EqualFold(n, strings.ToLower(fieldOutput.Name)) })

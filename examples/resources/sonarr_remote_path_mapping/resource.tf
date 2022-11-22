@@ -1,5 +1,5 @@
 resource "sonarr_remote_path_mapping" "example" {
-  host        = "%s"
-  remote_path = "%s"
-  local_path  = "/config/"
+  host        = "www.transmission.com"
+  remote_path = "/download/"
+  local_path  = "/transmission-download/"
 }
