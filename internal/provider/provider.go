@@ -138,6 +138,7 @@ func (p *SonarrProvider) Resources(ctx context.Context) []func() resource.Resour
 		NewDownloadClientUsenetDownloadStationResource,
 		NewDownloadClientNzbgetResource,
 		NewDownloadClientNzbvortexResource,
+		NewDownloadClientPneumaticResource,
 		NewDownloadClientAria2Resource,
 		NewDownloadClientDelugeResource,
 		NewDownloadClientTorrentDownloadStationResource,
