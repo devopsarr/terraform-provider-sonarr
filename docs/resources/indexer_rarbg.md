@@ -17,7 +17,7 @@ For more information refer to [Indexer](https://wiki.servarr.com/sonarr/settings
 ```terraform
 resource "sonarr_indexer_rargb" "example" {
   enable_automatic_search = true
-  name                    = "Test"
+  name                    = "Example"
   implementation          = "Newznab"
   base_url                = "https://torrentapi.org"
   ranked_only             = "false"
