@@ -57,7 +57,7 @@ resource "sonarr_download_client" "example" {
 - `older_tv_priority` (Number) Older TV priority. `0` Last, `1` First.
 - `password` (String) Password.
 - `port` (Number) Port.
-- `post_im_tags` (Set of String) Post import tags.
+- `post_import_tags` (Set of String) Post import tags.
 - `priority` (Number) Priority.
 - `read_only` (Boolean) Read only flag.
 - `recent_tv_priority` (Number) Recent TV priority. `0` Last, `1` First.

@@ -27,7 +27,7 @@ var (
 	downloadClientBoolFields        = []string{"addPaused", "useSsl", "startOnAdd", "sequentialOrder", "firstAndLast", "addStopped", "saveMagnetFiles", "readOnly"}
 	downloadClientIntFields         = []string{"port", "recentTvPriority", "olderTvPriority", "initialState", "intialState"}
 	downloadClientStringFields      = []string{"host", "apiKey", "urlBase", "rpcPath", "secretToken", "password", "username", "tvCategory", "tvImportedCategory", "tvDirectory", "destination", "category", "nzbFolder", "strmFolder", "torrentFolder", "magnetFileExtension", "watchFolder"}
-	downloadClientStringSliceFields = []string{"fieldTags", "postImTags"}
+	downloadClientStringSliceFields = []string{"fieldTags", "postImportTags"}
 	downloadClientIntSliceFields    = []string{"additionalTags"}
 )
 
@@ -43,9 +43,9 @@ type DownloadClientResource struct {
 // DownloadClient describes the download client data model.
 type DownloadClient struct {
 	Tags                     types.Set    `tfsdk:"tags"`
-	PostImTags               types.Set    `tfsdk:"post_im_tags"`
 	FieldTags                types.Set    `tfsdk:"field_tags"`
 	AdditionalTags           types.Set    `tfsdk:"additional_tags"`
+	PostImportTags           types.Set    `tfsdk:"post_import_tags"`
 	NzbFolder                types.String `tfsdk:"nzb_folder"`
 	Category                 types.String `tfsdk:"category"`
 	Implementation           types.String `tfsdk:"implementation"`
@@ -364,7 +364,7 @@ func (r *DownloadClientResource) GetSchema(ctx context.Context) (tfsdk.Schema, d
 					ElemType: types.StringType,
 				},
 			},
-			"post_im_tags": {
+			"post_import_tags": {
 				MarkdownDescription: "Post import tags.",
 				Optional:            true,
 				Computed:            true,
@@ -530,7 +530,7 @@ func (d *DownloadClient) write(ctx context.Context, downloadClient *sonarr.Downl
 	d.Tags = types.SetValueMust(types.Int64Type, nil)
 	d.AdditionalTags = types.SetValueMust(types.Int64Type, nil)
 	d.FieldTags = types.SetValueMust(types.StringType, nil)
-	d.PostImTags = types.SetValueMust(types.StringType, nil)
+	d.PostImportTags = types.SetValueMust(types.StringType, nil)
 	tfsdk.ValueFrom(ctx, downloadClient.Tags, d.Tags.Type(ctx), &d.Tags)
 	d.writeFields(ctx, downloadClient.Fields)
 }
@@ -565,7 +565,8 @@ func (d *DownloadClient) writeFields(ctx context.Context, fields []*starr.FieldO
 			continue
 		}
 
-		if slices.Contains(downloadClientStringSliceFields, f.Name) {
+		// add specific check for tags to map field_tags
+		if slices.Contains(downloadClientStringSliceFields, f.Name) || f.Name == "tags" {
 			tools.WriteStringSliceField(ctx, f, d)
 		}
 	}
