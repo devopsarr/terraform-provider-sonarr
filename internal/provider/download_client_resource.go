@@ -24,9 +24,9 @@ var _ resource.Resource = &DownloadClientResource{}
 var _ resource.ResourceWithImportState = &DownloadClientResource{}
 
 var (
-	downloadClientBoolFields        = []string{"addPaused", "useSsl", "startOnAdd", "sequentialOrder", "firstAndLast", "addStopped", "saveMagnetFiles", "readOnly", "watchFolder"}
+	downloadClientBoolFields        = []string{"addPaused", "useSsl", "startOnAdd", "sequentialOrder", "firstAndLast", "addStopped", "saveMagnetFiles", "readOnly"}
 	downloadClientIntFields         = []string{"port", "recentTvPriority", "olderTvPriority", "initialState", "intialState"}
-	downloadClientStringFields      = []string{"host", "apiKey", "urlBase", "rpcPath", "secretToken", "password", "username", "tvCategory", "tvImportedCategory", "tvDirectory", "destination", "category", "nzbFolder", "strmFolder", "torrentFolder", "magnetFileExtension"}
+	downloadClientStringFields      = []string{"host", "apiKey", "urlBase", "rpcPath", "secretToken", "password", "username", "tvCategory", "tvImportedCategory", "tvDirectory", "destination", "category", "nzbFolder", "strmFolder", "torrentFolder", "magnetFileExtension", "watchFolder"}
 	downloadClientStringSliceFields = []string{"fieldTags", "postImTags"}
 	downloadClientIntSliceFields    = []string{"additionalTags"}
 )
@@ -53,6 +53,7 @@ type DownloadClient struct {
 	Protocol                 types.String `tfsdk:"protocol"`
 	MagnetFileExtension      types.String `tfsdk:"magnet_file_extension"`
 	TorrentFolder            types.String `tfsdk:"torrent_folder"`
+	WatchFolder              types.String `tfsdk:"watch_folder"`
 	StrmFolder               types.String `tfsdk:"strm_folder"`
 	Host                     types.String `tfsdk:"host"`
 	ConfigContract           types.String `tfsdk:"config_contract"`
@@ -81,7 +82,6 @@ type DownloadClient struct {
 	StartOnAdd               types.Bool   `tfsdk:"start_on_add"`
 	UseSsl                   types.Bool   `tfsdk:"use_ssl"`
 	AddPaused                types.Bool   `tfsdk:"add_paused"`
-	WatchFolder              types.Bool   `tfsdk:"watch_folder"`
 	Enable                   types.Bool   `tfsdk:"enable"`
 	RemoveFailedDownloads    types.Bool   `tfsdk:"remove_failed_downloads"`
 	RemoveCompletedDownloads types.Bool   `tfsdk:"remove_completed_downloads"`
@@ -203,12 +203,6 @@ func (r *DownloadClientResource) GetSchema(ctx context.Context) (tfsdk.Schema, d
 			},
 			"read_only": {
 				MarkdownDescription: "Read only flag.",
-				Optional:            true,
-				Computed:            true,
-				Type:                types.BoolType,
-			},
-			"watch_folder": {
-				MarkdownDescription: "Watch folder flag.",
 				Optional:            true,
 				Computed:            true,
 				Type:                types.BoolType,
@@ -338,6 +332,12 @@ func (r *DownloadClientResource) GetSchema(ctx context.Context) (tfsdk.Schema, d
 			},
 			"torrent_folder": {
 				MarkdownDescription: "Torrent folder.",
+				Optional:            true,
+				Computed:            true,
+				Type:                types.StringType,
+			},
+			"watch_folder": {
+				MarkdownDescription: "Watch folder flag.",
 				Optional:            true,
 				Computed:            true,
 				Type:                types.StringType,
