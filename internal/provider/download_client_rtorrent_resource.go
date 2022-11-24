@@ -16,29 +16,28 @@ import (
 )
 
 const (
-	downloadClientUtorrentResourceName   = "download_client_utorrent"
-	DownloadClientUtorrentImplementation = "UTorrent"
-	DownloadClientUtorrentConfigContrat  = "UTorrentSettings"
-	DownloadClientUtorrentProtocol       = "torrent"
+	downloadClientRtorrentResourceName   = "download_client_rtorrent"
+	DownloadClientRtorrentImplementation = "RTorrent"
+	DownloadClientRtorrentConfigContrat  = "RTorrentSettings"
+	DownloadClientRtorrentProtocol       = "torrent"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ resource.Resource = &DownloadClientUtorrentResource{}
-var _ resource.ResourceWithImportState = &DownloadClientUtorrentResource{}
+var _ resource.Resource = &DownloadClientRtorrentResource{}
+var _ resource.ResourceWithImportState = &DownloadClientRtorrentResource{}
 
-func NewDownloadClientUtorrentResource() resource.Resource {
-	return &DownloadClientUtorrentResource{}
+func NewDownloadClientRtorrentResource() resource.Resource {
+	return &DownloadClientRtorrentResource{}
 }
 
-// DownloadClientUtorrentResource defines the download client implementation.
-type DownloadClientUtorrentResource struct {
+// DownloadClientRtorrentResource defines the download client implementation.
+type DownloadClientRtorrentResource struct {
 	client *sonarr.Sonarr
 }
 
-// DownloadClientUtorrent describes the download client data model.
-type DownloadClientUtorrent struct {
+// DownloadClientRtorrent describes the download client data model.
+type DownloadClientRtorrent struct {
 	Tags                     types.Set    `tfsdk:"tags"`
-	TvImportedCategory       types.String `tfsdk:"tv_imported_category"`
 	Name                     types.String `tfsdk:"name"`
 	Host                     types.String `tfsdk:"host"`
 	URLBase                  types.String `tfsdk:"url_base"`
@@ -46,19 +45,20 @@ type DownloadClientUtorrent struct {
 	Password                 types.String `tfsdk:"password"`
 	TvCategory               types.String `tfsdk:"tv_category"`
 	TvDirectory              types.String `tfsdk:"tv_directory"`
+	TvImportedCategory       types.String `tfsdk:"tv_imported_category"`
 	RecentTvPriority         types.Int64  `tfsdk:"recent_tv_priority"`
+	OlderTvPriority          types.Int64  `tfsdk:"older_tv_priority"`
 	Priority                 types.Int64  `tfsdk:"priority"`
 	Port                     types.Int64  `tfsdk:"port"`
 	ID                       types.Int64  `tfsdk:"id"`
-	OlderTvPriority          types.Int64  `tfsdk:"older_tv_priority"`
-	IntialState              types.Int64  `tfsdk:"intial_state"`
+	AddStopped               types.Bool   `tfsdk:"add_stopped"`
 	UseSsl                   types.Bool   `tfsdk:"use_ssl"`
 	Enable                   types.Bool   `tfsdk:"enable"`
 	RemoveFailedDownloads    types.Bool   `tfsdk:"remove_failed_downloads"`
 	RemoveCompletedDownloads types.Bool   `tfsdk:"remove_completed_downloads"`
 }
 
-func (d DownloadClientUtorrent) toDownloadClient() *DownloadClient {
+func (d DownloadClientRtorrent) toDownloadClient() *DownloadClient {
 	return &DownloadClient{
 		Tags:                     d.Tags,
 		Name:                     d.Name,
@@ -68,13 +68,13 @@ func (d DownloadClientUtorrent) toDownloadClient() *DownloadClient {
 		Password:                 d.Password,
 		TvCategory:               d.TvCategory,
 		TvDirectory:              d.TvDirectory,
+		TvImportedCategory:       d.TvImportedCategory,
 		RecentTvPriority:         d.RecentTvPriority,
 		OlderTvPriority:          d.OlderTvPriority,
 		Priority:                 d.Priority,
 		Port:                     d.Port,
 		ID:                       d.ID,
-		TvImportedCategory:       d.TvImportedCategory,
-		IntialState:              d.IntialState,
+		AddStopped:               d.AddStopped,
 		UseSsl:                   d.UseSsl,
 		Enable:                   d.Enable,
 		RemoveFailedDownloads:    d.RemoveFailedDownloads,
@@ -82,7 +82,7 @@ func (d DownloadClientUtorrent) toDownloadClient() *DownloadClient {
 	}
 }
 
-func (d *DownloadClientUtorrent) fromDownloadClient(client *DownloadClient) {
+func (d *DownloadClientRtorrent) fromDownloadClient(client *DownloadClient) {
 	d.Tags = client.Tags
 	d.Name = client.Name
 	d.Host = client.Host
@@ -91,26 +91,26 @@ func (d *DownloadClientUtorrent) fromDownloadClient(client *DownloadClient) {
 	d.Password = client.Password
 	d.TvCategory = client.TvCategory
 	d.TvDirectory = client.TvDirectory
+	d.TvImportedCategory = client.TvImportedCategory
 	d.RecentTvPriority = client.RecentTvPriority
 	d.OlderTvPriority = client.OlderTvPriority
 	d.Priority = client.Priority
 	d.Port = client.Port
 	d.ID = client.ID
-	d.TvImportedCategory = client.TvImportedCategory
-	d.IntialState = client.IntialState
+	d.AddStopped = client.AddStopped
 	d.UseSsl = client.UseSsl
 	d.Enable = client.Enable
 	d.RemoveFailedDownloads = client.RemoveFailedDownloads
 	d.RemoveCompletedDownloads = client.RemoveCompletedDownloads
 }
 
-func (r *DownloadClientUtorrentResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_" + downloadClientUtorrentResourceName
+func (r *DownloadClientRtorrentResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+	resp.TypeName = req.ProviderTypeName + "_" + downloadClientRtorrentResourceName
 }
 
-func (r *DownloadClientUtorrentResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
+func (r *DownloadClientRtorrentResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		MarkdownDescription: "<!-- subcategory:Download Clients -->Download Client uTorrent resource.\nFor more information refer to [Download Client](https://wiki.servarr.com/sonarr/settings#download-clients) and [uTorrent](https://wiki.servarr.com/sonarr/supported#utorrent).",
+		MarkdownDescription: "<!-- subcategory:Download Clients -->Download Client RTorrent resource.\nFor more information refer to [Download Client](https://wiki.servarr.com/sonarr/settings#download-clients) and [RTorrent](https://wiki.servarr.com/sonarr/supported#rtorrent).",
 		Attributes: map[string]tfsdk.Attribute{
 			"enable": {
 				MarkdownDescription: "Enable flag.",
@@ -158,6 +158,12 @@ func (r *DownloadClientUtorrentResource) GetSchema(ctx context.Context) (tfsdk.S
 				},
 			},
 			// Field values
+			"add_stopped": {
+				MarkdownDescription: "Add stopped flag.",
+				Optional:            true,
+				Computed:            true,
+				Type:                types.BoolType,
+			},
 			"use_ssl": {
 				MarkdownDescription: "Use SSL flag.",
 				Optional:            true,
@@ -171,25 +177,16 @@ func (r *DownloadClientUtorrentResource) GetSchema(ctx context.Context) (tfsdk.S
 				Type:                types.Int64Type,
 			},
 			"recent_tv_priority": {
-				MarkdownDescription: "Recent TV priority. `0` Last, `1` First.",
+				MarkdownDescription: "Recent TV priority. `0` VeryLow, `1` Low, `2` Normal, `3` High.",
 				Optional:            true,
 				Computed:            true,
 				Type:                types.Int64Type,
 				Validators: []tfsdk.AttributeValidator{
-					tools.IntMatch([]int64{0, 1}),
+					tools.IntMatch([]int64{0, 1, 2, 3}),
 				},
 			},
 			"older_tv_priority": {
-				MarkdownDescription: "Older TV priority. `0` Last, `1` First.",
-				Optional:            true,
-				Computed:            true,
-				Type:                types.Int64Type,
-				Validators: []tfsdk.AttributeValidator{
-					tools.IntMatch([]int64{0, 1}),
-				},
-			},
-			"intial_state": {
-				MarkdownDescription: "Initial state, with Stop support. `0` Start, `1` ForceStart, `2` Pause, `3` Stop.",
+				MarkdownDescription: "Older TV priority. `0` VeryLow, `1` Low, `2` Normal, `3` High.",
 				Optional:            true,
 				Computed:            true,
 				Type:                types.Int64Type,
@@ -227,14 +224,14 @@ func (r *DownloadClientUtorrentResource) GetSchema(ctx context.Context) (tfsdk.S
 				Computed:            true,
 				Type:                types.StringType,
 			},
-			"tv_imported_category": {
-				MarkdownDescription: "TV imported category.",
+			"tv_directory": {
+				MarkdownDescription: "TV directory.",
 				Optional:            true,
 				Computed:            true,
 				Type:                types.StringType,
 			},
-			"tv_directory": {
-				MarkdownDescription: "TV directory.",
+			"tv_imported_category": {
+				MarkdownDescription: "TV imported category.",
 				Optional:            true,
 				Computed:            true,
 				Type:                types.StringType,
@@ -243,7 +240,7 @@ func (r *DownloadClientUtorrentResource) GetSchema(ctx context.Context) (tfsdk.S
 	}, nil
 }
 
-func (r *DownloadClientUtorrentResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+func (r *DownloadClientRtorrentResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
 	// Prevent panic if the provider has not been configured.
 	if req.ProviderData == nil {
 		return
@@ -262,9 +259,9 @@ func (r *DownloadClientUtorrentResource) Configure(ctx context.Context, req reso
 	r.client = client
 }
 
-func (r *DownloadClientUtorrentResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
+func (r *DownloadClientRtorrentResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	// Retrieve values from plan
-	var client *DownloadClientUtorrent
+	var client *DownloadClientRtorrent
 
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &client)...)
 
@@ -272,25 +269,25 @@ func (r *DownloadClientUtorrentResource) Create(ctx context.Context, req resourc
 		return
 	}
 
-	// Create new DownloadClientUtorrent
+	// Create new DownloadClientRtorrent
 	request := client.read(ctx)
 
 	response, err := r.client.AddDownloadClientContext(ctx, request)
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", downloadClientUtorrentResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", downloadClientRtorrentResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "created "+downloadClientUtorrentResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "created "+downloadClientRtorrentResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
 	client.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &client)...)
 }
 
-func (r *DownloadClientUtorrentResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
+func (r *DownloadClientRtorrentResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	// Get current state
-	var client DownloadClientUtorrent
+	var client DownloadClientRtorrent
 
 	resp.Diagnostics.Append(req.State.Get(ctx, &client)...)
 
@@ -298,23 +295,23 @@ func (r *DownloadClientUtorrentResource) Read(ctx context.Context, req resource.
 		return
 	}
 
-	// Get DownloadClientUtorrent current value
+	// Get DownloadClientRtorrent current value
 	response, err := r.client.GetDownloadClientContext(ctx, client.ID.ValueInt64())
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", downloadClientUtorrentResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", downloadClientRtorrentResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read "+downloadClientUtorrentResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "read "+downloadClientRtorrentResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Map response body to resource schema attribute
 	client.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &client)...)
 }
 
-func (r *DownloadClientUtorrentResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+func (r *DownloadClientRtorrentResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	// Get plan values
-	var client *DownloadClientUtorrent
+	var client *DownloadClientRtorrent
 
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &client)...)
 
@@ -322,24 +319,24 @@ func (r *DownloadClientUtorrentResource) Update(ctx context.Context, req resourc
 		return
 	}
 
-	// Update DownloadClientUtorrent
+	// Update DownloadClientRtorrent
 	request := client.read(ctx)
 
 	response, err := r.client.UpdateDownloadClientContext(ctx, request)
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", downloadClientUtorrentResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", downloadClientRtorrentResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "updated "+downloadClientUtorrentResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "updated "+downloadClientRtorrentResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
 	client.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &client)...)
 }
 
-func (r *DownloadClientUtorrentResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var client *DownloadClientUtorrent
+func (r *DownloadClientRtorrentResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
+	var client *DownloadClientRtorrent
 
 	resp.Diagnostics.Append(req.State.Get(ctx, &client)...)
 
@@ -347,19 +344,19 @@ func (r *DownloadClientUtorrentResource) Delete(ctx context.Context, req resourc
 		return
 	}
 
-	// Delete DownloadClientUtorrent current value
+	// Delete DownloadClientRtorrent current value
 	err := r.client.DeleteDownloadClientContext(ctx, client.ID.ValueInt64())
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", downloadClientUtorrentResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", downloadClientRtorrentResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted "+downloadClientUtorrentResourceName+": "+strconv.Itoa(int(client.ID.ValueInt64())))
+	tflog.Trace(ctx, "deleted "+downloadClientRtorrentResourceName+": "+strconv.Itoa(int(client.ID.ValueInt64())))
 	resp.State.RemoveResource(ctx)
 }
 
-func (r *DownloadClientUtorrentResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+func (r *DownloadClientRtorrentResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	// resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
@@ -371,11 +368,11 @@ func (r *DownloadClientUtorrentResource) ImportState(ctx context.Context, req re
 		return
 	}
 
-	tflog.Trace(ctx, "imported "+downloadClientUtorrentResourceName+": "+strconv.Itoa(id))
+	tflog.Trace(ctx, "imported "+downloadClientRtorrentResourceName+": "+strconv.Itoa(id))
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 
-func (d *DownloadClientUtorrent) write(ctx context.Context, downloadClient *sonarr.DownloadClientOutput) {
+func (d *DownloadClientRtorrent) write(ctx context.Context, downloadClient *sonarr.DownloadClientOutput) {
 	genericDownloadClient := DownloadClient{
 		Enable:                   types.BoolValue(downloadClient.Enable),
 		RemoveCompletedDownloads: types.BoolValue(downloadClient.RemoveCompletedDownloads),
@@ -390,7 +387,7 @@ func (d *DownloadClientUtorrent) write(ctx context.Context, downloadClient *sona
 	d.fromDownloadClient(&genericDownloadClient)
 }
 
-func (d *DownloadClientUtorrent) read(ctx context.Context) *sonarr.DownloadClientInput {
+func (d *DownloadClientRtorrent) read(ctx context.Context) *sonarr.DownloadClientInput {
 	var tags []int
 
 	tfsdk.ValueAs(ctx, d.Tags, &tags)
@@ -401,10 +398,10 @@ func (d *DownloadClientUtorrent) read(ctx context.Context) *sonarr.DownloadClien
 		RemoveFailedDownloads:    d.RemoveFailedDownloads.ValueBool(),
 		Priority:                 int(d.Priority.ValueInt64()),
 		ID:                       d.ID.ValueInt64(),
-		ConfigContract:           DownloadClientUtorrentConfigContrat,
-		Implementation:           DownloadClientUtorrentImplementation,
+		ConfigContract:           DownloadClientRtorrentConfigContrat,
+		Implementation:           DownloadClientRtorrentImplementation,
 		Name:                     d.Name.ValueString(),
-		Protocol:                 DownloadClientUtorrentProtocol,
+		Protocol:                 DownloadClientRtorrentProtocol,
 		Tags:                     tags,
 		Fields:                   d.toDownloadClient().readFields(ctx),
 	}
