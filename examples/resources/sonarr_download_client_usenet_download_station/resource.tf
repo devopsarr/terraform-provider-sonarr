@@ -1,4 +1,4 @@
-resource "sonarr_download_client_torrent_download_station" "example" {
+resource "sonarr_download_client_usenet_download_station" "example" {
   enable   = true
   priority = 1
   name     = "Example"
