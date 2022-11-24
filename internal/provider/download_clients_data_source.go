@@ -149,11 +149,6 @@ func (d *DownloadClientsDataSource) GetSchema(ctx context.Context) (tfsdk.Schema
 						Computed:            true,
 						Type:                types.BoolType,
 					},
-					"watch_folder": {
-						MarkdownDescription: "Watch folder flag.",
-						Computed:            true,
-						Type:                types.BoolType,
-					},
 					"port": {
 						MarkdownDescription: "Port.",
 						Computed:            true,
@@ -254,6 +249,11 @@ func (d *DownloadClientsDataSource) GetSchema(ctx context.Context) (tfsdk.Schema
 						Computed:            true,
 						Type:                types.StringType,
 					},
+					"watch_folder": {
+						MarkdownDescription: "Watch folder flag.",
+						Computed:            true,
+						Type:                types.StringType,
+					},
 					"magnet_file_extension": {
 						MarkdownDescription: "Magnet file extension.",
 						Computed:            true,
@@ -273,7 +273,7 @@ func (d *DownloadClientsDataSource) GetSchema(ctx context.Context) (tfsdk.Schema
 							ElemType: types.StringType,
 						},
 					},
-					"post_im_tags": {
+					"post_import_tags": {
 						MarkdownDescription: "Post import tags.",
 						Computed:            true,
 						Type: types.SetType{

@@ -47,7 +47,7 @@ data "sonarr_download_client" "example" {
 - `older_tv_priority` (Number) Older TV priority. `0` Last, `1` First.
 - `password` (String) Password.
 - `port` (Number) Port.
-- `post_im_tags` (Set of String) Post import tags.
+- `post_import_tags` (Set of String) Post import tags.
 - `priority` (Number) Priority.
 - `protocol` (String) Protocol. Valid values are 'usenet' and 'torrent'.
 - `read_only` (Boolean) Read only flag.
@@ -68,6 +68,6 @@ data "sonarr_download_client" "example" {
 - `url_base` (String) Base URL.
 - `use_ssl` (Boolean) Use SSL flag.
 - `username` (String) Username.
-- `watch_folder` (Boolean) Watch folder flag.
+- `watch_folder` (String) Watch folder flag.
 
 

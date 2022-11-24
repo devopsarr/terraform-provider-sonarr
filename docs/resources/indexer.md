@@ -17,7 +17,7 @@ For more information refer to [Indexer](https://wiki.servarr.com/sonarr/settings
 ```terraform
 resource "sonarr_indexer" "example" {
   enable_automatic_search = true
-  name                    = "Test"
+  name                    = "Example"
   implementation          = "Newznab"
   protocol                = "usenet"
   config_contract         = "NewznabSettings"

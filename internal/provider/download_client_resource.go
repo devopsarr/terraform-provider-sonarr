@@ -24,10 +24,10 @@ var _ resource.Resource = &DownloadClientResource{}
 var _ resource.ResourceWithImportState = &DownloadClientResource{}
 
 var (
-	downloadClientBoolFields        = []string{"addPaused", "useSsl", "startOnAdd", "sequentialOrder", "firstAndLast", "addStopped", "saveMagnetFiles", "readOnly", "watchFolder"}
+	downloadClientBoolFields        = []string{"addPaused", "useSsl", "startOnAdd", "sequentialOrder", "firstAndLast", "addStopped", "saveMagnetFiles", "readOnly"}
 	downloadClientIntFields         = []string{"port", "recentTvPriority", "olderTvPriority", "initialState", "intialState"}
-	downloadClientStringFields      = []string{"host", "apiKey", "urlBase", "rpcPath", "secretToken", "password", "username", "tvCategory", "tvImportedCategory", "tvDirectory", "destination", "category", "nzbFolder", "strmFolder", "torrentFolder", "magnetFileExtension"}
-	downloadClientStringSliceFields = []string{"fieldTags", "postImTags"}
+	downloadClientStringFields      = []string{"host", "apiKey", "urlBase", "rpcPath", "secretToken", "password", "username", "tvCategory", "tvImportedCategory", "tvDirectory", "destination", "category", "nzbFolder", "strmFolder", "torrentFolder", "magnetFileExtension", "watchFolder"}
+	downloadClientStringSliceFields = []string{"fieldTags", "postImportTags"}
 	downloadClientIntSliceFields    = []string{"additionalTags"}
 )
 
@@ -43,9 +43,9 @@ type DownloadClientResource struct {
 // DownloadClient describes the download client data model.
 type DownloadClient struct {
 	Tags                     types.Set    `tfsdk:"tags"`
-	PostImTags               types.Set    `tfsdk:"post_im_tags"`
 	FieldTags                types.Set    `tfsdk:"field_tags"`
 	AdditionalTags           types.Set    `tfsdk:"additional_tags"`
+	PostImportTags           types.Set    `tfsdk:"post_import_tags"`
 	NzbFolder                types.String `tfsdk:"nzb_folder"`
 	Category                 types.String `tfsdk:"category"`
 	Implementation           types.String `tfsdk:"implementation"`
@@ -53,6 +53,7 @@ type DownloadClient struct {
 	Protocol                 types.String `tfsdk:"protocol"`
 	MagnetFileExtension      types.String `tfsdk:"magnet_file_extension"`
 	TorrentFolder            types.String `tfsdk:"torrent_folder"`
+	WatchFolder              types.String `tfsdk:"watch_folder"`
 	StrmFolder               types.String `tfsdk:"strm_folder"`
 	Host                     types.String `tfsdk:"host"`
 	ConfigContract           types.String `tfsdk:"config_contract"`
@@ -81,7 +82,6 @@ type DownloadClient struct {
 	StartOnAdd               types.Bool   `tfsdk:"start_on_add"`
 	UseSsl                   types.Bool   `tfsdk:"use_ssl"`
 	AddPaused                types.Bool   `tfsdk:"add_paused"`
-	WatchFolder              types.Bool   `tfsdk:"watch_folder"`
 	Enable                   types.Bool   `tfsdk:"enable"`
 	RemoveFailedDownloads    types.Bool   `tfsdk:"remove_failed_downloads"`
 	RemoveCompletedDownloads types.Bool   `tfsdk:"remove_completed_downloads"`
@@ -203,12 +203,6 @@ func (r *DownloadClientResource) GetSchema(ctx context.Context) (tfsdk.Schema, d
 			},
 			"read_only": {
 				MarkdownDescription: "Read only flag.",
-				Optional:            true,
-				Computed:            true,
-				Type:                types.BoolType,
-			},
-			"watch_folder": {
-				MarkdownDescription: "Watch folder flag.",
 				Optional:            true,
 				Computed:            true,
 				Type:                types.BoolType,
@@ -342,6 +336,12 @@ func (r *DownloadClientResource) GetSchema(ctx context.Context) (tfsdk.Schema, d
 				Computed:            true,
 				Type:                types.StringType,
 			},
+			"watch_folder": {
+				MarkdownDescription: "Watch folder flag.",
+				Optional:            true,
+				Computed:            true,
+				Type:                types.StringType,
+			},
 			"magnet_file_extension": {
 				MarkdownDescription: "Magnet file extension.",
 				Optional:            true,
@@ -364,7 +364,7 @@ func (r *DownloadClientResource) GetSchema(ctx context.Context) (tfsdk.Schema, d
 					ElemType: types.StringType,
 				},
 			},
-			"post_im_tags": {
+			"post_import_tags": {
 				MarkdownDescription: "Post import tags.",
 				Optional:            true,
 				Computed:            true,
@@ -530,7 +530,7 @@ func (d *DownloadClient) write(ctx context.Context, downloadClient *sonarr.Downl
 	d.Tags = types.SetValueMust(types.Int64Type, nil)
 	d.AdditionalTags = types.SetValueMust(types.Int64Type, nil)
 	d.FieldTags = types.SetValueMust(types.StringType, nil)
-	d.PostImTags = types.SetValueMust(types.StringType, nil)
+	d.PostImportTags = types.SetValueMust(types.StringType, nil)
 	tfsdk.ValueFrom(ctx, downloadClient.Tags, d.Tags.Type(ctx), &d.Tags)
 	d.writeFields(ctx, downloadClient.Fields)
 }
@@ -565,7 +565,8 @@ func (d *DownloadClient) writeFields(ctx context.Context, fields []*starr.FieldO
 			continue
 		}
 
-		if slices.Contains(downloadClientStringSliceFields, f.Name) {
+		// add specific check for tags to map field_tags
+		if slices.Contains(downloadClientStringSliceFields, f.Name) || f.Name == "tags" {
 			tools.WriteStringSliceField(ctx, f, d)
 		}
 	}
