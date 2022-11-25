@@ -42,13 +42,13 @@ resource "sonarr_indexer" "example" {
 
 - `additional_parameters` (String) Additional parameters.
 - `allow_zero_size` (Boolean) Allow zero size files.
-- `anime_categories` (Set of Number) Anime list.
+- `anime_categories` (Set of Number) Anime categories list.
 - `anime_standard_format_search` (Boolean) Search anime in standard format.
 - `api_key` (String, Sensitive) API key.
 - `api_path` (String) API path.
 - `base_url` (String) Base URL.
 - `captcha_token` (String) Captcha token.
-- `categories` (Set of Number) Series list.
+- `categories` (Set of Number) Categories list.
 - `cookie` (String) Cookie.
 - `delay` (Number) Delay before grabbing.
 - `download_client_id` (Number) Download client ID.

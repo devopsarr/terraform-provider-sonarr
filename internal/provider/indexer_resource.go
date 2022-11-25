@@ -250,7 +250,7 @@ func (r *IndexerResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Dia
 				Type:                types.StringType,
 			},
 			"categories": {
-				MarkdownDescription: "Series list.",
+				MarkdownDescription: "Categories list.",
 				Optional:            true,
 				Computed:            true,
 				Type: types.SetType{
@@ -258,7 +258,7 @@ func (r *IndexerResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Dia
 				},
 			},
 			"anime_categories": {
-				MarkdownDescription: "Anime list.",
+				MarkdownDescription: "Anime categories list.",
 				Optional:            true,
 				Computed:            true,
 				Type: types.SetType{
