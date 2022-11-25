@@ -154,6 +154,7 @@ func (p *SonarrProvider) Resources(ctx context.Context) []func() resource.Resour
 		NewDownloadClientVuzeResource,
 		NewIndexerConfigResource,
 		NewIndexerResource,
+		NewIndexerFanzubResource,
 		NewIndexerNewznabResource,
 		NewIndexerRarbgResource,
 		NewLanguageProfileResource,
