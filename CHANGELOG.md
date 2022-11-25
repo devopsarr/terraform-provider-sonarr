@@ -1,5 +1,48 @@
 # Changelog
 
+## [2.4.0](https://github.com/devopsarr/terraform-provider-sonarr/compare/v2.3.0...v2.4.0) (2022-11-25)
+
+
+### Features
+
+* add download client aria2 resource ([bed4a61](https://github.com/devopsarr/terraform-provider-sonarr/commit/bed4a61938af886d0cd8b875729cff7501b7cecb))
+* add download client deluge resource ([158c17b](https://github.com/devopsarr/terraform-provider-sonarr/commit/158c17b2bb4a6dd6d6bb800039ae17f477469a51))
+* add download client flood resource ([61871a2](https://github.com/devopsarr/terraform-provider-sonarr/commit/61871a2e350467eb5d80fac86500e73ee3d47e64))
+* add download client hadouken resource ([b1a4c00](https://github.com/devopsarr/terraform-provider-sonarr/commit/b1a4c004b577d27458775a014c0151dd237fcac7))
+* add download client nzbget resource ([0c11272](https://github.com/devopsarr/terraform-provider-sonarr/commit/0c1127230e1aabec2d81fb241f0a0e96e0724d4e))
+* add download client nzbvortex resource ([d673fd9](https://github.com/devopsarr/terraform-provider-sonarr/commit/d673fd9c910f1a2cf09d05b2305923ba9efaf57d))
+* add download client pneumatic resource ([f05cdfd](https://github.com/devopsarr/terraform-provider-sonarr/commit/f05cdfddd96acc0868e55c81c9a309091c48f4f8))
+* add download client qbittorrent resource ([0f3f24f](https://github.com/devopsarr/terraform-provider-sonarr/commit/0f3f24fdb15e82778487415b99aa6c9ad022a39c))
+* add download client rtorrent resource ([175cc6c](https://github.com/devopsarr/terraform-provider-sonarr/commit/175cc6cba98b017fa204b1022e0f096c80c83847))
+* add download client sabnzbd resource ([bd9c190](https://github.com/devopsarr/terraform-provider-sonarr/commit/bd9c19054683fec3b96acc6273c45c62016e45c3))
+* add download client torrent blackhole resource ([ad5c855](https://github.com/devopsarr/terraform-provider-sonarr/commit/ad5c85579af3fa79b52abff7fca85c99ad0b0546))
+* add download client torrent download station ([cf66358](https://github.com/devopsarr/terraform-provider-sonarr/commit/cf66358002c6a9c5286fb380c673b9ada015d860))
+* add download client usenet blackhole resource ([dcaa5fe](https://github.com/devopsarr/terraform-provider-sonarr/commit/dcaa5fe578b108035420e4aff0d2b61b89004c64))
+* add download client usenet download station resource ([3c7aee2](https://github.com/devopsarr/terraform-provider-sonarr/commit/3c7aee226ddfbab69002c7139dd9a6ba85a8641b))
+* add download client utorrent resource ([7c56c38](https://github.com/devopsarr/terraform-provider-sonarr/commit/7c56c3803cbc1028662a287b5415d76c5cee58de))
+* add download client vuze resource ([7733bb3](https://github.com/devopsarr/terraform-provider-sonarr/commit/7733bb35080caa2828c3d37fb17e373646f2f59c))
+* add fields exceptions ([ca7e4f5](https://github.com/devopsarr/terraform-provider-sonarr/commit/ca7e4f5d827af85e3259c8cc9a70119c00aa957b))
+* add indexer broadcasthenet resource ([cbe27f4](https://github.com/devopsarr/terraform-provider-sonarr/commit/cbe27f4c1d9b5dccdb6b40d6fbd3fd6561a672d5))
+* add indexer fanzub resource ([187af1c](https://github.com/devopsarr/terraform-provider-sonarr/commit/187af1c9c4acdcb4891a0a7500c71b64665e803d))
+* add indexer filelist resource ([8489b2d](https://github.com/devopsarr/terraform-provider-sonarr/commit/8489b2dad65ab1336a5cec3ed0d6964ef49106de))
+* add indexer hdbits resource ([f2c9cd2](https://github.com/devopsarr/terraform-provider-sonarr/commit/f2c9cd2412adb09a403a4f7cdb59e9efefef26e3))
+* add indexer iptorrents resource ([e43c573](https://github.com/devopsarr/terraform-provider-sonarr/commit/e43c573bd4c9354b53ad587c136b87d10839784d))
+* add indexer nyaa resource ([ef6df58](https://github.com/devopsarr/terraform-provider-sonarr/commit/ef6df5817af79cb5b648961b65559a7e1fa06a59))
+* add indexer omgwtfnzbs resource ([bf74074](https://github.com/devopsarr/terraform-provider-sonarr/commit/bf74074fa221133f671a70dd62614a2019eac0aa))
+* add indexer orrentleech resource ([c5d1bf5](https://github.com/devopsarr/terraform-provider-sonarr/commit/c5d1bf53c92bbfeb6c0df8e1081bc35f47a5e2ba))
+* add indexer torrent rss resource ([9d4098d](https://github.com/devopsarr/terraform-provider-sonarr/commit/9d4098d4e898f4e7bba8f61b0d6aa76a524a81ab))
+* add indexer torznab resource ([5849a65](https://github.com/devopsarr/terraform-provider-sonarr/commit/5849a6549fbe2037b664518389de88516e4784ea))
+
+
+### Bug Fixes
+
+* download client ds watch folder type ([f4afe44](https://github.com/devopsarr/terraform-provider-sonarr/commit/f4afe446651555975c908b76cbfb4c7621767ab1))
+* download client watch_folder field to string ([c240caa](https://github.com/devopsarr/terraform-provider-sonarr/commit/c240caad8885e1d2ef2bf9430101c9b6caab55ec))
+* seedcriteria fields ([69466c6](https://github.com/devopsarr/terraform-provider-sonarr/commit/69466c61c3be6f227ca1395e9a2ab4489a55fdcf))
+* sensitive fields ([b24abed](https://github.com/devopsarr/terraform-provider-sonarr/commit/b24abed139fb53dfa3241b291e0b7b9070eb53bf))
+* **tool:** WriteStringField work with other types ([a40d15f](https://github.com/devopsarr/terraform-provider-sonarr/commit/a40d15f2bf5e8e48936017d90b148222ae39014c))
+* torrent blackhole required parameters ([52ccc52](https://github.com/devopsarr/terraform-provider-sonarr/commit/52ccc5237b507148f676ac42bd43d08ee942c9e4))
+
 ## [2.3.0](https://github.com/devopsarr/terraform-provider-sonarr/compare/v2.2.0...v2.3.0) (2022-11-03)
 
 
