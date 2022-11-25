@@ -178,6 +178,7 @@ func (p *SonarrProvider) Resources(ctx context.Context) []func() resource.Resour
 		NewNotificationCustomScriptResource,
 		NewNotificationWebhookResource,
 		NewNotificationDiscordResource,
+		NewNotificationEmailResource,
 
 		// Profiles
 		NewDelayProfileResource,
