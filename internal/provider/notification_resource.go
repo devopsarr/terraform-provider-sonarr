@@ -256,7 +256,7 @@ func (r *NotificationResource) Schema(ctx context.Context, req resource.SchemaRe
 				Optional:            true,
 				Computed:            true,
 				Validators: []validator.Int64{
-					int64validator.OneOf(-2, -1, 0, 1, 2, 3, 4, 5, 7),
+					int64validator.OneOf(-2, -1, 0, 1, 2, 3, 4, 5, 7, 8),
 				},
 			},
 			"access_token": schema.StringAttribute{

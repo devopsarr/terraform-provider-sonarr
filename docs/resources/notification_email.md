@@ -19,7 +19,6 @@ resource "sonarr_notification_email" "example" {
   on_grab                            = false
   on_download                        = true
   on_upgrade                         = true
-  on_rename                          = false
   on_series_delete                   = false
   on_episode_file_delete             = false
   on_episode_file_delete_for_upgrade = true
@@ -59,7 +58,7 @@ resource "sonarr_notification_email" "example" {
 
 - `bcc` (Set of String) Bcc.
 - `cc` (Set of String) Cc.
-- `password` (String, Sensitive) password.
+- `password` (String, Sensitive) Password.
 - `port` (Number) Port.
 - `require_encryption` (Boolean) Require encryption flag.
 - `tags` (Set of Number) List of associated tags.

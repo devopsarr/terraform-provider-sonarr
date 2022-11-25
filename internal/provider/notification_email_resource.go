@@ -208,7 +208,7 @@ func (r *NotificationEmailResource) GetSchema(ctx context.Context) (tfsdk.Schema
 				Type:                types.StringType,
 			},
 			"password": {
-				MarkdownDescription: "password.",
+				MarkdownDescription: "Password.",
 				Optional:            true,
 				Computed:            true,
 				Sensitive:           true,
