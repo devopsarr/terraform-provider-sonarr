@@ -55,7 +55,6 @@ type NotificationEmail struct {
 	OnApplicationUpdate           types.Bool   `tfsdk:"on_application_update"`
 	OnHealthIssue                 types.Bool   `tfsdk:"on_health_issue"`
 	OnSeriesDelete                types.Bool   `tfsdk:"on_series_delete"`
-	OnRename                      types.Bool   `tfsdk:"on_rename"`
 	OnUpgrade                     types.Bool   `tfsdk:"on_upgrade"`
 	OnDownload                    types.Bool   `tfsdk:"on_download"`
 }
@@ -81,7 +80,6 @@ func (n NotificationEmail) toNotification() *Notification {
 		OnApplicationUpdate:           n.OnApplicationUpdate,
 		OnHealthIssue:                 n.OnHealthIssue,
 		OnSeriesDelete:                n.OnSeriesDelete,
-		OnRename:                      n.OnRename,
 		OnUpgrade:                     n.OnUpgrade,
 		OnDownload:                    n.OnDownload,
 	}
@@ -107,7 +105,6 @@ func (n *NotificationEmail) fromNotification(notification *Notification) {
 	n.OnApplicationUpdate = notification.OnApplicationUpdate
 	n.OnHealthIssue = notification.OnHealthIssue
 	n.OnSeriesDelete = notification.OnSeriesDelete
-	n.OnRename = notification.OnRename
 	n.OnUpgrade = notification.OnUpgrade
 	n.OnDownload = notification.OnDownload
 }
@@ -132,11 +129,6 @@ func (r *NotificationEmailResource) GetSchema(ctx context.Context) (tfsdk.Schema
 			},
 			"on_upgrade": {
 				MarkdownDescription: "On upgrade flag.",
-				Required:            true,
-				Type:                types.BoolType,
-			},
-			"on_rename": {
-				MarkdownDescription: "On rename flag.",
 				Required:            true,
 				Type:                types.BoolType,
 			},
@@ -391,7 +383,6 @@ func (n *NotificationEmail) write(ctx context.Context, notification *sonarr.Noti
 		OnGrab:                        types.BoolValue(notification.OnGrab),
 		OnDownload:                    types.BoolValue(notification.OnDownload),
 		OnUpgrade:                     types.BoolValue(notification.OnUpgrade),
-		OnRename:                      types.BoolValue(notification.OnRename),
 		OnSeriesDelete:                types.BoolValue(notification.OnSeriesDelete),
 		OnEpisodeFileDelete:           types.BoolValue(notification.OnEpisodeFileDelete),
 		OnEpisodeFileDeleteForUpgrade: types.BoolValue(notification.OnEpisodeFileDeleteForUpgrade),
@@ -416,7 +407,6 @@ func (n *NotificationEmail) read(ctx context.Context) *sonarr.NotificationInput 
 		OnGrab:                        n.OnGrab.ValueBool(),
 		OnDownload:                    n.OnDownload.ValueBool(),
 		OnUpgrade:                     n.OnUpgrade.ValueBool(),
-		OnRename:                      n.OnRename.ValueBool(),
 		OnSeriesDelete:                n.OnSeriesDelete.ValueBool(),
 		OnEpisodeFileDelete:           n.OnEpisodeFileDelete.ValueBool(),
 		OnEpisodeFileDeleteForUpgrade: n.OnEpisodeFileDeleteForUpgrade.ValueBool(),
