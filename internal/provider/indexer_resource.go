@@ -446,13 +446,13 @@ func (i *Indexer) writeFields(ctx context.Context, fields []*starr.FieldOutput) 
 			continue
 		}
 
-		if slices.Contains(indexerIntFields, f.Name) {
+		if slices.Contains(indexerIntFields, f.Name) || f.Name == "seedCriteria.seedTime" || f.Name == "seedCriteria.seasonPackSeedTime" {
 			tools.WriteIntField(f, i)
 
 			continue
 		}
 
-		if slices.Contains(indexerFloatFields, f.Name) {
+		if slices.Contains(indexerFloatFields, f.Name) || f.Name == "seedCriteria.seedRatio" {
 			tools.WriteFloatField(f, i)
 
 			continue
