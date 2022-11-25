@@ -3,13 +3,13 @@
 page_title: "sonarr_notification Resource - terraform-provider-sonarr"
 subcategory: "Notifications"
 description: |-
-  Notification resource.
+  Generic Notification resource. When possible use a specific resource instead.
   For more information refer to Notification https://wiki.servarr.com/sonarr/settings#connect.
 ---
 
 # sonarr_notification (Resource)
 
-<!-- subcategory:Notifications -->Notification resource.
+<!-- subcategory:Notifications -->Generic Notification resource. When possible use a specific resource instead.
 For more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect).
 
 ## Example Usage
