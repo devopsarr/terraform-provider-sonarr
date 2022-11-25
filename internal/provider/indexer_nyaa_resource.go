@@ -16,89 +16,89 @@ import (
 )
 
 const (
-	indexerNewznabResourceName   = "indexer_newznab"
-	IndexerNewznabImplementation = "Newznab"
-	IndexerNewznabConfigContrat  = "NewznabSettings"
-	IndexerNewznabProtocol       = "usenet"
+	indexerNyaaResourceName   = "indexer_nyaa"
+	IndexerNyaaImplementation = "Nyaa"
+	IndexerNyaaConfigContrat  = "NyaaSettings"
+	IndexerNyaaProtocol       = "torrent"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ resource.Resource = &IndexerNewznabResource{}
-var _ resource.ResourceWithImportState = &IndexerNewznabResource{}
+var _ resource.Resource = &IndexerNyaaResource{}
+var _ resource.ResourceWithImportState = &IndexerNyaaResource{}
 
-func NewIndexerNewznabResource() resource.Resource {
-	return &IndexerNewznabResource{}
+func NewIndexerNyaaResource() resource.Resource {
+	return &IndexerNyaaResource{}
 }
 
-// IndexerNewznabResource defines the Newznab indexer implementation.
-type IndexerNewznabResource struct {
+// IndexerNyaaResource defines the Nyaa indexer implementation.
+type IndexerNyaaResource struct {
 	client *sonarr.Sonarr
 }
 
-// IndexerNewznab describes the Newznab indexer data model.
-type IndexerNewznab struct {
-	Tags                      types.Set    `tfsdk:"tags"`
-	Categories                types.Set    `tfsdk:"categories"`
-	AnimeCategories           types.Set    `tfsdk:"anime_categories"`
-	AdditionalParameters      types.String `tfsdk:"additional_parameters"`
-	BaseURL                   types.String `tfsdk:"base_url"`
-	APIPath                   types.String `tfsdk:"api_path"`
-	APIKey                    types.String `tfsdk:"api_key"`
-	Name                      types.String `tfsdk:"name"`
-	ID                        types.Int64  `tfsdk:"id"`
-	DownloadClientID          types.Int64  `tfsdk:"download_client_id"`
-	Priority                  types.Int64  `tfsdk:"priority"`
-	AnimeStandardFormatSearch types.Bool   `tfsdk:"anime_standard_format_search"`
-	EnableRss                 types.Bool   `tfsdk:"enable_rss"`
-	EnableInteractiveSearch   types.Bool   `tfsdk:"enable_interactive_search"`
-	EnableAutomaticSearch     types.Bool   `tfsdk:"enable_automatic_search"`
+// IndexerNyaa describes the Nyaa indexer data model.
+type IndexerNyaa struct {
+	Tags                      types.Set     `tfsdk:"tags"`
+	Name                      types.String  `tfsdk:"name"`
+	BaseURL                   types.String  `tfsdk:"base_url"`
+	AdditionalParameters      types.String  `tfsdk:"additional_parameters"`
+	Priority                  types.Int64   `tfsdk:"priority"`
+	ID                        types.Int64   `tfsdk:"id"`
+	DownloadClientID          types.Int64   `tfsdk:"download_client_id"`
+	MinimumSeeders            types.Int64   `tfsdk:"minimum_seeders"`
+	SeasonPackSeedTime        types.Int64   `tfsdk:"season_pack_seed_time"`
+	SeedTime                  types.Int64   `tfsdk:"seed_time"`
+	SeedRatio                 types.Float64 `tfsdk:"seed_ratio"`
+	AnimeStandardFormatSearch types.Bool    `tfsdk:"anime_standard_format_search"`
+	EnableAutomaticSearch     types.Bool    `tfsdk:"enable_automatic_search"`
+	EnableRss                 types.Bool    `tfsdk:"enable_rss"`
+	EnableInteractiveSearch   types.Bool    `tfsdk:"enable_interactive_search"`
 }
 
-func (i IndexerNewznab) toIndexer() *Indexer {
+func (i IndexerNyaa) toIndexer() *Indexer {
 	return &Indexer{
-		AnimeStandardFormatSearch: i.AnimeStandardFormatSearch,
 		EnableAutomaticSearch:     i.EnableAutomaticSearch,
 		EnableInteractiveSearch:   i.EnableInteractiveSearch,
 		EnableRss:                 i.EnableRss,
+		AnimeStandardFormatSearch: i.AnimeStandardFormatSearch,
 		Priority:                  i.Priority,
 		DownloadClientID:          i.DownloadClientID,
 		ID:                        i.ID,
 		Name:                      i.Name,
 		AdditionalParameters:      i.AdditionalParameters,
-		APIKey:                    i.APIKey,
-		APIPath:                   i.APIPath,
+		MinimumSeeders:            i.MinimumSeeders,
+		SeasonPackSeedTime:        i.SeasonPackSeedTime,
+		SeedTime:                  i.SeedTime,
+		SeedRatio:                 i.SeedRatio,
 		BaseURL:                   i.BaseURL,
-		AnimeCategories:           i.AnimeCategories,
-		Categories:                i.Categories,
 		Tags:                      i.Tags,
 	}
 }
 
-func (i *IndexerNewznab) fromIndexer(indexer *Indexer) {
-	i.AnimeStandardFormatSearch = indexer.AnimeStandardFormatSearch
+func (i *IndexerNyaa) fromIndexer(indexer *Indexer) {
 	i.EnableAutomaticSearch = indexer.EnableAutomaticSearch
 	i.EnableInteractiveSearch = indexer.EnableInteractiveSearch
 	i.EnableRss = indexer.EnableRss
+	i.AnimeStandardFormatSearch = indexer.AnimeStandardFormatSearch
 	i.Priority = indexer.Priority
 	i.DownloadClientID = indexer.DownloadClientID
 	i.ID = indexer.ID
 	i.Name = indexer.Name
 	i.AdditionalParameters = indexer.AdditionalParameters
-	i.APIKey = indexer.APIKey
-	i.APIPath = indexer.APIPath
+	i.MinimumSeeders = indexer.MinimumSeeders
+	i.SeasonPackSeedTime = indexer.SeasonPackSeedTime
+	i.SeedTime = indexer.SeedTime
+	i.SeedRatio = indexer.SeedRatio
 	i.BaseURL = indexer.BaseURL
-	i.AnimeCategories = indexer.AnimeCategories
-	i.Categories = indexer.Categories
 	i.Tags = indexer.Tags
 }
 
-func (r *IndexerNewznabResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_" + indexerNewznabResourceName
+func (r *IndexerNyaaResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+	resp.TypeName = req.ProviderTypeName + "_" + indexerNyaaResourceName
 }
 
-func (r *IndexerNewznabResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
+func (r *IndexerNyaaResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		MarkdownDescription: "<!-- subcategory:Indexers -->Indexer Newznab resource.\nFor more information refer to [Indexer](https://wiki.servarr.com/sonarr/settings#indexers) and [Newznab](https://wiki.servarr.com/sonarr/supported#newznab).",
+		MarkdownDescription: "<!-- subcategory:Indexers -->Indexer Nyaa resource.\nFor more information refer to [Indexer](https://wiki.servarr.com/sonarr/settings#indexers) and [Nyaa](https://wiki.servarr.com/sonarr/supported#nyaa).",
 		Attributes: map[string]tfsdk.Attribute{
 			"enable_automatic_search": {
 				MarkdownDescription: "Enable automatic search flag.",
@@ -131,7 +131,7 @@ func (r *IndexerNewznabResource) GetSchema(ctx context.Context) (tfsdk.Schema, d
 				Type:                types.Int64Type,
 			},
 			"name": {
-				MarkdownDescription: "IndexerNewznab name.",
+				MarkdownDescription: "IndexerNyaa name.",
 				Required:            true,
 				Type:                types.StringType,
 			},
@@ -144,7 +144,7 @@ func (r *IndexerNewznabResource) GetSchema(ctx context.Context) (tfsdk.Schema, d
 				},
 			},
 			"id": {
-				MarkdownDescription: "IndexerNewznab ID.",
+				MarkdownDescription: "IndexerNyaa ID.",
 				Computed:            true,
 				Type:                types.Int64Type,
 				PlanModifiers: tfsdk.AttributePlanModifiers{
@@ -158,52 +158,46 @@ func (r *IndexerNewznabResource) GetSchema(ctx context.Context) (tfsdk.Schema, d
 				Computed:            true,
 				Type:                types.BoolType,
 			},
+			"minimum_seeders": {
+				MarkdownDescription: "Minimum seeders.",
+				Optional:            true,
+				Computed:            true,
+				Type:                types.Int64Type,
+			},
+			"season_pack_seed_time": {
+				MarkdownDescription: "Season seed time.",
+				Optional:            true,
+				Computed:            true,
+				Type:                types.Int64Type,
+			},
+			"seed_time": {
+				MarkdownDescription: "Seed time.",
+				Optional:            true,
+				Computed:            true,
+				Type:                types.Int64Type,
+			},
+			"seed_ratio": {
+				MarkdownDescription: "Seed ratio.",
+				Optional:            true,
+				Computed:            true,
+				Type:                types.Float64Type,
+			},
 			"additional_parameters": {
 				MarkdownDescription: "Additional parameters.",
 				Optional:            true,
 				Computed:            true,
 				Type:                types.StringType,
 			},
-			"api_key": {
-				MarkdownDescription: "API key.",
-				Optional:            true,
-				Computed:            true,
-				Sensitive:           true,
-				Type:                types.StringType,
-			},
-			"api_path": {
-				MarkdownDescription: "API path.",
-				Optional:            true,
-				Computed:            true,
-				Type:                types.StringType,
-			},
 			"base_url": {
 				MarkdownDescription: "Base URL.",
-				Optional:            true,
-				Computed:            true,
+				Required:            true,
 				Type:                types.StringType,
-			},
-			"categories": {
-				MarkdownDescription: "Series list.",
-				Optional:            true,
-				Computed:            true,
-				Type: types.SetType{
-					ElemType: types.Int64Type,
-				},
-			},
-			"anime_categories": {
-				MarkdownDescription: "Anime list.",
-				Optional:            true,
-				Computed:            true,
-				Type: types.SetType{
-					ElemType: types.Int64Type,
-				},
 			},
 		},
 	}, nil
 }
 
-func (r *IndexerNewznabResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+func (r *IndexerNyaaResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
 	// Prevent panic if the provider has not been configured.
 	if req.ProviderData == nil {
 		return
@@ -222,9 +216,9 @@ func (r *IndexerNewznabResource) Configure(ctx context.Context, req resource.Con
 	r.client = client
 }
 
-func (r *IndexerNewznabResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
+func (r *IndexerNyaaResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	// Retrieve values from plan
-	var indexer *IndexerNewznab
+	var indexer *IndexerNyaa
 
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &indexer)...)
 
@@ -232,25 +226,25 @@ func (r *IndexerNewznabResource) Create(ctx context.Context, req resource.Create
 		return
 	}
 
-	// Create new IndexerNewznab
+	// Create new IndexerNyaa
 	request := indexer.read(ctx)
 
 	response, err := r.client.AddIndexerContext(ctx, request)
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", indexerNewznabResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", indexerNyaaResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "created "+indexerNewznabResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "created "+indexerNyaaResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
 	indexer.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &indexer)...)
 }
 
-func (r *IndexerNewznabResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
+func (r *IndexerNyaaResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	// Get current state
-	var indexer *IndexerNewznab
+	var indexer *IndexerNyaa
 
 	resp.Diagnostics.Append(req.State.Get(ctx, &indexer)...)
 
@@ -258,23 +252,23 @@ func (r *IndexerNewznabResource) Read(ctx context.Context, req resource.ReadRequ
 		return
 	}
 
-	// Get IndexerNewznab current value
+	// Get IndexerNyaa current value
 	response, err := r.client.GetIndexerContext(ctx, indexer.ID.ValueInt64())
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerNewznabResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerNyaaResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read "+indexerNewznabResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "read "+indexerNyaaResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Map response body to resource schema attribute
 	indexer.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &indexer)...)
 }
 
-func (r *IndexerNewznabResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+func (r *IndexerNyaaResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	// Get plan values
-	var indexer *IndexerNewznab
+	var indexer *IndexerNyaa
 
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &indexer)...)
 
@@ -282,24 +276,24 @@ func (r *IndexerNewznabResource) Update(ctx context.Context, req resource.Update
 		return
 	}
 
-	// Update IndexerNewznab
+	// Update IndexerNyaa
 	request := indexer.read(ctx)
 
 	response, err := r.client.UpdateIndexerContext(ctx, request)
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", indexerNewznabResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update "+indexerNyaaResourceName+", got error: %s", err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "updated "+indexerNewznabResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "updated "+indexerNyaaResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
 	indexer.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &indexer)...)
 }
 
-func (r *IndexerNewznabResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var indexer IndexerNewznab
+func (r *IndexerNyaaResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
+	var indexer *IndexerNyaa
 
 	resp.Diagnostics.Append(req.State.Get(ctx, &indexer)...)
 
@@ -307,19 +301,19 @@ func (r *IndexerNewznabResource) Delete(ctx context.Context, req resource.Delete
 		return
 	}
 
-	// Delete IndexerNewznab current value
+	// Delete IndexerNyaa current value
 	err := r.client.DeleteIndexerContext(ctx, indexer.ID.ValueInt64())
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerNewznabResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerNyaaResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted "+indexerNewznabResourceName+": "+strconv.Itoa(int(indexer.ID.ValueInt64())))
+	tflog.Trace(ctx, "deleted "+indexerNyaaResourceName+": "+strconv.Itoa(int(indexer.ID.ValueInt64())))
 	resp.State.RemoveResource(ctx)
 }
 
-func (r *IndexerNewznabResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+func (r *IndexerNyaaResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	// resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
@@ -331,11 +325,11 @@ func (r *IndexerNewznabResource) ImportState(ctx context.Context, req resource.I
 		return
 	}
 
-	tflog.Trace(ctx, "imported "+indexerNewznabResourceName+": "+strconv.Itoa(id))
+	tflog.Trace(ctx, "imported "+indexerNyaaResourceName+": "+strconv.Itoa(id))
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 
-func (i *IndexerNewznab) write(ctx context.Context, indexer *sonarr.IndexerOutput) {
+func (i *IndexerNyaa) write(ctx context.Context, indexer *sonarr.IndexerOutput) {
 	genericIndexer := Indexer{
 		EnableAutomaticSearch:   types.BoolValue(indexer.EnableAutomaticSearch),
 		EnableInteractiveSearch: types.BoolValue(indexer.EnableInteractiveSearch),
@@ -345,15 +339,13 @@ func (i *IndexerNewznab) write(ctx context.Context, indexer *sonarr.IndexerOutpu
 		ID:                      types.Int64Value(indexer.ID),
 		Name:                    types.StringValue(indexer.Name),
 		Tags:                    types.SetValueMust(types.Int64Type, nil),
-		AnimeCategories:         types.SetValueMust(types.Int64Type, nil),
-		Categories:              types.SetValueMust(types.Int64Type, nil),
 	}
 	tfsdk.ValueFrom(ctx, indexer.Tags, genericIndexer.Tags.Type(ctx), &genericIndexer.Tags)
 	genericIndexer.writeFields(ctx, indexer.Fields)
 	i.fromIndexer(&genericIndexer)
 }
 
-func (i *IndexerNewznab) read(ctx context.Context) *sonarr.IndexerInput {
+func (i *IndexerNyaa) read(ctx context.Context) *sonarr.IndexerInput {
 	var tags []int
 
 	tfsdk.ValueAs(ctx, i.Tags, &tags)
@@ -365,10 +357,10 @@ func (i *IndexerNewznab) read(ctx context.Context) *sonarr.IndexerInput {
 		Priority:                i.Priority.ValueInt64(),
 		DownloadClientID:        i.DownloadClientID.ValueInt64(),
 		ID:                      i.ID.ValueInt64(),
-		ConfigContract:          IndexerNewznabConfigContrat,
-		Implementation:          IndexerNewznabImplementation,
+		ConfigContract:          IndexerNyaaConfigContrat,
+		Implementation:          IndexerNyaaImplementation,
 		Name:                    i.Name.ValueString(),
-		Protocol:                IndexerNewznabProtocol,
+		Protocol:                IndexerNyaaProtocol,
 		Tags:                    tags,
 		Fields:                  i.toIndexer().readFields(ctx),
 	}

@@ -20,7 +20,19 @@ func getFieldExceptions() []fieldException {
 	return []fieldException{
 		{
 			apiName: "tags",
-			tfName:  "fieldtags",
+			tfName:  "fieldTags",
+		},
+		{
+			apiName: "seedCriteria.seedTime",
+			tfName:  "seedTime",
+		},
+		{
+			apiName: "seedCriteria.seedRatio",
+			tfName:  "seedRatio",
+		},
+		{
+			apiName: "seedCriteria.seasonPackSeedTime",
+			tfName:  "seasonPackSeedTime",
 		},
 	}
 }
