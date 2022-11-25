@@ -142,6 +142,7 @@ func (d *IndexerDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.D
 			"api_key": {
 				MarkdownDescription: "API key.",
 				Computed:            true,
+				Sensitive:           true,
 				Type:                types.StringType,
 			},
 			"api_path": {
@@ -167,6 +168,7 @@ func (d *IndexerDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.D
 			"passkey": {
 				MarkdownDescription: "Passkey.",
 				Computed:            true,
+				Sensitive:           true,
 				Type:                types.StringType,
 			},
 			"username": {

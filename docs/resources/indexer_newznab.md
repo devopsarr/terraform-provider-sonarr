@@ -36,7 +36,7 @@ resource "sonarr_indexer_newznab" "example" {
 - `additional_parameters` (String) Additional parameters.
 - `anime_categories` (Set of Number) Anime list.
 - `anime_standard_format_search` (Boolean) Search anime in standard format.
-- `api_key` (String) API key.
+- `api_key` (String, Sensitive) API key.
 - `api_path` (String) API path.
 - `base_url` (String) Base URL.
 - `categories` (Set of Number) Series list.

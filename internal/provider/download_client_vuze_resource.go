@@ -213,6 +213,7 @@ func (r *DownloadClientVuzeResource) GetSchema(ctx context.Context) (tfsdk.Schem
 				MarkdownDescription: "Password.",
 				Optional:            true,
 				Computed:            true,
+				Sensitive:           true,
 				Type:                types.StringType,
 			},
 			"tv_category": {

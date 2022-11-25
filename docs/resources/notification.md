@@ -58,12 +58,12 @@ resource "sonarr_notification" "example" {
 ### Optional
 
 - `access_token` (String) Access token.
-- `access_token_secret` (String) Access token secret.
+- `access_token_secret` (String, Sensitive) Access token secret.
 - `always_update` (Boolean) Always update flag.
-- `api_key` (String) API key.
+- `api_key` (String, Sensitive) API key.
 - `app_token` (String) App token.
 - `arguments` (String) Arguments.
-- `auth_token` (String) Auth token.
+- `auth_token` (String, Sensitive) Auth token.
 - `auth_user` (String) Auth user.
 - `author` (String) Author.
 - `avatar` (String) Avatar.
@@ -75,7 +75,7 @@ resource "sonarr_notification" "example" {
 - `chat_id` (String) Chat ID.
 - `clean_library` (Boolean) Clean library flag.
 - `consumer_key` (String) Consumer key.
-- `consumer_secret` (String) Consumer secret.
+- `consumer_secret` (String, Sensitive) Consumer secret.
 - `device_ids` (Set of String) Device IDs.
 - `device_names` (String) Device names.
 - `devices` (Set of String) Devices.
@@ -91,7 +91,7 @@ resource "sonarr_notification" "example" {
 - `mention` (String) Mention.
 - `method` (Number) Method. `1` POST, `2` PUT.
 - `notify` (Boolean) Notify flag.
-- `password` (String) password.
+- `password` (String, Sensitive) password.
 - `path` (String) Path.
 - `port` (Number) Port.
 - `priority` (Number) Priority.
@@ -107,7 +107,7 @@ resource "sonarr_notification" "example" {
 - `sound` (String) Sound.
 - `tags` (Set of Number) List of associated tags.
 - `to` (String) To.
-- `token` (String) Token.
+- `token` (String, Sensitive) Token.
 - `update_library` (Boolean) Update library flag.
 - `url` (String) URL.
 - `use_eu_endpoint` (Boolean) Use EU endpoint flag.

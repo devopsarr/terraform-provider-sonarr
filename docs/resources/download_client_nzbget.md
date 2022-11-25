@@ -38,7 +38,7 @@ resource "sonarr_download_client_nzbget" "example" {
 - `enable` (Boolean) Enable flag.
 - `host` (String) host.
 - `older_tv_priority` (Number) Older TV priority. `-100` VeryLow, `-50` Low, `0` Normal, `50` High, `100` VeryHigh, `900` Force.
-- `password` (String) Password.
+- `password` (String, Sensitive) Password.
 - `port` (Number) Port.
 - `priority` (Number) Priority.
 - `recent_tv_priority` (Number) Recent TV priority. `-100` VeryLow, `-50` Low, `0` Normal, `50` High, `100` VeryHigh, `900` Force.

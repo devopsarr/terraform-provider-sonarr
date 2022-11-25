@@ -225,6 +225,7 @@ func (r *DownloadClientFloodResource) GetSchema(ctx context.Context) (tfsdk.Sche
 				MarkdownDescription: "Password.",
 				Optional:            true,
 				Computed:            true,
+				Sensitive:           true,
 				Type:                types.StringType,
 			},
 			"destination": {

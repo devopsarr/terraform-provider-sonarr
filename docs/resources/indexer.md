@@ -44,7 +44,7 @@ resource "sonarr_indexer" "example" {
 - `allow_zero_size` (Boolean) Allow zero size files.
 - `anime_categories` (Set of Number) Anime list.
 - `anime_standard_format_search` (Boolean) Search anime in standard format.
-- `api_key` (String) API key.
+- `api_key` (String, Sensitive) API key.
 - `api_path` (String) API path.
 - `base_url` (String) Base URL.
 - `captcha_token` (String) Captcha token.
@@ -56,7 +56,7 @@ resource "sonarr_indexer" "example" {
 - `enable_interactive_search` (Boolean) Enable interactive search flag.
 - `enable_rss` (Boolean) Enable RSS flag.
 - `minimum_seeders` (Number) Minimum seeders.
-- `passkey` (String) Passkey.
+- `passkey` (String, Sensitive) Passkey.
 - `priority` (Number) Priority.
 - `ranked_only` (Boolean) Allow ranked only.
 - `season_pack_seed_time` (Number) Season seed time.

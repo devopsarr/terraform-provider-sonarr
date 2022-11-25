@@ -216,6 +216,7 @@ func (r *DownloadClientDelugeResource) GetSchema(ctx context.Context) (tfsdk.Sch
 				MarkdownDescription: "Password.",
 				Optional:            true,
 				Computed:            true,
+				Sensitive:           true,
 				Type:                types.StringType,
 			},
 			"tv_category": {

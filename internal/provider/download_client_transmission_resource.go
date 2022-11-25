@@ -213,6 +213,7 @@ func (r *DownloadClientTransmissionResource) GetSchema(ctx context.Context) (tfs
 				MarkdownDescription: "Password.",
 				Optional:            true,
 				Computed:            true,
+				Sensitive:           true,
 				Type:                types.StringType,
 			},
 			"tv_category": {

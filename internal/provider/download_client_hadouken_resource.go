@@ -175,6 +175,7 @@ func (r *DownloadClientHadoukenResource) GetSchema(ctx context.Context) (tfsdk.S
 			"password": {
 				MarkdownDescription: "Password.",
 				Required:            true,
+				Sensitive:           true,
 				Type:                types.StringType,
 			},
 			"category": {

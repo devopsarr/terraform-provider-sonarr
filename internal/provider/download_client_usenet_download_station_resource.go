@@ -171,6 +171,7 @@ func (r *DownloadClientUsenetDownloadStationResource) GetSchema(ctx context.Cont
 				MarkdownDescription: "Password.",
 				Optional:            true,
 				Computed:            true,
+				Sensitive:           true,
 				Type:                types.StringType,
 			},
 			"tv_category": {

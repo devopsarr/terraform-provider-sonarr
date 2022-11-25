@@ -35,7 +35,7 @@ resource "sonarr_download_client_torrent_download_station" "example" {
 
 - `enable` (Boolean) Enable flag.
 - `host` (String) host.
-- `password` (String) Password.
+- `password` (String, Sensitive) Password.
 - `port` (Number) Port.
 - `priority` (Number) Priority.
 - `remove_completed_downloads` (Boolean) Remove completed downloads flag.

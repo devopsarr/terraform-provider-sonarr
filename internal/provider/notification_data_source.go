@@ -194,6 +194,7 @@ func (d *NotificationDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, d
 			"access_token": {
 				MarkdownDescription: "Access token.",
 				Computed:            true,
+				Sensitive:           true,
 				Type:                types.StringType,
 			},
 			"access_token_secret": {
@@ -204,6 +205,7 @@ func (d *NotificationDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, d
 			"api_key": {
 				MarkdownDescription: "API key.",
 				Computed:            true,
+				Sensitive:           true,
 				Type:                types.StringType,
 			},
 			"app_token": {
@@ -224,6 +226,7 @@ func (d *NotificationDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, d
 			"auth_token": {
 				MarkdownDescription: "Auth token.",
 				Computed:            true,
+				Sensitive:           true,
 				Type:                types.StringType,
 			},
 			"auth_user": {
@@ -269,6 +272,7 @@ func (d *NotificationDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, d
 			"consumer_secret": {
 				MarkdownDescription: "Consumer secret.",
 				Computed:            true,
+				Sensitive:           true,
 				Type:                types.StringType,
 			},
 			"device_names": {
@@ -314,6 +318,7 @@ func (d *NotificationDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, d
 			"password": {
 				MarkdownDescription: "password.",
 				Computed:            true,
+				Sensitive:           true,
 				Type:                types.StringType,
 			},
 			"path": {
@@ -374,6 +379,7 @@ func (d *NotificationDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, d
 			"user_key": {
 				MarkdownDescription: "User key.",
 				Computed:            true,
+				Sensitive:           true,
 				Type:                types.StringType,
 			},
 			"username": {

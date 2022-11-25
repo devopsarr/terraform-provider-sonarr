@@ -168,6 +168,7 @@ func (r *IndexerNewznabResource) GetSchema(ctx context.Context) (tfsdk.Schema, d
 				MarkdownDescription: "API key.",
 				Optional:            true,
 				Computed:            true,
+				Sensitive:           true,
 				Type:                types.StringType,
 			},
 			"api_path": {
