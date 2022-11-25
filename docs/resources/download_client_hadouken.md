@@ -33,7 +33,7 @@ resource "sonarr_download_client_hadouken" "example" {
 ### Required
 
 - `name` (String) Download Client name.
-- `password` (String) Password.
+- `password` (String, Sensitive) Password.
 - `username` (String) Username.
 
 ### Optional

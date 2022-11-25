@@ -219,6 +219,7 @@ func (r *DownloadClientUtorrentResource) GetSchema(ctx context.Context) (tfsdk.S
 				MarkdownDescription: "Password.",
 				Optional:            true,
 				Computed:            true,
+				Sensitive:           true,
 				Type:                types.StringType,
 			},
 			"tv_category": {

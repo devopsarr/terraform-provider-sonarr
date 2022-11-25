@@ -39,7 +39,7 @@ resource "sonarr_download_client_utorrent" "example" {
 - `host` (String) host.
 - `intial_state` (Number) Initial state, with Stop support. `0` Start, `1` ForceStart, `2` Pause, `3` Stop.
 - `older_tv_priority` (Number) Older TV priority. `0` Last, `1` First.
-- `password` (String) Password.
+- `password` (String, Sensitive) Password.
 - `port` (Number) Port.
 - `priority` (Number) Priority.
 - `recent_tv_priority` (Number) Recent TV priority. `0` Last, `1` First.

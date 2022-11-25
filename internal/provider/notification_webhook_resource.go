@@ -192,6 +192,7 @@ func (r *NotificationWebhookResource) GetSchema(ctx context.Context) (tfsdk.Sche
 				MarkdownDescription: "password.",
 				Optional:            true,
 				Computed:            true,
+				Sensitive:           true,
 				Type:                types.StringType,
 			},
 			"method": {

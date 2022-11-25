@@ -41,7 +41,7 @@ resource "sonarr_download_client_qbittorrent" "example" {
 - `host` (String) host.
 - `initial_state` (Number) Initial state, with Stop support. `0` Start, `1` ForceStart, `2` Pause.
 - `older_tv_priority` (Number) Older TV priority. `0` Last, `1` First.
-- `password` (String) Password.
+- `password` (String, Sensitive) Password.
 - `port` (Number) Port.
 - `priority` (Number) Priority.
 - `recent_tv_priority` (Number) Recent TV priority. `0` Last, `1` First.

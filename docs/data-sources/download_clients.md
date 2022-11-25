@@ -33,7 +33,7 @@ Read-Only:
 - `add_paused` (Boolean) Add paused flag.
 - `add_stopped` (Boolean) Add stopped flag.
 - `additional_tags` (Set of Number) Additional tags, `0` TitleSlug, `1` Quality, `2` Language, `3` ReleaseGroup, `4` Year, `5` Indexer, `6` Network.
-- `api_key` (String) API key.
+- `api_key` (String, Sensitive) API key.
 - `category` (String) Category.
 - `config_contract` (String) DownloadClient configuration template.
 - `destination` (String) Destination.
@@ -60,7 +60,7 @@ Read-Only:
 - `remove_failed_downloads` (Boolean) Remove failed downloads flag.
 - `rpc_path` (String) RPC path.
 - `save_magnet_files` (Boolean) Save magnet files flag.
-- `secret_token` (String) Secret token.
+- `secret_token` (String, Sensitive) Secret token.
 - `sequential_order` (Boolean) Sequential order flag.
 - `start_on_add` (Boolean) Start on add flag.
 - `strm_folder` (String) STRM folder.
@@ -71,7 +71,7 @@ Read-Only:
 - `tv_imported_category` (String) TV imported category.
 - `url_base` (String) Base URL.
 - `use_ssl` (Boolean) Use SSL flag.
-- `username` (String) Username.
+- `username` (String, Sensitive) Username.
 - `watch_folder` (String) Watch folder flag.
 
 

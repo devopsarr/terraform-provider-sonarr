@@ -256,6 +256,7 @@ func (r *DownloadClientResource) GetSchema(ctx context.Context) (tfsdk.Schema, d
 				MarkdownDescription: "API key.",
 				Optional:            true,
 				Computed:            true,
+				Sensitive:           true,
 				Type:                types.StringType,
 			},
 			"rpc_path": {
@@ -274,6 +275,7 @@ func (r *DownloadClientResource) GetSchema(ctx context.Context) (tfsdk.Schema, d
 				MarkdownDescription: "Secret token.",
 				Optional:            true,
 				Computed:            true,
+				Sensitive:           true,
 				Type:                types.StringType,
 			},
 			"username": {
@@ -286,6 +288,7 @@ func (r *DownloadClientResource) GetSchema(ctx context.Context) (tfsdk.Schema, d
 				MarkdownDescription: "Password.",
 				Optional:            true,
 				Computed:            true,
+				Sensitive:           true,
 				Type:                types.StringType,
 			},
 			"tv_category": {

@@ -57,7 +57,7 @@ resource "sonarr_notification_webhook" "example" {
 
 ### Optional
 
-- `password` (String) password.
+- `password` (String, Sensitive) password.
 - `tags` (Set of Number) List of associated tags.
 - `username` (String) Username.
 

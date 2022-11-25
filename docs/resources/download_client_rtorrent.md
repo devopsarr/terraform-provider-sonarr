@@ -38,7 +38,7 @@ resource "sonarr_download_client_rtorrent" "example" {
 - `enable` (Boolean) Enable flag.
 - `host` (String) host.
 - `older_tv_priority` (Number) Older TV priority. `0` VeryLow, `1` Low, `2` Normal, `3` High.
-- `password` (String) Password.
+- `password` (String, Sensitive) Password.
 - `port` (Number) Port.
 - `priority` (Number) Priority.
 - `recent_tv_priority` (Number) Recent TV priority. `0` VeryLow, `1` Low, `2` Normal, `3` High.

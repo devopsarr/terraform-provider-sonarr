@@ -31,6 +31,8 @@ resource "sonarr_download_client_torrent_blackhole" "example" {
 ### Required
 
 - `name` (String) Download Client name.
+- `torrent_folder` (String) Torrent folder.
+- `watch_folder` (String) Watch folder flag.
 
 ### Optional
 
@@ -42,8 +44,6 @@ resource "sonarr_download_client_torrent_blackhole" "example" {
 - `remove_failed_downloads` (Boolean) Remove failed downloads flag.
 - `save_magnet_files` (Boolean) Save magnet files flag.
 - `tags` (Set of Number) List of associated tags.
-- `torrent_folder` (String) Torrent folder.
-- `watch_folder` (String) Watch folder flag.
 
 ### Read-Only
 

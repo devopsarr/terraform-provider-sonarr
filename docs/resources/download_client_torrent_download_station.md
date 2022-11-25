@@ -20,7 +20,7 @@ resource "sonarr_download_client_torrent_download_station" "example" {
   priority = 1
   name     = "Example"
   host     = "downloadstation"
-  port     = 9091
+  port     = 5000
 }
 ```
 
@@ -35,7 +35,7 @@ resource "sonarr_download_client_torrent_download_station" "example" {
 
 - `enable` (Boolean) Enable flag.
 - `host` (String) host.
-- `password` (String) Password.
+- `password` (String, Sensitive) Password.
 - `port` (Number) Port.
 - `priority` (Number) Priority.
 - `remove_completed_downloads` (Boolean) Remove completed downloads flag.

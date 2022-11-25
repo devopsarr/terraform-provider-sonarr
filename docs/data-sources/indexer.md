@@ -31,7 +31,7 @@ data "sonarr_indexer" "example" {
 - `allow_zero_size` (Boolean) Allow zero size files.
 - `anime_categories` (Set of Number) Anime list.
 - `anime_standard_format_search` (Boolean) Search anime in standard format.
-- `api_key` (String) API key.
+- `api_key` (String, Sensitive) API key.
 - `api_path` (String) API path.
 - `base_url` (String) Base URL.
 - `captcha_token` (String) Captcha token.
@@ -46,7 +46,7 @@ data "sonarr_indexer" "example" {
 - `id` (Number) Indexer ID.
 - `implementation` (String) Indexer implementation name.
 - `minimum_seeders` (Number) Minimum seeders.
-- `passkey` (String) Passkey.
+- `passkey` (String, Sensitive) Passkey.
 - `priority` (Number) Priority.
 - `protocol` (String) Protocol. Valid values are 'usenet' and 'torrent'.
 - `ranked_only` (Boolean) Allow ranked only.

@@ -43,7 +43,7 @@ resource "sonarr_download_client_flood" "example" {
 - `field_tags` (Set of String) Field tags.
 - `host` (String) host.
 - `older_tv_priority` (Number) Older TV priority. `0` Last, `1` First.
-- `password` (String) Password.
+- `password` (String, Sensitive) Password.
 - `port` (Number) Port.
 - `post_import_tags` (Set of String) Post import tags.
 - `priority` (Number) Priority.

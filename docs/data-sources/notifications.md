@@ -31,10 +31,10 @@ data "sonarr_notifications" "example" {
 Read-Only:
 
 - `access_token` (String) Access token.
-- `access_token_secret` (String) Access token secret.
+- `access_token_secret` (String, Sensitive) Access token secret.
 - `always_update` (Boolean) Always update flag.
-- `api_key` (String) API key.
-- `app_token` (String) App token.
+- `api_key` (String, Sensitive) API key.
+- `app_token` (String, Sensitive) App token.
 - `arguments` (String) Arguments.
 - `auth_token` (String) Auth token.
 - `auth_user` (String) Auth user.
@@ -49,7 +49,7 @@ Read-Only:
 - `clean_library` (Boolean) Clean library flag.
 - `config_contract` (String) Notification configuration template.
 - `consumer_key` (String) Consumer key.
-- `consumer_secret` (String) Consumer secret.
+- `consumer_secret` (String, Sensitive) Consumer secret.
 - `device_ids` (Set of String) Device IDs.
 - `device_names` (String) Device names.
 - `devices` (Set of String) Devices.
@@ -78,7 +78,7 @@ Read-Only:
 - `on_rename` (Boolean) On rename flag.
 - `on_series_delete` (Boolean) On series delete flag.
 - `on_upgrade` (Boolean) On upgrade flag.
-- `password` (String) password.
+- `password` (String, Sensitive) password.
 - `path` (String) Path.
 - `port` (Number) Port.
 - `priority` (Number) Priority.
