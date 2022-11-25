@@ -84,10 +84,10 @@ resource "sonarr_notification" "example" {
 - `expire` (String) Expire.
 - `expires` (String) Expires.
 - `from` (String) From.
-- `grab_fields` (Number) Grab fields. `0` Overview, `1` Rating, `2` Genres, `3` Quality, `4` Group, `5` Size, `6` Links, `7` Release, `8` Poster, `9` Fanart.
+- `grab_fields` (Set of Number) Grab fields. `0` Overview, `1` Rating, `2` Genres, `3` Quality, `4` Group, `5` Size, `6` Links, `7` Release, `8` Poster, `9` Fanart.
 - `host` (String) Host.
 - `icon` (String) Icon.
-- `import_fields` (Number) Import fields. `0` Overview, `1` Rating, `2` Genres, `3` Quality, `4` Codecs, `5` Group, `6` Size, `7` Languages, `8` Subtitles, `9` Links, `10` Release, `11` Poster, `12` Fanart.
+- `import_fields` (Set of Number) Import fields. `0` Overview, `1` Rating, `2` Genres, `3` Quality, `4` Codecs, `5` Group, `6` Size, `7` Languages, `8` Subtitles, `9` Links, `10` Release, `11` Poster, `12` Fanart.
 - `mention` (String) Mention.
 - `method` (Number) Method. `1` POST, `2` PUT.
 - `notify` (Boolean) Notify flag.

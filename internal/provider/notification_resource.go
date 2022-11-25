@@ -30,8 +30,9 @@ var _ resource.ResourceWithImportState = &NotificationResource{}
 var (
 	notificationBoolFields        = []string{"alwaysUpdate", "cleanLibrary", "directMessage", "notify", "requireEncryption", "sendSilently", "updateLibrary", "useEuEndpoint", "useSSL"}
 	notificationStringFields      = []string{"accessToken", "accessTokenSecret", "apiKey", "appToken", "arguments", "author", "authToken", "authUser", "avatar", "bcc", "botToken", "cc", "channel", "chatId", "consumerKey", "consumerSecret", "deviceNames", "displayTime", "expire", "expires", "from", "host", "icon", "mention", "password", "path", "refreshToken", "retry", "senderDomain", "senderId", "server", "signIn", "sound", "to", "token", "url", "userKey", "username", "webHookUrl"}
-	notificationIntFields         = []string{"grabFields", "importFields", "method", "port", "priority"}
+	notificationIntFields         = []string{"method", "port", "priority"}
 	notificationStringSliceFields = []string{"channelTags", "deviceIds", "devices", "recipients"}
+	notificationIntSliceFields    = []string{"grabFields", "importFields"}
 )
 
 func NewNotificationResource() resource.Resource {
@@ -50,6 +51,8 @@ type Notification struct {
 	Devices                       types.Set    `tfsdk:"devices"`
 	DeviceIds                     types.Set    `tfsdk:"device_ids"`
 	ChannelTags                   types.Set    `tfsdk:"channel_tags"`
+	ImportFields                  types.Set    `tfsdk:"import_fields"`
+	GrabFields                    types.Set    `tfsdk:"grab_fields"`
 	Path                          types.String `tfsdk:"path"`
 	RefreshToken                  types.String `tfsdk:"refresh_token"`
 	WebHookURL                    types.String `tfsdk:"web_hook_url"`
@@ -95,8 +98,6 @@ type Notification struct {
 	Priority                      types.Int64  `tfsdk:"priority"`
 	Port                          types.Int64  `tfsdk:"port"`
 	Method                        types.Int64  `tfsdk:"method"`
-	ImportFields                  types.Int64  `tfsdk:"import_fields"`
-	GrabFields                    types.Int64  `tfsdk:"grab_fields"`
 	ID                            types.Int64  `tfsdk:"id"`
 	UpdateLibrary                 types.Bool   `tfsdk:"update_library"`
 	OnGrab                        types.Bool   `tfsdk:"on_grab"`
@@ -241,22 +242,6 @@ func (r *NotificationResource) Schema(ctx context.Context, req resource.SchemaRe
 				MarkdownDescription: "Port.",
 				Optional:            true,
 				Computed:            true,
-			},
-			"grab_fields": schema.Int64Attribute{
-				MarkdownDescription: "Grab fields. `0` Overview, `1` Rating, `2` Genres, `3` Quality, `4` Group, `5` Size, `6` Links, `7` Release, `8` Poster, `9` Fanart.",
-				Optional:            true,
-				Computed:            true,
-				Validators: []validator.Int64{
-					int64validator.OneOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9),
-				},
-			},
-			"import_fields": schema.Int64Attribute{
-				MarkdownDescription: "Import fields. `0` Overview, `1` Rating, `2` Genres, `3` Quality, `4` Codecs, `5` Group, `6` Size, `7` Languages, `8` Subtitles, `9` Links, `10` Release, `11` Poster, `12` Fanart.",
-				Optional:            true,
-				Computed:            true,
-				Validators: []validator.Int64{
-					int64validator.OneOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12),
-				},
 			},
 			"method": schema.Int64Attribute{
 				MarkdownDescription: "Method. `1` POST, `2` PUT.",
@@ -474,6 +459,18 @@ func (r *NotificationResource) Schema(ctx context.Context, req resource.SchemaRe
 				MarkdownDescription: "Web hook url.",
 				Optional:            true,
 				Computed:            true,
+			},
+			"grab_fields": schema.SetAttribute{
+				MarkdownDescription: "Grab fields. `0` Overview, `1` Rating, `2` Genres, `3` Quality, `4` Group, `5` Size, `6` Links, `7` Release, `8` Poster, `9` Fanart.",
+				Optional:            true,
+				Computed:            true,
+				ElementType:         types.Int64Type,
+			},
+			"import_fields": schema.SetAttribute{
+				MarkdownDescription: "Import fields. `0` Overview, `1` Rating, `2` Genres, `3` Quality, `4` Codecs, `5` Group, `6` Size, `7` Languages, `8` Subtitles, `9` Links, `10` Release, `11` Poster, `12` Fanart.",
+				Optional:            true,
+				Computed:            true,
+				ElementType:         types.Int64Type,
 			},
 			"channel_tags": schema.SetAttribute{
 				MarkdownDescription: "Channel tags.",
@@ -700,6 +697,10 @@ func (n *Notification) writeFields(ctx context.Context, fields []*starr.FieldOut
 		if slices.Contains(notificationStringSliceFields, f.Name) {
 			tools.WriteStringSliceField(ctx, f, n)
 		}
+
+		if slices.Contains(notificationIntSliceFields, f.Name) {
+			tools.WriteIntSliceField(ctx, f, n)
+		}
 	}
 }
 
@@ -751,6 +752,12 @@ func (n *Notification) readFields(ctx context.Context) []*starr.FieldInput {
 
 	for _, s := range notificationStringSliceFields {
 		if field := tools.ReadStringSliceField(ctx, s, n); field != nil {
+			output = append(output, field)
+		}
+	}
+
+	for _, i := range notificationIntSliceFields {
+		if field := tools.ReadIntSliceField(ctx, i, n); field != nil {
 			output = append(output, field)
 		}
 	}
