@@ -129,7 +129,7 @@ func (p *SonarrProvider) Configure(ctx context.Context, req provider.ConfigureRe
 
 func (p *SonarrProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
-		NewDelayProfileResource,
+		// Download Clients
 		NewDownloadClientConfigResource,
 		NewDownloadClientResource,
 		NewDownloadClientUsenetDownloadStationResource,
@@ -149,6 +149,9 @@ func (p *SonarrProvider) Resources(ctx context.Context) []func() resource.Resour
 		NewDownloadClientTransmissionResource,
 		NewDownloadClientUtorrentResource,
 		NewDownloadClientVuzeResource,
+		NewRemotePathMappingResource,
+
+		// Indexers
 		NewIndexerConfigResource,
 		NewIndexerResource,
 		NewIndexerFanzubResource,
@@ -163,48 +166,74 @@ func (p *SonarrProvider) Resources(ctx context.Context) []func() resource.Resour
 		NewIndexerTorrentRssResource,
 		NewIndexerTorrentleechResource,
 		NewIndexerTorznabResource,
-		NewLanguageProfileResource,
+
+		// Media Management
 		NewMediaManagementResource,
 		NewNamingResource,
+		NewRootFolderResource,
+
+		// Notifications
 		NewNotificationResource,
+		NewNotificationBoxcarResource,
 		NewNotificationCustomScriptResource,
 		NewNotificationWebhookResource,
+
+		// Profiles
+		NewDelayProfileResource,
+		NewLanguageProfileResource,
 		NewQualityProfileResource,
 		NewReleaseProfileResource,
-		NewRemotePathMappingResource,
-		NewRootFolderResource,
+
+		// Series
 		NewSeriesResource,
+
+		// Tags
 		NewTagResource,
 	}
 }
 
 func (p *SonarrProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
-		NewDelayProfileDataSource,
-		NewDelayProfilesDataSource,
+		// Download Clients
 		NewDownloadClientConfigDataSource,
 		NewDownloadClientDataSource,
 		NewDownloadClientsDataSource,
+		NewRemotePathMappingDataSource,
+		NewRemotePathMappingsDataSource,
+
+		// Indexers
 		NewIndexerConfigDataSource,
 		NewIndexerDataSource,
 		NewIndexersDataSource,
-		NewLanguageProfileDataSource,
-		NewLanguageProfilesDataSource,
+
+		// Media Management
 		NewMediaManagementDataSource,
 		NewNamingDataSource,
+		NewRootFolderDataSource,
+		NewRootFoldersDataSource,
+
+		// Notifications
 		NewNotificationDataSource,
 		NewNotificationsDataSource,
+
+		// Profiles
+		NewDelayProfileDataSource,
+		NewDelayProfilesDataSource,
+		NewLanguageProfileDataSource,
+		NewLanguageProfilesDataSource,
 		NewQualityProfileDataSource,
 		NewQualityProfilesDataSource,
 		NewReleaseProfileDataSource,
 		NewReleaseProfilesDataSource,
-		NewRemotePathMappingDataSource,
-		NewRemotePathMappingsDataSource,
-		NewRootFolderDataSource,
-		NewRootFoldersDataSource,
+
+		// Series
 		NewSeriesDataSource,
 		NewAllSeriessDataSource,
+
+		// System Status
 		NewSystemStatusDataSource,
+
+		// Tags
 		NewTagDataSource,
 		NewTagsDataSource,
 	}
