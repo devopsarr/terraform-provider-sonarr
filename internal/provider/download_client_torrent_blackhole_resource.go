@@ -151,14 +151,12 @@ func (r *DownloadClientTorrentBlackholeResource) GetSchema(ctx context.Context) 
 			},
 			"torrent_folder": {
 				MarkdownDescription: "Torrent folder.",
-				Optional:            true,
-				Computed:            true,
+				Required:            true,
 				Type:                types.StringType,
 			},
 			"watch_folder": {
 				MarkdownDescription: "Watch folder flag.",
-				Optional:            true,
-				Computed:            true,
+				Required:            true,
 				Type:                types.StringType,
 			},
 			"magnet_file_extension": {
