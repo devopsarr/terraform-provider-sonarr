@@ -164,6 +164,7 @@ func (p *SonarrProvider) Resources(ctx context.Context) []func() resource.Resour
 		NewIndexerNyaaResource,
 		NewIndexerRarbgResource,
 		NewIndexerTorrentRssResource,
+		NewIndexerTorrentleechResource,
 		NewLanguageProfileResource,
 		NewMediaManagementResource,
 		NewNamingResource,
