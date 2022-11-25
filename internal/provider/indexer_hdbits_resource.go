@@ -16,34 +16,32 @@ import (
 )
 
 const (
-	indexerFilelistResourceName   = "indexer_filelist"
-	IndexerFilelistImplementation = "FileList"
-	IndexerFilelistConfigContrat  = "FileListSettings"
-	IndexerFilelistProtocol       = "torrent"
+	indexerHdbitsResourceName   = "indexer_hdbits"
+	IndexerHdbitsImplementation = "HDBits"
+	IndexerHdbitsConfigContrat  = "HDBitsSettings"
+	IndexerHdbitsProtocol       = "torrent"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ resource.Resource = &IndexerFilelistResource{}
-var _ resource.ResourceWithImportState = &IndexerFilelistResource{}
+var _ resource.Resource = &IndexerHdbitsResource{}
+var _ resource.ResourceWithImportState = &IndexerHdbitsResource{}
 
-func NewIndexerFilelistResource() resource.Resource {
-	return &IndexerFilelistResource{}
+func NewIndexerHdbitsResource() resource.Resource {
+	return &IndexerHdbitsResource{}
 }
 
-// IndexerFilelistResource defines the Filelist indexer implementation.
-type IndexerFilelistResource struct {
+// IndexerHdbitsResource defines the Hdbits indexer implementation.
+type IndexerHdbitsResource struct {
 	client *sonarr.Sonarr
 }
 
-// IndexerFilelist describes the Filelist indexer data model.
-type IndexerFilelist struct {
+// IndexerHdbits describes the Hdbits indexer data model.
+type IndexerHdbits struct {
 	Tags                    types.Set     `tfsdk:"tags"`
-	Categories              types.Set     `tfsdk:"categories"`
-	AnimeCategories         types.Set     `tfsdk:"anime_categories"`
 	Name                    types.String  `tfsdk:"name"`
 	BaseURL                 types.String  `tfsdk:"base_url"`
 	Username                types.String  `tfsdk:"username"`
-	Passkey                 types.String  `tfsdk:"passkey"`
+	APIKey                  types.String  `tfsdk:"api_key"`
 	Priority                types.Int64   `tfsdk:"priority"`
 	ID                      types.Int64   `tfsdk:"id"`
 	DownloadClientID        types.Int64   `tfsdk:"download_client_id"`
@@ -56,7 +54,7 @@ type IndexerFilelist struct {
 	EnableInteractiveSearch types.Bool    `tfsdk:"enable_interactive_search"`
 }
 
-func (i IndexerFilelist) toIndexer() *Indexer {
+func (i IndexerHdbits) toIndexer() *Indexer {
 	return &Indexer{
 		EnableAutomaticSearch:   i.EnableAutomaticSearch,
 		EnableInteractiveSearch: i.EnableInteractiveSearch,
@@ -70,15 +68,13 @@ func (i IndexerFilelist) toIndexer() *Indexer {
 		SeedTime:                i.SeedTime,
 		SeedRatio:               i.SeedRatio,
 		Username:                i.Username,
-		Passkey:                 i.Passkey,
+		APIKey:                  i.APIKey,
 		BaseURL:                 i.BaseURL,
 		Tags:                    i.Tags,
-		Categories:              i.Categories,
-		AnimeCategories:         i.AnimeCategories,
 	}
 }
 
-func (i *IndexerFilelist) fromIndexer(indexer *Indexer) {
+func (i *IndexerHdbits) fromIndexer(indexer *Indexer) {
 	i.EnableAutomaticSearch = indexer.EnableAutomaticSearch
 	i.EnableInteractiveSearch = indexer.EnableInteractiveSearch
 	i.EnableRss = indexer.EnableRss
@@ -91,20 +87,18 @@ func (i *IndexerFilelist) fromIndexer(indexer *Indexer) {
 	i.SeedTime = indexer.SeedTime
 	i.SeedRatio = indexer.SeedRatio
 	i.Username = indexer.Username
-	i.Passkey = indexer.Passkey
+	i.APIKey = indexer.APIKey
 	i.BaseURL = indexer.BaseURL
 	i.Tags = indexer.Tags
-	i.Categories = indexer.Categories
-	i.AnimeCategories = indexer.AnimeCategories
 }
 
-func (r *IndexerFilelistResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_" + indexerFilelistResourceName
+func (r *IndexerHdbitsResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+	resp.TypeName = req.ProviderTypeName + "_" + indexerHdbitsResourceName
 }
 
-func (r *IndexerFilelistResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
+func (r *IndexerHdbitsResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
 	return tfsdk.Schema{
-		MarkdownDescription: "<!-- subcategory:Indexers -->Indexer FileList resource.\nFor more information refer to [Indexer](https://wiki.servarr.com/sonarr/settings#indexers) and [FileList](https://wiki.servarr.com/sonarr/supported#filelist).",
+		MarkdownDescription: "<!-- subcategory:Indexers -->Indexer HDBits resource.\nFor more information refer to [Indexer](https://wiki.servarr.com/sonarr/settings#indexers) and [HDBits](https://wiki.servarr.com/sonarr/supported#hdbits).",
 		Attributes: map[string]tfsdk.Attribute{
 			"enable_automatic_search": {
 				MarkdownDescription: "Enable automatic search flag.",
@@ -137,7 +131,7 @@ func (r *IndexerFilelistResource) GetSchema(ctx context.Context) (tfsdk.Schema, 
 				Type:                types.Int64Type,
 			},
 			"name": {
-				MarkdownDescription: "IndexerFilelist name.",
+				MarkdownDescription: "IndexerHdbits name.",
 				Required:            true,
 				Type:                types.StringType,
 			},
@@ -150,7 +144,7 @@ func (r *IndexerFilelistResource) GetSchema(ctx context.Context) (tfsdk.Schema, 
 				},
 			},
 			"id": {
-				MarkdownDescription: "IndexerFilelist ID.",
+				MarkdownDescription: "IndexerHdbits ID.",
 				Computed:            true,
 				Type:                types.Int64Type,
 				PlanModifiers: tfsdk.AttributePlanModifiers{
@@ -188,8 +182,8 @@ func (r *IndexerFilelistResource) GetSchema(ctx context.Context) (tfsdk.Schema, 
 				Computed:            true,
 				Type:                types.StringType,
 			},
-			"passkey": {
-				MarkdownDescription: "Passkey.",
+			"api_key": {
+				MarkdownDescription: "API key.",
 				Required:            true,
 				Sensitive:           true,
 				Type:                types.StringType,
@@ -199,27 +193,11 @@ func (r *IndexerFilelistResource) GetSchema(ctx context.Context) (tfsdk.Schema, 
 				Required:            true,
 				Type:                types.StringType,
 			},
-			"categories": {
-				MarkdownDescription: "Categories list.",
-				Optional:            true,
-				Computed:            true,
-				Type: types.SetType{
-					ElemType: types.Int64Type,
-				},
-			},
-			"anime_categories": {
-				MarkdownDescription: "Anime categories list.",
-				Optional:            true,
-				Computed:            true,
-				Type: types.SetType{
-					ElemType: types.Int64Type,
-				},
-			},
 		},
 	}, nil
 }
 
-func (r *IndexerFilelistResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+func (r *IndexerHdbitsResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
 	// Prevent panic if the provider has not been configured.
 	if req.ProviderData == nil {
 		return
@@ -238,9 +216,9 @@ func (r *IndexerFilelistResource) Configure(ctx context.Context, req resource.Co
 	r.client = client
 }
 
-func (r *IndexerFilelistResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
+func (r *IndexerHdbitsResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	// Retrieve values from plan
-	var indexer *IndexerFilelist
+	var indexer *IndexerHdbits
 
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &indexer)...)
 
@@ -248,25 +226,25 @@ func (r *IndexerFilelistResource) Create(ctx context.Context, req resource.Creat
 		return
 	}
 
-	// Create new IndexerFilelist
+	// Create new IndexerHdbits
 	request := indexer.read(ctx)
 
 	response, err := r.client.AddIndexerContext(ctx, request)
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", indexerFilelistResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", indexerHdbitsResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "created "+indexerFilelistResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "created "+indexerHdbitsResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
 	indexer.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &indexer)...)
 }
 
-func (r *IndexerFilelistResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
+func (r *IndexerHdbitsResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	// Get current state
-	var indexer *IndexerFilelist
+	var indexer *IndexerHdbits
 
 	resp.Diagnostics.Append(req.State.Get(ctx, &indexer)...)
 
@@ -274,23 +252,23 @@ func (r *IndexerFilelistResource) Read(ctx context.Context, req resource.ReadReq
 		return
 	}
 
-	// Get IndexerFilelist current value
+	// Get IndexerHdbits current value
 	response, err := r.client.GetIndexerContext(ctx, indexer.ID.ValueInt64())
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerFilelistResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerHdbitsResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read "+indexerFilelistResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "read "+indexerHdbitsResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Map response body to resource schema attribute
 	indexer.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &indexer)...)
 }
 
-func (r *IndexerFilelistResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+func (r *IndexerHdbitsResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	// Get plan values
-	var indexer *IndexerFilelist
+	var indexer *IndexerHdbits
 
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &indexer)...)
 
@@ -298,24 +276,24 @@ func (r *IndexerFilelistResource) Update(ctx context.Context, req resource.Updat
 		return
 	}
 
-	// Update IndexerFilelist
+	// Update IndexerHdbits
 	request := indexer.read(ctx)
 
 	response, err := r.client.UpdateIndexerContext(ctx, request)
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update "+indexerFilelistResourceName+", got error: %s", err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update "+indexerHdbitsResourceName+", got error: %s", err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "updated "+indexerFilelistResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "updated "+indexerHdbitsResourceName+": "+strconv.Itoa(int(response.ID)))
 	// Generate resource state struct
 	indexer.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &indexer)...)
 }
 
-func (r *IndexerFilelistResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var indexer *IndexerFilelist
+func (r *IndexerHdbitsResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
+	var indexer *IndexerHdbits
 
 	resp.Diagnostics.Append(req.State.Get(ctx, &indexer)...)
 
@@ -323,19 +301,19 @@ func (r *IndexerFilelistResource) Delete(ctx context.Context, req resource.Delet
 		return
 	}
 
-	// Delete IndexerFilelist current value
+	// Delete IndexerHdbits current value
 	err := r.client.DeleteIndexerContext(ctx, indexer.ID.ValueInt64())
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerFilelistResourceName, err))
+		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerHdbitsResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted "+indexerFilelistResourceName+": "+strconv.Itoa(int(indexer.ID.ValueInt64())))
+	tflog.Trace(ctx, "deleted "+indexerHdbitsResourceName+": "+strconv.Itoa(int(indexer.ID.ValueInt64())))
 	resp.State.RemoveResource(ctx)
 }
 
-func (r *IndexerFilelistResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+func (r *IndexerHdbitsResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	// resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
@@ -347,11 +325,11 @@ func (r *IndexerFilelistResource) ImportState(ctx context.Context, req resource.
 		return
 	}
 
-	tflog.Trace(ctx, "imported "+indexerFilelistResourceName+": "+strconv.Itoa(id))
+	tflog.Trace(ctx, "imported "+indexerHdbitsResourceName+": "+strconv.Itoa(id))
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 
-func (i *IndexerFilelist) write(ctx context.Context, indexer *sonarr.IndexerOutput) {
+func (i *IndexerHdbits) write(ctx context.Context, indexer *sonarr.IndexerOutput) {
 	genericIndexer := Indexer{
 		EnableAutomaticSearch:   types.BoolValue(indexer.EnableAutomaticSearch),
 		EnableInteractiveSearch: types.BoolValue(indexer.EnableInteractiveSearch),
@@ -367,7 +345,7 @@ func (i *IndexerFilelist) write(ctx context.Context, indexer *sonarr.IndexerOutp
 	i.fromIndexer(&genericIndexer)
 }
 
-func (i *IndexerFilelist) read(ctx context.Context) *sonarr.IndexerInput {
+func (i *IndexerHdbits) read(ctx context.Context) *sonarr.IndexerInput {
 	var tags []int
 
 	tfsdk.ValueAs(ctx, i.Tags, &tags)
@@ -379,10 +357,10 @@ func (i *IndexerFilelist) read(ctx context.Context) *sonarr.IndexerInput {
 		Priority:                i.Priority.ValueInt64(),
 		DownloadClientID:        i.DownloadClientID.ValueInt64(),
 		ID:                      i.ID.ValueInt64(),
-		ConfigContract:          IndexerFilelistConfigContrat,
-		Implementation:          IndexerFilelistImplementation,
+		ConfigContract:          IndexerHdbitsConfigContrat,
+		Implementation:          IndexerHdbitsImplementation,
 		Name:                    i.Name.ValueString(),
-		Protocol:                IndexerFilelistProtocol,
+		Protocol:                IndexerHdbitsProtocol,
 		Tags:                    tags,
 		Fields:                  i.toIndexer().readFields(ctx),
 	}
