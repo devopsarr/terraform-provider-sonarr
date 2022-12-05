@@ -25,10 +25,6 @@ data "sonarr_series" "example" {
 
 - `title` (String) Series Title.
 
-### Optional
-
-- `tags` (Set of Number) Tags.
-
 ### Read-Only
 
 - `id` (Number) Series ID.
@@ -38,6 +34,7 @@ data "sonarr_series" "example" {
 - `quality_profile_id` (Number) Quality Profile ID.
 - `root_folder_path` (String) Series Root Folder.
 - `season_folder` (Boolean) Season Folder flag.
+- `tags` (Set of Number) List of associated tags.
 - `title_slug` (String) Series Title in kebab format.
 - `tvdb_id` (Number) TVDB ID.
 - `use_scene_numbering` (Boolean) Scene numbering flag.

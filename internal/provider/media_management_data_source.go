@@ -6,9 +6,7 @@ import (
 
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
-	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr/sonarr"
 )
@@ -31,108 +29,89 @@ func (d *MediaManagementDataSource) Metadata(ctx context.Context, req datasource
 	resp.TypeName = req.ProviderTypeName + "_" + mediaManagementDataSourceName
 }
 
-func (d *MediaManagementDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+func (d *MediaManagementDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the delay server.
 		MarkdownDescription: "<!-- subcategory:Media Management -->[Media Management](../resources/media_management).",
-		Attributes: map[string]tfsdk.Attribute{
-			"id": {
+		Attributes: map[string]schema.Attribute{
+			"id": schema.Int64Attribute{
 				MarkdownDescription: "Delay Profile ID.",
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
-			"unmonitor_previous_episodes": {
+			"unmonitor_previous_episodes": schema.BoolAttribute{
 				MarkdownDescription: "Unmonitor deleted files.",
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"hardlinks_copy": {
+			"hardlinks_copy": schema.BoolAttribute{
 				MarkdownDescription: "Use hardlinks instead of copy.",
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"create_empty_folders": {
+			"create_empty_folders": schema.BoolAttribute{
 				MarkdownDescription: "Create empty series directories.",
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"delete_empty_folders": {
+			"delete_empty_folders": schema.BoolAttribute{
 				MarkdownDescription: "Delete empty series directories.",
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"enable_media_info": {
+			"enable_media_info": schema.BoolAttribute{
 				MarkdownDescription: "Scan files details.",
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"import_extra_files": {
+			"import_extra_files": schema.BoolAttribute{
 				MarkdownDescription: "Import extra files. If enabled it will leverage 'extra_file_extensions'.",
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"set_permissions": {
+			"set_permissions": schema.BoolAttribute{
 				MarkdownDescription: "Set permission for imported files.",
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"skip_free_space_check": {
+			"skip_free_space_check": schema.BoolAttribute{
 				MarkdownDescription: "Skip free space check before importing.",
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"minimum_free_space": {
+			"minimum_free_space": schema.Int64Attribute{
 				MarkdownDescription: "Minimum free space in MB to allow import.",
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
-			"recycle_bin_days": {
+			"recycle_bin_days": schema.Int64Attribute{
 				MarkdownDescription: "Recyle bin days of retention.",
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
-			"chmod_folder": {
+			"chmod_folder": schema.StringAttribute{
 				MarkdownDescription: "Permission in linux format.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"chown_group": {
+			"chown_group": schema.StringAttribute{
 				MarkdownDescription: "Group used for permission.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"download_propers_repacks": {
+			"download_propers_repacks": schema.StringAttribute{
 				MarkdownDescription: "Download proper and repack policy. valid inputs are: 'preferAndUpgrade', 'doNotUpgrade', and 'doNotPrefer'.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"episode_title_required": {
+			"episode_title_required": schema.StringAttribute{
 				MarkdownDescription: "Episode title requirement policy. valid inputs are: 'always', 'bulkSeasonReleases' and 'never'.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"extra_file_extensions": {
+			"extra_file_extensions": schema.StringAttribute{
 				MarkdownDescription: "Comma separated list of extra files to import (.nfo will be imported as .nfo-orig).",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"file_date": {
+			"file_date": schema.StringAttribute{
 				MarkdownDescription: "Define the file date modification. valid inputs are: 'none', 'localAirDate, and 'utcAirDate'.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"recycle_bin_path": {
+			"recycle_bin_path": schema.StringAttribute{
 				MarkdownDescription: "Recycle bin absolute path.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"rescan_after_refresh": {
+			"rescan_after_refresh": schema.StringAttribute{
 				MarkdownDescription: "Rescan after refresh policy. valid inputs are: 'always', 'afterManual' and 'never'.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
 		},
-	}, nil
+	}
 }
 
 func (d *MediaManagementDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {

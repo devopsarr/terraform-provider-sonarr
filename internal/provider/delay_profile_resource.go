@@ -6,9 +6,13 @@ import (
 	"strconv"
 
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -47,72 +51,62 @@ func (r *DelayProfileResource) Metadata(ctx context.Context, req resource.Metada
 	resp.TypeName = req.ProviderTypeName + "_" + delayProfileResourceName
 }
 
-func (r *DelayProfileResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+func (r *DelayProfileResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		MarkdownDescription: "<!-- subcategory:Profiles -->Delay Profile resource.\nFor more information refer to [Delay Profiles](https://wiki.servarr.com/sonarr/settings#delay-profiles) documentation.",
-		Attributes: map[string]tfsdk.Attribute{
-			"id": {
+		Attributes: map[string]schema.Attribute{
+			"id": schema.Int64Attribute{
 				MarkdownDescription: "Delay Profile ID.",
 				Computed:            true,
-				Type:                types.Int64Type,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					resource.UseStateForUnknown(),
+				PlanModifiers: []planmodifier.Int64{
+					int64planmodifier.UseStateForUnknown(),
 				},
 			},
-			"enable_usenet": {
+			"enable_usenet": schema.BoolAttribute{
 				MarkdownDescription: "Usenet allowed flag at least one of `enable_usenet` and `enable_torrent` must be defined.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"enable_torrent": {
+			"enable_torrent": schema.BoolAttribute{
 				MarkdownDescription: "Torrent allowed flag at least one of `enable_usenet` and `enable_torrent` must be defined.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"bypass_if_highest_quality": {
+			"bypass_if_highest_quality": schema.BoolAttribute{
 				MarkdownDescription: "Bypass for highest quality flag.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"usenet_delay": {
+			"usenet_delay": schema.Int64Attribute{
 				MarkdownDescription: "Usenet delay.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
-			"torrent_delay": {
+			"torrent_delay": schema.Int64Attribute{
 				MarkdownDescription: "Torrent Delay.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
-			"order": {
+			"order": schema.Int64Attribute{
 				MarkdownDescription: "Order.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
-			"tags": {
+			"tags": schema.SetAttribute{
 				MarkdownDescription: "List of associated tags.",
 				Required:            true,
-				Type: types.SetType{
-					ElemType: types.Int64Type,
-				},
+				ElementType:         types.Int64Type,
 			},
-			"preferred_protocol": {
+			"preferred_protocol": schema.StringAttribute{
 				MarkdownDescription: "Preferred protocol.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
-				Validators: []tfsdk.AttributeValidator{
-					tools.StringMatch([]string{"usenet", "torrent"}),
+				Validators: []validator.String{
+					stringvalidator.OneOf("usenet", "torrent"),
 				},
 			},
 		},
-	}, nil
+	}
 }
 
 func (r *DelayProfileResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {

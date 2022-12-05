@@ -7,7 +7,7 @@ import (
 
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -38,65 +38,56 @@ func (d *ReleaseProfilesDataSource) Metadata(ctx context.Context, req datasource
 	resp.TypeName = req.ProviderTypeName + "_" + releaseProfilesDataSourceName
 }
 
-func (d *ReleaseProfilesDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+func (d *ReleaseProfilesDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the release server.
 		MarkdownDescription: "<!-- subcategory:Profiles -->List all available [Release Profiles](../resources/release_profile).",
-		Attributes: map[string]tfsdk.Attribute{
+		Attributes: map[string]schema.Attribute{
 			// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
-			"id": {
+			"id": schema.StringAttribute{
 				Computed: true,
-				Type:     types.StringType,
 			},
-			"release_profiles": {
+			"release_profiles": schema.SetNestedAttribute{
 				MarkdownDescription: "Release Profile list.",
 				Computed:            true,
-				Attributes: tfsdk.SetNestedAttributes(map[string]tfsdk.Attribute{
-					"id": {
-						MarkdownDescription: "Release Profile ID.",
-						Computed:            true,
-						Type:                types.Int64Type,
-					},
-					"enabled": {
-						MarkdownDescription: "Enabled",
-						Computed:            true,
-						Type:                types.BoolType,
-					},
-					"name": {
-						MarkdownDescription: "Release profile name.",
-						Computed:            true,
-						Type:                types.StringType,
-					},
-					"indexer_id": {
-						MarkdownDescription: "Indexer ID. Set `0` for all.",
-						Computed:            true,
-						Type:                types.Int64Type,
-					},
-					"required": {
-						MarkdownDescription: "Required terms.",
-						Computed:            true,
-						Type: types.SetType{
-							ElemType: types.StringType,
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: map[string]schema.Attribute{
+						"id": schema.Int64Attribute{
+							MarkdownDescription: "Release Profile ID.",
+							Computed:            true,
+						},
+						"enabled": schema.BoolAttribute{
+							MarkdownDescription: "Enabled",
+							Computed:            true,
+						},
+						"name": schema.StringAttribute{
+							MarkdownDescription: "Release profile name.",
+							Computed:            true,
+						},
+						"indexer_id": schema.Int64Attribute{
+							MarkdownDescription: "Indexer ID. Set `0` for all.",
+							Computed:            true,
+						},
+						"required": schema.SetAttribute{
+							MarkdownDescription: "Required terms.",
+							Computed:            true,
+							ElementType:         types.StringType,
+						},
+						"ignored": schema.SetAttribute{
+							MarkdownDescription: "Ignored terms.",
+							Computed:            true,
+							ElementType:         types.StringType,
+						},
+						"tags": schema.SetAttribute{
+							MarkdownDescription: "List of associated tags.",
+							Optional:            true,
+							ElementType:         types.Int64Type,
 						},
 					},
-					"ignored": {
-						MarkdownDescription: "Ignored terms.",
-						Computed:            true,
-						Type: types.SetType{
-							ElemType: types.StringType,
-						},
-					},
-					"tags": {
-						MarkdownDescription: "List of associated tags.",
-						Computed:            true,
-						Type: types.SetType{
-							ElemType: types.Int64Type,
-						},
-					},
-				}),
+				},
 			},
 		},
-	}, nil
+	}
 }
 
 func (d *ReleaseProfilesDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {

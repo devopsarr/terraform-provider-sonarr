@@ -6,9 +6,7 @@ import (
 
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
-	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr/sonarr"
 )
@@ -31,63 +29,53 @@ func (d *NamingDataSource) Metadata(ctx context.Context, req datasource.Metadata
 	resp.TypeName = req.ProviderTypeName + "_" + namingDataSourceName
 }
 
-func (d *NamingDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+func (d *NamingDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the delay server.
 		MarkdownDescription: "<!-- subcategory:Media Management -->[Naming](../resources/naming).",
-		Attributes: map[string]tfsdk.Attribute{
-			"id": {
+		Attributes: map[string]schema.Attribute{
+			"id": schema.Int64Attribute{
 				MarkdownDescription: "Delay Profile ID.",
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
-			"rename_episodes": {
+			"rename_episodes": schema.BoolAttribute{
 				MarkdownDescription: "Sonarr will use the existing file name if false.",
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"replace_illegal_characters": {
+			"replace_illegal_characters": schema.BoolAttribute{
 				MarkdownDescription: "Replace illegal characters. They will be removed if false.",
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"multi_episode_style": {
+			"multi_episode_style": schema.Int64Attribute{
 				MarkdownDescription: "Multi episode style. 0 - 'Extend' 1 - 'Duplicate' 2 - 'Repeat' 3 - 'Scene' 4 - 'Range' 5 - 'Prefixed Range'.",
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
-			"daily_episode_format": {
+			"daily_episode_format": schema.StringAttribute{
 				MarkdownDescription: "Daily episode format.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"anime_episode_format": {
+			"anime_episode_format": schema.StringAttribute{
 				MarkdownDescription: "Anime episode format.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"series_folder_format": {
+			"series_folder_format": schema.StringAttribute{
 				MarkdownDescription: "Series folder format.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"season_folder_format": {
+			"season_folder_format": schema.StringAttribute{
 				MarkdownDescription: "Season folder format.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"specials_folder_format": {
+			"specials_folder_format": schema.StringAttribute{
 				MarkdownDescription: "Special folder format.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"standard_episode_format": {
+			"standard_episode_format": schema.StringAttribute{
 				MarkdownDescription: "Standard episode formatss.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
 		},
-	}, nil
+	}
 }
 
 func (d *NamingDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {

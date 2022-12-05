@@ -7,7 +7,7 @@ import (
 
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -38,71 +38,62 @@ func (d *DelayProfilesDataSource) Metadata(ctx context.Context, req datasource.M
 	resp.TypeName = req.ProviderTypeName + "_" + delayProfilesDataSourceName
 }
 
-func (d *DelayProfilesDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+func (d *DelayProfilesDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the delay server.
 		MarkdownDescription: "<!-- subcategory:Profiles -->List all available [Delay Profiles](../resources/delay_profile).",
-		Attributes: map[string]tfsdk.Attribute{
+		Attributes: map[string]schema.Attribute{
 			// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
-			"id": {
+			"id": schema.StringAttribute{
 				Computed: true,
-				Type:     types.StringType,
 			},
-			"delay_profiles": {
+			"delay_profiles": schema.SetNestedAttribute{
 				MarkdownDescription: "Delay Profile list.",
 				Computed:            true,
-				Attributes: tfsdk.SetNestedAttributes(map[string]tfsdk.Attribute{
-					"id": {
-						MarkdownDescription: "Delay Profile ID.",
-						Computed:            true,
-						Type:                types.Int64Type,
-					},
-					"enable_usenet": {
-						MarkdownDescription: "Usenet allowed Flag.",
-						Computed:            true,
-						Type:                types.BoolType,
-					},
-					"enable_torrent": {
-						MarkdownDescription: "Torrent allowed Flag.",
-						Computed:            true,
-						Type:                types.BoolType,
-					},
-					"bypass_if_highest_quality": {
-						MarkdownDescription: "Bypass for highest quality Flag.",
-						Computed:            true,
-						Type:                types.BoolType,
-					},
-					"usenet_delay": {
-						MarkdownDescription: "Usenet delay.",
-						Computed:            true,
-						Type:                types.Int64Type,
-					},
-					"torrent_delay": {
-						MarkdownDescription: "Torrent Delay.",
-						Computed:            true,
-						Type:                types.Int64Type,
-					},
-					"order": {
-						MarkdownDescription: "Order.",
-						Computed:            true,
-						Type:                types.Int64Type,
-					},
-					"tags": {
-						MarkdownDescription: "List of associated tags.",
-						Computed:            true,
-						Type: types.SetType{
-							ElemType: types.Int64Type,
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: map[string]schema.Attribute{
+						"id": schema.Int64Attribute{
+							MarkdownDescription: "Delay Profile ID.",
+							Computed:            true,
+						},
+						"enable_usenet": schema.BoolAttribute{
+							MarkdownDescription: "Usenet allowed Flag.",
+							Computed:            true,
+						},
+						"enable_torrent": schema.BoolAttribute{
+							MarkdownDescription: "Torrent allowed Flag.",
+							Computed:            true,
+						},
+						"bypass_if_highest_quality": schema.BoolAttribute{
+							MarkdownDescription: "Bypass for highest quality Flag.",
+							Computed:            true,
+						},
+						"usenet_delay": schema.Int64Attribute{
+							MarkdownDescription: "Usenet delay.",
+							Computed:            true,
+						},
+						"torrent_delay": schema.Int64Attribute{
+							MarkdownDescription: "Torrent Delay.",
+							Computed:            true,
+						},
+						"order": schema.Int64Attribute{
+							MarkdownDescription: "Order.",
+							Computed:            true,
+						},
+						"tags": schema.SetAttribute{
+							MarkdownDescription: "List of associated tags.",
+							Optional:            true,
+							ElementType:         types.Int64Type,
+						},
+						"preferred_protocol": schema.StringAttribute{
+							MarkdownDescription: "Preferred protocol.",
+							Computed:            true,
 						},
 					},
-					"preferred_protocol": {
-						MarkdownDescription: "Preferred protocol.",
-						Computed:            true,
-						Type:                types.StringType,
-					},
-				}),
+				},
 			},
 		},
-	}, nil
+	}
 }
 
 func (d *DelayProfilesDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {

@@ -7,9 +7,13 @@ import (
 
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -45,44 +49,40 @@ func (r *LanguageProfileResource) Metadata(ctx context.Context, req resource.Met
 	resp.TypeName = req.ProviderTypeName + "_" + languageProfileResourceName
 }
 
-func (r *LanguageProfileResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+func (r *LanguageProfileResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		MarkdownDescription: "<!-- subcategory:Profiles -->Language Profile resource.\nFor more information refer to [Language Profile](https://wiki.servarr.com/sonarr/settings#language-profiles) documentation.",
-		Attributes: map[string]tfsdk.Attribute{
-			"id": {
+		Attributes: map[string]schema.Attribute{
+			"id": schema.Int64Attribute{
 				MarkdownDescription: "Language Profile ID.",
 				Computed:            true,
-				Type:                types.Int64Type,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					resource.UseStateForUnknown(),
+				PlanModifiers: []planmodifier.Int64{
+					int64planmodifier.UseStateForUnknown(),
 				},
 			},
-			"name": {
+			"name": schema.StringAttribute{
 				MarkdownDescription: "Language Profile name.",
 				Required:            true,
-				Type:                types.StringType,
 			},
-			"upgrade_allowed": {
+			"upgrade_allowed": schema.BoolAttribute{
 				MarkdownDescription: "Upgrade allowed Flag.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"cutoff_language": {
+			"cutoff_language": schema.StringAttribute{
 				MarkdownDescription: "Name of language.",
 				Required:            true,
-				Type:                types.StringType,
-				Validators: []tfsdk.AttributeValidator{
-					tools.StringMatch(helpers.Languages),
+				Validators: []validator.String{
+					stringvalidator.OneOf(helpers.Languages...),
 				},
 			},
-			"languages": {
+			"languages": schema.SetAttribute{
 				MarkdownDescription: "list of languages in profile.",
 				Required:            true,
-				Type:                types.SetType{ElemType: types.StringType},
+				ElementType:         types.StringType,
 			},
 		},
-	}, nil
+	}
 }
 
 func (r *LanguageProfileResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {

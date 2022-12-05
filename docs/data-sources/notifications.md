@@ -28,6 +28,10 @@ data "sonarr_notifications" "example" {
 <a id="nestedatt--notifications"></a>
 ### Nested Schema for `notifications`
 
+Optional:
+
+- `tags` (Set of Number) List of associated tags.
+
 Read-Only:
 
 - `access_token` (String) Access token.
@@ -92,7 +96,6 @@ Read-Only:
 - `server` (String) server.
 - `sign_in` (String) Sign in.
 - `sound` (String) Sound.
-- `tags` (Set of Number) List of associated tags.
 - `to` (String) To.
 - `token` (String) Token.
 - `update_library` (Boolean) Update library flag.

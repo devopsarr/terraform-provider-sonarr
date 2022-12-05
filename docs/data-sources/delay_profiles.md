@@ -28,6 +28,10 @@ data "sonarr_delay_profiles" "example" {
 <a id="nestedatt--delay_profiles"></a>
 ### Nested Schema for `delay_profiles`
 
+Optional:
+
+- `tags` (Set of Number) List of associated tags.
+
 Read-Only:
 
 - `bypass_if_highest_quality` (Boolean) Bypass for highest quality Flag.
@@ -36,7 +40,6 @@ Read-Only:
 - `id` (Number) Delay Profile ID.
 - `order` (Number) Order.
 - `preferred_protocol` (String) Preferred protocol.
-- `tags` (Set of Number) List of associated tags.
 - `torrent_delay` (Number) Torrent Delay.
 - `usenet_delay` (Number) Usenet delay.
 

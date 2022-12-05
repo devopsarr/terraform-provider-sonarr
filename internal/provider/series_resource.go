@@ -6,9 +6,11 @@ import (
 	"strconv"
 
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -72,78 +74,65 @@ func (r *SeriesResource) Metadata(ctx context.Context, req resource.MetadataRequ
 	resp.TypeName = req.ProviderTypeName + "_" + seriesResourceName
 }
 
-func (r *SeriesResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
+func (r *SeriesResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	// TODO: waiting to implement seasons and images until empty conversion is managed natively https://www.terraform.io/plugin/framework/accessing-values#conversion-rules
-	return tfsdk.Schema{
+	resp.Schema = schema.Schema{
 		MarkdownDescription: "<!-- subcategory:Series -->Series resource.\nFor more information refer to [Series](https://wiki.servarr.com/sonarr/library#series) documentation.",
-		Attributes: map[string]tfsdk.Attribute{
-			"title": {
+		Attributes: map[string]schema.Attribute{
+			"title": schema.StringAttribute{
 				MarkdownDescription: "Series Title.",
 				Required:            true,
-				Type:                types.StringType,
 			},
-			"title_slug": {
+			"title_slug": schema.StringAttribute{
 				MarkdownDescription: "Series Title in kebab format.",
 				Required:            true,
-				Type:                types.StringType,
 			},
-			"monitored": {
+			"monitored": schema.BoolAttribute{
 				MarkdownDescription: "Monitored flag.",
 				Required:            true,
-				Type:                types.BoolType,
 			},
-			"season_folder": {
+			"season_folder": schema.BoolAttribute{
 				MarkdownDescription: "Season Folder flag.",
 				Required:            true,
-				Type:                types.BoolType,
 			},
-			"use_scene_numbering": {
+			"use_scene_numbering": schema.BoolAttribute{
 				MarkdownDescription: "Scene numbering flag.",
 				Required:            true,
-				Type:                types.BoolType,
 			},
-			"language_profile_id": {
+			"language_profile_id": schema.Int64Attribute{
 				MarkdownDescription: "Language Profile ID .",
 				Required:            true,
-				Type:                types.Int64Type,
 			},
-			"quality_profile_id": {
+			"quality_profile_id": schema.Int64Attribute{
 				MarkdownDescription: "Quality Profile ID.",
 				Required:            true,
-				Type:                types.Int64Type,
 			},
-			"tvdb_id": {
+			"tvdb_id": schema.Int64Attribute{
 				MarkdownDescription: "TVDB ID.",
 				Required:            true,
-				Type:                types.Int64Type,
 			},
-			"path": {
+			"path": schema.StringAttribute{
 				MarkdownDescription: "Series Path.",
 				Required:            true,
-				Type:                types.StringType,
 			},
-			"root_folder_path": {
+			"root_folder_path": schema.StringAttribute{
 				MarkdownDescription: "Series Root Folder.",
 				Required:            true,
-				Type:                types.StringType,
 			},
-			"tags": {
-				MarkdownDescription: "Tags.",
+			"tags": schema.SetAttribute{
+				MarkdownDescription: "List of associated tags.",
 				Optional:            true,
-				Type: types.SetType{
-					ElemType: types.Int64Type,
-				},
+				ElementType:         types.Int64Type,
 			},
-			"id": {
+			"id": schema.Int64Attribute{
 				MarkdownDescription: "Series ID.",
 				Computed:            true,
-				Type:                types.Int64Type,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					resource.UseStateForUnknown(),
+				PlanModifiers: []planmodifier.Int64{
+					int64planmodifier.UseStateForUnknown(),
 				},
 			},
 		},
-	}, nil
+	}
 }
 
 func (r *SeriesResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {

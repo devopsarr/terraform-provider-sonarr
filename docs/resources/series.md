@@ -50,7 +50,7 @@ resource "sonarr_series" "example" {
 
 ### Optional
 
-- `tags` (Set of Number) Tags.
+- `tags` (Set of Number) List of associated tags.
 
 ### Read-Only
 

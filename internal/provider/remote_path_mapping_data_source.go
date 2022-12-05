@@ -7,9 +7,7 @@ import (
 
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
-	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr/sonarr"
 )
@@ -32,33 +30,29 @@ func (d *RemotePathMappingDataSource) Metadata(ctx context.Context, req datasour
 	resp.TypeName = req.ProviderTypeName + "_" + remotePathMappingDataSourceName
 }
 
-func (d *RemotePathMappingDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+func (d *RemotePathMappingDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the delay server.
 		MarkdownDescription: "<!-- subcategory:Download Clients -->Single [Remote Path Mapping](../resources/remote_path_mapping).",
-		Attributes: map[string]tfsdk.Attribute{
-			"id": {
+		Attributes: map[string]schema.Attribute{
+			"id": schema.Int64Attribute{
 				MarkdownDescription: "Remote Path Mapping ID.",
 				Required:            true,
-				Type:                types.Int64Type,
 			},
-			"host": {
+			"host": schema.StringAttribute{
 				MarkdownDescription: "Download Client host.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"remote_path": {
+			"remote_path": schema.StringAttribute{
 				MarkdownDescription: "Download Client remote path.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"local_path": {
+			"local_path": schema.StringAttribute{
 				MarkdownDescription: "Local path.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
 		},
-	}, nil
+	}
 }
 
 func (d *RemotePathMappingDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {

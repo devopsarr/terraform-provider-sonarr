@@ -6,9 +6,7 @@ import (
 
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
-	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr/sonarr"
 )
@@ -31,33 +29,29 @@ func (d *DownloadClientConfigDataSource) Metadata(ctx context.Context, req datas
 	resp.TypeName = req.ProviderTypeName + "_" + downloadClientConfigDataSourceName
 }
 
-func (d *DownloadClientConfigDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+func (d *DownloadClientConfigDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the delay server.
 		MarkdownDescription: "<!-- subcategory:Download Clients -->[Download Client Config](../resources/download_client_config).",
-		Attributes: map[string]tfsdk.Attribute{
-			"id": {
+		Attributes: map[string]schema.Attribute{
+			"id": schema.Int64Attribute{
 				MarkdownDescription: "Download Client Config ID.",
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
-			"enable_completed_download_handling": {
+			"enable_completed_download_handling": schema.BoolAttribute{
 				MarkdownDescription: "Enable Completed Download Handling flag.",
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"auto_redownload_failed": {
+			"auto_redownload_failed": schema.BoolAttribute{
 				MarkdownDescription: "Auto Redownload Failed flag.",
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"download_client_working_folders": {
+			"download_client_working_folders": schema.StringAttribute{
 				MarkdownDescription: "Download Client Working Folders.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
 		},
-	}, nil
+	}
 }
 
 func (d *DownloadClientConfigDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {

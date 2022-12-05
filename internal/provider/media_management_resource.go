@@ -6,10 +6,13 @@ import (
 	"strconv"
 
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr/sonarr"
@@ -57,122 +60,103 @@ func (r *MediaManagementResource) Metadata(ctx context.Context, req resource.Met
 	resp.TypeName = req.ProviderTypeName + "_" + mediaManagementResourceName
 }
 
-func (r *MediaManagementResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+func (r *MediaManagementResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		MarkdownDescription: "<!-- subcategory:Media Management -->Media Management resource.\nFor more information refer to [Naming](https://wiki.servarr.com/sonarr/settings#file-management) documentation.",
-		Attributes: map[string]tfsdk.Attribute{
-			"id": {
+		Attributes: map[string]schema.Attribute{
+			"id": schema.Int64Attribute{
 				MarkdownDescription: "Media Management ID.",
 				Computed:            true,
-				Type:                types.Int64Type,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					resource.UseStateForUnknown(),
+				PlanModifiers: []planmodifier.Int64{
+					int64planmodifier.UseStateForUnknown(),
 				},
 			},
-			"unmonitor_previous_episodes": {
+			"unmonitor_previous_episodes": schema.BoolAttribute{
 				MarkdownDescription: "Unmonitor deleted files.",
 				Required:            true,
-				Type:                types.BoolType,
 			},
-			"hardlinks_copy": {
+			"hardlinks_copy": schema.BoolAttribute{
 				MarkdownDescription: "Use hardlinks instead of copy.",
 				Required:            true,
-				Type:                types.BoolType,
 			},
-			"create_empty_folders": {
+			"create_empty_folders": schema.BoolAttribute{
 				MarkdownDescription: "Create empty series directories.",
 				Required:            true,
-				Type:                types.BoolType,
 			},
-			"delete_empty_folders": {
+			"delete_empty_folders": schema.BoolAttribute{
 				MarkdownDescription: "Delete empty series directories.",
 				Required:            true,
-				Type:                types.BoolType,
 			},
-			"enable_media_info": {
+			"enable_media_info": schema.BoolAttribute{
 				MarkdownDescription: "Scan files details.",
 				Required:            true,
-				Type:                types.BoolType,
 			},
-			"import_extra_files": {
+			"import_extra_files": schema.BoolAttribute{
 				MarkdownDescription: "Import extra files. If enabled it will leverage 'extra_file_extensions'.",
 				Required:            true,
-				Type:                types.BoolType,
 			},
-			"set_permissions": {
+			"set_permissions": schema.BoolAttribute{
 				MarkdownDescription: "Set permission for imported files.",
 				Required:            true,
-				Type:                types.BoolType,
 			},
-			"skip_free_space_check": {
+			"skip_free_space_check": schema.BoolAttribute{
 				MarkdownDescription: "Skip free space check before importing.",
 				Required:            true,
-				Type:                types.BoolType,
 			},
-			"minimum_free_space": {
+			"minimum_free_space": schema.Int64Attribute{
 				MarkdownDescription: "Minimum free space in MB to allow import.",
 				Required:            true,
-				Type:                types.Int64Type,
 			},
-			"recycle_bin_days": {
+			"recycle_bin_days": schema.Int64Attribute{
 				MarkdownDescription: "Recyle bin days of retention.",
 				Required:            true,
-				Type:                types.Int64Type,
 			},
-			"chmod_folder": {
+			"chmod_folder": schema.StringAttribute{
 				MarkdownDescription: "Permission in linux format.",
 				Required:            true,
-				Type:                types.StringType,
 			},
-			"chown_group": {
+			"chown_group": schema.StringAttribute{
 				MarkdownDescription: "Group used for permission.",
 				Required:            true,
-				Type:                types.StringType,
 			},
-			"download_propers_repacks": {
+			"download_propers_repacks": schema.StringAttribute{
 				MarkdownDescription: "Download proper and repack policy. valid inputs are: 'preferAndUpgrade', 'doNotUpgrade', and 'doNotPrefer'.",
 				Required:            true,
-				Type:                types.StringType,
-				Validators: []tfsdk.AttributeValidator{
-					tools.StringMatch([]string{"preferAndUpgrade", "doNotUpgrade", "doNotPrefer"}),
+				Validators: []validator.String{
+					stringvalidator.OneOf("preferAndUpgrade", "doNotUpgrade", "doNotPrefer"),
 				},
 			},
-			"episode_title_required": {
+			"episode_title_required": schema.StringAttribute{
 				MarkdownDescription: "Episode title requirement policy. valid inputs are: 'always', 'bulkSeasonReleases' and 'never'.",
 				Required:            true,
-				Type:                types.StringType,
-				Validators: []tfsdk.AttributeValidator{
-					tools.StringMatch([]string{"always", "bulkSeasonReleases", "never"}),
+				Validators: []validator.String{
+					stringvalidator.OneOf("always", "bulkSeasonReleases", "never"),
 				},
 			},
-			"extra_file_extensions": {
+			"extra_file_extensions": schema.StringAttribute{
 				MarkdownDescription: "Comma separated list of extra files to import (.nfo will be imported as .nfo-orig).",
 				Required:            true,
-				Type:                types.StringType,
 			},
-			"file_date": {
+			"file_date": schema.StringAttribute{
 				MarkdownDescription: "Define the file date modification. valid inputs are: 'none', 'localAirDate, and 'utcAirDate'.",
 				Required:            true,
-				Type:                types.StringType,
-				Validators: []tfsdk.AttributeValidator{
-					tools.StringMatch([]string{"none", "localAirDate", "utcAirDate"}),
+				Validators: []validator.String{
+					stringvalidator.OneOf("none", "localAirDate", "utcAirDate"),
 				},
 			},
-			"recycle_bin_path": {
+			"recycle_bin_path": schema.StringAttribute{
 				MarkdownDescription: "Recycle bin absolute path.",
 				Required:            true,
-				Type:                types.StringType,
 			},
-			"rescan_after_refresh": {
+			"rescan_after_refresh": schema.StringAttribute{
 				MarkdownDescription: "Rescan after refresh policy. valid inputs are: 'always', 'afterManual' and 'never'.",
 				Required:            true,
-				Type:                types.StringType,
-				Validators: []tfsdk.AttributeValidator{
-					tools.StringMatch([]string{"always", "afterManual", "never"}),
+				Validators: []validator.String{
+					stringvalidator.OneOf("always", "afterManual", "never"),
 				},
 			},
 		},
-	}, nil
+	}
 }
 
 func (r *MediaManagementResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {

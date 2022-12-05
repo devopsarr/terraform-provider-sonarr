@@ -37,7 +37,7 @@ Read-Only:
 - `quality_profile_id` (Number) Quality Profile ID.
 - `root_folder_path` (String) Series Root Folder.
 - `season_folder` (Boolean) Season Folder flag.
-- `tags` (Set of Number) Tags.
+- `tags` (Set of Number) List of associated tags.
 - `title` (String) Series Title.
 - `title_slug` (String) Series Title in kebab format.
 - `tvdb_id` (Number) TVDB ID.

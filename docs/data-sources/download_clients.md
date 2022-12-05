@@ -28,6 +28,10 @@ data "sonarr_download_clients" "example" {
 <a id="nestedatt--download_clients"></a>
 ### Nested Schema for `download_clients`
 
+Optional:
+
+- `tags` (Set of Number) List of associated tags.
+
 Read-Only:
 
 - `add_paused` (Boolean) Add paused flag.
@@ -64,7 +68,6 @@ Read-Only:
 - `sequential_order` (Boolean) Sequential order flag.
 - `start_on_add` (Boolean) Start on add flag.
 - `strm_folder` (String) STRM folder.
-- `tags` (Set of Number) List of associated tags.
 - `torrent_folder` (String) Torrent folder.
 - `tv_category` (String) TV category.
 - `tv_directory` (String) TV directory.
