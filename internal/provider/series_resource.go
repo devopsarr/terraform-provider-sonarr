@@ -122,6 +122,7 @@ func (r *SeriesResource) Schema(ctx context.Context, req resource.SchemaRequest,
 			"tags": schema.SetAttribute{
 				MarkdownDescription: "List of associated tags.",
 				Optional:            true,
+				Computed:            true,
 				ElementType:         types.Int64Type,
 			},
 			"id": schema.Int64Attribute{
@@ -275,10 +276,7 @@ func (r *SeriesResource) ImportState(ctx context.Context, req resource.ImportSta
 }
 
 func (s *Series) write(ctx context.Context, series *sonarr.Series) {
-	if !s.Tags.IsNull() || !(len(series.Tags) == 0) {
-		s.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, series.Tags)
-	}
-
+	s.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, series.Tags)
 	s.Monitored = types.BoolValue(series.Monitored)
 	s.SeasonFolder = types.BoolValue(series.SeasonFolder)
 	s.UseSceneNumbering = types.BoolValue(series.UseSceneNumbering)

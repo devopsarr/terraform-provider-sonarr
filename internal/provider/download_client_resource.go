@@ -98,7 +98,7 @@ func (r *DownloadClientResource) Metadata(ctx context.Context, req resource.Meta
 
 func (r *DownloadClientResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Download Clients -->Download Client resource.\nFor more information refer to [Download Client](https://wiki.servarr.com/sonarr/settings#download-clients).",
+		MarkdownDescription: "<!-- subcategory:Download Clients -->Generic Download Client resource. When possible use a specific resource instead.\nFor more information refer to [Download Client](https://wiki.servarr.com/sonarr/settings#download-clients).",
 		Attributes: map[string]schema.Attribute{
 			"enable": schema.BoolAttribute{
 				MarkdownDescription: "Enable flag.",
@@ -142,6 +142,7 @@ func (r *DownloadClientResource) Schema(ctx context.Context, req resource.Schema
 			"tags": schema.SetAttribute{
 				MarkdownDescription: "List of associated tags.",
 				Optional:            true,
+				Computed:            true,
 				ElementType:         types.Int64Type,
 			},
 			"id": schema.Int64Attribute{
@@ -379,7 +380,6 @@ func (r *DownloadClientResource) Create(ctx context.Context, req resource.Create
 	// Generate resource state struct
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state DownloadClient
-	state.Tags = client.Tags
 
 	state.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
@@ -407,7 +407,6 @@ func (r *DownloadClientResource) Read(ctx context.Context, req resource.ReadRequ
 	// Map response body to resource schema attribute
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state DownloadClient
-	state.Tags = client.Tags
 
 	state.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
@@ -437,7 +436,6 @@ func (r *DownloadClientResource) Update(ctx context.Context, req resource.Update
 	// Generate resource state struct
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state DownloadClient
-	state.Tags = client.Tags
 
 	state.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
@@ -481,10 +479,7 @@ func (r *DownloadClientResource) ImportState(ctx context.Context, req resource.I
 }
 
 func (d *DownloadClient) write(ctx context.Context, downloadClient *sonarr.DownloadClientOutput) {
-	if !d.Tags.IsNull() && len(downloadClient.Tags) == 0 {
-		d.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, downloadClient.Tags)
-	}
-
+	d.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, downloadClient.Tags)
 	d.Enable = types.BoolValue(downloadClient.Enable)
 	d.RemoveCompletedDownloads = types.BoolValue(downloadClient.RemoveCompletedDownloads)
 	d.RemoveFailedDownloads = types.BoolValue(downloadClient.RemoveFailedDownloads)

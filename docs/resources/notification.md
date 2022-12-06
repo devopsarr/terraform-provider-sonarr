@@ -3,13 +3,13 @@
 page_title: "sonarr_notification Resource - terraform-provider-sonarr"
 subcategory: "Notifications"
 description: |-
-  Notification resource.
+  Generic Notification resource. When possible use a specific resource instead.
   For more information refer to Notification https://wiki.servarr.com/sonarr/settings#connect.
 ---
 
 # sonarr_notification (Resource)
 
-<!-- subcategory:Notifications -->Notification resource.
+<!-- subcategory:Notifications -->Generic Notification resource. When possible use a specific resource instead.
 For more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect).
 
 ## Example Usage
@@ -61,15 +61,15 @@ resource "sonarr_notification" "example" {
 - `access_token_secret` (String, Sensitive) Access token secret.
 - `always_update` (Boolean) Always update flag.
 - `api_key` (String, Sensitive) API key.
-- `app_token` (String) App token.
+- `app_token` (String, Sensitive) App token.
 - `arguments` (String) Arguments.
 - `auth_token` (String, Sensitive) Auth token.
 - `auth_user` (String) Auth user.
 - `author` (String) Author.
 - `avatar` (String) Avatar.
-- `bcc` (String) Bcc.
+- `bcc` (Set of String) Bcc.
 - `bot_token` (String) Bot token.
-- `cc` (String) Cc.
+- `cc` (Set of String) Cc.
 - `channel` (String) Channel.
 - `channel_tags` (Set of String) Channel tags.
 - `chat_id` (String) Chat ID.
@@ -80,14 +80,14 @@ resource "sonarr_notification" "example" {
 - `device_names` (String) Device names.
 - `devices` (Set of String) Devices.
 - `direct_message` (Boolean) Direct message flag.
-- `display_time` (String) Display time.
-- `expire` (String) Expire.
+- `display_time` (Number) Display time.
+- `expire` (Number) Expire.
 - `expires` (String) Expires.
 - `from` (String) From.
-- `grab_fields` (Number) Grab fields. `0` Overview, `1` Rating, `2` Genres, `3` Quality, `4` Group, `5` Size, `6` Links, `7` Release, `8` Poster, `9` Fanart.
+- `grab_fields` (Set of Number) Grab fields. `0` Overview, `1` Rating, `2` Genres, `3` Quality, `4` Group, `5` Size, `6` Links, `7` Release, `8` Poster, `9` Fanart.
 - `host` (String) Host.
 - `icon` (String) Icon.
-- `import_fields` (Number) Import fields. `0` Overview, `1` Rating, `2` Genres, `3` Quality, `4` Codecs, `5` Group, `6` Size, `7` Languages, `8` Subtitles, `9` Links, `10` Release, `11` Poster, `12` Fanart.
+- `import_fields` (Set of Number) Import fields. `0` Overview, `1` Rating, `2` Genres, `3` Quality, `4` Codecs, `5` Group, `6` Size, `7` Languages, `8` Subtitles, `9` Links, `10` Release, `11` Poster, `12` Fanart.
 - `mention` (String) Mention.
 - `method` (Number) Method. `1` POST, `2` PUT.
 - `notify` (Boolean) Notify flag.
@@ -98,7 +98,7 @@ resource "sonarr_notification" "example" {
 - `recipients` (Set of String) Recipients.
 - `refresh_token` (String) Refresh token.
 - `require_encryption` (Boolean) Require encryption flag.
-- `retry` (String) Retry.
+- `retry` (Number) Retry.
 - `send_silently` (Boolean) Add silently flag.
 - `sender_domain` (String) Sender domain.
 - `sender_id` (String) Sender ID.
@@ -106,7 +106,7 @@ resource "sonarr_notification" "example" {
 - `sign_in` (String) Sign in.
 - `sound` (String) Sound.
 - `tags` (Set of Number) List of associated tags.
-- `to` (String) To.
+- `to` (Set of String) To.
 - `token` (String, Sensitive) Token.
 - `update_library` (Boolean) Update library flag.
 - `url` (String) URL.

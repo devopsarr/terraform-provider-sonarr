@@ -83,7 +83,7 @@ func (r *IndexerResource) Metadata(ctx context.Context, req resource.MetadataReq
 
 func (r *IndexerResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Indexers -->Indexer resource.\nFor more information refer to [Indexer](https://wiki.servarr.com/sonarr/settings#indexers) documentation.",
+		MarkdownDescription: "<!-- subcategory:Indexers -->Generic Indexer resource. When possible use a specific resource instead.\nFor more information refer to [Indexer](https://wiki.servarr.com/sonarr/settings#indexers) documentation.",
 		Attributes: map[string]schema.Attribute{
 			"enable_automatic_search": schema.BoolAttribute{
 				MarkdownDescription: "Enable automatic search flag.",
@@ -132,6 +132,7 @@ func (r *IndexerResource) Schema(ctx context.Context, req resource.SchemaRequest
 			"tags": schema.SetAttribute{
 				MarkdownDescription: "List of associated tags.",
 				Optional:            true,
+				Computed:            true,
 				ElementType:         types.Int64Type,
 			},
 			"id": schema.Int64Attribute{
@@ -385,10 +386,7 @@ func (r *IndexerResource) ImportState(ctx context.Context, req resource.ImportSt
 }
 
 func (i *Indexer) write(ctx context.Context, indexer *sonarr.IndexerOutput) {
-	if !i.Tags.IsNull() && len(indexer.Tags) == 0 {
-		i.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, indexer.Tags)
-	}
-
+	i.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, indexer.Tags)
 	i.EnableAutomaticSearch = types.BoolValue(indexer.EnableAutomaticSearch)
 	i.EnableInteractiveSearch = types.BoolValue(indexer.EnableInteractiveSearch)
 	i.EnableRss = types.BoolValue(indexer.EnableRss)

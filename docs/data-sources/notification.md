@@ -27,8 +27,8 @@ data "sonarr_notification" "example" {
 
 ### Read-Only
 
-- `access_token` (String, Sensitive) Access token.
-- `access_token_secret` (String) Access token secret.
+- `access_token` (String) Access token.
+- `access_token_secret` (String, Sensitive) Access token secret.
 - `always_update` (Boolean) Always update flag.
 - `api_key` (String, Sensitive) API key.
 - `app_token` (String) App token.
@@ -37,9 +37,9 @@ data "sonarr_notification" "example" {
 - `auth_user` (String) Auth user.
 - `author` (String) Author.
 - `avatar` (String) Avatar.
-- `bcc` (String) BCC.
+- `bcc` (Set of String) Bcc.
 - `bot_token` (String) Bot token.
-- `cc` (String) CC.
+- `cc` (Set of String) Cc.
 - `channel` (String) Channel.
 - `channel_tags` (Set of String) Channel tags.
 - `chat_id` (String) Chat ID.
@@ -51,16 +51,16 @@ data "sonarr_notification" "example" {
 - `device_names` (String) Device names.
 - `devices` (Set of String) Devices.
 - `direct_message` (Boolean) Direct message flag.
-- `display_time` (String) Display time.
-- `expire` (String) Expire.
+- `display_time` (Number) Display time.
+- `expire` (Number) Expire.
 - `expires` (String) Expires.
 - `from` (String) From.
-- `grab_fields` (Number) Grab fields. `0` Overview, `1` Rating, `2` Genres, `3` Quality, `4` Group, `5` Size, `6` Links, `7` Release, `8` Poster, `9` Fanart.
+- `grab_fields` (Set of Number) Grab fields. `0` Overview, `1` Rating, `2` Genres, `3` Quality, `4` Group, `5` Size, `6` Links, `7` Release, `8` Poster, `9` Fanart.
 - `host` (String) Host.
 - `icon` (String) Icon.
 - `id` (Number) Notification ID.
 - `implementation` (String) Notification implementation name.
-- `import_fields` (Number) Import fields. `0` Overview, `1` Rating, `2` Genres, `3` Quality, `4` Codecs, `5` Group, `6` Size, `7` Languages, `8` Subtitles, `9` Links, `10` Release, `11` Poster, `12` Fanart.
+- `import_fields` (Set of Number) Import fields. `0` Overview, `1` Rating, `2` Genres, `3` Quality, `4` Codecs, `5` Group, `6` Size, `7` Languages, `8` Subtitles, `9` Links, `10` Release, `11` Poster, `12` Fanart.
 - `include_health_warnings` (Boolean) Include health warnings.
 - `mention` (String) Mention.
 - `method` (Number) Method. `1` POST, `2` PUT.
@@ -81,7 +81,7 @@ data "sonarr_notification" "example" {
 - `recipients` (Set of String) Recipients.
 - `refresh_token` (String) Refresh token.
 - `require_encryption` (Boolean) Require encryption flag.
-- `retry` (String) Retry.
+- `retry` (Number) Retry.
 - `send_silently` (Boolean) Add silently flag.
 - `sender_domain` (String) Sender domain.
 - `sender_id` (String) Sender ID.
@@ -89,13 +89,13 @@ data "sonarr_notification" "example" {
 - `sign_in` (String) Sign in.
 - `sound` (String) Sound.
 - `tags` (Set of Number) List of associated tags.
-- `to` (String) To.
-- `token` (String) Token.
+- `to` (Set of String) To.
+- `token` (String, Sensitive) Token.
 - `update_library` (Boolean) Update library flag.
 - `url` (String) URL.
 - `use_eu_endpoint` (Boolean) Use EU endpoint flag.
 - `use_ssl` (Boolean) Use SSL flag.
-- `user_key` (String, Sensitive) User key.
+- `user_key` (String) User key.
 - `username` (String) Username.
 - `web_hook_url` (String) Web hook url.
 

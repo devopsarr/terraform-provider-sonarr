@@ -143,6 +143,7 @@ func (r *DownloadClientRtorrentResource) Schema(ctx context.Context, req resourc
 			"tags": schema.SetAttribute{
 				MarkdownDescription: "List of associated tags.",
 				Optional:            true,
+				Computed:            true,
 				ElementType:         types.Int64Type,
 			},
 			"id": schema.Int64Attribute{
@@ -364,12 +365,8 @@ func (d *DownloadClientRtorrent) write(ctx context.Context, downloadClient *sona
 		Priority:                 types.Int64Value(int64(downloadClient.Priority)),
 		ID:                       types.Int64Value(downloadClient.ID),
 		Name:                     types.StringValue(downloadClient.Name),
-		Tags:                     types.SetNull(types.Int64Type),
 	}
-	if !d.Tags.IsNull() || !(len(downloadClient.Tags) == 0) {
-		genericDownloadClient.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, downloadClient.Tags)
-	}
-
+	genericDownloadClient.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, downloadClient.Tags)
 	genericDownloadClient.writeFields(ctx, downloadClient.Fields)
 	d.fromDownloadClient(&genericDownloadClient)
 }

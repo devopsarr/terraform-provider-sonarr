@@ -3,13 +3,13 @@
 page_title: "sonarr_download_client Resource - terraform-provider-sonarr"
 subcategory: "Download Clients"
 description: |-
-  Download Client resource.
+  Generic Download Client resource. When possible use a specific resource instead.
   For more information refer to Download Client https://wiki.servarr.com/sonarr/settings#download-clients.
 ---
 
 # sonarr_download_client (Resource)
 
-<!-- subcategory:Download Clients -->Download Client resource.
+<!-- subcategory:Download Clients -->Generic Download Client resource. When possible use a specific resource instead.
 For more information refer to [Download Client](https://wiki.servarr.com/sonarr/settings#download-clients).
 
 ## Example Usage
