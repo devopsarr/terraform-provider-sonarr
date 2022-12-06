@@ -187,6 +187,7 @@ func (p *SonarrProvider) Resources(ctx context.Context) []func() resource.Resour
 		NewNotificationPlexResource,
 		NewNotificationProwlResource,
 		NewNotificationPushbulletResource,
+		NewNotificationPushoverResource,
 
 		// Profiles
 		NewDelayProfileResource,
