@@ -61,7 +61,7 @@ resource "sonarr_notification" "example" {
 - `access_token_secret` (String, Sensitive) Access token secret.
 - `always_update` (Boolean) Always update flag.
 - `api_key` (String, Sensitive) API key.
-- `app_token` (String) App token.
+- `app_token` (String, Sensitive) App token.
 - `arguments` (String) Arguments.
 - `auth_token` (String, Sensitive) Auth token.
 - `auth_user` (String) Auth user.

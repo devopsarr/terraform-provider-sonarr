@@ -291,6 +291,7 @@ func (r *NotificationResource) Schema(ctx context.Context, req resource.SchemaRe
 				MarkdownDescription: "App token.",
 				Optional:            true,
 				Computed:            true,
+				Sensitive:           true,
 			},
 			"arguments": schema.StringAttribute{
 				MarkdownDescription: "Arguments.",
