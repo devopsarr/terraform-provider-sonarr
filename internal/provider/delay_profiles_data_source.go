@@ -82,7 +82,7 @@ func (d *DelayProfilesDataSource) Schema(ctx context.Context, req datasource.Sch
 						},
 						"tags": schema.SetAttribute{
 							MarkdownDescription: "List of associated tags.",
-							Optional:            true,
+							Computed:            true,
 							ElementType:         types.Int64Type,
 						},
 						"preferred_protocol": schema.StringAttribute{

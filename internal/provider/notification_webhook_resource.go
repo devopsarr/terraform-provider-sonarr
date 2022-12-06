@@ -338,9 +338,12 @@ func (n *NotificationWebhook) write(ctx context.Context, notification *sonarr.No
 		IncludeHealthWarnings:         types.BoolValue(notification.IncludeHealthWarnings),
 		ID:                            types.Int64Value(notification.ID),
 		Name:                          types.StringValue(notification.Name),
-		Tags:                          types.SetValueMust(types.Int64Type, nil),
+		Tags:                          types.SetNull(types.Int64Type),
 	}
-	tfsdk.ValueFrom(ctx, notification.Tags, genericNotification.Tags.Type(ctx), &genericNotification.Tags)
+	if !n.Tags.IsNull() || !(len(notification.Tags) == 0) {
+		genericNotification.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, notification.Tags)
+	}
+
 	genericNotification.writeFields(ctx, notification.Fields)
 	n.fromNotification(&genericNotification)
 }

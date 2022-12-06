@@ -283,6 +283,7 @@ func (r *IndexerResource) Create(ctx context.Context, req resource.CreateRequest
 	// Generate resource state struct.
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state Indexer
+	state.Tags = indexer.Tags
 
 	state.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
@@ -310,6 +311,7 @@ func (r *IndexerResource) Read(ctx context.Context, req resource.ReadRequest, re
 	// Generate resource state struct.
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state Indexer
+	state.Tags = indexer.Tags
 
 	state.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
@@ -339,6 +341,7 @@ func (r *IndexerResource) Update(ctx context.Context, req resource.UpdateRequest
 	// Generate resource state struct.
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state Indexer
+	state.Tags = indexer.Tags
 
 	state.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
@@ -382,6 +385,10 @@ func (r *IndexerResource) ImportState(ctx context.Context, req resource.ImportSt
 }
 
 func (i *Indexer) write(ctx context.Context, indexer *sonarr.IndexerOutput) {
+	if !i.Tags.IsNull() && len(indexer.Tags) == 0 {
+		i.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, indexer.Tags)
+	}
+
 	i.EnableAutomaticSearch = types.BoolValue(indexer.EnableAutomaticSearch)
 	i.EnableInteractiveSearch = types.BoolValue(indexer.EnableInteractiveSearch)
 	i.EnableRss = types.BoolValue(indexer.EnableRss)
@@ -392,10 +399,8 @@ func (i *Indexer) write(ctx context.Context, indexer *sonarr.IndexerOutput) {
 	i.Implementation = types.StringValue(indexer.Implementation)
 	i.Name = types.StringValue(indexer.Name)
 	i.Protocol = types.StringValue(indexer.Protocol)
-	i.Tags = types.SetValueMust(types.Int64Type, nil)
 	i.AnimeCategories = types.SetValueMust(types.Int64Type, nil)
 	i.Categories = types.SetValueMust(types.Int64Type, nil)
-	tfsdk.ValueFrom(ctx, indexer.Tags, i.Tags.Type(ctx), &i.Tags)
 	i.writeFields(ctx, indexer.Fields)
 }
 

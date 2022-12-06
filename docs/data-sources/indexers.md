@@ -28,10 +28,6 @@ data "sonarr_indexers" "example" {
 <a id="nestedatt--indexers"></a>
 ### Nested Schema for `indexers`
 
-Optional:
-
-- `tags` (Set of Number) List of associated tags.
-
 Read-Only:
 
 - `additional_parameters` (String) Additional parameters.
@@ -61,6 +57,7 @@ Read-Only:
 - `season_pack_seed_time` (Number) Season seed time.
 - `seed_ratio` (Number) Seed ratio.
 - `seed_time` (Number) Seed time.
+- `tags` (Set of Number) List of associated tags.
 - `username` (String) Username.
 
 

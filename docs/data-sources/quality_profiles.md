@@ -39,14 +39,11 @@ Read-Only:
 <a id="nestedatt--quality_profiles--quality_groups"></a>
 ### Nested Schema for `quality_profiles.quality_groups`
 
-Required:
-
-- `qualities` (Attributes Set) Qualities in group. (see [below for nested schema](#nestedatt--quality_profiles--quality_groups--qualities))
-
 Read-Only:
 
 - `id` (Number) Quality group ID.
 - `name` (String) Quality group name.
+- `qualities` (Attributes Set) Qualities in group. (see [below for nested schema](#nestedatt--quality_profiles--quality_groups--qualities))
 
 <a id="nestedatt--quality_profiles--quality_groups--qualities"></a>
 ### Nested Schema for `quality_profiles.quality_groups.qualities`

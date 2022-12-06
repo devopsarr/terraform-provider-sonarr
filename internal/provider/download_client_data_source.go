@@ -5,10 +5,8 @@ import (
 	"fmt"
 
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
-	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr/sonarr"
@@ -122,9 +120,6 @@ func (d *DownloadClientDataSource) Schema(ctx context.Context, req datasource.Sc
 			"older_tv_priority": schema.Int64Attribute{
 				MarkdownDescription: "Older TV priority. `0` Last, `1` First.",
 				Computed:            true,
-				Validators: []validator.Int64{
-					int64validator.OneOf(0, 1),
-				},
 			},
 			"initial_state": schema.Int64Attribute{
 				MarkdownDescription: "Initial state. `0` Start, `1` ForceStart, `2` Pause.",

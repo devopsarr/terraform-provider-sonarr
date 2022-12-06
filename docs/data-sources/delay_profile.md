@@ -25,10 +25,6 @@ data "sonarr_delay_profile" "example" {
 
 - `id` (Number) Delay Profile ID.
 
-### Optional
-
-- `tags` (Set of Number) List of associated tags.
-
 ### Read-Only
 
 - `bypass_if_highest_quality` (Boolean) Bypass for highest quality Flag.
@@ -36,6 +32,7 @@ data "sonarr_delay_profile" "example" {
 - `enable_usenet` (Boolean) Usenet allowed Flag.
 - `order` (Number) Order.
 - `preferred_protocol` (String) Preferred protocol.
+- `tags` (Set of Number) List of associated tags.
 - `torrent_delay` (Number) Torrent Delay.
 - `usenet_delay` (Number) Usenet delay.
 

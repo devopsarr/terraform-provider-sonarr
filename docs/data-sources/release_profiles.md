@@ -28,10 +28,6 @@ data "sonarr_release_profiles" "example" {
 <a id="nestedatt--release_profiles"></a>
 ### Nested Schema for `release_profiles`
 
-Optional:
-
-- `tags` (Set of Number) List of associated tags.
-
 Read-Only:
 
 - `enabled` (Boolean) Enabled
@@ -40,5 +36,6 @@ Read-Only:
 - `indexer_id` (Number) Indexer ID. Set `0` for all.
 - `name` (String) Release profile name.
 - `required` (Set of String) Required terms.
+- `tags` (Set of Number) List of associated tags.
 
 

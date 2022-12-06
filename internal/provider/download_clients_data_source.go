@@ -41,14 +41,14 @@ func (d *DownloadClientsDataSource) Metadata(ctx context.Context, req datasource
 func (d *DownloadClientsDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the delay server.
-		MarkdownDescription: "<!-- subcategory:Download Clients -->List all available [DownloadClients](../resources/download_client).",
+		MarkdownDescription: "<!-- subcategory:Download Clients -->List all available [Download Clients](../resources/download_client).",
 		Attributes: map[string]schema.Attribute{
 			// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 			"id": schema.StringAttribute{
 				Computed: true,
 			},
 			"download_clients": schema.SetNestedAttribute{
-				MarkdownDescription: "Download Client list..",
+				MarkdownDescription: "Download Client list.",
 				Computed:            true,
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
@@ -86,7 +86,7 @@ func (d *DownloadClientsDataSource) Schema(ctx context.Context, req datasource.S
 						},
 						"tags": schema.SetAttribute{
 							MarkdownDescription: "List of associated tags.",
-							Optional:            true,
+							Computed:            true,
 							ElementType:         types.Int64Type,
 						},
 						"id": schema.Int64Attribute{
@@ -171,11 +171,11 @@ func (d *DownloadClientsDataSource) Schema(ctx context.Context, req datasource.S
 						"username": schema.StringAttribute{
 							MarkdownDescription: "Username.",
 							Computed:            true,
-							Sensitive:           true,
 						},
 						"password": schema.StringAttribute{
 							MarkdownDescription: "Password.",
 							Computed:            true,
+							Sensitive:           true,
 						},
 						"tv_category": schema.StringAttribute{
 							MarkdownDescription: "TV category.",
@@ -205,12 +205,12 @@ func (d *DownloadClientsDataSource) Schema(ctx context.Context, req datasource.S
 							MarkdownDescription: "STRM folder.",
 							Computed:            true,
 						},
-						"torrent_folder": schema.StringAttribute{
-							MarkdownDescription: "Torrent folder.",
-							Computed:            true,
-						},
 						"watch_folder": schema.StringAttribute{
 							MarkdownDescription: "Watch folder flag.",
+							Computed:            true,
+						},
+						"torrent_folder": schema.StringAttribute{
+							MarkdownDescription: "Torrent folder.",
 							Computed:            true,
 						},
 						"magnet_file_extension": schema.StringAttribute{
@@ -276,12 +276,13 @@ func (d *DownloadClientsDataSource) Read(ctx context.Context, req datasource.Rea
 
 	tflog.Trace(ctx, "read "+downloadClientsDataSourceName)
 	// Map response body to resource schema attribute
-	profiles := make([]DownloadClient, len(response))
-	for i, p := range response {
-		profiles[i].write(ctx, p)
+	downloadClients := make([]DownloadClient, len(response))
+	for i, d := range response {
+		downloadClients[i].Tags = types.SetNull(types.Int64Type)
+		downloadClients[i].write(ctx, d)
 	}
 
-	tfsdk.ValueFrom(ctx, profiles, data.DownloadClients.Type(context.Background()), &data.DownloadClients)
+	tfsdk.ValueFrom(ctx, downloadClients, data.DownloadClients.Type(context.Background()), &data.DownloadClients)
 	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 	data.ID = types.StringValue(strconv.Itoa(len(response)))
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

@@ -80,7 +80,7 @@ func (d *ReleaseProfilesDataSource) Schema(ctx context.Context, req datasource.S
 						},
 						"tags": schema.SetAttribute{
 							MarkdownDescription: "List of associated tags.",
-							Optional:            true,
+							Computed:            true,
 							ElementType:         types.Int64Type,
 						},
 					},

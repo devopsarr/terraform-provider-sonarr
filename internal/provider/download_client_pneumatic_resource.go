@@ -273,9 +273,12 @@ func (d *DownloadClientPneumatic) write(ctx context.Context, downloadClient *son
 		Priority:                 types.Int64Value(int64(downloadClient.Priority)),
 		ID:                       types.Int64Value(downloadClient.ID),
 		Name:                     types.StringValue(downloadClient.Name),
-		Tags:                     types.SetValueMust(types.Int64Type, nil),
+		Tags:                     types.SetNull(types.Int64Type),
 	}
-	tfsdk.ValueFrom(ctx, downloadClient.Tags, genericDownloadClient.Tags.Type(ctx), &genericDownloadClient.Tags)
+	if !d.Tags.IsNull() || !(len(downloadClient.Tags) == 0) {
+		genericDownloadClient.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, downloadClient.Tags)
+	}
+
 	genericDownloadClient.writeFields(ctx, downloadClient.Fields)
 	d.fromDownloadClient(&genericDownloadClient)
 }

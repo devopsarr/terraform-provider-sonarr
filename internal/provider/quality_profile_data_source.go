@@ -65,7 +65,7 @@ func (d *QualityProfileDataSource) Schema(ctx context.Context, req datasource.Sc
 						},
 						"qualities": schema.SetNestedAttribute{
 							MarkdownDescription: "Qualities in group.",
-							Required:            true,
+							Computed:            true,
 							NestedObject: schema.NestedAttributeObject{
 								Attributes: map[string]schema.Attribute{
 									"id": schema.Int64Attribute{

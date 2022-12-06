@@ -546,6 +546,7 @@ func (r *NotificationResource) Create(ctx context.Context, req resource.CreateRe
 	// Generate resource state struct
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state Notification
+	state.Tags = notification.Tags
 
 	state.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
@@ -573,6 +574,7 @@ func (r *NotificationResource) Read(ctx context.Context, req resource.ReadReques
 	// Map response body to resource schema attribute
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state Notification
+	state.Tags = notification.Tags
 
 	state.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
@@ -602,6 +604,7 @@ func (r *NotificationResource) Update(ctx context.Context, req resource.UpdateRe
 	// Generate resource state struct
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state Notification
+	state.Tags = notification.Tags
 
 	state.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
@@ -645,6 +648,10 @@ func (r *NotificationResource) ImportState(ctx context.Context, req resource.Imp
 }
 
 func (n *Notification) write(ctx context.Context, notification *sonarr.NotificationOutput) {
+	if !n.Tags.IsNull() && len(notification.Tags) == 0 {
+		n.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, notification.Tags)
+	}
+
 	n.OnGrab = types.BoolValue(notification.OnGrab)
 	n.OnDownload = types.BoolValue(notification.OnDownload)
 	n.OnUpgrade = types.BoolValue(notification.OnUpgrade)
@@ -659,12 +666,10 @@ func (n *Notification) write(ctx context.Context, notification *sonarr.Notificat
 	n.Name = types.StringValue(notification.Name)
 	n.Implementation = types.StringValue(notification.Implementation)
 	n.ConfigContract = types.StringValue(notification.ConfigContract)
-	n.Tags = types.SetValueMust(types.Int64Type, nil)
 	n.ChannelTags = types.SetValueMust(types.StringType, nil)
 	n.DeviceIds = types.SetValueMust(types.StringType, nil)
 	n.Devices = types.SetValueMust(types.StringType, nil)
 	n.Recipients = types.SetValueMust(types.StringType, nil)
-	tfsdk.ValueFrom(ctx, notification.Tags, n.Tags.Type(ctx), &n.Tags)
 	n.writeFields(ctx, notification.Fields)
 }
 

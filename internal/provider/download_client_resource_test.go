@@ -53,5 +53,6 @@ func testAccDownloadClientResourceConfig(name, enable string) string {
 		host = "transmission"
 		url_base = "/transmission/"
 		port = 9091
+		tags = []
 	}`, enable, name)
 }

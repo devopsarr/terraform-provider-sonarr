@@ -54,7 +54,7 @@ func (r *TagResource) Schema(ctx context.Context, req resource.SchemaRequest, re
 				Required:            true,
 				Validators: []validator.String{
 					stringvalidator.RegexMatches(
-						regexp.MustCompile(`^.*[A-Z]+.*$`),
+						regexp.MustCompile(`^.*[^A-Z]+.*$`),
 						"String cannot contains uppercase values",
 					),
 				},

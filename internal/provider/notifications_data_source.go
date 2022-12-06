@@ -106,7 +106,7 @@ func (d *NotificationsDataSource) Schema(ctx context.Context, req datasource.Sch
 						},
 						"tags": schema.SetAttribute{
 							MarkdownDescription: "List of associated tags.",
-							Optional:            true,
+							Computed:            true,
 							ElementType:         types.Int64Type,
 						},
 						"id": schema.Int64Attribute{
@@ -395,12 +395,13 @@ func (d *NotificationsDataSource) Read(ctx context.Context, req datasource.ReadR
 
 	tflog.Trace(ctx, "read "+notificationsDataSourceName)
 	// Map response body to resource schema attribute
-	profiles := make([]Notification, len(response))
-	for i, p := range response {
-		profiles[i].write(ctx, p)
+	notifications := make([]Notification, len(response))
+	for i, n := range response {
+		notifications[i].Tags = types.SetNull(types.Int64Type)
+		notifications[i].write(ctx, n)
 	}
 
-	tfsdk.ValueFrom(ctx, profiles, data.Notifications.Type(context.Background()), &data.Notifications)
+	tfsdk.ValueFrom(ctx, notifications, data.Notifications.Type(context.Background()), &data.Notifications)
 	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 	data.ID = types.StringValue(strconv.Itoa(len(response)))
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

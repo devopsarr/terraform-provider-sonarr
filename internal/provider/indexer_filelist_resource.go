@@ -341,9 +341,12 @@ func (i *IndexerFilelist) write(ctx context.Context, indexer *sonarr.IndexerOutp
 		DownloadClientID:        types.Int64Value(indexer.DownloadClientID),
 		ID:                      types.Int64Value(indexer.ID),
 		Name:                    types.StringValue(indexer.Name),
-		Tags:                    types.SetValueMust(types.Int64Type, nil),
+		Tags:                    types.SetNull(types.Int64Type),
 	}
-	tfsdk.ValueFrom(ctx, indexer.Tags, genericIndexer.Tags.Type(ctx), &genericIndexer.Tags)
+	if !i.Tags.IsNull() || !(len(indexer.Tags) == 0) {
+		genericIndexer.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, indexer.Tags)
+	}
+
 	genericIndexer.writeFields(ctx, indexer.Fields)
 	i.fromIndexer(&genericIndexer)
 }

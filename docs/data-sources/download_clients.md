@@ -3,12 +3,12 @@
 page_title: "sonarr_download_clients Data Source - terraform-provider-sonarr"
 subcategory: "Download Clients"
 description: |-
-  List all available DownloadClients ../resources/download_client.
+  List all available Download Clients ../resources/download_client.
 ---
 
 # sonarr_download_clients (Data Source)
 
-<!-- subcategory:Download Clients -->List all available [DownloadClients](../resources/download_client).
+<!-- subcategory:Download Clients -->List all available [Download Clients](../resources/download_client).
 
 ## Example Usage
 
@@ -22,15 +22,11 @@ data "sonarr_download_clients" "example" {
 
 ### Read-Only
 
-- `download_clients` (Attributes Set) Download Client list.. (see [below for nested schema](#nestedatt--download_clients))
+- `download_clients` (Attributes Set) Download Client list. (see [below for nested schema](#nestedatt--download_clients))
 - `id` (String) The ID of this resource.
 
 <a id="nestedatt--download_clients"></a>
 ### Nested Schema for `download_clients`
-
-Optional:
-
-- `tags` (Set of Number) List of associated tags.
 
 Read-Only:
 
@@ -53,7 +49,7 @@ Read-Only:
 - `name` (String) Download Client name.
 - `nzb_folder` (String) NZB folder.
 - `older_tv_priority` (Number) Older TV priority. `0` Last, `1` First.
-- `password` (String) Password.
+- `password` (String, Sensitive) Password.
 - `port` (Number) Port.
 - `post_import_tags` (Set of String) Post import tags.
 - `priority` (Number) Priority.
@@ -68,13 +64,14 @@ Read-Only:
 - `sequential_order` (Boolean) Sequential order flag.
 - `start_on_add` (Boolean) Start on add flag.
 - `strm_folder` (String) STRM folder.
+- `tags` (Set of Number) List of associated tags.
 - `torrent_folder` (String) Torrent folder.
 - `tv_category` (String) TV category.
 - `tv_directory` (String) TV directory.
 - `tv_imported_category` (String) TV imported category.
 - `url_base` (String) Base URL.
 - `use_ssl` (Boolean) Use SSL flag.
-- `username` (String, Sensitive) Username.
+- `username` (String) Username.
 - `watch_folder` (String) Watch folder flag.
 
 

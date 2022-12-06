@@ -275,6 +275,10 @@ func (r *SeriesResource) ImportState(ctx context.Context, req resource.ImportSta
 }
 
 func (s *Series) write(ctx context.Context, series *sonarr.Series) {
+	if !s.Tags.IsNull() || !(len(series.Tags) == 0) {
+		s.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, series.Tags)
+	}
+
 	s.Monitored = types.BoolValue(series.Monitored)
 	s.SeasonFolder = types.BoolValue(series.SeasonFolder)
 	s.UseSceneNumbering = types.BoolValue(series.UseSceneNumbering)
@@ -286,8 +290,6 @@ func (s *Series) write(ctx context.Context, series *sonarr.Series) {
 	s.Title = types.StringValue(series.Title)
 	s.TitleSlug = types.StringValue(series.TitleSlug)
 	s.RootFolderPath = types.StringValue(series.RootFolderPath)
-	s.Tags = types.SetValueMust(types.Int64Type, nil)
-	tfsdk.ValueFrom(ctx, series.Tags, s.Tags.Type(ctx), &s.Tags)
 }
 
 func (s *Series) read(ctx context.Context) *sonarr.AddSeriesInput {
