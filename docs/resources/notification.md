@@ -80,7 +80,7 @@ resource "sonarr_notification" "example" {
 - `device_names` (String) Device names.
 - `devices` (Set of String) Devices.
 - `direct_message` (Boolean) Direct message flag.
-- `display_time` (String) Display time.
+- `display_time` (Number) Display time.
 - `expire` (String) Expire.
 - `expires` (String) Expires.
 - `from` (String) From.

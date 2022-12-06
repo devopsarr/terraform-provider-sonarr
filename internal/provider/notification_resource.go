@@ -29,8 +29,8 @@ var _ resource.ResourceWithImportState = &NotificationResource{}
 
 var (
 	notificationBoolFields        = []string{"alwaysUpdate", "cleanLibrary", "directMessage", "notify", "requireEncryption", "sendSilently", "updateLibrary", "useEuEndpoint", "useSSL"}
-	notificationStringFields      = []string{"accessToken", "accessTokenSecret", "apiKey", "appToken", "arguments", "author", "authToken", "authUser", "avatar", "botToken", "channel", "chatId", "consumerKey", "consumerSecret", "deviceNames", "displayTime", "expire", "expires", "from", "host", "icon", "mention", "password", "path", "refreshToken", "retry", "senderDomain", "senderId", "server", "signIn", "sound", "token", "url", "userKey", "username", "webHookUrl"}
-	notificationIntFields         = []string{"method", "port", "priority"}
+	notificationStringFields      = []string{"accessToken", "accessTokenSecret", "apiKey", "appToken", "arguments", "author", "authToken", "authUser", "avatar", "botToken", "channel", "chatId", "consumerKey", "consumerSecret", "deviceNames", "expire", "expires", "from", "host", "icon", "mention", "password", "path", "refreshToken", "retry", "senderDomain", "senderId", "server", "signIn", "sound", "token", "url", "userKey", "username", "webHookUrl"}
+	notificationIntFields         = []string{"method", "port", "priority", "displayTime"}
 	notificationStringSliceFields = []string{"channelTags", "deviceIds", "devices", "recipients", "to", "cc", "bcc"}
 	notificationIntSliceFields    = []string{"grabFields", "importFields"}
 )
@@ -94,7 +94,7 @@ type Notification struct {
 	ConsumerKey                   types.String `tfsdk:"consumer_key"`
 	ConsumerSecret                types.String `tfsdk:"consumer_secret"`
 	DeviceNames                   types.String `tfsdk:"device_names"`
-	DisplayTime                   types.String `tfsdk:"display_time"`
+	DisplayTime                   types.Int64  `tfsdk:"display_time"`
 	Priority                      types.Int64  `tfsdk:"priority"`
 	Port                          types.Int64  `tfsdk:"port"`
 	Method                        types.Int64  `tfsdk:"method"`
@@ -338,7 +338,7 @@ func (r *NotificationResource) Schema(ctx context.Context, req resource.SchemaRe
 				Optional:            true,
 				Computed:            true,
 			},
-			"display_time": schema.StringAttribute{
+			"display_time": schema.Int64Attribute{
 				MarkdownDescription: "Display time.",
 				Optional:            true,
 				Computed:            true,
