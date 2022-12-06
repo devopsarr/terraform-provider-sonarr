@@ -666,10 +666,15 @@ func (n *Notification) write(ctx context.Context, notification *sonarr.Notificat
 	n.Name = types.StringValue(notification.Name)
 	n.Implementation = types.StringValue(notification.Implementation)
 	n.ConfigContract = types.StringValue(notification.ConfigContract)
+	n.ImportFields = types.SetValueMust(types.Int64Type, nil)
+	n.GrabFields = types.SetValueMust(types.Int64Type, nil)
 	n.ChannelTags = types.SetValueMust(types.StringType, nil)
 	n.DeviceIds = types.SetValueMust(types.StringType, nil)
 	n.Devices = types.SetValueMust(types.StringType, nil)
 	n.Recipients = types.SetValueMust(types.StringType, nil)
+	n.To = types.SetValueMust(types.StringType, nil)
+	n.Cc = types.SetValueMust(types.StringType, nil)
+	n.Bcc = types.SetValueMust(types.StringType, nil)
 	n.writeFields(ctx, notification.Fields)
 }
 
@@ -699,10 +704,14 @@ func (n *Notification) writeFields(ctx context.Context, fields []*starr.FieldOut
 
 		if slices.Contains(notificationStringSliceFields, f.Name) {
 			tools.WriteStringSliceField(ctx, f, n)
+
+			continue
 		}
 
 		if slices.Contains(notificationIntSliceFields, f.Name) {
 			tools.WriteIntSliceField(ctx, f, n)
+
+			continue
 		}
 	}
 }

@@ -6,9 +6,11 @@ import (
 	"strconv"
 
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -89,85 +91,70 @@ func (r *NotificationBoxcarResource) Metadata(ctx context.Context, req resource.
 	resp.TypeName = req.ProviderTypeName + "_" + notificationBoxcarResourceName
 }
 
-func (r *NotificationBoxcarResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+func (r *NotificationBoxcarResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		MarkdownDescription: "<!-- subcategory:Notifications -->Notification Boxcar resource.\nFor more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect) and [Boxcar](https://wiki.servarr.com/sonarr/supported#boxcar).",
-		Attributes: map[string]tfsdk.Attribute{
-			"on_grab": {
+		Attributes: map[string]schema.Attribute{
+			"on_grab": schema.BoolAttribute{
 				MarkdownDescription: "On grab flag.",
 				Required:            true,
-				Type:                types.BoolType,
 			},
-			"on_download": {
+			"on_download": schema.BoolAttribute{
 				MarkdownDescription: "On download flag.",
 				Required:            true,
-				Type:                types.BoolType,
 			},
-			"on_upgrade": {
+			"on_upgrade": schema.BoolAttribute{
 				MarkdownDescription: "On upgrade flag.",
 				Required:            true,
-				Type:                types.BoolType,
 			},
-			"on_series_delete": {
+			"on_series_delete": schema.BoolAttribute{
 				MarkdownDescription: "On series delete flag.",
 				Required:            true,
-				Type:                types.BoolType,
 			},
-			"on_episode_file_delete": {
+			"on_episode_file_delete": schema.BoolAttribute{
 				MarkdownDescription: "On episode file delete flag.",
 				Required:            true,
-				Type:                types.BoolType,
 			},
-			"on_episode_file_delete_for_upgrade": {
+			"on_episode_file_delete_for_upgrade": schema.BoolAttribute{
 				MarkdownDescription: "On episode file delete for upgrade flag.",
 				Required:            true,
-				Type:                types.BoolType,
 			},
-			"on_health_issue": {
+			"on_health_issue": schema.BoolAttribute{
 				MarkdownDescription: "On health issue flag.",
 				Required:            true,
-				Type:                types.BoolType,
 			},
-			"on_application_update": {
+			"on_application_update": schema.BoolAttribute{
 				MarkdownDescription: "On application update flag.",
 				Required:            true,
-				Type:                types.BoolType,
 			},
-			"include_health_warnings": {
+			"include_health_warnings": schema.BoolAttribute{
 				MarkdownDescription: "Include health warnings.",
 				Required:            true,
-				Type:                types.BoolType,
 			},
-			"name": {
+			"name": schema.StringAttribute{
 				MarkdownDescription: "NotificationBoxcar name.",
 				Required:            true,
-				Type:                types.StringType,
 			},
-			"tags": {
+			"tags": schema.SetAttribute{
 				MarkdownDescription: "List of associated tags.",
 				Optional:            true,
-				Computed:            true,
-				Type: types.SetType{
-					ElemType: types.Int64Type,
-				},
+				ElementType:         types.Int64Type,
 			},
-			"id": {
+			"id": schema.Int64Attribute{
 				MarkdownDescription: "Notification ID.",
 				Computed:            true,
-				Type:                types.Int64Type,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					resource.UseStateForUnknown(),
+				PlanModifiers: []planmodifier.Int64{
+					int64planmodifier.UseStateForUnknown(),
 				},
 			},
 			// Field values
-			"token": {
+			"token": schema.StringAttribute{
 				MarkdownDescription: "Token.",
 				Required:            true,
 				Sensitive:           true,
-				Type:                types.StringType,
 			},
 		},
-	}, nil
+	}
 }
 
 func (r *NotificationBoxcarResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
@@ -315,9 +302,12 @@ func (n *NotificationBoxcar) write(ctx context.Context, notification *sonarr.Not
 		IncludeHealthWarnings:         types.BoolValue(notification.IncludeHealthWarnings),
 		ID:                            types.Int64Value(notification.ID),
 		Name:                          types.StringValue(notification.Name),
-		Tags:                          types.SetValueMust(types.Int64Type, nil),
+		Tags:                          types.SetNull(types.Int64Type),
 	}
-	tfsdk.ValueFrom(ctx, notification.Tags, genericNotification.Tags.Type(ctx), &genericNotification.Tags)
+	if !n.Tags.IsNull() || !(len(notification.Tags) == 0) {
+		genericNotification.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, notification.Tags)
+	}
+
 	genericNotification.writeFields(ctx, notification.Fields)
 	n.fromNotification(&genericNotification)
 }
