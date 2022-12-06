@@ -1,5 +1,37 @@
 # Changelog
 
+## [2.5.0](https://github.com/devopsarr/terraform-provider-sonarr/compare/v2.4.0...v2.5.0) (2022-12-06)
+
+
+### Features
+
+* add notification boxcar resource ([5366ec2](https://github.com/devopsarr/terraform-provider-sonarr/commit/5366ec29fd5298186c4e96b2c89ac0b4f1116446))
+* add notification discord resource ([b1e0303](https://github.com/devopsarr/terraform-provider-sonarr/commit/b1e030370ec1391b045a12697966b474c57f593c))
+* add notification email resource ([8344c92](https://github.com/devopsarr/terraform-provider-sonarr/commit/8344c92be1e1bd47a5972d23fe69d6fceec59558))
+* add notification emby resource ([be53d09](https://github.com/devopsarr/terraform-provider-sonarr/commit/be53d090e78f556166c316fae2287af89a987a6b))
+* add notification gotify resource ([cb17bb9](https://github.com/devopsarr/terraform-provider-sonarr/commit/cb17bb99a668d83bdbae8b928bc551fdb1717d1c))
+* add notification join resource ([446374e](https://github.com/devopsarr/terraform-provider-sonarr/commit/446374e20566c14a4f7d88e5aa5ec4e97b1e11f9))
+* add notification kodi resource ([6b75f52](https://github.com/devopsarr/terraform-provider-sonarr/commit/6b75f5249fe85a33ef045a98a2b94ff9cd7fbfcd))
+* add notification mailgun resource ([35c60a8](https://github.com/devopsarr/terraform-provider-sonarr/commit/35c60a89ba695e975342eb74de1d2897c406d226))
+* add notification plex resource ([c6b0948](https://github.com/devopsarr/terraform-provider-sonarr/commit/c6b09480eebdf0c90487245cce93a4c11d524edc))
+* add notification prowl resource ([9ed0337](https://github.com/devopsarr/terraform-provider-sonarr/commit/9ed03376aa63ce08bddee77073117b87266056ed))
+* add notification pushbullet resource ([3735a00](https://github.com/devopsarr/terraform-provider-sonarr/commit/3735a00dee5c9064c989364a6bf9070e0433d1ec))
+* add notification pushover resource ([37c8912](https://github.com/devopsarr/terraform-provider-sonarr/commit/37c8912332bc000290ae71822202f0716636b548))
+* add notification sendgrid resource ([0e6e2a7](https://github.com/devopsarr/terraform-provider-sonarr/commit/0e6e2a7ed06bd73063dd1d694af6d17b3db0293d))
+* add notification slack resource ([7afbf19](https://github.com/devopsarr/terraform-provider-sonarr/commit/7afbf194790da4500f4162b919912e74d0e292a3))
+* add notification synology indexer resource ([8a2973e](https://github.com/devopsarr/terraform-provider-sonarr/commit/8a2973e451547873f99d5e9b5b4ccdb8b2a21066))
+* add notification telegram resource ([ac3960b](https://github.com/devopsarr/terraform-provider-sonarr/commit/ac3960b912c7fe1cbf9e8d6e84d9ad5bf6030c1b))
+* add notification twitter resource ([b82990d](https://github.com/devopsarr/terraform-provider-sonarr/commit/b82990dc9acd667a25f210710377d39497e9c70a))
+
+
+### Bug Fixes
+
+* correct few notification types ([203d1ae](https://github.com/devopsarr/terraform-provider-sonarr/commit/203d1aecd6c56b44089941bae07e7f67ba8934cc))
+* notification email fields type ([53b5dcd](https://github.com/devopsarr/terraform-provider-sonarr/commit/53b5dcdabe4dd7ddc015327f625bef87826cf5c7))
+* removed unused on_rename ([51bafc9](https://github.com/devopsarr/terraform-provider-sonarr/commit/51bafc96435e5ae60b853ca0c0d3cf9a81170110))
+* tags behaviour with null and empty array ([8936dc7](https://github.com/devopsarr/terraform-provider-sonarr/commit/8936dc7d02e305d30f93f870b507d58e222aadb4))
+* update grabfields and importfields type ([ed4472a](https://github.com/devopsarr/terraform-provider-sonarr/commit/ed4472a42e95c48f67ca156a3290284749810cd5))
+
 ## [2.4.0](https://github.com/devopsarr/terraform-provider-sonarr/compare/v2.3.0...v2.4.0) (2022-11-25)
 
 
