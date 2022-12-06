@@ -81,7 +81,7 @@ resource "sonarr_notification" "example" {
 - `devices` (Set of String) Devices.
 - `direct_message` (Boolean) Direct message flag.
 - `display_time` (Number) Display time.
-- `expire` (String) Expire.
+- `expire` (Number) Expire.
 - `expires` (String) Expires.
 - `from` (String) From.
 - `grab_fields` (Set of Number) Grab fields. `0` Overview, `1` Rating, `2` Genres, `3` Quality, `4` Group, `5` Size, `6` Links, `7` Release, `8` Poster, `9` Fanart.
@@ -98,7 +98,7 @@ resource "sonarr_notification" "example" {
 - `recipients` (Set of String) Recipients.
 - `refresh_token` (String) Refresh token.
 - `require_encryption` (Boolean) Require encryption flag.
-- `retry` (String) Retry.
+- `retry` (Number) Retry.
 - `send_silently` (Boolean) Add silently flag.
 - `sender_domain` (String) Sender domain.
 - `sender_id` (String) Sender ID.

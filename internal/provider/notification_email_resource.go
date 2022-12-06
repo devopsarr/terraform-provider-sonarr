@@ -162,6 +162,7 @@ func (r *NotificationEmailResource) Schema(ctx context.Context, req resource.Sch
 			"tags": schema.SetAttribute{
 				MarkdownDescription: "List of associated tags.",
 				Optional:            true,
+				Computed:            true,
 				ElementType:         types.Int64Type,
 			},
 			"id": schema.Int64Attribute{
@@ -367,12 +368,8 @@ func (n *NotificationEmail) write(ctx context.Context, notification *sonarr.Noti
 		IncludeHealthWarnings:         types.BoolValue(notification.IncludeHealthWarnings),
 		ID:                            types.Int64Value(notification.ID),
 		Name:                          types.StringValue(notification.Name),
-		Tags:                          types.SetNull(types.Int64Type),
 	}
-	if !n.Tags.IsNull() || !(len(notification.Tags) == 0) {
-		genericNotification.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, notification.Tags)
-	}
-
+	genericNotification.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, notification.Tags)
 	genericNotification.writeFields(ctx, notification.Fields)
 	n.fromNotification(&genericNotification)
 }

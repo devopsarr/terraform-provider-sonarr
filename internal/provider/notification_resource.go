@@ -29,8 +29,8 @@ var _ resource.ResourceWithImportState = &NotificationResource{}
 
 var (
 	notificationBoolFields        = []string{"alwaysUpdate", "cleanLibrary", "directMessage", "notify", "requireEncryption", "sendSilently", "updateLibrary", "useEuEndpoint", "useSSL"}
-	notificationStringFields      = []string{"accessToken", "accessTokenSecret", "apiKey", "appToken", "arguments", "author", "authToken", "authUser", "avatar", "botToken", "channel", "chatId", "consumerKey", "consumerSecret", "deviceNames", "expire", "expires", "from", "host", "icon", "mention", "password", "path", "refreshToken", "retry", "senderDomain", "senderId", "server", "signIn", "sound", "token", "url", "userKey", "username", "webHookUrl"}
-	notificationIntFields         = []string{"method", "port", "priority", "displayTime"}
+	notificationStringFields      = []string{"accessToken", "accessTokenSecret", "apiKey", "appToken", "arguments", "author", "authToken", "authUser", "avatar", "botToken", "channel", "chatId", "consumerKey", "consumerSecret", "deviceNames", "expires", "from", "host", "icon", "mention", "password", "path", "refreshToken", "senderDomain", "senderId", "server", "signIn", "sound", "token", "url", "userKey", "username", "webHookUrl"}
+	notificationIntFields         = []string{"method", "port", "priority", "retry", "expire", "displayTime"}
 	notificationStringSliceFields = []string{"channelTags", "deviceIds", "devices", "recipients", "to", "cc", "bcc"}
 	notificationIntSliceFields    = []string{"grabFields", "importFields"}
 )
@@ -77,7 +77,6 @@ type Notification struct {
 	Host                          types.String `tfsdk:"host"`
 	From                          types.String `tfsdk:"from"`
 	Expires                       types.String `tfsdk:"expires"`
-	Expire                        types.String `tfsdk:"expire"`
 	AccessToken                   types.String `tfsdk:"access_token"`
 	AccessTokenSecret             types.String `tfsdk:"access_token_secret"`
 	APIKey                        types.String `tfsdk:"api_key"`
@@ -87,17 +86,18 @@ type Notification struct {
 	AuthToken                     types.String `tfsdk:"auth_token"`
 	AuthUser                      types.String `tfsdk:"auth_user"`
 	Implementation                types.String `tfsdk:"implementation"`
-	Retry                         types.String `tfsdk:"retry"`
 	Password                      types.String `tfsdk:"password"`
 	Channel                       types.String `tfsdk:"channel"`
 	ChatID                        types.String `tfsdk:"chat_id"`
 	ConsumerKey                   types.String `tfsdk:"consumer_key"`
 	ConsumerSecret                types.String `tfsdk:"consumer_secret"`
 	DeviceNames                   types.String `tfsdk:"device_names"`
+	Expire                        types.Int64  `tfsdk:"expire"`
 	DisplayTime                   types.Int64  `tfsdk:"display_time"`
 	Priority                      types.Int64  `tfsdk:"priority"`
 	Port                          types.Int64  `tfsdk:"port"`
 	Method                        types.Int64  `tfsdk:"method"`
+	Retry                         types.Int64  `tfsdk:"retry"`
 	ID                            types.Int64  `tfsdk:"id"`
 	UpdateLibrary                 types.Bool   `tfsdk:"update_library"`
 	OnGrab                        types.Bool   `tfsdk:"on_grab"`
@@ -183,6 +183,7 @@ func (r *NotificationResource) Schema(ctx context.Context, req resource.SchemaRe
 			"tags": schema.SetAttribute{
 				MarkdownDescription: "List of associated tags.",
 				Optional:            true,
+				Computed:            true,
 				ElementType:         types.Int64Type,
 			},
 			"id": schema.Int64Attribute{
@@ -238,6 +239,11 @@ func (r *NotificationResource) Schema(ctx context.Context, req resource.SchemaRe
 				Optional:            true,
 				Computed:            true,
 			},
+			"expire": schema.Int64Attribute{
+				MarkdownDescription: "Expire.",
+				Optional:            true,
+				Computed:            true,
+			},
 			"port": schema.Int64Attribute{
 				MarkdownDescription: "Port.",
 				Optional:            true,
@@ -258,6 +264,11 @@ func (r *NotificationResource) Schema(ctx context.Context, req resource.SchemaRe
 				Validators: []validator.Int64{
 					int64validator.OneOf(-2, -1, 0, 1, 2, 3, 4, 5, 7, 8),
 				},
+			},
+			"retry": schema.Int64Attribute{
+				MarkdownDescription: "Retry.",
+				Optional:            true,
+				Computed:            true,
 			},
 			"access_token": schema.StringAttribute{
 				MarkdownDescription: "Access token.",
@@ -343,11 +354,6 @@ func (r *NotificationResource) Schema(ctx context.Context, req resource.SchemaRe
 				Optional:            true,
 				Computed:            true,
 			},
-			"expire": schema.StringAttribute{
-				MarkdownDescription: "Expire.",
-				Optional:            true,
-				Computed:            true,
-			},
 			"expires": schema.StringAttribute{
 				MarkdownDescription: "Expires.",
 				Optional:            true,
@@ -386,11 +392,6 @@ func (r *NotificationResource) Schema(ctx context.Context, req resource.SchemaRe
 			},
 			"refresh_token": schema.StringAttribute{
 				MarkdownDescription: "Refresh token.",
-				Optional:            true,
-				Computed:            true,
-			},
-			"retry": schema.StringAttribute{
-				MarkdownDescription: "Retry.",
 				Optional:            true,
 				Computed:            true,
 			},
@@ -546,7 +547,6 @@ func (r *NotificationResource) Create(ctx context.Context, req resource.CreateRe
 	// Generate resource state struct
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state Notification
-	state.Tags = notification.Tags
 
 	state.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
@@ -574,7 +574,6 @@ func (r *NotificationResource) Read(ctx context.Context, req resource.ReadReques
 	// Map response body to resource schema attribute
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state Notification
-	state.Tags = notification.Tags
 
 	state.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
@@ -604,7 +603,6 @@ func (r *NotificationResource) Update(ctx context.Context, req resource.UpdateRe
 	// Generate resource state struct
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state Notification
-	state.Tags = notification.Tags
 
 	state.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
@@ -648,10 +646,7 @@ func (r *NotificationResource) ImportState(ctx context.Context, req resource.Imp
 }
 
 func (n *Notification) write(ctx context.Context, notification *sonarr.NotificationOutput) {
-	if !n.Tags.IsNull() && len(notification.Tags) == 0 {
-		n.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, notification.Tags)
-	}
-
+	n.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, notification.Tags)
 	n.OnGrab = types.BoolValue(notification.OnGrab)
 	n.OnDownload = types.BoolValue(notification.OnDownload)
 	n.OnUpgrade = types.BoolValue(notification.OnUpgrade)

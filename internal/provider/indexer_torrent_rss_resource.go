@@ -134,6 +134,7 @@ func (r *IndexerTorrentRssResource) Schema(ctx context.Context, req resource.Sch
 			"tags": schema.SetAttribute{
 				MarkdownDescription: "List of associated tags.",
 				Optional:            true,
+				Computed:            true,
 				ElementType:         types.Int64Type,
 			},
 			"id": schema.Int64Attribute{
@@ -323,12 +324,8 @@ func (i *IndexerTorrentRss) write(ctx context.Context, indexer *sonarr.IndexerOu
 		DownloadClientID:        types.Int64Value(indexer.DownloadClientID),
 		ID:                      types.Int64Value(indexer.ID),
 		Name:                    types.StringValue(indexer.Name),
-		Tags:                    types.SetNull(types.Int64Type),
 	}
-	if !i.Tags.IsNull() || !(len(indexer.Tags) == 0) {
-		genericIndexer.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, indexer.Tags)
-	}
-
+	genericIndexer.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, indexer.Tags)
 	genericIndexer.writeFields(ctx, indexer.Fields)
 	i.fromIndexer(&genericIndexer)
 }

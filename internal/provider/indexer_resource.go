@@ -132,6 +132,7 @@ func (r *IndexerResource) Schema(ctx context.Context, req resource.SchemaRequest
 			"tags": schema.SetAttribute{
 				MarkdownDescription: "List of associated tags.",
 				Optional:            true,
+				Computed:            true,
 				ElementType:         types.Int64Type,
 			},
 			"id": schema.Int64Attribute{
@@ -385,10 +386,7 @@ func (r *IndexerResource) ImportState(ctx context.Context, req resource.ImportSt
 }
 
 func (i *Indexer) write(ctx context.Context, indexer *sonarr.IndexerOutput) {
-	if !i.Tags.IsNull() && len(indexer.Tags) == 0 {
-		i.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, indexer.Tags)
-	}
-
+	i.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, indexer.Tags)
 	i.EnableAutomaticSearch = types.BoolValue(indexer.EnableAutomaticSearch)
 	i.EnableInteractiveSearch = types.BoolValue(indexer.EnableInteractiveSearch)
 	i.EnableRss = types.BoolValue(indexer.EnableRss)

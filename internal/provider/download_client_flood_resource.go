@@ -152,6 +152,7 @@ func (r *DownloadClientFloodResource) Schema(ctx context.Context, req resource.S
 			"tags": schema.SetAttribute{
 				MarkdownDescription: "List of associated tags.",
 				Optional:            true,
+				Computed:            true,
 				ElementType:         types.Int64Type,
 			},
 			"id": schema.Int64Attribute{
@@ -395,12 +396,8 @@ func (d *DownloadClientFlood) write(ctx context.Context, downloadClient *sonarr.
 		AdditionalTags:           types.SetValueMust(types.Int64Type, nil),
 		FieldTags:                types.SetValueMust(types.StringType, nil),
 		PostImportTags:           types.SetValueMust(types.StringType, nil),
-		Tags:                     types.SetNull(types.Int64Type),
 	}
-	if !d.Tags.IsNull() || !(len(downloadClient.Tags) == 0) {
-		genericDownloadClient.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, downloadClient.Tags)
-	}
-
+	genericDownloadClient.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, downloadClient.Tags)
 	genericDownloadClient.writeFields(ctx, downloadClient.Fields)
 	d.fromDownloadClient(&genericDownloadClient)
 }
