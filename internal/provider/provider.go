@@ -243,6 +243,7 @@ func (p *SonarrProvider) DataSources(ctx context.Context) []func() datasource.Da
 		NewQualityProfilesDataSource,
 		NewReleaseProfileDataSource,
 		NewReleaseProfilesDataSource,
+		NewQualityDefinitionsDataSource,
 
 		// Series
 		NewSeriesDataSource,
