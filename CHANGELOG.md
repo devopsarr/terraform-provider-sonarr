@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.6.0](https://github.com/devopsarr/terraform-provider-sonarr/compare/v2.5.0...v2.6.0) (2022-12-06)
+
+
+### Features
+
+* add quality definition datasource ([b2a06db](https://github.com/devopsarr/terraform-provider-sonarr/commit/b2a06dbba80cbac772f59ecd583d6448c60b73de))
+* add quality definition resource ([efebfb4](https://github.com/devopsarr/terraform-provider-sonarr/commit/efebfb49c57abd46ce56ae453c7a7636a9854078))
+* add quality definitions datasource ([566d657](https://github.com/devopsarr/terraform-provider-sonarr/commit/566d657bbce6737f5560783d516b5c87cdbff879))
+
 ## [2.5.0](https://github.com/devopsarr/terraform-provider-sonarr/compare/v2.4.0...v2.5.0) (2022-12-06)
 
 
