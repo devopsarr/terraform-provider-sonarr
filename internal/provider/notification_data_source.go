@@ -6,9 +6,7 @@ import (
 
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/resource"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
+	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr/sonarr"
@@ -32,396 +30,313 @@ func (d *NotificationDataSource) Metadata(ctx context.Context, req datasource.Me
 	resp.TypeName = req.ProviderTypeName + "_" + notificationDataSourceName
 }
 
-func (d *NotificationDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+func (d *NotificationDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the delay server.
 		MarkdownDescription: "<!-- subcategory:Notifications -->Single [Notification](../resources/notification).",
-		Attributes: map[string]tfsdk.Attribute{
-			"on_grab": {
+		Attributes: map[string]schema.Attribute{
+			"on_grab": schema.BoolAttribute{
 				MarkdownDescription: "On grab flag.",
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"on_download": {
+			"on_download": schema.BoolAttribute{
 				MarkdownDescription: "On download flag.",
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"on_upgrade": {
+			"on_upgrade": schema.BoolAttribute{
 				MarkdownDescription: "On upgrade flag.",
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"on_rename": {
+			"on_rename": schema.BoolAttribute{
 				MarkdownDescription: "On rename flag.",
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"on_series_delete": {
+			"on_series_delete": schema.BoolAttribute{
 				MarkdownDescription: "On series delete flag.",
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"on_episode_file_delete": {
+			"on_episode_file_delete": schema.BoolAttribute{
 				MarkdownDescription: "On episode file delete flag.",
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"on_episode_file_delete_for_upgrade": {
+			"on_episode_file_delete_for_upgrade": schema.BoolAttribute{
 				MarkdownDescription: "On episode file delete for upgrade flag.",
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"on_health_issue": {
+			"on_health_issue": schema.BoolAttribute{
 				MarkdownDescription: "On health issue flag.",
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"on_application_update": {
+			"on_application_update": schema.BoolAttribute{
 				MarkdownDescription: "On application update flag.",
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"include_health_warnings": {
+			"include_health_warnings": schema.BoolAttribute{
 				MarkdownDescription: "Include health warnings.",
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"config_contract": {
+			"config_contract": schema.StringAttribute{
 				MarkdownDescription: "Notification configuration template.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"implementation": {
+			"implementation": schema.StringAttribute{
 				MarkdownDescription: "Notification implementation name.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"name": {
+			"name": schema.StringAttribute{
 				MarkdownDescription: "Notification name.",
 				Required:            true,
-				Type:                types.StringType,
 			},
-			"tags": {
+			"tags": schema.SetAttribute{
 				MarkdownDescription: "List of associated tags.",
 				Computed:            true,
-				Type: types.SetType{
-					ElemType: types.Int64Type,
-				},
+				ElementType:         types.Int64Type,
 			},
-			"id": {
+			"id": schema.Int64Attribute{
 				MarkdownDescription: "Notification ID.",
 				Computed:            true,
-				Type:                types.Int64Type,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					resource.UseStateForUnknown(),
-				},
 			},
 			// Field values
-			"always_update": {
+			"always_update": schema.BoolAttribute{
 				MarkdownDescription: "Always update flag.",
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"clean_library": {
+			"clean_library": schema.BoolAttribute{
 				MarkdownDescription: "Clean library flag.",
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"direct_message": {
+			"direct_message": schema.BoolAttribute{
 				MarkdownDescription: "Direct message flag.",
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"notify": {
+			"notify": schema.BoolAttribute{
 				MarkdownDescription: "Notify flag.",
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"require_encryption": {
+			"require_encryption": schema.BoolAttribute{
 				MarkdownDescription: "Require encryption flag.",
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"send_silently": {
+			"send_silently": schema.BoolAttribute{
 				MarkdownDescription: "Add silently flag.",
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"update_library": {
+			"update_library": schema.BoolAttribute{
 				MarkdownDescription: "Update library flag.",
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"use_eu_endpoint": {
+			"use_eu_endpoint": schema.BoolAttribute{
 				MarkdownDescription: "Use EU endpoint flag.",
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"use_ssl": {
+			"use_ssl": schema.BoolAttribute{
 				MarkdownDescription: "Use SSL flag.",
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"port": {
+			"port": schema.Int64Attribute{
 				MarkdownDescription: "Port.",
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
-			"grab_fields": {
+			"grab_fields": schema.Int64Attribute{
 				MarkdownDescription: "Grab fields. `0` Overview, `1` Rating, `2` Genres, `3` Quality, `4` Group, `5` Size, `6` Links, `7` Release, `8` Poster, `9` Fanart.",
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
-			"import_fields": {
+			"import_fields": schema.Int64Attribute{
 				MarkdownDescription: "Import fields. `0` Overview, `1` Rating, `2` Genres, `3` Quality, `4` Codecs, `5` Group, `6` Size, `7` Languages, `8` Subtitles, `9` Links, `10` Release, `11` Poster, `12` Fanart.",
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
-			"method": {
+			"method": schema.Int64Attribute{
 				MarkdownDescription: "Method. `1` POST, `2` PUT.",
 				Computed:            true,
-				Type:                types.Int64Type,
-				Validators: []tfsdk.AttributeValidator{
-					tools.IntMatch([]int64{1, 2}),
-				},
 			},
-			"priority": {
+			"priority": schema.Int64Attribute{
 				MarkdownDescription: "Priority.", // TODO: add values in description
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
-			"access_token": {
+			"access_token": schema.StringAttribute{
 				MarkdownDescription: "Access token.",
 				Computed:            true,
 				Sensitive:           true,
-				Type:                types.StringType,
 			},
-			"access_token_secret": {
+			"access_token_secret": schema.StringAttribute{
 				MarkdownDescription: "Access token secret.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"api_key": {
+			"api_key": schema.StringAttribute{
 				MarkdownDescription: "API key.",
 				Computed:            true,
 				Sensitive:           true,
-				Type:                types.StringType,
 			},
-			"app_token": {
+			"app_token": schema.StringAttribute{
 				MarkdownDescription: "App token.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"arguments": {
+			"arguments": schema.StringAttribute{
 				MarkdownDescription: "Arguments.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"author": {
+			"author": schema.StringAttribute{
 				MarkdownDescription: "Author.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"auth_token": {
+			"auth_token": schema.StringAttribute{
 				MarkdownDescription: "Auth token.",
 				Computed:            true,
 				Sensitive:           true,
-				Type:                types.StringType,
 			},
-			"auth_user": {
+			"auth_user": schema.StringAttribute{
 				MarkdownDescription: "Auth user.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"avatar": {
+			"avatar": schema.StringAttribute{
 				MarkdownDescription: "Avatar.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"bcc": {
+			"bcc": schema.StringAttribute{
 				MarkdownDescription: "BCC.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"bot_token": {
+			"bot_token": schema.StringAttribute{
 				MarkdownDescription: "Bot token.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"cc": {
+			"cc": schema.StringAttribute{
 				MarkdownDescription: "CC.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"channel": {
+			"channel": schema.StringAttribute{
 				MarkdownDescription: "Channel.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"chat_id": {
+			"chat_id": schema.StringAttribute{
 				MarkdownDescription: "Chat ID.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"consumer_key": {
+			"consumer_key": schema.StringAttribute{
 				MarkdownDescription: "Consumer key.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"consumer_secret": {
+			"consumer_secret": schema.StringAttribute{
 				MarkdownDescription: "Consumer secret.",
 				Computed:            true,
 				Sensitive:           true,
-				Type:                types.StringType,
 			},
-			"device_names": {
+			"device_names": schema.StringAttribute{
 				MarkdownDescription: "Device names.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"display_time": {
+			"display_time": schema.StringAttribute{
 				MarkdownDescription: "Display time.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"expire": {
+			"expire": schema.StringAttribute{
 				MarkdownDescription: "Expire.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"expires": {
+			"expires": schema.StringAttribute{
 				MarkdownDescription: "Expires.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"from": {
+			"from": schema.StringAttribute{
 				MarkdownDescription: "From.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"host": {
+			"host": schema.StringAttribute{
 				MarkdownDescription: "Host.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"icon": {
+			"icon": schema.StringAttribute{
 				MarkdownDescription: "Icon.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"mention": {
+			"mention": schema.StringAttribute{
 				MarkdownDescription: "Mention.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"password": {
+			"password": schema.StringAttribute{
 				MarkdownDescription: "password.",
 				Computed:            true,
 				Sensitive:           true,
-				Type:                types.StringType,
 			},
-			"path": {
+			"path": schema.StringAttribute{
 				MarkdownDescription: "Path.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"refresh_token": {
+			"refresh_token": schema.StringAttribute{
 				MarkdownDescription: "Refresh token.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"retry": {
+			"retry": schema.StringAttribute{
 				MarkdownDescription: "Retry.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"sender_domain": {
+			"sender_domain": schema.StringAttribute{
 				MarkdownDescription: "Sender domain.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"sender_id": {
+			"sender_id": schema.StringAttribute{
 				MarkdownDescription: "Sender ID.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"server": {
+			"server": schema.StringAttribute{
 				MarkdownDescription: "server.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"sign_in": {
+			"sign_in": schema.StringAttribute{
 				MarkdownDescription: "Sign in.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"sound": {
+			"sound": schema.StringAttribute{
 				MarkdownDescription: "Sound.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"to": {
+			"to": schema.StringAttribute{
 				MarkdownDescription: "To.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"token": {
+			"token": schema.StringAttribute{
 				MarkdownDescription: "Token.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"url": {
+			"url": schema.StringAttribute{
 				MarkdownDescription: "URL.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"user_key": {
+			"user_key": schema.StringAttribute{
 				MarkdownDescription: "User key.",
 				Computed:            true,
 				Sensitive:           true,
-				Type:                types.StringType,
 			},
-			"username": {
+			"username": schema.StringAttribute{
 				MarkdownDescription: "Username.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"web_hook_url": {
+			"web_hook_url": schema.StringAttribute{
 				MarkdownDescription: "Web hook url.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"channel_tags": {
+			"channel_tags": schema.SetAttribute{
 				MarkdownDescription: "Channel tags.",
 				Computed:            true,
-				Type: types.SetType{
-					ElemType: types.StringType,
-				},
+				ElementType:         types.StringType,
 			},
-			"device_ids": {
+			"device_ids": schema.SetAttribute{
 				MarkdownDescription: "Device IDs.",
 				Computed:            true,
-				Type: types.SetType{
-					ElemType: types.StringType,
-				},
+				ElementType:         types.StringType,
 			},
-			"devices": {
+			"devices": schema.SetAttribute{
 				MarkdownDescription: "Devices.",
 				Computed:            true,
-				Type: types.SetType{
-					ElemType: types.StringType,
-				},
+				ElementType:         types.StringType,
 			},
-			"recipients": {
+			"recipients": schema.SetAttribute{
 				MarkdownDescription: "Recipients.",
 				Computed:            true,
-				Type: types.SetType{
-					ElemType: types.StringType,
-				},
+				ElementType:         types.StringType,
 			},
 		},
-	}, nil
+	}
 }
 
 func (d *NotificationDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {

@@ -6,9 +6,11 @@ import (
 	"strconv"
 
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -45,62 +47,52 @@ func (r *ReleaseProfileResource) Metadata(ctx context.Context, req resource.Meta
 	resp.TypeName = req.ProviderTypeName + "_" + releaseProfileResourceName
 }
 
-func (r *ReleaseProfileResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+func (r *ReleaseProfileResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		MarkdownDescription: "<!-- subcategory:Profiles -->Release Profile resource.\nFor more information refer to [Release Profiles](https://wiki.servarr.com/sonarr/settings#release-profiles) documentation.",
-		Attributes: map[string]tfsdk.Attribute{
-			"id": {
+		Attributes: map[string]schema.Attribute{
+			"id": schema.Int64Attribute{
 				MarkdownDescription: "Release Profile ID.",
 				Computed:            true,
-				Type:                types.Int64Type,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					resource.UseStateForUnknown(),
+				PlanModifiers: []planmodifier.Int64{
+					int64planmodifier.UseStateForUnknown(),
 				},
 			},
-			"enabled": {
+			"enabled": schema.BoolAttribute{
 				MarkdownDescription: "Enabled",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"name": {
+			"name": schema.StringAttribute{
 				MarkdownDescription: "Release profile name.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"indexer_id": {
+			"indexer_id": schema.Int64Attribute{
 				MarkdownDescription: "Indexer ID. Set `0` for all.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
-			"required": {
+			"required": schema.SetAttribute{
 				MarkdownDescription: "Required terms. At least one of `required` and `ignored` must be set.",
 				Optional:            true,
 				Computed:            true,
-				Type: types.SetType{
-					ElemType: types.StringType,
-				},
+				ElementType:         types.StringType,
 			},
-			"ignored": {
+			"ignored": schema.SetAttribute{
 				MarkdownDescription: "Ignored terms. At least one of `required` and `ignored` must be set.",
 				Optional:            true,
 				Computed:            true,
-				Type: types.SetType{
-					ElemType: types.StringType,
-				},
+				ElementType:         types.StringType,
 			},
-			"tags": {
+			"tags": schema.SetAttribute{
 				MarkdownDescription: "List of associated tags.",
 				Optional:            true,
 				Computed:            true,
-				Type: types.SetType{
-					ElemType: types.Int64Type,
-				},
+				ElementType:         types.Int64Type,
 			},
 		},
-	}, nil
+	}
 }
 
 func (r *ReleaseProfileResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {

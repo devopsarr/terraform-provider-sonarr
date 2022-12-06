@@ -7,8 +7,7 @@ import (
 
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -39,254 +38,205 @@ func (d *DownloadClientsDataSource) Metadata(ctx context.Context, req datasource
 	resp.TypeName = req.ProviderTypeName + "_" + downloadClientsDataSourceName
 }
 
-func (d *DownloadClientsDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+func (d *DownloadClientsDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the delay server.
-		MarkdownDescription: "<!-- subcategory:Download Clients -->List all available [DownloadClients](../resources/download_client).",
-		Attributes: map[string]tfsdk.Attribute{
+		MarkdownDescription: "<!-- subcategory:Download Clients -->List all available [Download Clients](../resources/download_client).",
+		Attributes: map[string]schema.Attribute{
 			// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
-			"id": {
+			"id": schema.StringAttribute{
 				Computed: true,
-				Type:     types.StringType,
 			},
-			"download_clients": {
-				MarkdownDescription: "Download Client list..",
+			"download_clients": schema.SetNestedAttribute{
+				MarkdownDescription: "Download Client list.",
 				Computed:            true,
-				Attributes: tfsdk.SetNestedAttributes(map[string]tfsdk.Attribute{
-					"enable": {
-						MarkdownDescription: "Enable flag.",
-						Computed:            true,
-						Type:                types.BoolType,
-					},
-					"remove_completed_downloads": {
-						MarkdownDescription: "Remove completed downloads flag.",
-						Computed:            true,
-						Type:                types.BoolType,
-					},
-					"remove_failed_downloads": {
-						MarkdownDescription: "Remove failed downloads flag.",
-						Computed:            true,
-						Type:                types.BoolType,
-					},
-					"priority": {
-						MarkdownDescription: "Priority.",
-						Computed:            true,
-						Type:                types.Int64Type,
-					},
-					"config_contract": {
-						MarkdownDescription: "DownloadClient configuration template.",
-						Computed:            true,
-						Type:                types.StringType,
-					},
-					"implementation": {
-						MarkdownDescription: "DownloadClient implementation name.",
-						Computed:            true,
-						Type:                types.StringType,
-					},
-					"name": {
-						MarkdownDescription: "Download Client name.",
-						Computed:            true,
-						Type:                types.StringType,
-					},
-					"protocol": {
-						MarkdownDescription: "Protocol. Valid values are 'usenet' and 'torrent'.",
-						Computed:            true,
-						Type:                types.StringType,
-					},
-					"tags": {
-						MarkdownDescription: "List of associated tags.",
-						Computed:            true,
-						Type: types.SetType{
-							ElemType: types.Int64Type,
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: map[string]schema.Attribute{
+						"enable": schema.BoolAttribute{
+							MarkdownDescription: "Enable flag.",
+							Computed:            true,
+						},
+						"remove_completed_downloads": schema.BoolAttribute{
+							MarkdownDescription: "Remove completed downloads flag.",
+							Computed:            true,
+						},
+						"remove_failed_downloads": schema.BoolAttribute{
+							MarkdownDescription: "Remove failed downloads flag.",
+							Computed:            true,
+						},
+						"priority": schema.Int64Attribute{
+							MarkdownDescription: "Priority.",
+							Computed:            true,
+						},
+						"config_contract": schema.StringAttribute{
+							MarkdownDescription: "DownloadClient configuration template.",
+							Computed:            true,
+						},
+						"implementation": schema.StringAttribute{
+							MarkdownDescription: "DownloadClient implementation name.",
+							Computed:            true,
+						},
+						"name": schema.StringAttribute{
+							MarkdownDescription: "Download Client name.",
+							Computed:            true,
+						},
+						"protocol": schema.StringAttribute{
+							MarkdownDescription: "Protocol. Valid values are 'usenet' and 'torrent'.",
+							Computed:            true,
+						},
+						"tags": schema.SetAttribute{
+							MarkdownDescription: "List of associated tags.",
+							Computed:            true,
+							ElementType:         types.Int64Type,
+						},
+						"id": schema.Int64Attribute{
+							MarkdownDescription: "Download Client ID.",
+							Computed:            true,
+						},
+						// Field values
+						"add_paused": schema.BoolAttribute{
+							MarkdownDescription: "Add paused flag.",
+							Computed:            true,
+						},
+						"use_ssl": schema.BoolAttribute{
+							MarkdownDescription: "Use SSL flag.",
+							Computed:            true,
+						},
+						"start_on_add": schema.BoolAttribute{
+							MarkdownDescription: "Start on add flag.",
+							Computed:            true,
+						},
+						"sequential_order": schema.BoolAttribute{
+							MarkdownDescription: "Sequential order flag.",
+							Computed:            true,
+						},
+						"first_and_last": schema.BoolAttribute{
+							MarkdownDescription: "First and last flag.",
+							Computed:            true,
+						},
+						"add_stopped": schema.BoolAttribute{
+							MarkdownDescription: "Add stopped flag.",
+							Computed:            true,
+						},
+						"save_magnet_files": schema.BoolAttribute{
+							MarkdownDescription: "Save magnet files flag.",
+							Computed:            true,
+						},
+						"read_only": schema.BoolAttribute{
+							MarkdownDescription: "Read only flag.",
+							Computed:            true,
+						},
+						"port": schema.Int64Attribute{
+							MarkdownDescription: "Port.",
+							Computed:            true,
+						},
+						"recent_tv_priority": schema.Int64Attribute{
+							MarkdownDescription: "Recent TV priority. `0` Last, `1` First.",
+							Computed:            true,
+						},
+						"older_tv_priority": schema.Int64Attribute{
+							MarkdownDescription: "Older TV priority. `0` Last, `1` First.",
+							Computed:            true,
+						},
+						"initial_state": schema.Int64Attribute{
+							MarkdownDescription: "Initial state. `0` Start, `1` ForceStart, `2` Pause.",
+							Computed:            true,
+						},
+						"intial_state": schema.Int64Attribute{
+							MarkdownDescription: "Initial state, with Stop support. `0` Start, `1` ForceStart, `2` Pause, `3` Stop.",
+							Computed:            true,
+						},
+						"host": schema.StringAttribute{
+							MarkdownDescription: "host.",
+							Computed:            true,
+						},
+						"api_key": schema.StringAttribute{
+							MarkdownDescription: "API key.",
+							Computed:            true,
+							Sensitive:           true,
+						},
+						"rpc_path": schema.StringAttribute{
+							MarkdownDescription: "RPC path.",
+							Computed:            true,
+						},
+						"url_base": schema.StringAttribute{
+							MarkdownDescription: "Base URL.",
+							Computed:            true,
+						},
+						"secret_token": schema.StringAttribute{
+							MarkdownDescription: "Secret token.",
+							Computed:            true,
+							Sensitive:           true,
+						},
+						"username": schema.StringAttribute{
+							MarkdownDescription: "Username.",
+							Computed:            true,
+						},
+						"password": schema.StringAttribute{
+							MarkdownDescription: "Password.",
+							Computed:            true,
+							Sensitive:           true,
+						},
+						"tv_category": schema.StringAttribute{
+							MarkdownDescription: "TV category.",
+							Computed:            true,
+						},
+						"tv_imported_category": schema.StringAttribute{
+							MarkdownDescription: "TV imported category.",
+							Computed:            true,
+						},
+						"tv_directory": schema.StringAttribute{
+							MarkdownDescription: "TV directory.",
+							Computed:            true,
+						},
+						"destination": schema.StringAttribute{
+							MarkdownDescription: "Destination.",
+							Computed:            true,
+						},
+						"category": schema.StringAttribute{
+							MarkdownDescription: "Category.",
+							Computed:            true,
+						},
+						"nzb_folder": schema.StringAttribute{
+							MarkdownDescription: "NZB folder.",
+							Computed:            true,
+						},
+						"strm_folder": schema.StringAttribute{
+							MarkdownDescription: "STRM folder.",
+							Computed:            true,
+						},
+						"watch_folder": schema.StringAttribute{
+							MarkdownDescription: "Watch folder flag.",
+							Computed:            true,
+						},
+						"torrent_folder": schema.StringAttribute{
+							MarkdownDescription: "Torrent folder.",
+							Computed:            true,
+						},
+						"magnet_file_extension": schema.StringAttribute{
+							MarkdownDescription: "Magnet file extension.",
+							Computed:            true,
+						},
+						"additional_tags": schema.SetAttribute{
+							MarkdownDescription: "Additional tags, `0` TitleSlug, `1` Quality, `2` Language, `3` ReleaseGroup, `4` Year, `5` Indexer, `6` Network.",
+							Computed:            true,
+							ElementType:         types.Int64Type,
+						},
+						"field_tags": schema.SetAttribute{
+							MarkdownDescription: "Field tags.",
+							Computed:            true,
+							ElementType:         types.StringType,
+						},
+						"post_import_tags": schema.SetAttribute{
+							MarkdownDescription: "Post import tags.",
+							Computed:            true,
+							ElementType:         types.StringType,
 						},
 					},
-					"id": {
-						MarkdownDescription: "Download Client ID.",
-						Computed:            true,
-						Type:                types.Int64Type,
-						PlanModifiers: tfsdk.AttributePlanModifiers{
-							resource.UseStateForUnknown(),
-						},
-					},
-					// Field values
-					"add_paused": {
-						MarkdownDescription: "Add paused flag.",
-						Computed:            true,
-						Type:                types.BoolType,
-					},
-					"use_ssl": {
-						MarkdownDescription: "Use SSL flag.",
-						Computed:            true,
-						Type:                types.BoolType,
-					},
-					"start_on_add": {
-						MarkdownDescription: "Start on add flag.",
-						Computed:            true,
-						Type:                types.BoolType,
-					},
-					"sequential_order": {
-						MarkdownDescription: "Sequential order flag.",
-						Computed:            true,
-						Type:                types.BoolType,
-					},
-					"first_and_last": {
-						MarkdownDescription: "First and last flag.",
-						Computed:            true,
-						Type:                types.BoolType,
-					},
-					"add_stopped": {
-						MarkdownDescription: "Add stopped flag.",
-						Computed:            true,
-						Type:                types.BoolType,
-					},
-					"save_magnet_files": {
-						MarkdownDescription: "Save magnet files flag.",
-						Computed:            true,
-						Type:                types.BoolType,
-					},
-					"read_only": {
-						MarkdownDescription: "Read only flag.",
-						Computed:            true,
-						Type:                types.BoolType,
-					},
-					"port": {
-						MarkdownDescription: "Port.",
-						Computed:            true,
-						Type:                types.Int64Type,
-					},
-					"recent_tv_priority": {
-						MarkdownDescription: "Recent TV priority. `0` Last, `1` First.",
-						Computed:            true,
-						Type:                types.Int64Type,
-					},
-					"older_tv_priority": {
-						MarkdownDescription: "Older TV priority. `0` Last, `1` First.",
-						Computed:            true,
-						Type:                types.Int64Type,
-					},
-					"initial_state": {
-						MarkdownDescription: "Initial state. `0` Start, `1` ForceStart, `2` Pause.",
-						Computed:            true,
-						Type:                types.Int64Type,
-					},
-					"intial_state": {
-						MarkdownDescription: "Initial state, with Stop support. `0` Start, `1` ForceStart, `2` Pause, `3` Stop.",
-						Computed:            true,
-						Type:                types.Int64Type,
-					},
-					"host": {
-						MarkdownDescription: "host.",
-						Computed:            true,
-						Type:                types.StringType,
-					},
-					"api_key": {
-						MarkdownDescription: "API key.",
-						Computed:            true,
-						Sensitive:           true,
-						Type:                types.StringType,
-					},
-					"rpc_path": {
-						MarkdownDescription: "RPC path.",
-						Computed:            true,
-						Type:                types.StringType,
-					},
-					"url_base": {
-						MarkdownDescription: "Base URL.",
-						Computed:            true,
-						Type:                types.StringType,
-					},
-					"secret_token": {
-						MarkdownDescription: "Secret token.",
-						Computed:            true,
-						Sensitive:           true,
-						Type:                types.StringType,
-					},
-					"username": {
-						MarkdownDescription: "Username.",
-						Computed:            true,
-						Sensitive:           true,
-						Type:                types.StringType,
-					},
-					"password": {
-						MarkdownDescription: "Password.",
-						Computed:            true,
-						Type:                types.StringType,
-					},
-					"tv_category": {
-						MarkdownDescription: "TV category.",
-						Computed:            true,
-						Type:                types.StringType,
-					},
-					"tv_imported_category": {
-						MarkdownDescription: "TV imported category.",
-						Computed:            true,
-						Type:                types.StringType,
-					},
-					"tv_directory": {
-						MarkdownDescription: "TV directory.",
-						Computed:            true,
-						Type:                types.StringType,
-					},
-					"destination": {
-						MarkdownDescription: "Destination.",
-						Computed:            true,
-						Type:                types.StringType,
-					},
-					"category": {
-						MarkdownDescription: "Category.",
-						Computed:            true,
-						Type:                types.StringType,
-					},
-					"nzb_folder": {
-						MarkdownDescription: "NZB folder.",
-						Computed:            true,
-						Type:                types.StringType,
-					},
-					"strm_folder": {
-						MarkdownDescription: "STRM folder.",
-						Computed:            true,
-						Type:                types.StringType,
-					},
-					"torrent_folder": {
-						MarkdownDescription: "Torrent folder.",
-						Computed:            true,
-						Type:                types.StringType,
-					},
-					"watch_folder": {
-						MarkdownDescription: "Watch folder flag.",
-						Computed:            true,
-						Type:                types.StringType,
-					},
-					"magnet_file_extension": {
-						MarkdownDescription: "Magnet file extension.",
-						Computed:            true,
-						Type:                types.StringType,
-					},
-					"additional_tags": {
-						MarkdownDescription: "Additional tags, `0` TitleSlug, `1` Quality, `2` Language, `3` ReleaseGroup, `4` Year, `5` Indexer, `6` Network.",
-						Computed:            true,
-						Type: types.SetType{
-							ElemType: types.Int64Type,
-						},
-					},
-					"field_tags": {
-						MarkdownDescription: "Field tags.",
-						Computed:            true,
-						Type: types.SetType{
-							ElemType: types.StringType,
-						},
-					},
-					"post_import_tags": {
-						MarkdownDescription: "Post import tags.",
-						Computed:            true,
-						Type: types.SetType{
-							ElemType: types.StringType,
-						},
-					},
-				}),
+				},
 			},
 		},
-	}, nil
+	}
 }
 
 func (d *DownloadClientsDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
@@ -326,12 +276,13 @@ func (d *DownloadClientsDataSource) Read(ctx context.Context, req datasource.Rea
 
 	tflog.Trace(ctx, "read "+downloadClientsDataSourceName)
 	// Map response body to resource schema attribute
-	profiles := make([]DownloadClient, len(response))
-	for i, p := range response {
-		profiles[i].write(ctx, p)
+	downloadClients := make([]DownloadClient, len(response))
+	for i, d := range response {
+		downloadClients[i].Tags = types.SetNull(types.Int64Type)
+		downloadClients[i].write(ctx, d)
 	}
 
-	tfsdk.ValueFrom(ctx, profiles, data.DownloadClients.Type(context.Background()), &data.DownloadClients)
+	tfsdk.ValueFrom(ctx, downloadClients, data.DownloadClients.Type(context.Background()), &data.DownloadClients)
 	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 	data.ID = types.StringValue(strconv.Itoa(len(response)))
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

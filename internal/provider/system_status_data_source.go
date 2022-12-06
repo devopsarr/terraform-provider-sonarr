@@ -6,8 +6,7 @@ import (
 
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
+	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr/sonarr"
@@ -62,149 +61,122 @@ func (d *SystemStatusDataSource) Metadata(ctx context.Context, req datasource.Me
 	resp.TypeName = req.ProviderTypeName + "_" + systemStatusDataSourceName
 }
 
-func (d *SystemStatusDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+func (d *SystemStatusDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the delay server.
 		MarkdownDescription: "<!-- subcategory:Status -->System Status resource. User must have rights to read `config.xml`.\nFor more information refer to [System Status](https://wiki.servarr.com/sonarr/system#status) documentation.",
-		Attributes: map[string]tfsdk.Attribute{
+		Attributes: map[string]schema.Attribute{
 			// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
-			"id": {
+			"id": schema.Int64Attribute{
 				MarkdownDescription: "Delay Profile ID.",
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
-			"is_debug": {
+			"is_debug": schema.BoolAttribute{
 				MarkdownDescription: "Is debug flag.",
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"is_production": {
+			"is_production": schema.BoolAttribute{
 				MarkdownDescription: "Is production flag.",
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"is_admin": {
+			"is_admin": schema.BoolAttribute{
 				MarkdownDescription: "Is admin flag.",
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"is_user_interactive": {
+			"is_user_interactive": schema.BoolAttribute{
 				MarkdownDescription: "Is user interactive flag.",
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"is_mono_runtime": {
+			"is_mono_runtime": schema.BoolAttribute{
 				MarkdownDescription: "Is mono runtime flag.",
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"is_mono": {
+			"is_mono": schema.BoolAttribute{
 				MarkdownDescription: "Is mono flag.",
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"is_linux": {
+			"is_linux": schema.BoolAttribute{
 				MarkdownDescription: "Is linux flag.",
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"is_osx": {
+			"is_osx": schema.BoolAttribute{
 				MarkdownDescription: "Is osx flag.",
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"is_windows": {
+			"is_windows": schema.BoolAttribute{
 				MarkdownDescription: "Is windows flag.",
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"version": {
+			"version": schema.StringAttribute{
 				MarkdownDescription: "Version.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"startup_path": {
+			"startup_path": schema.StringAttribute{
 				MarkdownDescription: "Startup path.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"app_data": {
+			"app_data": schema.StringAttribute{
 				MarkdownDescription: "App data folder.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"os_name": {
+			"os_name": schema.StringAttribute{
 				MarkdownDescription: "OS name.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"os_version": {
+			"os_version": schema.StringAttribute{
 				MarkdownDescription: "OS version.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"mode": {
+			"mode": schema.StringAttribute{
 				MarkdownDescription: "Mode.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"branch": {
+			"branch": schema.StringAttribute{
 				MarkdownDescription: "Branch.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"authentication": {
+			"authentication": schema.StringAttribute{
 				MarkdownDescription: "Authentication.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"sqlite_version": {
+			"sqlite_version": schema.StringAttribute{
 				MarkdownDescription: "SQLite version.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"url_base": {
+			"url_base": schema.StringAttribute{
 				MarkdownDescription: "Base URL.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"runtime_version": {
+			"runtime_version": schema.StringAttribute{
 				MarkdownDescription: "Runtime version.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"runtime_name": {
+			"runtime_name": schema.StringAttribute{
 				MarkdownDescription: "Runtime name.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"package_version": {
+			"package_version": schema.StringAttribute{
 				MarkdownDescription: "Package version.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"package_author": {
+			"package_author": schema.StringAttribute{
 				MarkdownDescription: "Package author.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"package_update_mechanism": {
+			"package_update_mechanism": schema.StringAttribute{
 				MarkdownDescription: "Package update mechanism.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"build_time": {
+			"build_time": schema.StringAttribute{
 				MarkdownDescription: "Build time.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"start_time": {
+			"start_time": schema.StringAttribute{
 				MarkdownDescription: "Start time.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
 		},
-	}, nil
+	}
 }
 
 func (d *SystemStatusDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {

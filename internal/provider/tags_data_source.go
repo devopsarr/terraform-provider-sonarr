@@ -7,7 +7,7 @@ import (
 
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -38,34 +38,33 @@ func (d *TagsDataSource) Metadata(ctx context.Context, req datasource.MetadataRe
 	resp.TypeName = req.ProviderTypeName + "_" + tagsDataSourceName
 }
 
-func (d *TagsDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+func (d *TagsDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the language server.
 		MarkdownDescription: "<!-- subcategory:Tags -->List all available [Tags](../resources/tag).",
-		Attributes: map[string]tfsdk.Attribute{
+		Attributes: map[string]schema.Attribute{
 			// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
-			"id": {
+			"id": schema.StringAttribute{
 				Computed: true,
-				Type:     types.StringType,
 			},
-			"tags": {
+			"tags": schema.SetNestedAttribute{
 				MarkdownDescription: "Tag list.",
 				Computed:            true,
-				Attributes: tfsdk.SetNestedAttributes(map[string]tfsdk.Attribute{
-					"id": {
-						MarkdownDescription: "Tag ID.",
-						Computed:            true,
-						Type:                types.Int64Type,
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: map[string]schema.Attribute{
+						"id": schema.Int64Attribute{
+							MarkdownDescription: "Tag ID.",
+							Computed:            true,
+						},
+						"label": schema.StringAttribute{
+							MarkdownDescription: "Tag label.",
+							Computed:            true,
+						},
 					},
-					"label": {
-						MarkdownDescription: "Tag label.",
-						Computed:            true,
-						Type:                types.StringType,
-					},
-				}),
+				},
 			},
 		},
-	}, nil
+	}
 }
 
 func (d *TagsDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {

@@ -6,9 +6,7 @@ import (
 
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
-	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr/sonarr"
 )
@@ -31,44 +29,41 @@ func (d *RootFolderDataSource) Metadata(ctx context.Context, req datasource.Meta
 	resp.TypeName = req.ProviderTypeName + "_" + rootFolderDataSourceName
 }
 
-func (d *RootFolderDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+func (d *RootFolderDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the delay server.
 		MarkdownDescription: "<!-- subcategory:Media Management -->Single [Root Folder](../resources/root_folder).",
-		Attributes: map[string]tfsdk.Attribute{
-			"path": {
+		Attributes: map[string]schema.Attribute{
+			"path": schema.StringAttribute{
 				MarkdownDescription: "Root Folder absolute path.",
 				Required:            true,
-				Type:                types.StringType,
 			},
-			"accessible": {
+			"accessible": schema.BoolAttribute{
 				MarkdownDescription: "Access flag.",
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"id": {
+			"id": schema.Int64Attribute{
 				MarkdownDescription: "Root Folder ID.",
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
-			"unmapped_folders": {
+			"unmapped_folders": schema.SetNestedAttribute{
 				MarkdownDescription: "List of folders with no associated series.",
 				Computed:            true,
-				Attributes: tfsdk.SetNestedAttributes(map[string]tfsdk.Attribute{
-					"path": {
-						MarkdownDescription: "Path of unmapped folder.",
-						Computed:            true,
-						Type:                types.StringType,
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: map[string]schema.Attribute{
+						"path": schema.StringAttribute{
+							MarkdownDescription: "Path of unmapped folder.",
+							Computed:            true,
+						},
+						"name": schema.StringAttribute{
+							MarkdownDescription: "Name of unmapped folder.",
+							Computed:            true,
+						},
 					},
-					"name": {
-						MarkdownDescription: "Name of unmapped folder.",
-						Computed:            true,
-						Type:                types.StringType,
-					},
-				}),
+				},
 			},
 		},
-	}, nil
+	}
 }
 
 func (d *RootFolderDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {

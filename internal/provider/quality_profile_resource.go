@@ -6,9 +6,11 @@ import (
 	"strconv"
 
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -59,94 +61,88 @@ func (r *QualityProfileResource) Metadata(ctx context.Context, req resource.Meta
 	resp.TypeName = req.ProviderTypeName + "_" + qualityProfileResourceName
 }
 
-func (r *QualityProfileResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+func (r *QualityProfileResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		MarkdownDescription: "<!-- subcategory:Profiles -->Quality Profile resource.\nFor more information refer to [Quality Profile](https://wiki.servarr.com/sonarr/settings#quality-profiles) documentation.",
-		Attributes: map[string]tfsdk.Attribute{
-			"id": {
+		Attributes: map[string]schema.Attribute{
+			"id": schema.Int64Attribute{
 				MarkdownDescription: "Quality Profile ID.",
 				Computed:            true,
-				Type:                types.Int64Type,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					resource.UseStateForUnknown(),
+				PlanModifiers: []planmodifier.Int64{
+					int64planmodifier.UseStateForUnknown(),
 				},
 			},
-			"name": {
+			"name": schema.StringAttribute{
 				MarkdownDescription: "Quality Profile Name.",
 				Required:            true,
-				Type:                types.StringType,
 			},
-			"upgrade_allowed": {
+			"upgrade_allowed": schema.BoolAttribute{
 				MarkdownDescription: "Upgrade allowed flag.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"cutoff": {
+			"cutoff": schema.Int64Attribute{
 				MarkdownDescription: "Quality ID to which cutoff.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
-			"quality_groups": {
+			"quality_groups": schema.SetNestedAttribute{
 				MarkdownDescription: "Quality groups.",
 				Required:            true,
-				Attributes:          tfsdk.SetNestedAttributes(r.getQualityGroupSchema().Attributes),
-			},
-		},
-	}, nil
-}
-
-func (r QualityProfileResource) getQualityGroupSchema() tfsdk.Schema {
-	return tfsdk.Schema{
-		Attributes: map[string]tfsdk.Attribute{
-			"id": {
-				MarkdownDescription: "Quality group ID.",
-				Optional:            true,
-				Computed:            true,
-				Type:                types.Int64Type,
-			},
-			"name": {
-				MarkdownDescription: "Quality group name.",
-				Optional:            true,
-				Computed:            true,
-				Type:                types.StringType,
-			},
-			"qualities": {
-				MarkdownDescription: "Qualities in group.",
-				Required:            true,
-				Attributes:          tfsdk.SetNestedAttributes(r.getQualitySchema().Attributes),
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: r.getQualityGroupSchema().Attributes,
+				},
 			},
 		},
 	}
 }
 
-func (r QualityProfileResource) getQualitySchema() tfsdk.Schema {
-	return tfsdk.Schema{
-		Attributes: map[string]tfsdk.Attribute{
-			"id": {
+func (r QualityProfileResource) getQualityGroupSchema() schema.Schema {
+	return schema.Schema{
+		Attributes: map[string]schema.Attribute{
+			"id": schema.Int64Attribute{
+				MarkdownDescription: "Quality group ID.",
+				Optional:            true,
+				Computed:            true,
+			},
+			"name": schema.StringAttribute{
+				MarkdownDescription: "Quality group name.",
+				Optional:            true,
+				Computed:            true,
+			},
+			"qualities": schema.SetNestedAttribute{
+				MarkdownDescription: "Qualities in group.",
+				Required:            true,
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: r.getQualitySchema().Attributes,
+				},
+			},
+		},
+	}
+}
+
+func (r QualityProfileResource) getQualitySchema() schema.Schema {
+	return schema.Schema{
+		Attributes: map[string]schema.Attribute{
+			"id": schema.Int64Attribute{
 				MarkdownDescription: "Quality ID.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
-			"resolution": {
+			"resolution": schema.Int64Attribute{
 				MarkdownDescription: "Resolution.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
-			"name": {
+			"name": schema.StringAttribute{
 				MarkdownDescription: "Quality name.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"source": {
+			"source": schema.StringAttribute{
 				MarkdownDescription: "Source.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
 		},
 	}

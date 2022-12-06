@@ -16,7 +16,7 @@ func TestAccIndexerOmgwtfnzbsResource(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Create and Read testing
 			{
-				Config: testAccIndexerOmgwtfnzbsResourceConfig("newzabResourceTest", 30),
+				Config: testAccIndexerOmgwtfnzbsResourceConfig("omgwtfnzbsResourceTest", 30),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("sonarr_indexer_omgwtfnzbs.test", "delay", "30"),
 					resource.TestCheckResourceAttrSet("sonarr_indexer_omgwtfnzbs.test", "id"),
@@ -24,7 +24,7 @@ func TestAccIndexerOmgwtfnzbsResource(t *testing.T) {
 			},
 			// Update and Read testing
 			{
-				Config: testAccIndexerOmgwtfnzbsResourceConfig("newzabResourceTest", 60),
+				Config: testAccIndexerOmgwtfnzbsResourceConfig("omgwtfnzbsResourceTest", 60),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("sonarr_indexer_omgwtfnzbs.test", "delay", "60"),
 				),

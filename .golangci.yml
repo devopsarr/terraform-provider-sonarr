@@ -59,7 +59,7 @@ linters-settings:
       mnd:
         checks:
           - argument
-        ignored-functions: "make,strconv.FormatFloat,strconv.FormatInt,strconv.ParseFloat,strconv.ParseInt,strings.SplitN"
+        ignored-functions: "make,strconv.FormatFloat,strconv.FormatInt,strconv.ParseFloat,strconv.ParseInt,strings.SplitN,int64validator.OneOf"
   nolintlint:
     allow-leading-space: false
     require-explanation: true

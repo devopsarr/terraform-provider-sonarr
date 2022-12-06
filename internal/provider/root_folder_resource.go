@@ -6,9 +6,12 @@ import (
 	"strconv"
 
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -49,53 +52,50 @@ func (r *RootFolderResource) Metadata(ctx context.Context, req resource.Metadata
 	resp.TypeName = req.ProviderTypeName + "_" + rootFolderResourceName
 }
 
-func (r *RootFolderResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+func (r *RootFolderResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		MarkdownDescription: "<!-- subcategory:Media Management -->Root Folder resource.\nFor more information refer to [Root Folders](https://wiki.servarr.com/sonarr/settings#root-folders) documentation.",
-		Attributes: map[string]tfsdk.Attribute{
+		Attributes: map[string]schema.Attribute{
 			// TODO: add validator
-			"path": {
+			"path": schema.StringAttribute{
 				MarkdownDescription: "Root Folder absolute path.",
 				Required:            true,
-				Type:                types.StringType,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					resource.RequiresReplace(),
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.RequiresReplace(),
 				},
 			},
-			"accessible": {
+			"accessible": schema.BoolAttribute{
 				MarkdownDescription: "Access flag.",
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"id": {
+			"id": schema.Int64Attribute{
 				MarkdownDescription: "Root Folder ID.",
 				Computed:            true,
-				Type:                types.Int64Type,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					resource.UseStateForUnknown(),
+				PlanModifiers: []planmodifier.Int64{
+					int64planmodifier.UseStateForUnknown(),
 				},
 			},
-			"unmapped_folders": {
+			"unmapped_folders": schema.SetNestedAttribute{
 				MarkdownDescription: "List of folders with no associated series.",
 				Computed:            true,
-				Attributes:          tfsdk.SetNestedAttributes(r.getUnmappedFolderSchema().Attributes),
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: r.getUnmappedFolderSchema().Attributes,
+				},
 			},
 		},
-	}, nil
+	}
 }
 
-func (r RootFolderResource) getUnmappedFolderSchema() tfsdk.Schema {
-	return tfsdk.Schema{
-		Attributes: map[string]tfsdk.Attribute{
-			"path": {
+func (r RootFolderResource) getUnmappedFolderSchema() schema.Schema {
+	return schema.Schema{
+		Attributes: map[string]schema.Attribute{
+			"path": schema.StringAttribute{
 				MarkdownDescription: "Path of unmapped folder.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"name": {
+			"name": schema.StringAttribute{
 				MarkdownDescription: "Name of unmapped folder.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
 		},
 	}

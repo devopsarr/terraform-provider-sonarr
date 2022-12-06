@@ -6,9 +6,7 @@ import (
 
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
-	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr/sonarr"
 )
@@ -31,38 +29,33 @@ func (d *IndexerConfigDataSource) Metadata(ctx context.Context, req datasource.M
 	resp.TypeName = req.ProviderTypeName + "_" + indexerConfigDataSourceName
 }
 
-func (d *IndexerConfigDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+func (d *IndexerConfigDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the delay server.
 		MarkdownDescription: "<!-- subcategory:Indexers -->[Indexer Config](../resources/indexer_config).",
-		Attributes: map[string]tfsdk.Attribute{
-			"id": {
+		Attributes: map[string]schema.Attribute{
+			"id": schema.Int64Attribute{
 				MarkdownDescription: "Delay Profile ID.",
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
-			"maximum_size": {
+			"maximum_size": schema.Int64Attribute{
 				MarkdownDescription: "Maximum size.",
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
-			"minimum_age": {
+			"minimum_age": schema.Int64Attribute{
 				MarkdownDescription: "Minimum age.",
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
-			"retention": {
+			"retention": schema.Int64Attribute{
 				MarkdownDescription: "Retention.",
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
-			"rss_sync_interval": {
+			"rss_sync_interval": schema.Int64Attribute{
 				MarkdownDescription: "RSS sync interval.",
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
 		},
-	}, nil
+	}
 }
 
 func (d *IndexerConfigDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {

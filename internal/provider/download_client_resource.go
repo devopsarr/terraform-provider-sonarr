@@ -6,9 +6,14 @@ import (
 	"strconv"
 
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -91,292 +96,244 @@ func (r *DownloadClientResource) Metadata(ctx context.Context, req resource.Meta
 	resp.TypeName = req.ProviderTypeName + "_" + downloadClientResourceName
 }
 
-func (r *DownloadClientResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+func (r *DownloadClientResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		MarkdownDescription: "<!-- subcategory:Download Clients -->Download Client resource.\nFor more information refer to [Download Client](https://wiki.servarr.com/sonarr/settings#download-clients).",
-		Attributes: map[string]tfsdk.Attribute{
-			"enable": {
+		Attributes: map[string]schema.Attribute{
+			"enable": schema.BoolAttribute{
 				MarkdownDescription: "Enable flag.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"remove_completed_downloads": {
+			"remove_completed_downloads": schema.BoolAttribute{
 				MarkdownDescription: "Remove completed downloads flag.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"remove_failed_downloads": {
+			"remove_failed_downloads": schema.BoolAttribute{
 				MarkdownDescription: "Remove failed downloads flag.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"priority": {
+			"priority": schema.Int64Attribute{
 				MarkdownDescription: "Priority.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
-			"config_contract": {
+			"config_contract": schema.StringAttribute{
 				MarkdownDescription: "DownloadClient configuration template.",
 				Required:            true,
-				Type:                types.StringType,
 			},
-			"implementation": {
+			"implementation": schema.StringAttribute{
 				MarkdownDescription: "DownloadClient implementation name.",
 				Required:            true,
-				Type:                types.StringType,
 			},
-			"name": {
+			"name": schema.StringAttribute{
 				MarkdownDescription: "Download Client name.",
 				Required:            true,
-				Type:                types.StringType,
 			},
-			"protocol": {
+			"protocol": schema.StringAttribute{
 				MarkdownDescription: "Protocol. Valid values are 'usenet' and 'torrent'.",
 				Required:            true,
-				Type:                types.StringType,
-				Validators: []tfsdk.AttributeValidator{
-					tools.StringMatch([]string{"usenet", "torrent"}),
+				Validators: []validator.String{
+					stringvalidator.OneOf("usenet", "torrent"),
 				},
 			},
-			"tags": {
+			"tags": schema.SetAttribute{
 				MarkdownDescription: "List of associated tags.",
 				Optional:            true,
-				Computed:            true,
-				Type: types.SetType{
-					ElemType: types.Int64Type,
-				},
+				ElementType:         types.Int64Type,
 			},
-			"id": {
+			"id": schema.Int64Attribute{
 				MarkdownDescription: "Download Client ID.",
 				Computed:            true,
-				Type:                types.Int64Type,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					resource.UseStateForUnknown(),
+				PlanModifiers: []planmodifier.Int64{
+					int64planmodifier.UseStateForUnknown(),
 				},
 			},
 			// Field values
-			"add_paused": {
+			"add_paused": schema.BoolAttribute{
 				MarkdownDescription: "Add paused flag.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"use_ssl": {
+			"use_ssl": schema.BoolAttribute{
 				MarkdownDescription: "Use SSL flag.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"start_on_add": {
+			"start_on_add": schema.BoolAttribute{
 				MarkdownDescription: "Start on add flag.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"sequential_order": {
+			"sequential_order": schema.BoolAttribute{
 				MarkdownDescription: "Sequential order flag.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"first_and_last": {
+			"first_and_last": schema.BoolAttribute{
 				MarkdownDescription: "First and last flag.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"add_stopped": {
+			"add_stopped": schema.BoolAttribute{
 				MarkdownDescription: "Add stopped flag.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"save_magnet_files": {
+			"save_magnet_files": schema.BoolAttribute{
 				MarkdownDescription: "Save magnet files flag.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"read_only": {
+			"read_only": schema.BoolAttribute{
 				MarkdownDescription: "Read only flag.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"port": {
+			"port": schema.Int64Attribute{
 				MarkdownDescription: "Port.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
-			"recent_tv_priority": {
+			"recent_tv_priority": schema.Int64Attribute{
 				MarkdownDescription: "Recent TV priority. `0` Last, `1` First.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.Int64Type,
-				Validators: []tfsdk.AttributeValidator{
-					tools.IntMatch([]int64{0, 1}),
+				Validators: []validator.Int64{
+					int64validator.OneOf(0, 1),
 				},
 			},
-			"older_tv_priority": {
+			"older_tv_priority": schema.Int64Attribute{
 				MarkdownDescription: "Older TV priority. `0` Last, `1` First.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.Int64Type,
-				Validators: []tfsdk.AttributeValidator{
-					tools.IntMatch([]int64{0, 1}),
+				Validators: []validator.Int64{
+					int64validator.OneOf(0, 1),
 				},
 			},
-			"initial_state": {
+			"initial_state": schema.Int64Attribute{
 				MarkdownDescription: "Initial state. `0` Start, `1` ForceStart, `2` Pause.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.Int64Type,
-				Validators: []tfsdk.AttributeValidator{
-					tools.IntMatch([]int64{0, 1}),
+				Validators: []validator.Int64{
+					int64validator.OneOf(0, 1),
 				},
 			},
-			"intial_state": {
+			"intial_state": schema.Int64Attribute{
 				MarkdownDescription: "Initial state, with Stop support. `0` Start, `1` ForceStart, `2` Pause, `3` Stop.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
-			"host": {
+			"host": schema.StringAttribute{
 				MarkdownDescription: "host.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"api_key": {
+			"api_key": schema.StringAttribute{
 				MarkdownDescription: "API key.",
 				Optional:            true,
 				Computed:            true,
 				Sensitive:           true,
-				Type:                types.StringType,
 			},
-			"rpc_path": {
+			"rpc_path": schema.StringAttribute{
 				MarkdownDescription: "RPC path.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"url_base": {
+			"url_base": schema.StringAttribute{
 				MarkdownDescription: "Base URL.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"secret_token": {
+			"secret_token": schema.StringAttribute{
 				MarkdownDescription: "Secret token.",
 				Optional:            true,
 				Computed:            true,
 				Sensitive:           true,
-				Type:                types.StringType,
 			},
-			"username": {
+			"username": schema.StringAttribute{
 				MarkdownDescription: "Username.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"password": {
+			"password": schema.StringAttribute{
 				MarkdownDescription: "Password.",
 				Optional:            true,
 				Computed:            true,
 				Sensitive:           true,
-				Type:                types.StringType,
 			},
-			"tv_category": {
+			"tv_category": schema.StringAttribute{
 				MarkdownDescription: "TV category.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"tv_imported_category": {
+			"tv_imported_category": schema.StringAttribute{
 				MarkdownDescription: "TV imported category.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"tv_directory": {
+			"tv_directory": schema.StringAttribute{
 				MarkdownDescription: "TV directory.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"destination": {
+			"destination": schema.StringAttribute{
 				MarkdownDescription: "Destination.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"category": {
+			"category": schema.StringAttribute{
 				MarkdownDescription: "Category.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"nzb_folder": {
+			"nzb_folder": schema.StringAttribute{
 				MarkdownDescription: "NZB folder.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"strm_folder": {
+			"strm_folder": schema.StringAttribute{
 				MarkdownDescription: "STRM folder.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"torrent_folder": {
+			"torrent_folder": schema.StringAttribute{
 				MarkdownDescription: "Torrent folder.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"watch_folder": {
+			"watch_folder": schema.StringAttribute{
 				MarkdownDescription: "Watch folder flag.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"magnet_file_extension": {
+			"magnet_file_extension": schema.StringAttribute{
 				MarkdownDescription: "Magnet file extension.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"additional_tags": {
+			"additional_tags": schema.SetAttribute{
 				MarkdownDescription: "Additional tags, `0` TitleSlug, `1` Quality, `2` Language, `3` ReleaseGroup, `4` Year, `5` Indexer, `6` Network.",
 				Optional:            true,
 				Computed:            true,
-				Type: types.SetType{
-					ElemType: types.Int64Type,
-				},
+				ElementType:         types.Int64Type,
 			},
-			"field_tags": {
+			"field_tags": schema.SetAttribute{
 				MarkdownDescription: "Field tags.",
 				Optional:            true,
 				Computed:            true,
-				Type: types.SetType{
-					ElemType: types.StringType,
-				},
+				ElementType:         types.StringType,
 			},
-			"post_import_tags": {
+			"post_import_tags": schema.SetAttribute{
 				MarkdownDescription: "Post import tags.",
 				Optional:            true,
 				Computed:            true,
-				Type: types.SetType{
-					ElemType: types.StringType,
-				},
+				ElementType:         types.StringType,
 			},
 		},
-	}, nil
+	}
 }
 
 func (r *DownloadClientResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
@@ -422,6 +379,7 @@ func (r *DownloadClientResource) Create(ctx context.Context, req resource.Create
 	// Generate resource state struct
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state DownloadClient
+	state.Tags = client.Tags
 
 	state.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
@@ -449,6 +407,7 @@ func (r *DownloadClientResource) Read(ctx context.Context, req resource.ReadRequ
 	// Map response body to resource schema attribute
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state DownloadClient
+	state.Tags = client.Tags
 
 	state.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
@@ -478,6 +437,7 @@ func (r *DownloadClientResource) Update(ctx context.Context, req resource.Update
 	// Generate resource state struct
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state DownloadClient
+	state.Tags = client.Tags
 
 	state.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
@@ -521,6 +481,10 @@ func (r *DownloadClientResource) ImportState(ctx context.Context, req resource.I
 }
 
 func (d *DownloadClient) write(ctx context.Context, downloadClient *sonarr.DownloadClientOutput) {
+	if !d.Tags.IsNull() && len(downloadClient.Tags) == 0 {
+		d.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, downloadClient.Tags)
+	}
+
 	d.Enable = types.BoolValue(downloadClient.Enable)
 	d.RemoveCompletedDownloads = types.BoolValue(downloadClient.RemoveCompletedDownloads)
 	d.RemoveFailedDownloads = types.BoolValue(downloadClient.RemoveFailedDownloads)
@@ -530,11 +494,9 @@ func (d *DownloadClient) write(ctx context.Context, downloadClient *sonarr.Downl
 	d.Implementation = types.StringValue(downloadClient.Implementation)
 	d.Name = types.StringValue(downloadClient.Name)
 	d.Protocol = types.StringValue(downloadClient.Protocol)
-	d.Tags = types.SetValueMust(types.Int64Type, nil)
 	d.AdditionalTags = types.SetValueMust(types.Int64Type, nil)
 	d.FieldTags = types.SetValueMust(types.StringType, nil)
 	d.PostImportTags = types.SetValueMust(types.StringType, nil)
-	tfsdk.ValueFrom(ctx, downloadClient.Tags, d.Tags.Type(ctx), &d.Tags)
 	d.writeFields(ctx, downloadClient.Fields)
 }
 

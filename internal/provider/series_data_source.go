@@ -6,8 +6,7 @@ import (
 
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
+	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr/sonarr"
@@ -31,75 +30,62 @@ func (d *SeriesDataSource) Metadata(ctx context.Context, req datasource.Metadata
 	resp.TypeName = req.ProviderTypeName + "_" + seriesDataSourceName
 }
 
-func (d *SeriesDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+func (d *SeriesDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the language server.
 		MarkdownDescription: "<!-- subcategory:Series -->Single [Series](../resources/series).",
-		Attributes: map[string]tfsdk.Attribute{
-			"id": {
+		Attributes: map[string]schema.Attribute{
+			"id": schema.Int64Attribute{
 				MarkdownDescription: "Series ID.",
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
-			"title": {
+			"title": schema.StringAttribute{
 				MarkdownDescription: "Series Title.",
 				Required:            true,
-				Type:                types.StringType,
 			},
-			"title_slug": {
+			"title_slug": schema.StringAttribute{
 				MarkdownDescription: "Series Title in kebab format.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"monitored": {
+			"monitored": schema.BoolAttribute{
 				MarkdownDescription: "Monitored flag.",
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"season_folder": {
+			"season_folder": schema.BoolAttribute{
 				MarkdownDescription: "Season Folder flag.",
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"use_scene_numbering": {
+			"use_scene_numbering": schema.BoolAttribute{
 				MarkdownDescription: "Scene numbering flag.",
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"language_profile_id": {
+			"language_profile_id": schema.Int64Attribute{
 				MarkdownDescription: "Language Profile ID .",
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
-			"quality_profile_id": {
+			"quality_profile_id": schema.Int64Attribute{
 				MarkdownDescription: "Quality Profile ID.",
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
-			"tvdb_id": {
+			"tvdb_id": schema.Int64Attribute{
 				MarkdownDescription: "TVDB ID.",
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
-			"path": {
+			"path": schema.StringAttribute{
 				MarkdownDescription: "Series Path.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"root_folder_path": {
+			"root_folder_path": schema.StringAttribute{
 				MarkdownDescription: "Series Root Folder.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"tags": {
-				MarkdownDescription: "Tags.",
-				Optional:            true,
-				Type: types.SetType{
-					ElemType: types.Int64Type,
-				},
+			"tags": schema.SetAttribute{
+				MarkdownDescription: "List of associated tags.",
+				Computed:            true,
+				ElementType:         types.Int64Type,
 			},
 		},
-	}, nil
+	}
 }
 
 func (d *SeriesDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {

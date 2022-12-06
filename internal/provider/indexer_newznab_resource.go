@@ -6,9 +6,11 @@ import (
 	"strconv"
 
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -96,111 +98,92 @@ func (r *IndexerNewznabResource) Metadata(ctx context.Context, req resource.Meta
 	resp.TypeName = req.ProviderTypeName + "_" + indexerNewznabResourceName
 }
 
-func (r *IndexerNewznabResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+func (r *IndexerNewznabResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		MarkdownDescription: "<!-- subcategory:Indexers -->Indexer Newznab resource.\nFor more information refer to [Indexer](https://wiki.servarr.com/sonarr/settings#indexers) and [Newznab](https://wiki.servarr.com/sonarr/supported#newznab).",
-		Attributes: map[string]tfsdk.Attribute{
-			"enable_automatic_search": {
+		Attributes: map[string]schema.Attribute{
+			"enable_automatic_search": schema.BoolAttribute{
 				MarkdownDescription: "Enable automatic search flag.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"enable_interactive_search": {
+			"enable_interactive_search": schema.BoolAttribute{
 				MarkdownDescription: "Enable interactive search flag.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"enable_rss": {
+			"enable_rss": schema.BoolAttribute{
 				MarkdownDescription: "Enable RSS flag.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"priority": {
+			"priority": schema.Int64Attribute{
 				MarkdownDescription: "Priority.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
-			"download_client_id": {
+			"download_client_id": schema.Int64Attribute{
 				MarkdownDescription: "Download client ID.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
-			"name": {
+			"name": schema.StringAttribute{
 				MarkdownDescription: "IndexerNewznab name.",
 				Required:            true,
-				Type:                types.StringType,
 			},
-			"tags": {
+			"tags": schema.SetAttribute{
 				MarkdownDescription: "List of associated tags.",
 				Optional:            true,
-				Computed:            true,
-				Type: types.SetType{
-					ElemType: types.Int64Type,
-				},
+				ElementType:         types.Int64Type,
 			},
-			"id": {
+			"id": schema.Int64Attribute{
 				MarkdownDescription: "IndexerNewznab ID.",
 				Computed:            true,
-				Type:                types.Int64Type,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					resource.UseStateForUnknown(),
+				PlanModifiers: []planmodifier.Int64{
+					int64planmodifier.UseStateForUnknown(),
 				},
 			},
 			// Field values
-			"anime_standard_format_search": {
+			"anime_standard_format_search": schema.BoolAttribute{
 				MarkdownDescription: "Search anime in standard format.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"additional_parameters": {
+			"additional_parameters": schema.StringAttribute{
 				MarkdownDescription: "Additional parameters.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"api_key": {
+			"api_key": schema.StringAttribute{
 				MarkdownDescription: "API key.",
 				Optional:            true,
 				Computed:            true,
 				Sensitive:           true,
-				Type:                types.StringType,
 			},
-			"api_path": {
+			"api_path": schema.StringAttribute{
 				MarkdownDescription: "API path.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"base_url": {
+			"base_url": schema.StringAttribute{
 				MarkdownDescription: "Base URL.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"categories": {
+			"categories": schema.SetAttribute{
 				MarkdownDescription: "Series list.",
 				Optional:            true,
 				Computed:            true,
-				Type: types.SetType{
-					ElemType: types.Int64Type,
-				},
+				ElementType:         types.Int64Type,
 			},
-			"anime_categories": {
+			"anime_categories": schema.SetAttribute{
 				MarkdownDescription: "Anime list.",
 				Optional:            true,
 				Computed:            true,
-				Type: types.SetType{
-					ElemType: types.Int64Type,
-				},
+				ElementType:         types.Int64Type,
 			},
 		},
-	}, nil
+	}
 }
 
 func (r *IndexerNewznabResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
@@ -344,11 +327,14 @@ func (i *IndexerNewznab) write(ctx context.Context, indexer *sonarr.IndexerOutpu
 		DownloadClientID:        types.Int64Value(indexer.DownloadClientID),
 		ID:                      types.Int64Value(indexer.ID),
 		Name:                    types.StringValue(indexer.Name),
-		Tags:                    types.SetValueMust(types.Int64Type, nil),
 		AnimeCategories:         types.SetValueMust(types.Int64Type, nil),
 		Categories:              types.SetValueMust(types.Int64Type, nil),
+		Tags:                    types.SetNull(types.Int64Type),
 	}
-	tfsdk.ValueFrom(ctx, indexer.Tags, genericIndexer.Tags.Type(ctx), &genericIndexer.Tags)
+	if !i.Tags.IsNull() || !(len(indexer.Tags) == 0) {
+		genericIndexer.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, indexer.Tags)
+	}
+
 	genericIndexer.writeFields(ctx, indexer.Fields)
 	i.fromIndexer(&genericIndexer)
 }

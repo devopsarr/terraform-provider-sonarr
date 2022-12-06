@@ -6,9 +6,11 @@ import (
 	"strconv"
 
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -78,68 +80,57 @@ func (r *DownloadClientUsenetBlackholeResource) Metadata(ctx context.Context, re
 	resp.TypeName = req.ProviderTypeName + "_" + downloadClientUsenetBlackholeResourceName
 }
 
-func (r *DownloadClientUsenetBlackholeResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+func (r *DownloadClientUsenetBlackholeResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		MarkdownDescription: "<!-- subcategory:Download Clients -->Download Client Usenet Blackhole resource.\nFor more information refer to [Download Client](https://wiki.servarr.com/sonarr/settings#download-clients) and [UsenetBlackhole](https://wiki.servarr.com/sonarr/supported#usenetblackhole).",
-		Attributes: map[string]tfsdk.Attribute{
-			"enable": {
+		Attributes: map[string]schema.Attribute{
+			"enable": schema.BoolAttribute{
 				MarkdownDescription: "Enable flag.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"remove_completed_downloads": {
+			"remove_completed_downloads": schema.BoolAttribute{
 				MarkdownDescription: "Remove completed downloads flag.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"remove_failed_downloads": {
+			"remove_failed_downloads": schema.BoolAttribute{
 				MarkdownDescription: "Remove failed downloads flag.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"priority": {
+			"priority": schema.Int64Attribute{
 				MarkdownDescription: "Priority.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
-			"name": {
+			"name": schema.StringAttribute{
 				MarkdownDescription: "Download Client name.",
 				Required:            true,
-				Type:                types.StringType,
 			},
-			"tags": {
+			"tags": schema.SetAttribute{
 				MarkdownDescription: "List of associated tags.",
 				Optional:            true,
-				Computed:            true,
-				Type: types.SetType{
-					ElemType: types.Int64Type,
-				},
+				ElementType:         types.Int64Type,
 			},
-			"id": {
+			"id": schema.Int64Attribute{
 				MarkdownDescription: "Download Client ID.",
 				Computed:            true,
-				Type:                types.Int64Type,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					resource.UseStateForUnknown(),
+				PlanModifiers: []planmodifier.Int64{
+					int64planmodifier.UseStateForUnknown(),
 				},
 			},
 			// Field values
-			"nzb_folder": {
+			"nzb_folder": schema.StringAttribute{
 				MarkdownDescription: "Usenet folder.",
 				Required:            true,
-				Type:                types.StringType,
 			},
-			"watch_folder": {
+			"watch_folder": schema.StringAttribute{
 				MarkdownDescription: "Watch folder flag.",
 				Required:            true,
-				Type:                types.StringType,
 			},
 		},
-	}, nil
+	}
 }
 
 func (r *DownloadClientUsenetBlackholeResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
@@ -282,9 +273,12 @@ func (d *DownloadClientUsenetBlackhole) write(ctx context.Context, downloadClien
 		Priority:                 types.Int64Value(int64(downloadClient.Priority)),
 		ID:                       types.Int64Value(downloadClient.ID),
 		Name:                     types.StringValue(downloadClient.Name),
-		Tags:                     types.SetValueMust(types.Int64Type, nil),
+		Tags:                     types.SetNull(types.Int64Type),
 	}
-	tfsdk.ValueFrom(ctx, downloadClient.Tags, genericDownloadClient.Tags.Type(ctx), &genericDownloadClient.Tags)
+	if !d.Tags.IsNull() || !(len(downloadClient.Tags) == 0) {
+		genericDownloadClient.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, downloadClient.Tags)
+	}
+
 	genericDownloadClient.writeFields(ctx, downloadClient.Fields)
 	d.fromDownloadClient(&genericDownloadClient)
 }

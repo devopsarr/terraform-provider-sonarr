@@ -6,9 +6,13 @@ import (
 	"strconv"
 
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -119,462 +123,384 @@ func (r *NotificationResource) Metadata(ctx context.Context, req resource.Metada
 	resp.TypeName = req.ProviderTypeName + "_" + notificationResourceName
 }
 
-func (r *NotificationResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+func (r *NotificationResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		MarkdownDescription: "<!-- subcategory:Notifications -->Notification resource.\nFor more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect).",
-		Attributes: map[string]tfsdk.Attribute{
-			"on_grab": {
+		Attributes: map[string]schema.Attribute{
+			"on_grab": schema.BoolAttribute{
 				MarkdownDescription: "On grab flag.",
 				Required:            true,
-				Type:                types.BoolType,
 			},
-			"on_download": {
+			"on_download": schema.BoolAttribute{
 				MarkdownDescription: "On download flag.",
 				Required:            true,
-				Type:                types.BoolType,
 			},
-			"on_upgrade": {
+			"on_upgrade": schema.BoolAttribute{
 				MarkdownDescription: "On upgrade flag.",
 				Required:            true,
-				Type:                types.BoolType,
 			},
-			"on_rename": {
+			"on_rename": schema.BoolAttribute{
 				MarkdownDescription: "On rename flag.",
 				Required:            true,
-				Type:                types.BoolType,
 			},
-			"on_series_delete": {
+			"on_series_delete": schema.BoolAttribute{
 				MarkdownDescription: "On series delete flag.",
 				Required:            true,
-				Type:                types.BoolType,
 			},
-			"on_episode_file_delete": {
+			"on_episode_file_delete": schema.BoolAttribute{
 				MarkdownDescription: "On episode file delete flag.",
 				Required:            true,
-				Type:                types.BoolType,
 			},
-			"on_episode_file_delete_for_upgrade": {
+			"on_episode_file_delete_for_upgrade": schema.BoolAttribute{
 				MarkdownDescription: "On episode file delete for upgrade flag.",
 				Required:            true,
-				Type:                types.BoolType,
 			},
-			"on_health_issue": {
+			"on_health_issue": schema.BoolAttribute{
 				MarkdownDescription: "On health issue flag.",
 				Required:            true,
-				Type:                types.BoolType,
 			},
-			"on_application_update": {
+			"on_application_update": schema.BoolAttribute{
 				MarkdownDescription: "On application update flag.",
 				Required:            true,
-				Type:                types.BoolType,
 			},
-			"include_health_warnings": {
+			"include_health_warnings": schema.BoolAttribute{
 				MarkdownDescription: "Include health warnings.",
 				Required:            true,
-				Type:                types.BoolType,
 			},
-			"config_contract": {
+			"config_contract": schema.StringAttribute{
 				MarkdownDescription: "Notification configuration template.",
 				Required:            true,
-				Type:                types.StringType,
 			},
-			"implementation": {
+			"implementation": schema.StringAttribute{
 				MarkdownDescription: "Notification implementation name.",
 				Required:            true,
-				Type:                types.StringType,
 			},
-			"name": {
+			"name": schema.StringAttribute{
 				MarkdownDescription: "Notification name.",
 				Required:            true,
-				Type:                types.StringType,
 			},
-			"tags": {
+			"tags": schema.SetAttribute{
 				MarkdownDescription: "List of associated tags.",
 				Optional:            true,
-				Computed:            true,
-				Type: types.SetType{
-					ElemType: types.Int64Type,
-				},
+				ElementType:         types.Int64Type,
 			},
-			"id": {
+			"id": schema.Int64Attribute{
 				MarkdownDescription: "Notification ID.",
 				Computed:            true,
-				Type:                types.Int64Type,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					resource.UseStateForUnknown(),
+				PlanModifiers: []planmodifier.Int64{
+					int64planmodifier.UseStateForUnknown(),
 				},
 			},
 			// Field values
-			"always_update": {
+			"always_update": schema.BoolAttribute{
 				MarkdownDescription: "Always update flag.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"clean_library": {
+			"clean_library": schema.BoolAttribute{
 				MarkdownDescription: "Clean library flag.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"direct_message": {
+			"direct_message": schema.BoolAttribute{
 				MarkdownDescription: "Direct message flag.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"notify": {
+			"notify": schema.BoolAttribute{
 				MarkdownDescription: "Notify flag.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"require_encryption": {
+			"require_encryption": schema.BoolAttribute{
 				MarkdownDescription: "Require encryption flag.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"send_silently": {
+			"send_silently": schema.BoolAttribute{
 				MarkdownDescription: "Add silently flag.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"update_library": {
+			"update_library": schema.BoolAttribute{
 				MarkdownDescription: "Update library flag.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"use_eu_endpoint": {
+			"use_eu_endpoint": schema.BoolAttribute{
 				MarkdownDescription: "Use EU endpoint flag.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"use_ssl": {
+			"use_ssl": schema.BoolAttribute{
 				MarkdownDescription: "Use SSL flag.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"port": {
+			"port": schema.Int64Attribute{
 				MarkdownDescription: "Port.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
-			"grab_fields": {
+			"grab_fields": schema.Int64Attribute{
 				MarkdownDescription: "Grab fields. `0` Overview, `1` Rating, `2` Genres, `3` Quality, `4` Group, `5` Size, `6` Links, `7` Release, `8` Poster, `9` Fanart.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.Int64Type,
-				Validators: []tfsdk.AttributeValidator{
-					tools.IntMatch([]int64{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}),
+				Validators: []validator.Int64{
+					int64validator.OneOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9),
 				},
 			},
-			"import_fields": {
+			"import_fields": schema.Int64Attribute{
 				MarkdownDescription: "Import fields. `0` Overview, `1` Rating, `2` Genres, `3` Quality, `4` Codecs, `5` Group, `6` Size, `7` Languages, `8` Subtitles, `9` Links, `10` Release, `11` Poster, `12` Fanart.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.Int64Type,
-				Validators: []tfsdk.AttributeValidator{
-					tools.IntMatch([]int64{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}),
+				Validators: []validator.Int64{
+					int64validator.OneOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12),
 				},
 			},
-			"method": {
+			"method": schema.Int64Attribute{
 				MarkdownDescription: "Method. `1` POST, `2` PUT.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.Int64Type,
-				Validators: []tfsdk.AttributeValidator{
-					tools.IntMatch([]int64{1, 2}),
+				Validators: []validator.Int64{
+					int64validator.OneOf(1, 2),
 				},
 			},
-			"priority": {
+			"priority": schema.Int64Attribute{
 				MarkdownDescription: "Priority.", // TODO: add values in description
 				Optional:            true,
 				Computed:            true,
-				Type:                types.Int64Type,
-				Validators: []tfsdk.AttributeValidator{
-					tools.IntMatch([]int64{-2, -1, 0, 1, 2, 3, 4, 5, 7}),
+				Validators: []validator.Int64{
+					int64validator.OneOf(-2, -1, 0, 1, 2, 3, 4, 5, 7),
 				},
 			},
-			"access_token": {
+			"access_token": schema.StringAttribute{
 				MarkdownDescription: "Access token.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"access_token_secret": {
+			"access_token_secret": schema.StringAttribute{
 				MarkdownDescription: "Access token secret.",
 				Optional:            true,
 				Computed:            true,
 				Sensitive:           true,
-				Type:                types.StringType,
 			},
-			"api_key": {
+			"api_key": schema.StringAttribute{
 				MarkdownDescription: "API key.",
 				Optional:            true,
 				Computed:            true,
 				Sensitive:           true,
-				Type:                types.StringType,
 			},
-			"app_token": {
+			"app_token": schema.StringAttribute{
 				MarkdownDescription: "App token.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"arguments": {
+			"arguments": schema.StringAttribute{
 				MarkdownDescription: "Arguments.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"author": {
+			"author": schema.StringAttribute{
 				MarkdownDescription: "Author.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"auth_token": {
+			"auth_token": schema.StringAttribute{
 				MarkdownDescription: "Auth token.",
 				Optional:            true,
 				Computed:            true,
 				Sensitive:           true,
-				Type:                types.StringType,
 			},
-			"auth_user": {
+			"auth_user": schema.StringAttribute{
 				MarkdownDescription: "Auth user.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"avatar": {
+			"avatar": schema.StringAttribute{
 				MarkdownDescription: "Avatar.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"bcc": {
+			"bcc": schema.StringAttribute{
 				MarkdownDescription: "Bcc.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"bot_token": {
+			"bot_token": schema.StringAttribute{
 				MarkdownDescription: "Bot token.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"cc": {
+			"cc": schema.StringAttribute{
 				MarkdownDescription: "Cc.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"channel": {
+			"channel": schema.StringAttribute{
 				MarkdownDescription: "Channel.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"chat_id": {
+			"chat_id": schema.StringAttribute{
 				MarkdownDescription: "Chat ID.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"consumer_key": {
+			"consumer_key": schema.StringAttribute{
 				MarkdownDescription: "Consumer key.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"consumer_secret": {
+			"consumer_secret": schema.StringAttribute{
 				MarkdownDescription: "Consumer secret.",
 				Optional:            true,
 				Computed:            true,
 				Sensitive:           true,
-				Type:                types.StringType,
 			},
-			"device_names": {
+			"device_names": schema.StringAttribute{
 				MarkdownDescription: "Device names.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"display_time": {
+			"display_time": schema.StringAttribute{
 				MarkdownDescription: "Display time.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"expire": {
+			"expire": schema.StringAttribute{
 				MarkdownDescription: "Expire.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"expires": {
+			"expires": schema.StringAttribute{
 				MarkdownDescription: "Expires.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"from": {
+			"from": schema.StringAttribute{
 				MarkdownDescription: "From.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"host": {
+			"host": schema.StringAttribute{
 				MarkdownDescription: "Host.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"icon": {
+			"icon": schema.StringAttribute{
 				MarkdownDescription: "Icon.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"mention": {
+			"mention": schema.StringAttribute{
 				MarkdownDescription: "Mention.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"password": {
+			"password": schema.StringAttribute{
 				MarkdownDescription: "password.",
 				Optional:            true,
 				Computed:            true,
 				Sensitive:           true,
-				Type:                types.StringType,
 			},
-			"path": {
+			"path": schema.StringAttribute{
 				MarkdownDescription: "Path.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"refresh_token": {
+			"refresh_token": schema.StringAttribute{
 				MarkdownDescription: "Refresh token.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"retry": {
+			"retry": schema.StringAttribute{
 				MarkdownDescription: "Retry.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"sender_domain": {
+			"sender_domain": schema.StringAttribute{
 				MarkdownDescription: "Sender domain.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"sender_id": {
+			"sender_id": schema.StringAttribute{
 				MarkdownDescription: "Sender ID.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"server": {
+			"server": schema.StringAttribute{
 				MarkdownDescription: "server.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"sign_in": {
+			"sign_in": schema.StringAttribute{
 				MarkdownDescription: "Sign in.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"sound": {
+			"sound": schema.StringAttribute{
 				MarkdownDescription: "Sound.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"to": {
+			"to": schema.StringAttribute{
 				MarkdownDescription: "To.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"token": {
+			"token": schema.StringAttribute{
 				MarkdownDescription: "Token.",
 				Optional:            true,
 				Computed:            true,
 				Sensitive:           true,
-				Type:                types.StringType,
 			},
-			"url": {
+			"url": schema.StringAttribute{
 				MarkdownDescription: "URL.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"user_key": {
+			"user_key": schema.StringAttribute{
 				MarkdownDescription: "User key.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"username": {
+			"username": schema.StringAttribute{
 				MarkdownDescription: "Username.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"web_hook_url": {
+			"web_hook_url": schema.StringAttribute{
 				MarkdownDescription: "Web hook url.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"channel_tags": {
+			"channel_tags": schema.SetAttribute{
 				MarkdownDescription: "Channel tags.",
 				Optional:            true,
 				Computed:            true,
-				Type: types.SetType{
-					ElemType: types.StringType,
-				},
+				ElementType:         types.StringType,
 			},
-			"device_ids": {
+			"device_ids": schema.SetAttribute{
 				MarkdownDescription: "Device IDs.",
 				Optional:            true,
 				Computed:            true,
-				Type: types.SetType{
-					ElemType: types.StringType,
-				},
+				ElementType:         types.StringType,
 			},
-			"devices": {
+			"devices": schema.SetAttribute{
 				MarkdownDescription: "Devices.",
 				Optional:            true,
 				Computed:            true,
-				Type: types.SetType{
-					ElemType: types.StringType,
-				},
+				ElementType:         types.StringType,
 			},
-			"recipients": {
+			"recipients": schema.SetAttribute{
 				MarkdownDescription: "Recipients.",
 				Optional:            true,
 				Computed:            true,
-				Type: types.SetType{
-					ElemType: types.StringType,
-				},
+				ElementType:         types.StringType,
 			},
 		},
-	}, nil
+	}
 }
 
 func (r *NotificationResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
@@ -620,6 +546,7 @@ func (r *NotificationResource) Create(ctx context.Context, req resource.CreateRe
 	// Generate resource state struct
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state Notification
+	state.Tags = notification.Tags
 
 	state.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
@@ -647,6 +574,7 @@ func (r *NotificationResource) Read(ctx context.Context, req resource.ReadReques
 	// Map response body to resource schema attribute
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state Notification
+	state.Tags = notification.Tags
 
 	state.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
@@ -676,6 +604,7 @@ func (r *NotificationResource) Update(ctx context.Context, req resource.UpdateRe
 	// Generate resource state struct
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state Notification
+	state.Tags = notification.Tags
 
 	state.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
@@ -719,6 +648,10 @@ func (r *NotificationResource) ImportState(ctx context.Context, req resource.Imp
 }
 
 func (n *Notification) write(ctx context.Context, notification *sonarr.NotificationOutput) {
+	if !n.Tags.IsNull() && len(notification.Tags) == 0 {
+		n.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, notification.Tags)
+	}
+
 	n.OnGrab = types.BoolValue(notification.OnGrab)
 	n.OnDownload = types.BoolValue(notification.OnDownload)
 	n.OnUpgrade = types.BoolValue(notification.OnUpgrade)
@@ -733,12 +666,10 @@ func (n *Notification) write(ctx context.Context, notification *sonarr.Notificat
 	n.Name = types.StringValue(notification.Name)
 	n.Implementation = types.StringValue(notification.Implementation)
 	n.ConfigContract = types.StringValue(notification.ConfigContract)
-	n.Tags = types.SetValueMust(types.Int64Type, nil)
 	n.ChannelTags = types.SetValueMust(types.StringType, nil)
 	n.DeviceIds = types.SetValueMust(types.StringType, nil)
 	n.Devices = types.SetValueMust(types.StringType, nil)
 	n.Recipients = types.SetValueMust(types.StringType, nil)
-	tfsdk.ValueFrom(ctx, notification.Tags, n.Tags.Type(ctx), &n.Tags)
 	n.writeFields(ctx, notification.Fields)
 }
 

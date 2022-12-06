@@ -7,8 +7,7 @@ import (
 
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -39,58 +38,53 @@ func (d *RootFoldersDataSource) Metadata(ctx context.Context, req datasource.Met
 	resp.TypeName = req.ProviderTypeName + "_" + rootFoldersDataSourceName
 }
 
-func (d *RootFoldersDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+func (d *RootFoldersDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the delay server.
 		MarkdownDescription: "<!-- subcategory:Media Management -->List all available [Root Folders](../resources/root_folder).",
-		Attributes: map[string]tfsdk.Attribute{
+		Attributes: map[string]schema.Attribute{
 			// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
-			"id": {
+			"id": schema.StringAttribute{
 				Computed: true,
-				Type:     types.StringType,
 			},
-			"root_folders": {
+			"root_folders": schema.SetNestedAttribute{
 				MarkdownDescription: "Root Folder list.",
 				Computed:            true,
-				Attributes: tfsdk.SetNestedAttributes(map[string]tfsdk.Attribute{
-					"path": {
-						MarkdownDescription: "Root Folder absolute path.",
-						Computed:            true,
-						Type:                types.StringType,
-					},
-					"accessible": {
-						MarkdownDescription: "Access flag.",
-						Computed:            true,
-						Type:                types.BoolType,
-					},
-					"id": {
-						MarkdownDescription: "Root Folder ID.",
-						Computed:            true,
-						Type:                types.Int64Type,
-						PlanModifiers: tfsdk.AttributePlanModifiers{
-							resource.UseStateForUnknown(),
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: map[string]schema.Attribute{
+						"path": schema.StringAttribute{
+							MarkdownDescription: "Root Folder absolute path.",
+							Computed:            true,
+						},
+						"accessible": schema.BoolAttribute{
+							MarkdownDescription: "Access flag.",
+							Computed:            true,
+						},
+						"id": schema.Int64Attribute{
+							MarkdownDescription: "Root Folder ID.",
+							Computed:            true,
+						},
+						"unmapped_folders": schema.SetNestedAttribute{
+							MarkdownDescription: "List of folders with no associated series.",
+							Computed:            true,
+							NestedObject: schema.NestedAttributeObject{
+								Attributes: map[string]schema.Attribute{
+									"path": schema.StringAttribute{
+										MarkdownDescription: "Path of unmapped folder.",
+										Computed:            true,
+									},
+									"name": schema.StringAttribute{
+										MarkdownDescription: "Name of unmapped folder.",
+										Computed:            true,
+									},
+								},
+							},
 						},
 					},
-					"unmapped_folders": {
-						MarkdownDescription: "List of folders with no associated series.",
-						Computed:            true,
-						Attributes: tfsdk.SetNestedAttributes(map[string]tfsdk.Attribute{
-							"path": {
-								MarkdownDescription: "Path of unmapped folder.",
-								Computed:            true,
-								Type:                types.StringType,
-							},
-							"name": {
-								MarkdownDescription: "Name of unmapped folder.",
-								Computed:            true,
-								Type:                types.StringType,
-							},
-						}),
-					},
-				}),
+				},
 			},
 		},
-	}, nil
+	}
 }
 
 func (d *RootFoldersDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {

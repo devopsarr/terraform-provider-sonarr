@@ -7,7 +7,7 @@ import (
 
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -38,49 +38,46 @@ func (d *LanguageProfilesDataSource) Metadata(ctx context.Context, req datasourc
 	resp.TypeName = req.ProviderTypeName + "_" + languageProfilesDataSourceName
 }
 
-func (d *LanguageProfilesDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+func (d *LanguageProfilesDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the language server.
 		MarkdownDescription: "<!-- subcategory:Profiles -->List all available [Language Profiles](../resources/language_profile).",
-		Attributes: map[string]tfsdk.Attribute{
+		Attributes: map[string]schema.Attribute{
 			// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
-			"id": {
+			"id": schema.StringAttribute{
 				Computed: true,
-				Type:     types.StringType,
 			},
-			"language_profiles": {
+			"language_profiles": schema.SetNestedAttribute{
 				MarkdownDescription: "Language Profile list.",
 				Computed:            true,
-				Attributes: tfsdk.SetNestedAttributes(map[string]tfsdk.Attribute{
-					"id": {
-						MarkdownDescription: "Language Profile ID.",
-						Computed:            true,
-						Type:                types.Int64Type,
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: map[string]schema.Attribute{
+						"id": schema.Int64Attribute{
+							MarkdownDescription: "Language Profile ID.",
+							Computed:            true,
+						},
+						"name": schema.StringAttribute{
+							MarkdownDescription: "Language Profile name.",
+							Computed:            true,
+						},
+						"upgrade_allowed": schema.BoolAttribute{
+							MarkdownDescription: "Upgrade allowed Flag.",
+							Computed:            true,
+						},
+						"cutoff_language": schema.StringAttribute{
+							MarkdownDescription: "Cutoff Language.",
+							Computed:            true,
+						},
+						"languages": schema.SetAttribute{
+							MarkdownDescription: "list of languages in profile.",
+							Computed:            true,
+							ElementType:         types.StringType,
+						},
 					},
-					"name": {
-						MarkdownDescription: "Language Profile name.",
-						Computed:            true,
-						Type:                types.StringType,
-					},
-					"upgrade_allowed": {
-						MarkdownDescription: "Upgrade allowed Flag.",
-						Computed:            true,
-						Type:                types.BoolType,
-					},
-					"cutoff_language": {
-						MarkdownDescription: "Cutoff Language.",
-						Computed:            true,
-						Type:                types.StringType,
-					},
-					"languages": {
-						MarkdownDescription: "list of languages in profile.",
-						Computed:            true,
-						Type:                types.SetType{ElemType: types.StringType},
-					},
-				}),
+				},
 			},
 		},
-	}, nil
+	}
 }
 
 func (d *LanguageProfilesDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {

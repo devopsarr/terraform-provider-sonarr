@@ -7,7 +7,7 @@ import (
 
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -38,44 +38,41 @@ func (d *RemotePathMappingsDataSource) Metadata(ctx context.Context, req datasou
 	resp.TypeName = req.ProviderTypeName + "_" + remotePathMappingsDataSourceName
 }
 
-func (d *RemotePathMappingsDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+func (d *RemotePathMappingsDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the delay server.
 		MarkdownDescription: "<!-- subcategory:Download Clients -->List all available [Remote Path Mappings](../resources/remote_path_mapping).",
-		Attributes: map[string]tfsdk.Attribute{
+		Attributes: map[string]schema.Attribute{
 			// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
-			"id": {
+			"id": schema.StringAttribute{
 				Computed: true,
-				Type:     types.StringType,
 			},
-			"remote_path_mappings": {
+			"remote_path_mappings": schema.SetNestedAttribute{
 				MarkdownDescription: "Remote Path Mapping list.",
 				Computed:            true,
-				Attributes: tfsdk.SetNestedAttributes(map[string]tfsdk.Attribute{
-					"host": {
-						MarkdownDescription: "Download Client host.",
-						Computed:            true,
-						Type:                types.StringType,
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: map[string]schema.Attribute{
+						"host": schema.StringAttribute{
+							MarkdownDescription: "Download Client host.",
+							Computed:            true,
+						},
+						"remote_path": schema.StringAttribute{
+							MarkdownDescription: "Download Client remote path.",
+							Computed:            true,
+						},
+						"local_path": schema.StringAttribute{
+							MarkdownDescription: "Local path.",
+							Computed:            true,
+						},
+						"id": schema.Int64Attribute{
+							MarkdownDescription: "RemotePathMapping ID.",
+							Computed:            true,
+						},
 					},
-					"remote_path": {
-						MarkdownDescription: "Download Client remote path.",
-						Computed:            true,
-						Type:                types.StringType,
-					},
-					"local_path": {
-						MarkdownDescription: "Local path.",
-						Computed:            true,
-						Type:                types.StringType,
-					},
-					"id": {
-						MarkdownDescription: "RemotePathMapping ID.",
-						Computed:            true,
-						Type:                types.Int64Type,
-					},
-				}),
+				},
 			},
 		},
-	}, nil
+	}
 }
 
 func (d *RemotePathMappingsDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {

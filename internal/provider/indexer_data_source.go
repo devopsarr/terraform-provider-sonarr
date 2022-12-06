@@ -6,8 +6,7 @@ import (
 
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
+	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr/sonarr"
@@ -31,167 +30,135 @@ func (d *IndexerDataSource) Metadata(ctx context.Context, req datasource.Metadat
 	resp.TypeName = req.ProviderTypeName + "_" + indexerDataSourceName
 }
 
-func (d *IndexerDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+func (d *IndexerDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the delay server.
 		MarkdownDescription: "<!-- subcategory:Indexers -->Single [Indexer](../resources/indexer).",
-		Attributes: map[string]tfsdk.Attribute{
-			"enable_automatic_search": {
+		Attributes: map[string]schema.Attribute{
+			"enable_automatic_search": schema.BoolAttribute{
 				MarkdownDescription: "Enable automatic search flag.",
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"enable_interactive_search": {
+			"enable_interactive_search": schema.BoolAttribute{
 				MarkdownDescription: "Enable interactive search flag.",
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"enable_rss": {
+			"enable_rss": schema.BoolAttribute{
 				MarkdownDescription: "Enable RSS flag.",
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"priority": {
+			"priority": schema.Int64Attribute{
 				MarkdownDescription: "Priority.",
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
-			"download_client_id": {
+			"download_client_id": schema.Int64Attribute{
 				MarkdownDescription: "Download client ID.",
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
-			"config_contract": {
+			"config_contract": schema.StringAttribute{
 				MarkdownDescription: "Indexer configuration template.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"implementation": {
+			"implementation": schema.StringAttribute{
 				MarkdownDescription: "Indexer implementation name.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"name": {
+			"name": schema.StringAttribute{
 				MarkdownDescription: "Indexer name.",
 				Required:            true,
-				Type:                types.StringType,
 			},
-			"protocol": {
+			"protocol": schema.StringAttribute{
 				MarkdownDescription: "Protocol. Valid values are 'usenet' and 'torrent'.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"tags": {
+			"tags": schema.SetAttribute{
 				MarkdownDescription: "List of associated tags.",
 				Computed:            true,
-				Type: types.SetType{
-					ElemType: types.Int64Type,
-				},
+				ElementType:         types.Int64Type,
 			},
-			"id": {
+			"id": schema.Int64Attribute{
 				MarkdownDescription: "Indexer ID.",
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
 			// Field values
-			"allow_zero_size": {
+			"allow_zero_size": schema.BoolAttribute{
 				MarkdownDescription: "Allow zero size files.",
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"anime_standard_format_search": {
+			"anime_standard_format_search": schema.BoolAttribute{
 				MarkdownDescription: "Search anime in standard format.",
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"ranked_only": {
+			"ranked_only": schema.BoolAttribute{
 				MarkdownDescription: "Allow ranked only.",
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"delay": {
+			"delay": schema.Int64Attribute{
 				MarkdownDescription: "Delay before grabbing.",
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
-			"minimum_seeders": {
+			"minimum_seeders": schema.Int64Attribute{
 				MarkdownDescription: "Minimum seeders.",
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
-			"season_pack_seed_time": {
+			"season_pack_seed_time": schema.Int64Attribute{
 				MarkdownDescription: "Season seed time.",
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
-			"seed_time": {
+			"seed_time": schema.Int64Attribute{
 				MarkdownDescription: "Seed time.",
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
-			"seed_ratio": {
+			"seed_ratio": schema.Float64Attribute{
 				MarkdownDescription: "Seed ratio.",
 				Computed:            true,
-				Type:                types.Float64Type,
 			},
-			"additional_parameters": {
+			"additional_parameters": schema.StringAttribute{
 				MarkdownDescription: "Additional parameters.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"api_key": {
+			"api_key": schema.StringAttribute{
 				MarkdownDescription: "API key.",
 				Computed:            true,
 				Sensitive:           true,
-				Type:                types.StringType,
 			},
-			"api_path": {
+			"api_path": schema.StringAttribute{
 				MarkdownDescription: "API path.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"base_url": {
+			"base_url": schema.StringAttribute{
 				MarkdownDescription: "Base URL.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"captcha_token": {
+			"captcha_token": schema.StringAttribute{
 				MarkdownDescription: "Captcha token.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"cookie": {
+			"cookie": schema.StringAttribute{
 				MarkdownDescription: "Cookie.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"passkey": {
+			"passkey": schema.StringAttribute{
 				MarkdownDescription: "Passkey.",
 				Computed:            true,
 				Sensitive:           true,
-				Type:                types.StringType,
 			},
-			"username": {
+			"username": schema.StringAttribute{
 				MarkdownDescription: "Username.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"categories": {
+			"categories": schema.SetAttribute{
 				MarkdownDescription: "Series list.",
 				Computed:            true,
-				Type: types.SetType{
-					ElemType: types.Int64Type,
-				},
+				ElementType:         types.Int64Type,
 			},
-			"anime_categories": {
+			"anime_categories": schema.SetAttribute{
 				MarkdownDescription: "Anime list.",
 				Computed:            true,
-				Type: types.SetType{
-					ElemType: types.Int64Type,
-				},
+				ElementType:         types.Int64Type,
 			},
 		},
-	}, nil
+	}
 }
 
 func (d *IndexerDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {

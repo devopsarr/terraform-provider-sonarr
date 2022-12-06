@@ -16,7 +16,7 @@ func TestAccIndexerFanzubResource(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Create and Read testing
 			{
-				Config: testAccIndexerFanzubResourceConfig("newzabResourceTest", "false"),
+				Config: testAccIndexerFanzubResourceConfig("fanzubResourceTest", "false"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("sonarr_indexer_fanzub.test", "anime_standard_format_search", "false"),
 					resource.TestCheckResourceAttr("sonarr_indexer_fanzub.test", "base_url", "http://fanzub.com/rss/"),
@@ -25,7 +25,7 @@ func TestAccIndexerFanzubResource(t *testing.T) {
 			},
 			// Update and Read testing
 			{
-				Config: testAccIndexerFanzubResourceConfig("newzabResourceTest", "true"),
+				Config: testAccIndexerFanzubResourceConfig("fanzubResourceTest", "true"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("sonarr_indexer_fanzub.test", "anime_standard_format_search", "true"),
 				),

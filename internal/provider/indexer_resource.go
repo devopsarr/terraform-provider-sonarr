@@ -6,9 +6,13 @@ import (
 	"strconv"
 
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -77,196 +81,163 @@ func (r *IndexerResource) Metadata(ctx context.Context, req resource.MetadataReq
 	resp.TypeName = req.ProviderTypeName + "_" + indexerResourceName
 }
 
-func (r *IndexerResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+func (r *IndexerResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		MarkdownDescription: "<!-- subcategory:Indexers -->Indexer resource.\nFor more information refer to [Indexer](https://wiki.servarr.com/sonarr/settings#indexers) documentation.",
-		Attributes: map[string]tfsdk.Attribute{
-			"enable_automatic_search": {
+		Attributes: map[string]schema.Attribute{
+			"enable_automatic_search": schema.BoolAttribute{
 				MarkdownDescription: "Enable automatic search flag.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"enable_interactive_search": {
+			"enable_interactive_search": schema.BoolAttribute{
 				MarkdownDescription: "Enable interactive search flag.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"enable_rss": {
+			"enable_rss": schema.BoolAttribute{
 				MarkdownDescription: "Enable RSS flag.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"priority": {
+			"priority": schema.Int64Attribute{
 				MarkdownDescription: "Priority.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
-			"download_client_id": {
+			"download_client_id": schema.Int64Attribute{
 				MarkdownDescription: "Download client ID.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
-			"config_contract": {
+			"config_contract": schema.StringAttribute{
 				MarkdownDescription: "Indexer configuration template.",
 				Required:            true,
-				Type:                types.StringType,
 			},
-			"implementation": {
+			"implementation": schema.StringAttribute{
 				MarkdownDescription: "Indexer implementation name.",
 				Required:            true,
-				Type:                types.StringType,
 			},
-			"name": {
+			"name": schema.StringAttribute{
 				MarkdownDescription: "Indexer name.",
 				Required:            true,
-				Type:                types.StringType,
 			},
-			"protocol": {
+			"protocol": schema.StringAttribute{
 				MarkdownDescription: "Protocol. Valid values are 'usenet' and 'torrent'.",
 				Required:            true,
-				Type:                types.StringType,
-				Validators: []tfsdk.AttributeValidator{
-					tools.StringMatch([]string{"usenet", "torrent"}),
+				Validators: []validator.String{
+					stringvalidator.OneOf("usenet", "torrent"),
 				},
 			},
-			"tags": {
+			"tags": schema.SetAttribute{
 				MarkdownDescription: "List of associated tags.",
 				Optional:            true,
-				Computed:            true,
-				Type: types.SetType{
-					ElemType: types.Int64Type,
-				},
+				ElementType:         types.Int64Type,
 			},
-			"id": {
+			"id": schema.Int64Attribute{
 				MarkdownDescription: "Indexer ID.",
 				Computed:            true,
-				Type:                types.Int64Type,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					resource.UseStateForUnknown(),
+				PlanModifiers: []planmodifier.Int64{
+					int64planmodifier.UseStateForUnknown(),
 				},
 			},
 			// Field values
-			"allow_zero_size": {
+			"allow_zero_size": schema.BoolAttribute{
 				MarkdownDescription: "Allow zero size files.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"anime_standard_format_search": {
+			"anime_standard_format_search": schema.BoolAttribute{
 				MarkdownDescription: "Search anime in standard format.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"ranked_only": {
+			"ranked_only": schema.BoolAttribute{
 				MarkdownDescription: "Allow ranked only.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"delay": {
+			"delay": schema.Int64Attribute{
 				MarkdownDescription: "Delay before grabbing.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
-			"minimum_seeders": {
+			"minimum_seeders": schema.Int64Attribute{
 				MarkdownDescription: "Minimum seeders.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
-			"season_pack_seed_time": {
+			"season_pack_seed_time": schema.Int64Attribute{
 				MarkdownDescription: "Season seed time.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
-			"seed_time": {
+			"seed_time": schema.Int64Attribute{
 				MarkdownDescription: "Seed time.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
-			"seed_ratio": {
+			"seed_ratio": schema.Float64Attribute{
 				MarkdownDescription: "Seed ratio.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.Float64Type,
 			},
-			"additional_parameters": {
+			"additional_parameters": schema.StringAttribute{
 				MarkdownDescription: "Additional parameters.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"api_key": {
+			"api_key": schema.StringAttribute{
 				MarkdownDescription: "API key.",
 				Optional:            true,
 				Computed:            true,
 				Sensitive:           true,
-				Type:                types.StringType,
 			},
-			"api_path": {
+			"api_path": schema.StringAttribute{
 				MarkdownDescription: "API path.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"base_url": {
+			"base_url": schema.StringAttribute{
 				MarkdownDescription: "Base URL.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"captcha_token": {
+			"captcha_token": schema.StringAttribute{
 				MarkdownDescription: "Captcha token.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"cookie": {
+			"cookie": schema.StringAttribute{
 				MarkdownDescription: "Cookie.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"passkey": {
+			"passkey": schema.StringAttribute{
 				MarkdownDescription: "Passkey.",
 				Optional:            true,
 				Computed:            true,
 				Sensitive:           true,
-				Type:                types.StringType,
 			},
-			"username": {
+			"username": schema.StringAttribute{
 				MarkdownDescription: "Username.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"categories": {
+			"categories": schema.SetAttribute{
 				MarkdownDescription: "Categories list.",
 				Optional:            true,
 				Computed:            true,
-				Type: types.SetType{
-					ElemType: types.Int64Type,
-				},
+				ElementType:         types.Int64Type,
 			},
-			"anime_categories": {
+			"anime_categories": schema.SetAttribute{
 				MarkdownDescription: "Anime categories list.",
 				Optional:            true,
 				Computed:            true,
-				Type: types.SetType{
-					ElemType: types.Int64Type,
-				},
+				ElementType:         types.Int64Type,
 			},
 		},
-	}, nil
+	}
 }
 
 func (r *IndexerResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
@@ -312,6 +283,7 @@ func (r *IndexerResource) Create(ctx context.Context, req resource.CreateRequest
 	// Generate resource state struct.
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state Indexer
+	state.Tags = indexer.Tags
 
 	state.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
@@ -339,6 +311,7 @@ func (r *IndexerResource) Read(ctx context.Context, req resource.ReadRequest, re
 	// Generate resource state struct.
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state Indexer
+	state.Tags = indexer.Tags
 
 	state.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
@@ -368,6 +341,7 @@ func (r *IndexerResource) Update(ctx context.Context, req resource.UpdateRequest
 	// Generate resource state struct.
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state Indexer
+	state.Tags = indexer.Tags
 
 	state.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
@@ -411,6 +385,10 @@ func (r *IndexerResource) ImportState(ctx context.Context, req resource.ImportSt
 }
 
 func (i *Indexer) write(ctx context.Context, indexer *sonarr.IndexerOutput) {
+	if !i.Tags.IsNull() && len(indexer.Tags) == 0 {
+		i.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, indexer.Tags)
+	}
+
 	i.EnableAutomaticSearch = types.BoolValue(indexer.EnableAutomaticSearch)
 	i.EnableInteractiveSearch = types.BoolValue(indexer.EnableInteractiveSearch)
 	i.EnableRss = types.BoolValue(indexer.EnableRss)
@@ -421,10 +399,8 @@ func (i *Indexer) write(ctx context.Context, indexer *sonarr.IndexerOutput) {
 	i.Implementation = types.StringValue(indexer.Implementation)
 	i.Name = types.StringValue(indexer.Name)
 	i.Protocol = types.StringValue(indexer.Protocol)
-	i.Tags = types.SetValueMust(types.Int64Type, nil)
 	i.AnimeCategories = types.SetValueMust(types.Int64Type, nil)
 	i.Categories = types.SetValueMust(types.Int64Type, nil)
-	tfsdk.ValueFrom(ctx, indexer.Tags, i.Tags.Type(ctx), &i.Tags)
 	i.writeFields(ctx, indexer.Fields)
 }
 

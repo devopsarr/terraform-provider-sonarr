@@ -6,10 +6,11 @@ import (
 	"strconv"
 
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr/sonarr"
@@ -42,35 +43,31 @@ func (r *DownloadClientConfigResource) Metadata(ctx context.Context, req resourc
 	resp.TypeName = req.ProviderTypeName + "_" + downloadClientConfigResourceName
 }
 
-func (r *DownloadClientConfigResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+func (r *DownloadClientConfigResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		MarkdownDescription: "<!-- subcategory:Download Clients -->Download Client Config resource.\nFor more information refer to [Download Client](https://wiki.servarr.com/sonarr/settings#completed-download-handling) documentation.",
-		Attributes: map[string]tfsdk.Attribute{
-			"id": {
+		Attributes: map[string]schema.Attribute{
+			"id": schema.Int64Attribute{
 				MarkdownDescription: "Download Client Config ID.",
 				Computed:            true,
-				Type:                types.Int64Type,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					resource.UseStateForUnknown(),
+				PlanModifiers: []planmodifier.Int64{
+					int64planmodifier.UseStateForUnknown(),
 				},
 			},
-			"enable_completed_download_handling": {
+			"enable_completed_download_handling": schema.BoolAttribute{
 				MarkdownDescription: "Enable Completed Download Handling flag.",
 				Required:            true,
-				Type:                types.BoolType,
 			},
-			"auto_redownload_failed": {
+			"auto_redownload_failed": schema.BoolAttribute{
 				MarkdownDescription: "Auto Redownload Failed flag.",
 				Required:            true,
-				Type:                types.BoolType,
 			},
-			"download_client_working_folders": {
+			"download_client_working_folders": schema.StringAttribute{
 				MarkdownDescription: "Download Client Working Folders.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
 		},
-	}, nil
+	}
 }
 
 func (r *DownloadClientConfigResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {

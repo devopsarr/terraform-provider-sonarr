@@ -52,5 +52,6 @@ func testAccIndexerResourceConfig(name, aSearch string) string {
 		base_url = "https://lolo.sickbeard.com"
 		api_path = "/api"
 		categories = [5030, 5040]
+		tags = []
 	}`, aSearch, name)
 }

@@ -6,8 +6,7 @@ import (
 
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
+	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golift.io/starr/sonarr"
@@ -31,38 +30,34 @@ func (d *LanguageProfileDataSource) Metadata(ctx context.Context, req datasource
 	resp.TypeName = req.ProviderTypeName + "_" + languageProfileDataSourceName
 }
 
-func (d *LanguageProfileDataSource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+func (d *LanguageProfileDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the language server.
 		MarkdownDescription: "<!-- subcategory:Profiles -->Single [Language Profile](../resources/language_profile).",
-		Attributes: map[string]tfsdk.Attribute{
-			"id": {
+		Attributes: map[string]schema.Attribute{
+			"id": schema.Int64Attribute{
 				MarkdownDescription: "Language Profile ID.",
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
-			"name": {
+			"name": schema.StringAttribute{
 				MarkdownDescription: "Language Profile name.",
 				Required:            true,
-				Type:                types.StringType,
 			},
-			"upgrade_allowed": {
+			"upgrade_allowed": schema.BoolAttribute{
 				MarkdownDescription: "Upgrade allowed Flag.",
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"cutoff_language": {
+			"cutoff_language": schema.StringAttribute{
 				MarkdownDescription: "Cutoff Language.",
 				Computed:            true,
-				Type:                types.StringType,
 			},
-			"languages": {
+			"languages": schema.SetAttribute{
 				MarkdownDescription: "list of languages in profile.",
 				Computed:            true,
-				Type:                types.SetType{ElemType: types.StringType},
+				ElementType:         types.StringType,
 			},
 		},
-	}, nil
+	}
 }
 
 func (d *LanguageProfileDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {

@@ -6,9 +6,11 @@ import (
 	"strconv"
 
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -96,105 +98,88 @@ func (r *IndexerTorrentRssResource) Metadata(ctx context.Context, req resource.M
 	resp.TypeName = req.ProviderTypeName + "_" + indexerTorrentRssResourceName
 }
 
-func (r *IndexerTorrentRssResource) GetSchema(ctx context.Context) (tfsdk.Schema, diag.Diagnostics) {
-	return tfsdk.Schema{
+func (r *IndexerTorrentRssResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+	resp.Schema = schema.Schema{
 		MarkdownDescription: "<!-- subcategory:Indexers -->Indexer Torrent RSS resource.\nFor more information refer to [Indexer](https://wiki.servarr.com/sonarr/settings#indexers) and [Torrent RSS](https://wiki.servarr.com/sonarr/supported#torrentrssindexer).",
-		Attributes: map[string]tfsdk.Attribute{
-			"enable_automatic_search": {
+		Attributes: map[string]schema.Attribute{
+			"enable_automatic_search": schema.BoolAttribute{
 				MarkdownDescription: "Enable automatic search flag.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"enable_interactive_search": {
+			"enable_interactive_search": schema.BoolAttribute{
 				MarkdownDescription: "Enable interactive search flag.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"enable_rss": {
+			"enable_rss": schema.BoolAttribute{
 				MarkdownDescription: "Enable RSS flag.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"priority": {
+			"priority": schema.Int64Attribute{
 				MarkdownDescription: "Priority.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
-			"download_client_id": {
+			"download_client_id": schema.Int64Attribute{
 				MarkdownDescription: "Download client ID.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
-			"name": {
+			"name": schema.StringAttribute{
 				MarkdownDescription: "IndexerTorrentRss name.",
 				Required:            true,
-				Type:                types.StringType,
 			},
-			"tags": {
+			"tags": schema.SetAttribute{
 				MarkdownDescription: "List of associated tags.",
 				Optional:            true,
-				Computed:            true,
-				Type: types.SetType{
-					ElemType: types.Int64Type,
-				},
+				ElementType:         types.Int64Type,
 			},
-			"id": {
+			"id": schema.Int64Attribute{
 				MarkdownDescription: "IndexerTorrentRss ID.",
 				Computed:            true,
-				Type:                types.Int64Type,
-				PlanModifiers: tfsdk.AttributePlanModifiers{
-					resource.UseStateForUnknown(),
+				PlanModifiers: []planmodifier.Int64{
+					int64planmodifier.UseStateForUnknown(),
 				},
 			},
 			// Field values
-			"allow_zero_size": {
+			"allow_zero_size": schema.BoolAttribute{
 				MarkdownDescription: "Allow zero size files.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.BoolType,
 			},
-			"minimum_seeders": {
+			"minimum_seeders": schema.Int64Attribute{
 				MarkdownDescription: "Minimum seeders.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
-			"season_pack_seed_time": {
+			"season_pack_seed_time": schema.Int64Attribute{
 				MarkdownDescription: "Season seed time.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
-			"seed_time": {
+			"seed_time": schema.Int64Attribute{
 				MarkdownDescription: "Seed time.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.Int64Type,
 			},
-			"seed_ratio": {
+			"seed_ratio": schema.Float64Attribute{
 				MarkdownDescription: "Seed ratio.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.Float64Type,
 			},
-			"base_url": {
+			"base_url": schema.StringAttribute{
 				MarkdownDescription: "Base URL.",
 				Required:            true,
-				Type:                types.StringType,
 			},
-			"cookie": {
+			"cookie": schema.StringAttribute{
 				MarkdownDescription: "Cookie.",
 				Optional:            true,
 				Computed:            true,
-				Type:                types.StringType,
 			},
 		},
-	}, nil
+	}
 }
 
 func (r *IndexerTorrentRssResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
@@ -338,9 +323,12 @@ func (i *IndexerTorrentRss) write(ctx context.Context, indexer *sonarr.IndexerOu
 		DownloadClientID:        types.Int64Value(indexer.DownloadClientID),
 		ID:                      types.Int64Value(indexer.ID),
 		Name:                    types.StringValue(indexer.Name),
-		Tags:                    types.SetValueMust(types.Int64Type, nil),
+		Tags:                    types.SetNull(types.Int64Type),
 	}
-	tfsdk.ValueFrom(ctx, indexer.Tags, genericIndexer.Tags.Type(ctx), &genericIndexer.Tags)
+	if !i.Tags.IsNull() || !(len(indexer.Tags) == 0) {
+		genericIndexer.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, indexer.Tags)
+	}
+
 	genericIndexer.writeFields(ctx, indexer.Fields)
 	i.fromIndexer(&genericIndexer)
 }
