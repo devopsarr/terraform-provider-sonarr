@@ -25,8 +25,10 @@ const (
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ resource.Resource = &IndexerBroadcastheNetResource{}
-var _ resource.ResourceWithImportState = &IndexerBroadcastheNetResource{}
+var (
+	_ resource.Resource                = &IndexerBroadcastheNetResource{}
+	_ resource.ResourceWithImportState = &IndexerBroadcastheNetResource{}
+)
 
 func NewIndexerBroadcastheNetResource() resource.Resource {
 	return &IndexerBroadcastheNetResource{}

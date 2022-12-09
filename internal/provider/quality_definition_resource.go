@@ -20,8 +20,10 @@ import (
 const qualityDefinitionResourceName = "quality_definition"
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ resource.Resource = &QualityDefinitionResource{}
-var _ resource.ResourceWithImportState = &QualityDefinitionResource{}
+var (
+	_ resource.Resource                = &QualityDefinitionResource{}
+	_ resource.ResourceWithImportState = &QualityDefinitionResource{}
+)
 
 func NewQualityDefinitionResource() resource.Resource {
 	return &QualityDefinitionResource{}

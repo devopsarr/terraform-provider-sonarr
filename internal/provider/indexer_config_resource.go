@@ -19,8 +19,10 @@ import (
 const indexerConfigResourceName = "indexer_config"
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ resource.Resource = &IndexerConfigResource{}
-var _ resource.ResourceWithImportState = &IndexerConfigResource{}
+var (
+	_ resource.Resource                = &IndexerConfigResource{}
+	_ resource.ResourceWithImportState = &IndexerConfigResource{}
+)
 
 func NewIndexerConfigResource() resource.Resource {
 	return &IndexerConfigResource{}

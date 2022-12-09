@@ -22,8 +22,10 @@ import (
 const delayProfileResourceName = "delay_profile"
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ resource.Resource = &DelayProfileResource{}
-var _ resource.ResourceWithImportState = &DelayProfileResource{}
+var (
+	_ resource.Resource                = &DelayProfileResource{}
+	_ resource.ResourceWithImportState = &DelayProfileResource{}
+)
 
 func NewDelayProfileResource() resource.Resource {
 	return &DelayProfileResource{}

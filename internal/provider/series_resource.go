@@ -20,8 +20,10 @@ import (
 const seriesResourceName = "series"
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ resource.Resource = &SeriesResource{}
-var _ resource.ResourceWithImportState = &SeriesResource{}
+var (
+	_ resource.Resource                = &SeriesResource{}
+	_ resource.ResourceWithImportState = &SeriesResource{}
+)
 
 func NewSeriesResource() resource.Resource {
 	return &SeriesResource{}

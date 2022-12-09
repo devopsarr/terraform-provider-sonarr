@@ -24,8 +24,10 @@ const (
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ resource.Resource = &NotificationSendgridResource{}
-var _ resource.ResourceWithImportState = &NotificationSendgridResource{}
+var (
+	_ resource.Resource                = &NotificationSendgridResource{}
+	_ resource.ResourceWithImportState = &NotificationSendgridResource{}
+)
 
 func NewNotificationSendgridResource() resource.Resource {
 	return &NotificationSendgridResource{}

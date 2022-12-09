@@ -26,8 +26,10 @@ const (
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ resource.Resource = &NotificationWebhookResource{}
-var _ resource.ResourceWithImportState = &NotificationWebhookResource{}
+var (
+	_ resource.Resource                = &NotificationWebhookResource{}
+	_ resource.ResourceWithImportState = &NotificationWebhookResource{}
+)
 
 func NewNotificationWebhookResource() resource.Resource {
 	return &NotificationWebhookResource{}

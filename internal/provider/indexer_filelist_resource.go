@@ -25,8 +25,10 @@ const (
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ resource.Resource = &IndexerFilelistResource{}
-var _ resource.ResourceWithImportState = &IndexerFilelistResource{}
+var (
+	_ resource.Resource                = &IndexerFilelistResource{}
+	_ resource.ResourceWithImportState = &IndexerFilelistResource{}
+)
 
 func NewIndexerFilelistResource() resource.Resource {
 	return &IndexerFilelistResource{}

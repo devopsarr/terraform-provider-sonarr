@@ -25,8 +25,10 @@ const (
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ resource.Resource = &IndexerRarbgResource{}
-var _ resource.ResourceWithImportState = &IndexerRarbgResource{}
+var (
+	_ resource.Resource                = &IndexerRarbgResource{}
+	_ resource.ResourceWithImportState = &IndexerRarbgResource{}
+)
 
 func NewIndexerRarbgResource() resource.Resource {
 	return &IndexerRarbgResource{}

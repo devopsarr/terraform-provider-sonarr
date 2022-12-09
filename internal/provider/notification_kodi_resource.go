@@ -24,8 +24,10 @@ const (
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ resource.Resource = &NotificationKodiResource{}
-var _ resource.ResourceWithImportState = &NotificationKodiResource{}
+var (
+	_ resource.Resource                = &NotificationKodiResource{}
+	_ resource.ResourceWithImportState = &NotificationKodiResource{}
+)
 
 func NewNotificationKodiResource() resource.Resource {
 	return &NotificationKodiResource{}

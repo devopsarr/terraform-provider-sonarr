@@ -24,8 +24,10 @@ import (
 const languageProfileResourceName = "language_profile"
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ resource.Resource = &LanguageProfileResource{}
-var _ resource.ResourceWithImportState = &LanguageProfileResource{}
+var (
+	_ resource.Resource                = &LanguageProfileResource{}
+	_ resource.ResourceWithImportState = &LanguageProfileResource{}
+)
 
 func NewLanguageProfileResource() resource.Resource {
 	return &LanguageProfileResource{}

@@ -24,8 +24,10 @@ import (
 const indexerResourceName = "indexer"
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ resource.Resource = &IndexerResource{}
-var _ resource.ResourceWithImportState = &IndexerResource{}
+var (
+	_ resource.Resource                = &IndexerResource{}
+	_ resource.ResourceWithImportState = &IndexerResource{}
+)
 
 var (
 	indexerIntSliceFields = []string{"categories", "animeCategories"}

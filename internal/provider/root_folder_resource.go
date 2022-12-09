@@ -22,8 +22,10 @@ import (
 const rootFolderResourceName = "root_folder"
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ resource.Resource = &RootFolderResource{}
-var _ resource.ResourceWithImportState = &RootFolderResource{}
+var (
+	_ resource.Resource                = &RootFolderResource{}
+	_ resource.ResourceWithImportState = &RootFolderResource{}
+)
 
 func NewRootFolderResource() resource.Resource {
 	return &RootFolderResource{}
