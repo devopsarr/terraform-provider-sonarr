@@ -229,6 +229,9 @@ func (p *SonarrProvider) DataSources(ctx context.Context) []func() datasource.Da
 		NewIndexerDataSource,
 		NewIndexersDataSource,
 
+		// Import Lists
+		NewImportListsDataSource,
+
 		// Media Management
 		NewMediaManagementDataSource,
 		NewNamingDataSource,
