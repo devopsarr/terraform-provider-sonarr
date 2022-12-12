@@ -24,8 +24,10 @@ const (
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ resource.Resource = &NotificationCustomScriptResource{}
-var _ resource.ResourceWithImportState = &NotificationCustomScriptResource{}
+var (
+	_ resource.Resource                = &NotificationCustomScriptResource{}
+	_ resource.ResourceWithImportState = &NotificationCustomScriptResource{}
+)
 
 func NewNotificationCustomScriptResource() resource.Resource {
 	return &NotificationCustomScriptResource{}

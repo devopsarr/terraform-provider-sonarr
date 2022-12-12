@@ -27,8 +27,10 @@ const (
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ resource.Resource = &DownloadClientNzbvortexResource{}
-var _ resource.ResourceWithImportState = &DownloadClientNzbvortexResource{}
+var (
+	_ resource.Resource                = &DownloadClientNzbvortexResource{}
+	_ resource.ResourceWithImportState = &DownloadClientNzbvortexResource{}
+)
 
 func NewDownloadClientNzbvortexResource() resource.Resource {
 	return &DownloadClientNzbvortexResource{}

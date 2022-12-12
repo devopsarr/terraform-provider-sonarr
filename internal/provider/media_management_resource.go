@@ -21,8 +21,10 @@ import (
 const mediaManagementResourceName = "media_management"
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ resource.Resource = &MediaManagementResource{}
-var _ resource.ResourceWithImportState = &MediaManagementResource{}
+var (
+	_ resource.Resource                = &MediaManagementResource{}
+	_ resource.ResourceWithImportState = &MediaManagementResource{}
+)
 
 func NewMediaManagementResource() resource.Resource {
 	return &MediaManagementResource{}

@@ -27,8 +27,10 @@ const (
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ resource.Resource = &DownloadClientRtorrentResource{}
-var _ resource.ResourceWithImportState = &DownloadClientRtorrentResource{}
+var (
+	_ resource.Resource                = &DownloadClientRtorrentResource{}
+	_ resource.ResourceWithImportState = &DownloadClientRtorrentResource{}
+)
 
 func NewDownloadClientRtorrentResource() resource.Resource {
 	return &DownloadClientRtorrentResource{}

@@ -25,8 +25,10 @@ import (
 const downloadClientResourceName = "download_client"
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ resource.Resource = &DownloadClientResource{}
-var _ resource.ResourceWithImportState = &DownloadClientResource{}
+var (
+	_ resource.Resource                = &DownloadClientResource{}
+	_ resource.ResourceWithImportState = &DownloadClientResource{}
+)
 
 var (
 	downloadClientBoolFields        = []string{"addPaused", "useSsl", "startOnAdd", "sequentialOrder", "firstAndLast", "addStopped", "saveMagnetFiles", "readOnly"}

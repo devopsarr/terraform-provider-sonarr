@@ -24,8 +24,10 @@ const (
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ resource.Resource = &NotificationPushbulletResource{}
-var _ resource.ResourceWithImportState = &NotificationPushbulletResource{}
+var (
+	_ resource.Resource                = &NotificationPushbulletResource{}
+	_ resource.ResourceWithImportState = &NotificationPushbulletResource{}
+)
 
 func NewNotificationPushbulletResource() resource.Resource {
 	return &NotificationPushbulletResource{}

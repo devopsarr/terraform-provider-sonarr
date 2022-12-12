@@ -24,8 +24,10 @@ const (
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ resource.Resource = &NotificationTelegramResource{}
-var _ resource.ResourceWithImportState = &NotificationTelegramResource{}
+var (
+	_ resource.Resource                = &NotificationTelegramResource{}
+	_ resource.ResourceWithImportState = &NotificationTelegramResource{}
+)
 
 func NewNotificationTelegramResource() resource.Resource {
 	return &NotificationTelegramResource{}

@@ -24,8 +24,10 @@ const (
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ resource.Resource = &NotificationMailgunResource{}
-var _ resource.ResourceWithImportState = &NotificationMailgunResource{}
+var (
+	_ resource.Resource                = &NotificationMailgunResource{}
+	_ resource.ResourceWithImportState = &NotificationMailgunResource{}
+)
 
 func NewNotificationMailgunResource() resource.Resource {
 	return &NotificationMailgunResource{}

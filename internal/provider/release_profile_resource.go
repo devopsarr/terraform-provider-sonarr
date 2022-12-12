@@ -20,8 +20,10 @@ import (
 const releaseProfileResourceName = "release_profile"
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ resource.Resource = &ReleaseProfileResource{}
-var _ resource.ResourceWithImportState = &ReleaseProfileResource{}
+var (
+	_ resource.Resource                = &ReleaseProfileResource{}
+	_ resource.ResourceWithImportState = &ReleaseProfileResource{}
+)
 
 func NewReleaseProfileResource() resource.Resource {
 	return &ReleaseProfileResource{}

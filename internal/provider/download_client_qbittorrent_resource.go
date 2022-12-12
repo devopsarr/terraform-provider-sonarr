@@ -29,8 +29,10 @@ const (
 var downloadClientQbittorrentInitialStates = []int64{0, 1, 2}
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ resource.Resource = &DownloadClientQbittorrentResource{}
-var _ resource.ResourceWithImportState = &DownloadClientQbittorrentResource{}
+var (
+	_ resource.Resource                = &DownloadClientQbittorrentResource{}
+	_ resource.ResourceWithImportState = &DownloadClientQbittorrentResource{}
+)
 
 func NewDownloadClientQbittorrentResource() resource.Resource {
 	return &DownloadClientQbittorrentResource{}

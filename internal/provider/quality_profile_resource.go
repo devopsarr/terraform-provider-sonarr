@@ -21,8 +21,10 @@ import (
 const qualityProfileResourceName = "quality_profile"
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ resource.Resource = &QualityProfileResource{}
-var _ resource.ResourceWithImportState = &QualityProfileResource{}
+var (
+	_ resource.Resource                = &QualityProfileResource{}
+	_ resource.ResourceWithImportState = &QualityProfileResource{}
+)
 
 func NewQualityProfileResource() resource.Resource {
 	return &QualityProfileResource{}

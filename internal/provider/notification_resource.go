@@ -24,8 +24,10 @@ import (
 const notificationResourceName = "notification"
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ resource.Resource = &NotificationResource{}
-var _ resource.ResourceWithImportState = &NotificationResource{}
+var (
+	_ resource.Resource                = &NotificationResource{}
+	_ resource.ResourceWithImportState = &NotificationResource{}
+)
 
 var (
 	notificationBoolFields        = []string{"alwaysUpdate", "cleanLibrary", "directMessage", "notify", "requireEncryption", "sendSilently", "updateLibrary", "useEuEndpoint", "useSSL"}

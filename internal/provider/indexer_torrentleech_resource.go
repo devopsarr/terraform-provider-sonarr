@@ -25,8 +25,10 @@ const (
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ resource.Resource = &IndexerTorrentleechResource{}
-var _ resource.ResourceWithImportState = &IndexerTorrentleechResource{}
+var (
+	_ resource.Resource                = &IndexerTorrentleechResource{}
+	_ resource.ResourceWithImportState = &IndexerTorrentleechResource{}
+)
 
 func NewIndexerTorrentleechResource() resource.Resource {
 	return &IndexerTorrentleechResource{}

@@ -19,8 +19,10 @@ import (
 const namingResourceName = "naming"
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ resource.Resource = &NamingResource{}
-var _ resource.ResourceWithImportState = &NamingResource{}
+var (
+	_ resource.Resource                = &NamingResource{}
+	_ resource.ResourceWithImportState = &NamingResource{}
+)
 
 func NewNamingResource() resource.Resource {
 	return &NamingResource{}

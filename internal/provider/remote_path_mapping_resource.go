@@ -19,8 +19,10 @@ import (
 const remotePathMappingResourceName = "remote_path_mapping"
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ resource.Resource = &RemotePathMappingResource{}
-var _ resource.ResourceWithImportState = &RemotePathMappingResource{}
+var (
+	_ resource.Resource                = &RemotePathMappingResource{}
+	_ resource.ResourceWithImportState = &RemotePathMappingResource{}
+)
 
 func NewRemotePathMappingResource() resource.Resource {
 	return &RemotePathMappingResource{}

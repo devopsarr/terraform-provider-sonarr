@@ -24,8 +24,10 @@ const (
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ resource.Resource = &NotificationPlexResource{}
-var _ resource.ResourceWithImportState = &NotificationPlexResource{}
+var (
+	_ resource.Resource                = &NotificationPlexResource{}
+	_ resource.ResourceWithImportState = &NotificationPlexResource{}
+)
 
 func NewNotificationPlexResource() resource.Resource {
 	return &NotificationPlexResource{}

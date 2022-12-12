@@ -17,8 +17,10 @@ import (
 // var stderr = os.Stderr
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ provider.Provider = &SonarrProvider{}
-var _ provider.ProviderWithMetadata = &SonarrProvider{}
+var (
+	_ provider.Provider             = &SonarrProvider{}
+	_ provider.ProviderWithMetadata = &SonarrProvider{}
+)
 
 // ScaffoldingProvider defines the provider implementation.
 type SonarrProvider struct {

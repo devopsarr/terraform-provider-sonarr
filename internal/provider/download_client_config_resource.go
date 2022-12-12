@@ -19,8 +19,10 @@ import (
 const downloadClientConfigResourceName = "download_client_config"
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ resource.Resource = &DownloadClientConfigResource{}
-var _ resource.ResourceWithImportState = &DownloadClientConfigResource{}
+var (
+	_ resource.Resource                = &DownloadClientConfigResource{}
+	_ resource.ResourceWithImportState = &DownloadClientConfigResource{}
+)
 
 func NewDownloadClientConfigResource() resource.Resource {
 	return &DownloadClientConfigResource{}
