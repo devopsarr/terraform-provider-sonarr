@@ -389,7 +389,6 @@ func (i *ImportList) write(ctx context.Context, importList *sonarr.ImportListOut
 	i.ID = types.Int64Value(importList.ID)
 	i.ConfigContract = types.StringValue(importList.ConfigContract)
 	i.Implementation = types.StringValue(importList.Implementation)
-	i.Name = types.StringValue(importList.Name)
 	i.ShouldMonitor = types.StringValue(importList.ShouldMonitor)
 	i.RootFolderPath = types.StringValue(importList.RootFolderPath)
 	i.SeriesType = types.StringValue(importList.SeriesType)
