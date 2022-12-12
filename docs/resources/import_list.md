@@ -27,7 +27,7 @@ resource "sonarr_import_list" "example" {
   implementation       = "SonarrImport"
   config_contract      = "SonarrSettings"
   base_url             = "http://127.0.0.1:8989"
-  api_key              = "b01df9fca2e64e459d64a09888ce7451"
+  api_key              = "APIKey"
   tags                 = [1, 2]
 }
 ```
