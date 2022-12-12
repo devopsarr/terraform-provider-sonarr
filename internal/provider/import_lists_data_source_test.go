@@ -15,7 +15,8 @@ func TestAccImportListsDataSource(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Create a delay profile to have a value to check
 			{
-				Config: testAccImportListResourceConfig("/config/.config/.mono", "importListsDataTest", "false"),
+				PreConfig: rootFolderDSInit,
+				Config:    testAccImportListResourceConfig("importListsDataTest", "false"),
 			},
 			// Read testing
 			{

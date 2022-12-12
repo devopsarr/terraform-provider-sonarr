@@ -16,7 +16,8 @@ func TestAccImportListSonarrResource(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Create and Read testing
 			{
-				Config: testAccImportListSonarrResourceConfig("resourceSonarrTest", "false"),
+				PreConfig: rootFolderDSInit,
+				Config:    testAccImportListSonarrResourceConfig("resourceSonarrTest", "false"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("sonarr_import_list_sonarr.test", "enable_automatic_add", "false"),
 					resource.TestCheckResourceAttrSet("sonarr_import_list_sonarr.test", "id"),
@@ -42,16 +43,12 @@ func TestAccImportListSonarrResource(t *testing.T) {
 
 func testAccImportListSonarrResourceConfig(name, add string) string {
 	return fmt.Sprintf(`
-	resource "sonarr_root_folder" "test" {
-		path = "/config/MediaCover"
-  	}
-
 	resource "sonarr_import_list_sonarr" "test" {
 		enable_automatic_add = %s
 		season_folder = true
 		should_monitor = "all"
 		series_type = "standard"
-		root_folder_path = sonarr_root_folder.test.path
+		root_folder_path = "/defaults"
 		quality_profile_id = 1
 		language_profile_id = 1
 		name = "%s"

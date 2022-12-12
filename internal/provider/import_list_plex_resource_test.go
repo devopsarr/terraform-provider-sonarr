@@ -16,7 +16,8 @@ func TestAccImportListPlexResource(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Create and Read testing
 			{
-				Config: testAccImportListPlexResourceConfig("resourcePlexTest", "false"),
+				PreConfig: rootFolderDSInit,
+				Config:    testAccImportListPlexResourceConfig("resourcePlexTest", "false"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("sonarr_import_list_plex.test", "season_folder", "false"),
 					resource.TestCheckResourceAttrSet("sonarr_import_list_plex.test", "id"),
@@ -42,16 +43,13 @@ func TestAccImportListPlexResource(t *testing.T) {
 
 func testAccImportListPlexResourceConfig(name, folder string) string {
 	return fmt.Sprintf(`
-	resource "sonarr_root_folder" "test" {
-		path = "/app"
-  	}
 
 	resource "sonarr_import_list_plex" "test" {
 		enable_automatic_add = false
 		season_folder = %s
 		should_monitor = "all"
 		series_type = "standard"
-		root_folder_path = sonarr_root_folder.test.path
+		root_folder_path = "/defaults"
 		quality_profile_id = 1
 		language_profile_id = 1
 		name = "%s"

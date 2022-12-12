@@ -1,9 +1,12 @@
 package provider
 
 import (
+	"os"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"golift.io/starr"
+	"golift.io/starr/sonarr"
 )
 
 func TestAccRootFolderDataSource(t *testing.T) {
@@ -15,7 +18,8 @@ func TestAccRootFolderDataSource(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Read testing
 			{
-				Config: testAccRootFolderDataSourceConfig,
+				PreConfig: rootFolderDSInit,
+				Config:    testAccRootFolderDataSourceConfig,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrSet("data.sonarr_root_folder.test", "id"),
 					resource.TestCheckResourceAttr("data.sonarr_root_folder.test", "path", "/defaults")),
@@ -25,11 +29,13 @@ func TestAccRootFolderDataSource(t *testing.T) {
 }
 
 const testAccRootFolderDataSourceConfig = `
-resource "sonarr_root_folder" "test" {
+data "sonarr_root_folder" "test" {
 	path = "/defaults"
 }
-
-data "sonarr_root_folder" "test" {
-	path = sonarr_root_folder.test.path
-}
 `
+
+func rootFolderDSInit() {
+	// ensure a /defaults root path is configured
+	client := *sonarr.New(starr.New(os.Getenv("SONARR_API_KEY"), os.Getenv("SONARR_URL"), 0))
+	_, _ = client.AddRootFolder(&sonarr.RootFolder{Path: "/defaults"})
+}

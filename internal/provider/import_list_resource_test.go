@@ -16,7 +16,8 @@ func TestAccImportListResource(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Create and Read testing
 			{
-				Config: testAccImportListResourceConfig("/config/.config", "importListResourceTest", "false"),
+				PreConfig: rootFolderDSInit,
+				Config:    testAccImportListResourceConfig("importListResourceTest", "false"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("sonarr_import_list.test", "enable_automatic_add", "false"),
 					resource.TestCheckResourceAttrSet("sonarr_import_list.test", "id"),
@@ -24,7 +25,7 @@ func TestAccImportListResource(t *testing.T) {
 			},
 			// Update and Read testing
 			{
-				Config: testAccImportListResourceConfig("/config/.config", "importListResourceTest", "true"),
+				Config: testAccImportListResourceConfig("importListResourceTest", "true"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("sonarr_import_list.test", "enable_automatic_add", "true"),
 				),
@@ -40,13 +41,11 @@ func TestAccImportListResource(t *testing.T) {
 	})
 }
 
-func testAccImportListResourceConfig(path, name, enable string) string {
+func testAccImportListResourceConfig(name, enable string) string {
 	return fmt.Sprintf(`
-	resource "sonarr_root_folder" "test" {
-		path = "%s"
-  	}
 
-	  resource "sonarr_quality_profile" "test" {
+
+	resource "sonarr_quality_profile" "test" {
 		name            = "%s"
 		upgrade_allowed = true
 		cutoff          = 1100
@@ -85,7 +84,7 @@ func testAccImportListResourceConfig(path, name, enable string) string {
 		season_folder = true
 		should_monitor = "all"
 		series_type = "standard"
-		root_folder_path = sonarr_root_folder.test.path
+		root_folder_path = "/defaults"
 		quality_profile_id = sonarr_quality_profile.test.id
 		language_profile_id = sonarr_language_profile.test.id
 		name = "%s"
@@ -94,5 +93,5 @@ func testAccImportListResourceConfig(path, name, enable string) string {
 		base_url = "http://127.0.0.1:8989"
 		api_key = "b01df9fca2e64e459d64a09888ce7451"
 		tags = []
-	}`, path, name, name, enable, name)
+	}`, name, name, enable, name)
 }

@@ -15,7 +15,8 @@ func TestAccImportListDataSource(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Read testing
 			{
-				Config: testAccImportListDataSourceConfig,
+				PreConfig: rootFolderDSInit,
+				Config:    testAccImportListDataSourceConfig,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrSet("data.sonarr_import_list.test", "id"),
 					resource.TestCheckResourceAttr("data.sonarr_import_list.test", "should_monitor", "all")),
@@ -25,16 +26,12 @@ func TestAccImportListDataSource(t *testing.T) {
 }
 
 const testAccImportListDataSourceConfig = `
-resource "sonarr_root_folder" "test" {
-	path = "/config/.config/.mono/keypairs"
-}
-
-  resource "sonarr_import_list" "test" {
+resource "sonarr_import_list" "test" {
 	enable_automatic_add = false
 	season_folder = true
 	should_monitor = "all"
 	series_type = "standard"
-	root_folder_path = sonarr_root_folder.test.path
+	root_folder_path = "/defaults"
 	quality_profile_id = 1
 	language_profile_id = 1
 	name = "importListDataTest"
