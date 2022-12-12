@@ -173,6 +173,7 @@ func (p *SonarrProvider) Resources(ctx context.Context) []func() resource.Resour
 		NewImportListResource,
 		NewImportListSonarrResource,
 		NewImportListPlexResource,
+		NewImportListTraktListResource,
 
 		// Media Management
 		NewMediaManagementResource,
