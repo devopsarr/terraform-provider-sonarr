@@ -19,8 +19,8 @@ import (
 
 const (
 	indexerTorrentRssResourceName   = "indexer_torrent_rss"
-	IndexerTorrentRssImplementation = "TorrentRssIndexer"
-	IndexerTorrentRssConfigContrat  = "TorrentRssIndexerSettings"
+	indexerTorrentRssImplementation = "TorrentRssIndexer"
+	indexerTorrentRssConfigContrat  = "TorrentRssIndexerSettings"
 	IndexerTorrentRssProtocol       = "torrent"
 )
 
@@ -344,8 +344,8 @@ func (i *IndexerTorrentRss) read(ctx context.Context) *sonarr.IndexerInput {
 		Priority:                i.Priority.ValueInt64(),
 		DownloadClientID:        i.DownloadClientID.ValueInt64(),
 		ID:                      i.ID.ValueInt64(),
-		ConfigContract:          IndexerTorrentRssConfigContrat,
-		Implementation:          IndexerTorrentRssImplementation,
+		ConfigContract:          indexerTorrentRssConfigContrat,
+		Implementation:          indexerTorrentRssImplementation,
 		Name:                    i.Name.ValueString(),
 		Protocol:                IndexerTorrentRssProtocol,
 		Tags:                    tags,

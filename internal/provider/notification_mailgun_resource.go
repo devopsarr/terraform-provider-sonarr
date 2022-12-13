@@ -19,8 +19,8 @@ import (
 
 const (
 	notificationMailgunResourceName   = "notification_mailgun"
-	NotificationMailgunImplementation = "Mailgun"
-	NotificationMailgunConfigContrat  = "MailgunSettings"
+	notificationMailgunImplementation = "Mailgun"
+	notificationMailgunConfigContrat  = "MailgunSettings"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -358,8 +358,8 @@ func (n *NotificationMailgun) read(ctx context.Context) *sonarr.NotificationInpu
 		OnHealthIssue:                 n.OnHealthIssue.ValueBool(),
 		OnApplicationUpdate:           n.OnApplicationUpdate.ValueBool(),
 		IncludeHealthWarnings:         n.IncludeHealthWarnings.ValueBool(),
-		ConfigContract:                NotificationMailgunConfigContrat,
-		Implementation:                NotificationMailgunImplementation,
+		ConfigContract:                notificationMailgunConfigContrat,
+		Implementation:                notificationMailgunImplementation,
 		ID:                            n.ID.ValueInt64(),
 		Name:                          n.Name.ValueString(),
 		Tags:                          tags,

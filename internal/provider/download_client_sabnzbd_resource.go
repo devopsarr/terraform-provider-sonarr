@@ -21,8 +21,8 @@ import (
 
 const (
 	downloadClientSabnzbdResourceName   = "download_client_sabnzbd"
-	DownloadClientSabnzbdImplementation = "Sabnzbd"
-	DownloadClientSabnzbdConfigContrat  = "SabnzbdSettings"
+	downloadClientSabnzbdImplementation = "Sabnzbd"
+	downloadClientSabnzbdConfigContrat  = "SabnzbdSettings"
 	DownloadClientSabnzbdProtocol       = "usenet"
 )
 
@@ -369,8 +369,8 @@ func (d *DownloadClientSabnzbd) read(ctx context.Context) *sonarr.DownloadClient
 		RemoveFailedDownloads:    d.RemoveFailedDownloads.ValueBool(),
 		Priority:                 int(d.Priority.ValueInt64()),
 		ID:                       d.ID.ValueInt64(),
-		ConfigContract:           DownloadClientSabnzbdConfigContrat,
-		Implementation:           DownloadClientSabnzbdImplementation,
+		ConfigContract:           downloadClientSabnzbdConfigContrat,
+		Implementation:           downloadClientSabnzbdImplementation,
 		Name:                     d.Name.ValueString(),
 		Protocol:                 DownloadClientSabnzbdProtocol,
 		Tags:                     tags,

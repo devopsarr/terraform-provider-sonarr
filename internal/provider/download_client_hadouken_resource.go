@@ -19,8 +19,8 @@ import (
 
 const (
 	downloadClientHadoukenResourceName   = "download_client_hadouken"
-	DownloadClientHadoukenImplementation = "Hadouken"
-	DownloadClientHadoukenConfigContrat  = "HadoukenSettings"
+	downloadClientHadoukenImplementation = "Hadouken"
+	downloadClientHadoukenConfigContrat  = "HadoukenSettings"
 	DownloadClientHadoukenProtocol       = "torrent"
 )
 
@@ -334,8 +334,8 @@ func (d *DownloadClientHadouken) read(ctx context.Context) *sonarr.DownloadClien
 		RemoveFailedDownloads:    d.RemoveFailedDownloads.ValueBool(),
 		Priority:                 int(d.Priority.ValueInt64()),
 		ID:                       d.ID.ValueInt64(),
-		ConfigContract:           DownloadClientHadoukenConfigContrat,
-		Implementation:           DownloadClientHadoukenImplementation,
+		ConfigContract:           downloadClientHadoukenConfigContrat,
+		Implementation:           downloadClientHadoukenImplementation,
 		Name:                     d.Name.ValueString(),
 		Protocol:                 DownloadClientHadoukenProtocol,
 		Tags:                     tags,

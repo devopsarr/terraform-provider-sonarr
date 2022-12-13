@@ -21,8 +21,8 @@ import (
 
 const (
 	downloadClientNzbgetResourceName   = "download_client_nzbget"
-	DownloadClientNzbgetImplementation = "Nzbget"
-	DownloadClientNzbgetConfigContrat  = "NzbgetSettings"
+	downloadClientNzbgetImplementation = "Nzbget"
+	downloadClientNzbgetConfigContrat  = "NzbgetSettings"
 	DownloadClientNzbgetProtocol       = "usenet"
 )
 
@@ -368,8 +368,8 @@ func (d *DownloadClientNzbget) read(ctx context.Context) *sonarr.DownloadClientI
 		RemoveFailedDownloads:    d.RemoveFailedDownloads.ValueBool(),
 		Priority:                 int(d.Priority.ValueInt64()),
 		ID:                       d.ID.ValueInt64(),
-		ConfigContract:           DownloadClientNzbgetConfigContrat,
-		Implementation:           DownloadClientNzbgetImplementation,
+		ConfigContract:           downloadClientNzbgetConfigContrat,
+		Implementation:           downloadClientNzbgetImplementation,
 		Name:                     d.Name.ValueString(),
 		Protocol:                 DownloadClientNzbgetProtocol,
 		Tags:                     tags,

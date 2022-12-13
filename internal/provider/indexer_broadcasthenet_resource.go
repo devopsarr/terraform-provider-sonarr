@@ -19,8 +19,8 @@ import (
 
 const (
 	indexerBroadcastheNetResourceName   = "indexer_broadcasthenet"
-	IndexerBroadcastheNetImplementation = "BroadcastheNet"
-	IndexerBroadcastheNetConfigContrat  = "BroadcastheNetSettings"
+	indexerBroadcastheNetImplementation = "BroadcastheNet"
+	indexerBroadcastheNetConfigContrat  = "BroadcastheNetSettings"
 	IndexerBroadcastheNetProtocol       = "torrent"
 )
 
@@ -336,8 +336,8 @@ func (i *IndexerBroadcastheNet) read(ctx context.Context) *sonarr.IndexerInput {
 		Priority:                i.Priority.ValueInt64(),
 		DownloadClientID:        i.DownloadClientID.ValueInt64(),
 		ID:                      i.ID.ValueInt64(),
-		ConfigContract:          IndexerBroadcastheNetConfigContrat,
-		Implementation:          IndexerBroadcastheNetImplementation,
+		ConfigContract:          indexerBroadcastheNetConfigContrat,
+		Implementation:          indexerBroadcastheNetImplementation,
 		Name:                    i.Name.ValueString(),
 		Protocol:                IndexerBroadcastheNetProtocol,
 		Tags:                    tags,

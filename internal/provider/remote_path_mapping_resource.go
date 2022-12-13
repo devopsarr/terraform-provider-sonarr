@@ -13,6 +13,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
+	"golift.io/starr"
 	"golift.io/starr/sonarr"
 )
 
@@ -205,15 +206,15 @@ func (r *RemotePathMappingResource) ImportState(ctx context.Context, req resourc
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 
-func (r *RemotePathMapping) write(remotePathMapping *sonarr.RemotePathMapping) {
+func (r *RemotePathMapping) write(remotePathMapping *starr.RemotePathMapping) {
 	r.ID = types.Int64Value(remotePathMapping.ID)
 	r.Host = types.StringValue(remotePathMapping.Host)
 	r.RemotePath = types.StringValue(remotePathMapping.RemotePath)
 	r.LocalPath = types.StringValue(remotePathMapping.LocalPath)
 }
 
-func (r *RemotePathMapping) read() *sonarr.RemotePathMapping {
-	return &sonarr.RemotePathMapping{
+func (r *RemotePathMapping) read() *starr.RemotePathMapping {
+	return &starr.RemotePathMapping{
 		ID:         r.ID.ValueInt64(),
 		Host:       r.Host.ValueString(),
 		RemotePath: r.RemotePath.ValueString(),

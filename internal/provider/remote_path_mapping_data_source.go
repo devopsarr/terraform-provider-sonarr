@@ -9,6 +9,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
+	"golift.io/starr"
 	"golift.io/starr/sonarr"
 )
 
@@ -104,7 +105,7 @@ func (d *RemotePathMappingDataSource) Read(ctx context.Context, req datasource.R
 	resp.Diagnostics.Append(resp.State.Set(ctx, &remoteMapping)...)
 }
 
-func findRemotePathMapping(id int64, mappings []*sonarr.RemotePathMapping) (*sonarr.RemotePathMapping, error) {
+func findRemotePathMapping(id int64, mappings []*starr.RemotePathMapping) (*starr.RemotePathMapping, error) {
 	for _, m := range mappings {
 		if m.ID == id {
 			return m, nil

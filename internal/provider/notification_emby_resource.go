@@ -19,8 +19,8 @@ import (
 
 const (
 	notificationEmbyResourceName   = "notification_emby"
-	NotificationEmbyImplementation = "MediaBrowser"
-	NotificationEmbyConfigContrat  = "MediaBrowserSettings"
+	notificationEmbyImplementation = "MediaBrowser"
+	notificationEmbyConfigContrat  = "MediaBrowserSettings"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -374,8 +374,8 @@ func (n *NotificationEmby) read(ctx context.Context) *sonarr.NotificationInput {
 		OnHealthIssue:                 n.OnHealthIssue.ValueBool(),
 		OnApplicationUpdate:           n.OnApplicationUpdate.ValueBool(),
 		IncludeHealthWarnings:         n.IncludeHealthWarnings.ValueBool(),
-		ConfigContract:                NotificationEmbyConfigContrat,
-		Implementation:                NotificationEmbyImplementation,
+		ConfigContract:                notificationEmbyConfigContrat,
+		Implementation:                notificationEmbyImplementation,
 		ID:                            n.ID.ValueInt64(),
 		Name:                          n.Name.ValueString(),
 		Tags:                          tags,

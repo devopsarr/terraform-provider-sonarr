@@ -19,8 +19,8 @@ import (
 
 const (
 	indexerHdbitsResourceName   = "indexer_hdbits"
-	IndexerHdbitsImplementation = "HDBits"
-	IndexerHdbitsConfigContrat  = "HDBitsSettings"
+	indexerHdbitsImplementation = "HDBits"
+	indexerHdbitsConfigContrat  = "HDBitsSettings"
 	IndexerHdbitsProtocol       = "torrent"
 )
 
@@ -344,8 +344,8 @@ func (i *IndexerHdbits) read(ctx context.Context) *sonarr.IndexerInput {
 		Priority:                i.Priority.ValueInt64(),
 		DownloadClientID:        i.DownloadClientID.ValueInt64(),
 		ID:                      i.ID.ValueInt64(),
-		ConfigContract:          IndexerHdbitsConfigContrat,
-		Implementation:          IndexerHdbitsImplementation,
+		ConfigContract:          indexerHdbitsConfigContrat,
+		Implementation:          indexerHdbitsImplementation,
 		Name:                    i.Name.ValueString(),
 		Protocol:                IndexerHdbitsProtocol,
 		Tags:                    tags,

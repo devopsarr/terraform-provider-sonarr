@@ -19,8 +19,8 @@ import (
 
 const (
 	notificationSlackResourceName   = "notification_slack"
-	NotificationSlackImplementation = "Slack"
-	NotificationSlackConfigContrat  = "SlackSettings"
+	notificationSlackImplementation = "Slack"
+	notificationSlackConfigContrat  = "SlackSettings"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -357,8 +357,8 @@ func (n *NotificationSlack) read(ctx context.Context) *sonarr.NotificationInput 
 		OnHealthIssue:                 n.OnHealthIssue.ValueBool(),
 		OnApplicationUpdate:           n.OnApplicationUpdate.ValueBool(),
 		IncludeHealthWarnings:         n.IncludeHealthWarnings.ValueBool(),
-		ConfigContract:                NotificationSlackConfigContrat,
-		Implementation:                NotificationSlackImplementation,
+		ConfigContract:                notificationSlackConfigContrat,
+		Implementation:                notificationSlackImplementation,
 		ID:                            n.ID.ValueInt64(),
 		Name:                          n.Name.ValueString(),
 		Tags:                          tags,

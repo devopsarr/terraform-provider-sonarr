@@ -19,8 +19,8 @@ import (
 
 const (
 	indexerRarbgResourceName   = "indexer_rarbg"
-	IndexerRarbgImplementation = "Rarbg"
-	IndexerRarbgConfigContrat  = "RarbgSettings"
+	indexerRarbgImplementation = "Rarbg"
+	indexerRarbgConfigContrat  = "RarbgSettings"
 	IndexerRarbgProtocol       = "torrent"
 )
 
@@ -345,8 +345,8 @@ func (i *IndexerRarbg) read(ctx context.Context) *sonarr.IndexerInput {
 		Priority:                i.Priority.ValueInt64(),
 		DownloadClientID:        i.DownloadClientID.ValueInt64(),
 		ID:                      i.ID.ValueInt64(),
-		ConfigContract:          IndexerRarbgConfigContrat,
-		Implementation:          IndexerRarbgImplementation,
+		ConfigContract:          indexerRarbgConfigContrat,
+		Implementation:          indexerRarbgImplementation,
 		Name:                    i.Name.ValueString(),
 		Protocol:                IndexerRarbgProtocol,
 		Tags:                    tags,

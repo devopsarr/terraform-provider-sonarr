@@ -21,8 +21,8 @@ import (
 
 const (
 	downloadClientTransmissionResourceName   = "download_client_transmission"
-	DownloadClientTransmissionImplementation = "Transmission"
-	DownloadClientTransmissionConfigContrat  = "TransmissionSettings"
+	downloadClientTransmissionImplementation = "Transmission"
+	downloadClientTransmissionConfigContrat  = "TransmissionSettings"
 	DownloadClientTransmissionProtocol       = "torrent"
 )
 
@@ -376,8 +376,8 @@ func (d *DownloadClientTransmission) read(ctx context.Context) *sonarr.DownloadC
 		RemoveFailedDownloads:    d.RemoveFailedDownloads.ValueBool(),
 		Priority:                 int(d.Priority.ValueInt64()),
 		ID:                       d.ID.ValueInt64(),
-		ConfigContract:           DownloadClientTransmissionConfigContrat,
-		Implementation:           DownloadClientTransmissionImplementation,
+		ConfigContract:           downloadClientTransmissionConfigContrat,
+		Implementation:           downloadClientTransmissionImplementation,
 		Name:                     d.Name.ValueString(),
 		Protocol:                 DownloadClientTransmissionProtocol,
 		Tags:                     tags,

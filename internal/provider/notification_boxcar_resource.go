@@ -19,8 +19,8 @@ import (
 
 const (
 	notificationBoxcarResourceName   = "notification_boxcar"
-	NotificationBoxcarImplementation = "Boxcar"
-	NotificationBoxcarConfigContrat  = "BoxcarSettings"
+	notificationBoxcarImplementation = "Boxcar"
+	notificationBoxcarConfigContrat  = "BoxcarSettings"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -326,8 +326,8 @@ func (n *NotificationBoxcar) read(ctx context.Context) *sonarr.NotificationInput
 		OnHealthIssue:                 n.OnHealthIssue.ValueBool(),
 		OnApplicationUpdate:           n.OnApplicationUpdate.ValueBool(),
 		IncludeHealthWarnings:         n.IncludeHealthWarnings.ValueBool(),
-		ConfigContract:                NotificationBoxcarConfigContrat,
-		Implementation:                NotificationBoxcarImplementation,
+		ConfigContract:                notificationBoxcarConfigContrat,
+		Implementation:                notificationBoxcarImplementation,
 		ID:                            n.ID.ValueInt64(),
 		Name:                          n.Name.ValueString(),
 		Tags:                          tags,

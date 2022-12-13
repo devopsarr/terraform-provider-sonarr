@@ -227,7 +227,7 @@ func (r *SeriesResource) Update(ctx context.Context, req resource.UpdateRequest,
 	// Update Series
 	request := series.read(ctx)
 
-	response, err := r.client.UpdateSeriesContext(ctx, request)
+	response, err := r.client.UpdateSeriesContext(ctx, request, true)
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", seriesResourceName, err))
 

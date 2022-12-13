@@ -169,6 +169,14 @@ func (p *SonarrProvider) Resources(ctx context.Context) []func() resource.Resour
 		NewIndexerTorrentleechResource,
 		NewIndexerTorznabResource,
 
+		// Import Lists
+		NewImportListResource,
+		NewImportListSonarrResource,
+		NewImportListPlexResource,
+		NewImportListTraktListResource,
+		NewImportListTraktPopularResource,
+		NewImportListTraktUserResource,
+
 		// Media Management
 		NewMediaManagementResource,
 		NewNamingResource,
@@ -225,6 +233,10 @@ func (p *SonarrProvider) DataSources(ctx context.Context) []func() datasource.Da
 		NewIndexerConfigDataSource,
 		NewIndexerDataSource,
 		NewIndexersDataSource,
+
+		// Import Lists
+		NewImportListDataSource,
+		NewImportListsDataSource,
 
 		// Media Management
 		NewMediaManagementDataSource,

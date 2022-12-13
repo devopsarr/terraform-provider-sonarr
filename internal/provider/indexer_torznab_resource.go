@@ -19,8 +19,8 @@ import (
 
 const (
 	indexerTorznabResourceName   = "indexer_torznab"
-	IndexerTorznabImplementation = "Torznab"
-	IndexerTorznabConfigContrat  = "TorznabSettings"
+	indexerTorznabImplementation = "Torznab"
+	indexerTorznabConfigContrat  = "TorznabSettings"
 	IndexerTorznabProtocol       = "torrent"
 )
 
@@ -379,8 +379,8 @@ func (i *IndexerTorznab) read(ctx context.Context) *sonarr.IndexerInput {
 		Priority:                i.Priority.ValueInt64(),
 		DownloadClientID:        i.DownloadClientID.ValueInt64(),
 		ID:                      i.ID.ValueInt64(),
-		ConfigContract:          IndexerTorznabConfigContrat,
-		Implementation:          IndexerTorznabImplementation,
+		ConfigContract:          indexerTorznabConfigContrat,
+		Implementation:          indexerTorznabImplementation,
 		Name:                    i.Name.ValueString(),
 		Protocol:                IndexerTorznabProtocol,
 		Tags:                    tags,

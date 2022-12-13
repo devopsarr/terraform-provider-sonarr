@@ -19,8 +19,8 @@ import (
 
 const (
 	indexerNyaaResourceName   = "indexer_nyaa"
-	IndexerNyaaImplementation = "Nyaa"
-	IndexerNyaaConfigContrat  = "NyaaSettings"
+	indexerNyaaImplementation = "Nyaa"
+	indexerNyaaConfigContrat  = "NyaaSettings"
 	IndexerNyaaProtocol       = "torrent"
 )
 
@@ -344,8 +344,8 @@ func (i *IndexerNyaa) read(ctx context.Context) *sonarr.IndexerInput {
 		Priority:                i.Priority.ValueInt64(),
 		DownloadClientID:        i.DownloadClientID.ValueInt64(),
 		ID:                      i.ID.ValueInt64(),
-		ConfigContract:          IndexerNyaaConfigContrat,
-		Implementation:          IndexerNyaaImplementation,
+		ConfigContract:          indexerNyaaConfigContrat,
+		Implementation:          indexerNyaaImplementation,
 		Name:                    i.Name.ValueString(),
 		Protocol:                IndexerNyaaProtocol,
 		Tags:                    tags,
