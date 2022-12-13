@@ -22,8 +22,8 @@ import (
 
 const (
 	importListTraktPopularResourceName   = "import_list_trakt_popular"
-	ImportListTraktPopularImplementation = "TraktPopularImport"
-	ImportListTraktPopularConfigContrat  = "TraktPopularSettings"
+	importListTraktPopularImplementation = "TraktPopularImport"
+	importListTraktPopularConfigContrat  = "TraktPopularSettings"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -393,8 +393,8 @@ func (i *ImportListTraktPopular) read(ctx context.Context) *sonarr.ImportListInp
 		QualityProfileID:   i.QualityProfileID.ValueInt64(),
 		EnableAutomaticAdd: i.EnableAutomaticAdd.ValueBool(),
 		SeasonFolder:       i.SeasonFolder.ValueBool(),
-		ConfigContract:     ImportListTraktPopularConfigContrat,
-		Implementation:     ImportListTraktPopularImplementation,
+		ConfigContract:     importListTraktPopularConfigContrat,
+		Implementation:     importListTraktPopularImplementation,
 		ID:                 i.ID.ValueInt64(),
 		Name:               i.Name.ValueString(),
 		Tags:               tags,

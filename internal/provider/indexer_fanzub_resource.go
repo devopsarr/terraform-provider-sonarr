@@ -19,8 +19,8 @@ import (
 
 const (
 	indexerFanzubResourceName   = "indexer_fanzub"
-	IndexerFanzubImplementation = "Fanzub"
-	IndexerFanzubConfigContrat  = "FanzubSettings"
+	indexerFanzubImplementation = "Fanzub"
+	indexerFanzubConfigContrat  = "FanzubSettings"
 	IndexerFanzubProtocol       = "usenet"
 )
 
@@ -307,8 +307,8 @@ func (i *IndexerFanzub) read(ctx context.Context) *sonarr.IndexerInput {
 		Priority:                i.Priority.ValueInt64(),
 		DownloadClientID:        i.DownloadClientID.ValueInt64(),
 		ID:                      i.ID.ValueInt64(),
-		ConfigContract:          IndexerFanzubConfigContrat,
-		Implementation:          IndexerFanzubImplementation,
+		ConfigContract:          indexerFanzubConfigContrat,
+		Implementation:          indexerFanzubImplementation,
 		Name:                    i.Name.ValueString(),
 		Protocol:                IndexerFanzubProtocol,
 		Tags:                    tags,

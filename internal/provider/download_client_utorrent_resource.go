@@ -21,8 +21,8 @@ import (
 
 const (
 	downloadClientUtorrentResourceName   = "download_client_utorrent"
-	DownloadClientUtorrentImplementation = "UTorrent"
-	DownloadClientUtorrentConfigContrat  = "UTorrentSettings"
+	downloadClientUtorrentImplementation = "UTorrent"
+	downloadClientUtorrentConfigContrat  = "UTorrentSettings"
 	DownloadClientUtorrentProtocol       = "torrent"
 )
 
@@ -387,8 +387,8 @@ func (d *DownloadClientUtorrent) read(ctx context.Context) *sonarr.DownloadClien
 		RemoveFailedDownloads:    d.RemoveFailedDownloads.ValueBool(),
 		Priority:                 int(d.Priority.ValueInt64()),
 		ID:                       d.ID.ValueInt64(),
-		ConfigContract:           DownloadClientUtorrentConfigContrat,
-		Implementation:           DownloadClientUtorrentImplementation,
+		ConfigContract:           downloadClientUtorrentConfigContrat,
+		Implementation:           downloadClientUtorrentImplementation,
 		Name:                     d.Name.ValueString(),
 		Protocol:                 DownloadClientUtorrentProtocol,
 		Tags:                     tags,

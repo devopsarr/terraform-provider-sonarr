@@ -21,8 +21,8 @@ import (
 
 const (
 	downloadClientQbittorrentResourceName   = "download_client_qbittorrent"
-	DownloadClientQbittorrentImplementation = "QBittorrent"
-	DownloadClientQbittorrentConfigContrat  = "QBittorrentSettings"
+	downloadClientQbittorrentImplementation = "QBittorrent"
+	downloadClientQbittorrentConfigContrat  = "QBittorrentSettings"
 	DownloadClientQbittorrentProtocol       = "torrent"
 )
 
@@ -405,8 +405,8 @@ func (d *DownloadClientQbittorrent) read(ctx context.Context) *sonarr.DownloadCl
 		RemoveFailedDownloads:    d.RemoveFailedDownloads.ValueBool(),
 		Priority:                 int(d.Priority.ValueInt64()),
 		ID:                       d.ID.ValueInt64(),
-		ConfigContract:           DownloadClientQbittorrentConfigContrat,
-		Implementation:           DownloadClientQbittorrentImplementation,
+		ConfigContract:           downloadClientQbittorrentConfigContrat,
+		Implementation:           downloadClientQbittorrentImplementation,
 		Name:                     d.Name.ValueString(),
 		Protocol:                 DownloadClientQbittorrentProtocol,
 		Tags:                     tags,

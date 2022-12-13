@@ -19,8 +19,8 @@ import (
 
 const (
 	indexerFilelistResourceName   = "indexer_filelist"
-	IndexerFilelistImplementation = "FileList"
-	IndexerFilelistConfigContrat  = "FileListSettings"
+	indexerFilelistImplementation = "FileList"
+	indexerFilelistConfigContrat  = "FileListSettings"
 	IndexerFilelistProtocol       = "torrent"
 )
 
@@ -362,8 +362,8 @@ func (i *IndexerFilelist) read(ctx context.Context) *sonarr.IndexerInput {
 		Priority:                i.Priority.ValueInt64(),
 		DownloadClientID:        i.DownloadClientID.ValueInt64(),
 		ID:                      i.ID.ValueInt64(),
-		ConfigContract:          IndexerFilelistConfigContrat,
-		Implementation:          IndexerFilelistImplementation,
+		ConfigContract:          indexerFilelistConfigContrat,
+		Implementation:          indexerFilelistImplementation,
 		Name:                    i.Name.ValueString(),
 		Protocol:                IndexerFilelistProtocol,
 		Tags:                    tags,

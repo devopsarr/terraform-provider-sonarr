@@ -21,8 +21,8 @@ import (
 
 const (
 	downloadClientVuzeResourceName   = "download_client_vuze"
-	DownloadClientVuzeImplementation = "Vuze"
-	DownloadClientVuzeConfigContrat  = "TransmissionSettings"
+	downloadClientVuzeImplementation = "Vuze"
+	downloadClientVuzeConfigContrat  = "TransmissionSettings"
 	DownloadClientVuzeProtocol       = "torrent"
 )
 
@@ -376,8 +376,8 @@ func (d *DownloadClientVuze) read(ctx context.Context) *sonarr.DownloadClientInp
 		RemoveFailedDownloads:    d.RemoveFailedDownloads.ValueBool(),
 		Priority:                 int(d.Priority.ValueInt64()),
 		ID:                       d.ID.ValueInt64(),
-		ConfigContract:           DownloadClientVuzeConfigContrat,
-		Implementation:           DownloadClientVuzeImplementation,
+		ConfigContract:           downloadClientVuzeConfigContrat,
+		Implementation:           downloadClientVuzeImplementation,
 		Name:                     d.Name.ValueString(),
 		Protocol:                 DownloadClientVuzeProtocol,
 		Tags:                     tags,

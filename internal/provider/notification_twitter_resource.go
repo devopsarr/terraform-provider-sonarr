@@ -19,8 +19,8 @@ import (
 
 const (
 	notificationTwitterResourceName   = "notification_twitter"
-	NotificationTwitterImplementation = "Twitter"
-	NotificationTwitterConfigContrat  = "TwitterSettings"
+	notificationTwitterImplementation = "Twitter"
+	notificationTwitterConfigContrat  = "TwitterSettings"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -365,8 +365,8 @@ func (n *NotificationTwitter) read(ctx context.Context) *sonarr.NotificationInpu
 		OnHealthIssue:                 n.OnHealthIssue.ValueBool(),
 		OnApplicationUpdate:           n.OnApplicationUpdate.ValueBool(),
 		IncludeHealthWarnings:         n.IncludeHealthWarnings.ValueBool(),
-		ConfigContract:                NotificationTwitterConfigContrat,
-		Implementation:                NotificationTwitterImplementation,
+		ConfigContract:                notificationTwitterConfigContrat,
+		Implementation:                notificationTwitterImplementation,
 		ID:                            n.ID.ValueInt64(),
 		Name:                          n.Name.ValueString(),
 		Tags:                          tags,

@@ -19,8 +19,8 @@ import (
 
 const (
 	notificationTraktResourceName   = "notification_trakt"
-	NotificationTraktImplementation = "Trakt"
-	NotificationTraktConfigContrat  = "TraktSettings"
+	notificationTraktImplementation = "Trakt"
+	notificationTraktConfigContrat  = "TraktSettings"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -325,8 +325,8 @@ func (n *NotificationTrakt) read(ctx context.Context) *sonarr.NotificationInput 
 		OnEpisodeFileDelete:           n.OnEpisodeFileDelete.ValueBool(),
 		OnEpisodeFileDeleteForUpgrade: n.OnEpisodeFileDeleteForUpgrade.ValueBool(),
 		IncludeHealthWarnings:         n.IncludeHealthWarnings.ValueBool(),
-		ConfigContract:                NotificationTraktConfigContrat,
-		Implementation:                NotificationTraktImplementation,
+		ConfigContract:                notificationTraktConfigContrat,
+		Implementation:                notificationTraktImplementation,
 		ID:                            n.ID.ValueInt64(),
 		Name:                          n.Name.ValueString(),
 		Tags:                          tags,

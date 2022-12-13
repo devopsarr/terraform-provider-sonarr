@@ -19,8 +19,8 @@ import (
 
 const (
 	notificationKodiResourceName   = "notification_kodi"
-	NotificationKodiImplementation = "Xbmc"
-	NotificationKodiConfigContrat  = "XbmcSettings"
+	notificationKodiImplementation = "Xbmc"
+	notificationKodiConfigContrat  = "XbmcSettings"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -406,8 +406,8 @@ func (n *NotificationKodi) read(ctx context.Context) *sonarr.NotificationInput {
 		OnHealthIssue:                 n.OnHealthIssue.ValueBool(),
 		OnApplicationUpdate:           n.OnApplicationUpdate.ValueBool(),
 		IncludeHealthWarnings:         n.IncludeHealthWarnings.ValueBool(),
-		ConfigContract:                NotificationKodiConfigContrat,
-		Implementation:                NotificationKodiImplementation,
+		ConfigContract:                notificationKodiConfigContrat,
+		Implementation:                notificationKodiImplementation,
 		ID:                            n.ID.ValueInt64(),
 		Name:                          n.Name.ValueString(),
 		Tags:                          tags,

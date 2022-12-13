@@ -19,8 +19,8 @@ import (
 
 const (
 	notificationEmailResourceName   = "notification_email"
-	NotificationEmailImplementation = "Email"
-	NotificationEmailConfigContrat  = "EmailSettings"
+	notificationEmailImplementation = "Email"
+	notificationEmailConfigContrat  = "EmailSettings"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -391,8 +391,8 @@ func (n *NotificationEmail) read(ctx context.Context) *sonarr.NotificationInput 
 		OnHealthIssue:                 n.OnHealthIssue.ValueBool(),
 		OnApplicationUpdate:           n.OnApplicationUpdate.ValueBool(),
 		IncludeHealthWarnings:         n.IncludeHealthWarnings.ValueBool(),
-		ConfigContract:                NotificationEmailConfigContrat,
-		Implementation:                NotificationEmailImplementation,
+		ConfigContract:                notificationEmailConfigContrat,
+		Implementation:                notificationEmailImplementation,
 		ID:                            n.ID.ValueInt64(),
 		Name:                          n.Name.ValueString(),
 		Tags:                          tags,

@@ -21,8 +21,8 @@ import (
 
 const (
 	importListTraktListResourceName   = "import_list_trakt_list"
-	ImportListTraktListImplementation = "TraktListImport"
-	ImportListTraktListConfigContrat  = "TraktListSettings"
+	importListTraktListImplementation = "TraktListImport"
+	importListTraktListConfigContrat  = "TraktListSettings"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -396,8 +396,8 @@ func (i *ImportListTraktList) read(ctx context.Context) *sonarr.ImportListInput 
 		QualityProfileID:   i.QualityProfileID.ValueInt64(),
 		EnableAutomaticAdd: i.EnableAutomaticAdd.ValueBool(),
 		SeasonFolder:       i.SeasonFolder.ValueBool(),
-		ConfigContract:     ImportListTraktListConfigContrat,
-		Implementation:     ImportListTraktListImplementation,
+		ConfigContract:     importListTraktListConfigContrat,
+		Implementation:     importListTraktListImplementation,
 		ID:                 i.ID.ValueInt64(),
 		Name:               i.Name.ValueString(),
 		Tags:               tags,

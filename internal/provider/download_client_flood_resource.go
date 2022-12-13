@@ -21,8 +21,8 @@ import (
 
 const (
 	downloadClientFloodResourceName   = "download_client_flood"
-	DownloadClientFloodImplementation = "Flood"
-	DownloadClientFloodConfigContrat  = "FloodSettings"
+	downloadClientFloodImplementation = "Flood"
+	downloadClientFloodConfigContrat  = "FloodSettings"
 	DownloadClientFloodProtocol       = "torrent"
 )
 
@@ -415,8 +415,8 @@ func (d *DownloadClientFlood) read(ctx context.Context) *sonarr.DownloadClientIn
 		RemoveFailedDownloads:    d.RemoveFailedDownloads.ValueBool(),
 		Priority:                 int(d.Priority.ValueInt64()),
 		ID:                       d.ID.ValueInt64(),
-		ConfigContract:           DownloadClientFloodConfigContrat,
-		Implementation:           DownloadClientFloodImplementation,
+		ConfigContract:           downloadClientFloodConfigContrat,
+		Implementation:           downloadClientFloodImplementation,
 		Name:                     d.Name.ValueString(),
 		Protocol:                 DownloadClientFloodProtocol,
 		Tags:                     tags,

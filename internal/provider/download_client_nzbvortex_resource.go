@@ -21,8 +21,8 @@ import (
 
 const (
 	downloadClientNzbvortexResourceName   = "download_client_nzbvortex"
-	DownloadClientNzbvortexImplementation = "Nzbvortex"
-	DownloadClientNzbvortexConfigContrat  = "NzbvortexSettings"
+	downloadClientNzbvortexImplementation = "Nzbvortex"
+	downloadClientNzbvortexConfigContrat  = "NzbvortexSettings"
 	DownloadClientNzbvortexProtocol       = "usenet"
 )
 
@@ -350,8 +350,8 @@ func (d *DownloadClientNzbvortex) read(ctx context.Context) *sonarr.DownloadClie
 		RemoveFailedDownloads:    d.RemoveFailedDownloads.ValueBool(),
 		Priority:                 int(d.Priority.ValueInt64()),
 		ID:                       d.ID.ValueInt64(),
-		ConfigContract:           DownloadClientNzbvortexConfigContrat,
-		Implementation:           DownloadClientNzbvortexImplementation,
+		ConfigContract:           downloadClientNzbvortexConfigContrat,
+		Implementation:           downloadClientNzbvortexImplementation,
 		Name:                     d.Name.ValueString(),
 		Protocol:                 DownloadClientNzbvortexProtocol,
 		Tags:                     tags,

@@ -19,8 +19,8 @@ import (
 
 const (
 	downloadClientTorrentDownloadStationResourceName   = "download_client_torrent_download_station"
-	DownloadClientTorrentDownloadStationImplementation = "TorrentDownloadStation"
-	DownloadClientTorrentDownloadStationConfigContrat  = "DownloadStationSettings"
+	downloadClientTorrentDownloadStationImplementation = "TorrentDownloadStation"
+	downloadClientTorrentDownloadStationConfigContrat  = "DownloadStationSettings"
 	DownloadClientTorrentDownloadStationProtocol       = "torrent"
 )
 
@@ -336,8 +336,8 @@ func (d *DownloadClientTorrentDownloadStation) read(ctx context.Context) *sonarr
 		RemoveFailedDownloads:    d.RemoveFailedDownloads.ValueBool(),
 		Priority:                 int(d.Priority.ValueInt64()),
 		ID:                       d.ID.ValueInt64(),
-		ConfigContract:           DownloadClientTorrentDownloadStationConfigContrat,
-		Implementation:           DownloadClientTorrentDownloadStationImplementation,
+		ConfigContract:           downloadClientTorrentDownloadStationConfigContrat,
+		Implementation:           downloadClientTorrentDownloadStationImplementation,
 		Name:                     d.Name.ValueString(),
 		Protocol:                 DownloadClientTorrentDownloadStationProtocol,
 		Tags:                     tags,

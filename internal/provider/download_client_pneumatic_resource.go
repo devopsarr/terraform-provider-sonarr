@@ -19,8 +19,8 @@ import (
 
 const (
 	downloadClientPneumaticResourceName   = "download_client_pneumatic"
-	DownloadClientPneumaticImplementation = "Pneumatic"
-	DownloadClientPneumaticConfigContrat  = "PneumaticSettings"
+	downloadClientPneumaticImplementation = "Pneumatic"
+	downloadClientPneumaticConfigContrat  = "PneumaticSettings"
 	DownloadClientPneumaticProtocol       = "usenet"
 )
 
@@ -293,8 +293,8 @@ func (d *DownloadClientPneumatic) read(ctx context.Context) *sonarr.DownloadClie
 		RemoveFailedDownloads:    d.RemoveFailedDownloads.ValueBool(),
 		Priority:                 int(d.Priority.ValueInt64()),
 		ID:                       d.ID.ValueInt64(),
-		ConfigContract:           DownloadClientPneumaticConfigContrat,
-		Implementation:           DownloadClientPneumaticImplementation,
+		ConfigContract:           downloadClientPneumaticConfigContrat,
+		Implementation:           downloadClientPneumaticImplementation,
 		Name:                     d.Name.ValueString(),
 		Protocol:                 DownloadClientPneumaticProtocol,
 		Tags:                     tags,

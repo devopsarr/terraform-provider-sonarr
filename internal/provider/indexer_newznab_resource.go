@@ -19,8 +19,8 @@ import (
 
 const (
 	indexerNewznabResourceName   = "indexer_newznab"
-	IndexerNewznabImplementation = "Newznab"
-	IndexerNewznabConfigContrat  = "NewznabSettings"
+	indexerNewznabImplementation = "Newznab"
+	indexerNewznabConfigContrat  = "NewznabSettings"
 	IndexerNewznabProtocol       = "usenet"
 )
 
@@ -350,8 +350,8 @@ func (i *IndexerNewznab) read(ctx context.Context) *sonarr.IndexerInput {
 		Priority:                i.Priority.ValueInt64(),
 		DownloadClientID:        i.DownloadClientID.ValueInt64(),
 		ID:                      i.ID.ValueInt64(),
-		ConfigContract:          IndexerNewznabConfigContrat,
-		Implementation:          IndexerNewznabImplementation,
+		ConfigContract:          indexerNewznabConfigContrat,
+		Implementation:          indexerNewznabImplementation,
 		Name:                    i.Name.ValueString(),
 		Protocol:                IndexerNewznabProtocol,
 		Tags:                    tags,

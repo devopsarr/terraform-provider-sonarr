@@ -19,8 +19,8 @@ import (
 
 const (
 	downloadClientAria2ResourceName   = "download_client_aria2"
-	DownloadClientAria2Implementation = "Aria2"
-	DownloadClientAria2ConfigContrat  = "Aria2Settings"
+	downloadClientAria2Implementation = "Aria2"
+	downloadClientAria2ConfigContrat  = "Aria2Settings"
 	DownloadClientAria2Protocol       = "torrent"
 )
 
@@ -319,8 +319,8 @@ func (d *DownloadClientAria2) read(ctx context.Context) *sonarr.DownloadClientIn
 		RemoveFailedDownloads:    d.RemoveFailedDownloads.ValueBool(),
 		Priority:                 int(d.Priority.ValueInt64()),
 		ID:                       d.ID.ValueInt64(),
-		ConfigContract:           DownloadClientAria2ConfigContrat,
-		Implementation:           DownloadClientAria2Implementation,
+		ConfigContract:           downloadClientAria2ConfigContrat,
+		Implementation:           downloadClientAria2Implementation,
 		Name:                     d.Name.ValueString(),
 		Protocol:                 DownloadClientAria2Protocol,
 		Tags:                     tags,

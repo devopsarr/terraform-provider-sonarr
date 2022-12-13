@@ -19,8 +19,8 @@ import (
 
 const (
 	notificationSendgridResourceName   = "notification_sendgrid"
-	NotificationSendgridImplementation = "Sendgrid"
-	NotificationSendgridConfigContrat  = "SendgridSettings"
+	notificationSendgridImplementation = "Sendgrid"
+	notificationSendgridConfigContrat  = "SendgridSettings"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -342,8 +342,8 @@ func (n *NotificationSendgrid) read(ctx context.Context) *sonarr.NotificationInp
 		OnHealthIssue:                 n.OnHealthIssue.ValueBool(),
 		OnApplicationUpdate:           n.OnApplicationUpdate.ValueBool(),
 		IncludeHealthWarnings:         n.IncludeHealthWarnings.ValueBool(),
-		ConfigContract:                NotificationSendgridConfigContrat,
-		Implementation:                NotificationSendgridImplementation,
+		ConfigContract:                notificationSendgridConfigContrat,
+		Implementation:                notificationSendgridImplementation,
 		ID:                            n.ID.ValueInt64(),
 		Name:                          n.Name.ValueString(),
 		Tags:                          tags,

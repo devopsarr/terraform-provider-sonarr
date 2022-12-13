@@ -19,8 +19,8 @@ import (
 
 const (
 	notificationCustomScriptResourceName   = "notification_custom_script"
-	NotificationCustomScriptImplementation = "CustomScript"
-	NotificationCustomScriptConfigContrat  = "CustomScriptSettings"
+	notificationCustomScriptImplementation = "CustomScript"
+	notificationCustomScriptConfigContrat  = "CustomScriptSettings"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -342,8 +342,8 @@ func (n *NotificationCustomScript) read(ctx context.Context) *sonarr.Notificatio
 		OnHealthIssue:                 n.OnHealthIssue.ValueBool(),
 		OnApplicationUpdate:           n.OnApplicationUpdate.ValueBool(),
 		IncludeHealthWarnings:         n.IncludeHealthWarnings.ValueBool(),
-		ConfigContract:                NotificationCustomScriptConfigContrat,
-		Implementation:                NotificationCustomScriptImplementation,
+		ConfigContract:                notificationCustomScriptConfigContrat,
+		Implementation:                notificationCustomScriptImplementation,
 		ID:                            n.ID.ValueInt64(),
 		Name:                          n.Name.ValueString(),
 		Tags:                          tags,

@@ -21,8 +21,8 @@ import (
 
 const (
 	downloadClientDelugeResourceName   = "download_client_deluge"
-	DownloadClientDelugeImplementation = "Deluge"
-	DownloadClientDelugeConfigContrat  = "DelugeSettings"
+	downloadClientDelugeImplementation = "Deluge"
+	downloadClientDelugeConfigContrat  = "DelugeSettings"
 	DownloadClientDelugeProtocol       = "torrent"
 )
 
@@ -384,8 +384,8 @@ func (d *DownloadClientDeluge) read(ctx context.Context) *sonarr.DownloadClientI
 		RemoveFailedDownloads:    d.RemoveFailedDownloads.ValueBool(),
 		Priority:                 int(d.Priority.ValueInt64()),
 		ID:                       d.ID.ValueInt64(),
-		ConfigContract:           DownloadClientDelugeConfigContrat,
-		Implementation:           DownloadClientDelugeImplementation,
+		ConfigContract:           downloadClientDelugeConfigContrat,
+		Implementation:           downloadClientDelugeImplementation,
 		Name:                     d.Name.ValueString(),
 		Protocol:                 DownloadClientDelugeProtocol,
 		Tags:                     tags,

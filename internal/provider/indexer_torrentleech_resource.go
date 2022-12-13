@@ -19,8 +19,8 @@ import (
 
 const (
 	indexerTorrentleechResourceName   = "indexer_torrentleech"
-	IndexerTorrentleechImplementation = "Torrentleech"
-	IndexerTorrentleechConfigContrat  = "TorrentleechSettings"
+	indexerTorrentleechImplementation = "Torrentleech"
+	indexerTorrentleechConfigContrat  = "TorrentleechSettings"
 	IndexerTorrentleechProtocol       = "torrent"
 )
 
@@ -337,8 +337,8 @@ func (i *IndexerTorrentleech) read(ctx context.Context) *sonarr.IndexerInput {
 		Priority:                i.Priority.ValueInt64(),
 		DownloadClientID:        i.DownloadClientID.ValueInt64(),
 		ID:                      i.ID.ValueInt64(),
-		ConfigContract:          IndexerTorrentleechConfigContrat,
-		Implementation:          IndexerTorrentleechImplementation,
+		ConfigContract:          indexerTorrentleechConfigContrat,
+		Implementation:          indexerTorrentleechImplementation,
 		Name:                    i.Name.ValueString(),
 		Protocol:                IndexerTorrentleechProtocol,
 		Tags:                    tags,

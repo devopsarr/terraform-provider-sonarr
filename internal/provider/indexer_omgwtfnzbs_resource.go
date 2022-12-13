@@ -19,8 +19,8 @@ import (
 
 const (
 	indexerOmgwtfnzbsResourceName   = "indexer_omgwtfnzbs"
-	IndexerOmgwtfnzbsImplementation = "Omgwtfnzbs"
-	IndexerOmgwtfnzbsConfigContrat  = "OmgwtfnzbsSettings"
+	indexerOmgwtfnzbsImplementation = "Omgwtfnzbs"
+	indexerOmgwtfnzbsConfigContrat  = "OmgwtfnzbsSettings"
 	IndexerOmgwtfnzbsProtocol       = "usenet"
 )
 
@@ -314,8 +314,8 @@ func (i *IndexerOmgwtfnzbs) read(ctx context.Context) *sonarr.IndexerInput {
 		Priority:                i.Priority.ValueInt64(),
 		DownloadClientID:        i.DownloadClientID.ValueInt64(),
 		ID:                      i.ID.ValueInt64(),
-		ConfigContract:          IndexerOmgwtfnzbsConfigContrat,
-		Implementation:          IndexerOmgwtfnzbsImplementation,
+		ConfigContract:          indexerOmgwtfnzbsConfigContrat,
+		Implementation:          indexerOmgwtfnzbsImplementation,
 		Name:                    i.Name.ValueString(),
 		Protocol:                IndexerOmgwtfnzbsProtocol,
 		Tags:                    tags,
