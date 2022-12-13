@@ -1,5 +1,20 @@
 # Changelog
 
+## [2.7.0](https://github.com/devopsarr/terraform-provider-sonarr/compare/v2.6.0...v2.7.0) (2022-12-13)
+
+
+### Features
+
+* add import list datasource ([3f0a3e2](https://github.com/devopsarr/terraform-provider-sonarr/commit/3f0a3e2f1f0d0e8c8fbd7a4a39fd75a66487d5f3))
+* add import list plex resource ([0c434e0](https://github.com/devopsarr/terraform-provider-sonarr/commit/0c434e0481f6480e89ce549bd5eab07adabb9b84))
+* add import list resource ([abc6b1c](https://github.com/devopsarr/terraform-provider-sonarr/commit/abc6b1cc12f45e3668923fd598c1a551aca2a033))
+* add import list sonarr resource ([1b24ae1](https://github.com/devopsarr/terraform-provider-sonarr/commit/1b24ae1ce53cb4bacd107c8629064cabcc0a40b8))
+* add import list trakt list resource ([00d4a01](https://github.com/devopsarr/terraform-provider-sonarr/commit/00d4a01558421696ebf0da21fd2b8026eca3cf9b))
+* add import list trakt popular resource ([c2f37ad](https://github.com/devopsarr/terraform-provider-sonarr/commit/c2f37ad8c821e2f0bb782bc1ab8bbcd378bae890))
+* add import list trakt user resource ([bcd309b](https://github.com/devopsarr/terraform-provider-sonarr/commit/bcd309bb9e24965100bfaff5fead8c7c7cb68ffe))
+* add import lists datasource ([2411b4e](https://github.com/devopsarr/terraform-provider-sonarr/commit/2411b4ecf156dbc965cc12c57d6d1f85bcb2c45d))
+* add search series datasource ([0f2f5cb](https://github.com/devopsarr/terraform-provider-sonarr/commit/0f2f5cb0258c2ebcf58625f09b040983c959360b))
+
 ## [2.6.0](https://github.com/devopsarr/terraform-provider-sonarr/compare/v2.5.0...v2.6.0) (2022-12-06)
 
 
