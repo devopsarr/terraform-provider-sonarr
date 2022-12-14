@@ -20,8 +20,8 @@ import (
 const (
 	indexerOmgwtfnzbsResourceName   = "indexer_omgwtfnzbs"
 	indexerOmgwtfnzbsImplementation = "Omgwtfnzbs"
-	indexerOmgwtfnzbsConfigContrat  = "OmgwtfnzbsSettings"
-	IndexerOmgwtfnzbsProtocol       = "usenet"
+	indexerOmgwtfnzbsConfigContract = "OmgwtfnzbsSettings"
+	indexerOmgwtfnzbsProtocol       = "usenet"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -314,10 +314,10 @@ func (i *IndexerOmgwtfnzbs) read(ctx context.Context) *sonarr.IndexerInput {
 		Priority:                i.Priority.ValueInt64(),
 		DownloadClientID:        i.DownloadClientID.ValueInt64(),
 		ID:                      i.ID.ValueInt64(),
-		ConfigContract:          indexerOmgwtfnzbsConfigContrat,
+		ConfigContract:          indexerOmgwtfnzbsConfigContract,
 		Implementation:          indexerOmgwtfnzbsImplementation,
 		Name:                    i.Name.ValueString(),
-		Protocol:                IndexerOmgwtfnzbsProtocol,
+		Protocol:                indexerOmgwtfnzbsProtocol,
 		Tags:                    tags,
 		Fields:                  i.toIndexer().readFields(ctx),
 	}

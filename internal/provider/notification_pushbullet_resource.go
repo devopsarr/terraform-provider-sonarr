@@ -20,7 +20,7 @@ import (
 const (
 	notificationPushbulletResourceName   = "notification_pushbullet"
 	notificationPushbulletImplementation = "PushBullet"
-	notificationPushbulletConfigContrat  = "PushBulletSettings"
+	notificationPushbulletConfigContract = "PushBulletSettings"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -352,7 +352,7 @@ func (n *NotificationPushbullet) read(ctx context.Context) *sonarr.NotificationI
 		OnHealthIssue:                 n.OnHealthIssue.ValueBool(),
 		OnApplicationUpdate:           n.OnApplicationUpdate.ValueBool(),
 		IncludeHealthWarnings:         n.IncludeHealthWarnings.ValueBool(),
-		ConfigContract:                notificationPushbulletConfigContrat,
+		ConfigContract:                notificationPushbulletConfigContract,
 		Implementation:                notificationPushbulletImplementation,
 		ID:                            n.ID.ValueInt64(),
 		Name:                          n.Name.ValueString(),

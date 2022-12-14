@@ -22,7 +22,7 @@ import (
 const (
 	importListSonarrResourceName   = "import_list_sonarr"
 	importListSonarrImplementation = "SonarrImport"
-	importListSonarrConfigContrat  = "SonarrSettings"
+	importListSonarrConfigContract = "SonarrSettings"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -350,7 +350,7 @@ func (i *ImportListSonarr) read(ctx context.Context) *sonarr.ImportListInput {
 		QualityProfileID:   i.QualityProfileID.ValueInt64(),
 		EnableAutomaticAdd: i.EnableAutomaticAdd.ValueBool(),
 		SeasonFolder:       i.SeasonFolder.ValueBool(),
-		ConfigContract:     importListSonarrConfigContrat,
+		ConfigContract:     importListSonarrConfigContract,
 		Implementation:     importListSonarrImplementation,
 		ID:                 i.ID.ValueInt64(),
 		Name:               i.Name.ValueString(),

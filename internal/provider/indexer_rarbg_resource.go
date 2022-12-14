@@ -20,8 +20,8 @@ import (
 const (
 	indexerRarbgResourceName   = "indexer_rarbg"
 	indexerRarbgImplementation = "Rarbg"
-	indexerRarbgConfigContrat  = "RarbgSettings"
-	IndexerRarbgProtocol       = "torrent"
+	indexerRarbgConfigContract = "RarbgSettings"
+	indexerRarbgProtocol       = "torrent"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -345,10 +345,10 @@ func (i *IndexerRarbg) read(ctx context.Context) *sonarr.IndexerInput {
 		Priority:                i.Priority.ValueInt64(),
 		DownloadClientID:        i.DownloadClientID.ValueInt64(),
 		ID:                      i.ID.ValueInt64(),
-		ConfigContract:          indexerRarbgConfigContrat,
+		ConfigContract:          indexerRarbgConfigContract,
 		Implementation:          indexerRarbgImplementation,
 		Name:                    i.Name.ValueString(),
-		Protocol:                IndexerRarbgProtocol,
+		Protocol:                indexerRarbgProtocol,
 		Tags:                    tags,
 		Fields:                  i.toIndexer().readFields(ctx),
 	}

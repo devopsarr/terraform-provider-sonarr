@@ -20,8 +20,8 @@ import (
 const (
 	indexerNyaaResourceName   = "indexer_nyaa"
 	indexerNyaaImplementation = "Nyaa"
-	indexerNyaaConfigContrat  = "NyaaSettings"
-	IndexerNyaaProtocol       = "torrent"
+	indexerNyaaConfigContract = "NyaaSettings"
+	indexerNyaaProtocol       = "torrent"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -344,10 +344,10 @@ func (i *IndexerNyaa) read(ctx context.Context) *sonarr.IndexerInput {
 		Priority:                i.Priority.ValueInt64(),
 		DownloadClientID:        i.DownloadClientID.ValueInt64(),
 		ID:                      i.ID.ValueInt64(),
-		ConfigContract:          indexerNyaaConfigContrat,
+		ConfigContract:          indexerNyaaConfigContract,
 		Implementation:          indexerNyaaImplementation,
 		Name:                    i.Name.ValueString(),
-		Protocol:                IndexerNyaaProtocol,
+		Protocol:                indexerNyaaProtocol,
 		Tags:                    tags,
 		Fields:                  i.toIndexer().readFields(ctx),
 	}

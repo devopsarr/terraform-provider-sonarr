@@ -22,7 +22,7 @@ import (
 const (
 	notificationProwlResourceName   = "notification_prowl"
 	notificationProwlImplementation = "Prowl"
-	notificationProwlConfigContrat  = "ProwlSettings"
+	notificationProwlConfigContract = "ProwlSettings"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -339,7 +339,7 @@ func (n *NotificationProwl) read(ctx context.Context) *sonarr.NotificationInput 
 		OnHealthIssue:                 n.OnHealthIssue.ValueBool(),
 		OnApplicationUpdate:           n.OnApplicationUpdate.ValueBool(),
 		IncludeHealthWarnings:         n.IncludeHealthWarnings.ValueBool(),
-		ConfigContract:                notificationProwlConfigContrat,
+		ConfigContract:                notificationProwlConfigContract,
 		Implementation:                notificationProwlImplementation,
 		ID:                            n.ID.ValueInt64(),
 		Name:                          n.Name.ValueString(),

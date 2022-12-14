@@ -22,7 +22,7 @@ import (
 const (
 	importListPlexResourceName   = "import_list_plex"
 	importListPlexImplementation = "PlexImport"
-	importListPlexConfigContrat  = "PlexListSettings"
+	importListPlexConfigContract = "PlexListSettings"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -316,7 +316,7 @@ func (i *ImportListPlex) read(ctx context.Context) *sonarr.ImportListInput {
 		QualityProfileID:   i.QualityProfileID.ValueInt64(),
 		EnableAutomaticAdd: i.EnableAutomaticAdd.ValueBool(),
 		SeasonFolder:       i.SeasonFolder.ValueBool(),
-		ConfigContract:     importListPlexConfigContrat,
+		ConfigContract:     importListPlexConfigContract,
 		Implementation:     importListPlexImplementation,
 		ID:                 i.ID.ValueInt64(),
 		Name:               i.Name.ValueString(),

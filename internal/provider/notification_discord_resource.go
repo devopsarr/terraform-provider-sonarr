@@ -20,7 +20,7 @@ import (
 const (
 	notificationDiscordResourceName   = "notification_discord"
 	notificationDiscordImplementation = "Discord"
-	notificationDiscordConfigContrat  = "DiscordSettings"
+	notificationDiscordConfigContract = "DiscordSettings"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -376,7 +376,7 @@ func (n *NotificationDiscord) read(ctx context.Context) *sonarr.NotificationInpu
 		OnHealthIssue:                 n.OnHealthIssue.ValueBool(),
 		OnApplicationUpdate:           n.OnApplicationUpdate.ValueBool(),
 		IncludeHealthWarnings:         n.IncludeHealthWarnings.ValueBool(),
-		ConfigContract:                notificationDiscordConfigContrat,
+		ConfigContract:                notificationDiscordConfigContract,
 		Implementation:                notificationDiscordImplementation,
 		ID:                            n.ID.ValueInt64(),
 		Name:                          n.Name.ValueString(),

@@ -22,7 +22,7 @@ import (
 const (
 	notificationJoinResourceName   = "notification_join"
 	notificationJoinImplementation = "Join"
-	notificationJoinConfigContrat  = "JoinSettings"
+	notificationJoinConfigContract = "JoinSettings"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -346,7 +346,7 @@ func (n *NotificationJoin) read(ctx context.Context) *sonarr.NotificationInput {
 		OnHealthIssue:                 n.OnHealthIssue.ValueBool(),
 		OnApplicationUpdate:           n.OnApplicationUpdate.ValueBool(),
 		IncludeHealthWarnings:         n.IncludeHealthWarnings.ValueBool(),
-		ConfigContract:                notificationJoinConfigContrat,
+		ConfigContract:                notificationJoinConfigContract,
 		Implementation:                notificationJoinImplementation,
 		ID:                            n.ID.ValueInt64(),
 		Name:                          n.Name.ValueString(),

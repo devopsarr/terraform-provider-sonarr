@@ -22,8 +22,8 @@ import (
 const (
 	downloadClientNzbvortexResourceName   = "download_client_nzbvortex"
 	downloadClientNzbvortexImplementation = "Nzbvortex"
-	downloadClientNzbvortexConfigContrat  = "NzbvortexSettings"
-	DownloadClientNzbvortexProtocol       = "usenet"
+	downloadClientNzbvortexConfigContract = "NzbvortexSettings"
+	downloadClientNzbvortexProtocol       = "usenet"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -350,10 +350,10 @@ func (d *DownloadClientNzbvortex) read(ctx context.Context) *sonarr.DownloadClie
 		RemoveFailedDownloads:    d.RemoveFailedDownloads.ValueBool(),
 		Priority:                 int(d.Priority.ValueInt64()),
 		ID:                       d.ID.ValueInt64(),
-		ConfigContract:           downloadClientNzbvortexConfigContrat,
+		ConfigContract:           downloadClientNzbvortexConfigContract,
 		Implementation:           downloadClientNzbvortexImplementation,
 		Name:                     d.Name.ValueString(),
-		Protocol:                 DownloadClientNzbvortexProtocol,
+		Protocol:                 downloadClientNzbvortexProtocol,
 		Tags:                     tags,
 		Fields:                   d.toDownloadClient().readFields(ctx),
 	}
