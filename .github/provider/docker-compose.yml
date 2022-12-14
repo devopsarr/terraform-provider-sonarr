@@ -1,0 +1,29 @@
+---
+version: "3.9"
+services:
+  sonarr:
+    image: linuxserver/sonarr:3.0.9
+    container_name: sonarr
+    depends_on:
+      - transmission
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/London
+    volumes:
+      - ./test.sh:/scripts/test.sh
+      - ./config.xml:/config/config.xml
+    ports:
+      - 8989:8989
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", " http://localhost:8989/system/status"]
+  transmission:
+    image: linuxserver/transmission:latest
+    container_name: transmission
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/London
+    ports:
+      - 9091:9091
