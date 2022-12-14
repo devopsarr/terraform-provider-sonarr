@@ -19,6 +19,8 @@ env:
   # Go language version to use for building. This value should also be updated
   # in the release workflow if changed.
   GO_VERSION: '1.19'
+  # Sonarr version 
+  SONARR_VERSION: '3.0.9'
 
 jobs:
   # Check Lint before building
@@ -78,7 +80,7 @@ jobs:
           -v ${{ github.workspace }}/.github/workflows/config.xml:/config/config.xml
           -p 8989:8989
           --health-cmd "curl --fail http://localhost:8989/system/status || exit 1"
-          linuxserver/sonarr
+          linuxserver/sonarr:${{ env.SONARR_VERSION }}
       - uses: actions/setup-go@v3
         with:
           go-version: ${{ env.GO_VERSION }}
