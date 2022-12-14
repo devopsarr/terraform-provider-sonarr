@@ -20,8 +20,8 @@ import (
 const (
 	indexerTorrentRssResourceName   = "indexer_torrent_rss"
 	indexerTorrentRssImplementation = "TorrentRssIndexer"
-	indexerTorrentRssConfigContrat  = "TorrentRssIndexerSettings"
-	IndexerTorrentRssProtocol       = "torrent"
+	indexerTorrentRssConfigContract = "TorrentRssIndexerSettings"
+	indexerTorrentRssProtocol       = "torrent"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -344,10 +344,10 @@ func (i *IndexerTorrentRss) read(ctx context.Context) *sonarr.IndexerInput {
 		Priority:                i.Priority.ValueInt64(),
 		DownloadClientID:        i.DownloadClientID.ValueInt64(),
 		ID:                      i.ID.ValueInt64(),
-		ConfigContract:          indexerTorrentRssConfigContrat,
+		ConfigContract:          indexerTorrentRssConfigContract,
 		Implementation:          indexerTorrentRssImplementation,
 		Name:                    i.Name.ValueString(),
-		Protocol:                IndexerTorrentRssProtocol,
+		Protocol:                indexerTorrentRssProtocol,
 		Tags:                    tags,
 		Fields:                  i.toIndexer().readFields(ctx),
 	}

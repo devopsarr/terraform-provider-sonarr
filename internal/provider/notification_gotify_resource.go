@@ -22,7 +22,7 @@ import (
 const (
 	notificationGotifyResourceName   = "notification_gotify"
 	notificationGotifyImplementation = "Gotify"
-	notificationGotifyConfigContrat  = "GotifySettings"
+	notificationGotifyConfigContract = "GotifySettings"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -346,7 +346,7 @@ func (n *NotificationGotify) read(ctx context.Context) *sonarr.NotificationInput
 		OnHealthIssue:                 n.OnHealthIssue.ValueBool(),
 		OnApplicationUpdate:           n.OnApplicationUpdate.ValueBool(),
 		IncludeHealthWarnings:         n.IncludeHealthWarnings.ValueBool(),
-		ConfigContract:                notificationGotifyConfigContrat,
+		ConfigContract:                notificationGotifyConfigContract,
 		Implementation:                notificationGotifyImplementation,
 		ID:                            n.ID.ValueInt64(),
 		Name:                          n.Name.ValueString(),

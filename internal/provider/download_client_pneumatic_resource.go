@@ -20,8 +20,8 @@ import (
 const (
 	downloadClientPneumaticResourceName   = "download_client_pneumatic"
 	downloadClientPneumaticImplementation = "Pneumatic"
-	downloadClientPneumaticConfigContrat  = "PneumaticSettings"
-	DownloadClientPneumaticProtocol       = "usenet"
+	downloadClientPneumaticConfigContract = "PneumaticSettings"
+	downloadClientPneumaticProtocol       = "usenet"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -293,10 +293,10 @@ func (d *DownloadClientPneumatic) read(ctx context.Context) *sonarr.DownloadClie
 		RemoveFailedDownloads:    d.RemoveFailedDownloads.ValueBool(),
 		Priority:                 int(d.Priority.ValueInt64()),
 		ID:                       d.ID.ValueInt64(),
-		ConfigContract:           downloadClientPneumaticConfigContrat,
+		ConfigContract:           downloadClientPneumaticConfigContract,
 		Implementation:           downloadClientPneumaticImplementation,
 		Name:                     d.Name.ValueString(),
-		Protocol:                 DownloadClientPneumaticProtocol,
+		Protocol:                 downloadClientPneumaticProtocol,
 		Tags:                     tags,
 		Fields:                   d.toDownloadClient().readFields(ctx),
 	}

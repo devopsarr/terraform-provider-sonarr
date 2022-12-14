@@ -20,8 +20,8 @@ import (
 const (
 	downloadClientTorrentBlackholeResourceName   = "download_client_torrent_blackhole"
 	downloadClientTorrentBlackholeImplementation = "TorrentBlackhole"
-	downloadClientTorrentBlackholeConfigContrat  = "TorrentBlackholeSettings"
-	DownloadClientTorrentBlackholeProtocol       = "torrent"
+	downloadClientTorrentBlackholeConfigContract = "TorrentBlackholeSettings"
+	downloadClientTorrentBlackholeProtocol       = "torrent"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -317,10 +317,10 @@ func (d *DownloadClientTorrentBlackhole) read(ctx context.Context) *sonarr.Downl
 		RemoveFailedDownloads:    d.RemoveFailedDownloads.ValueBool(),
 		Priority:                 int(d.Priority.ValueInt64()),
 		ID:                       d.ID.ValueInt64(),
-		ConfigContract:           downloadClientTorrentBlackholeConfigContrat,
+		ConfigContract:           downloadClientTorrentBlackholeConfigContract,
 		Implementation:           downloadClientTorrentBlackholeImplementation,
 		Name:                     d.Name.ValueString(),
-		Protocol:                 DownloadClientTorrentBlackholeProtocol,
+		Protocol:                 downloadClientTorrentBlackholeProtocol,
 		Tags:                     tags,
 		Fields:                   d.toDownloadClient().readFields(ctx),
 	}

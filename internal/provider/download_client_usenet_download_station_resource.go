@@ -20,8 +20,8 @@ import (
 const (
 	downloadClientUsenetDownloadStationResourceName   = "download_client_usenet_download_station"
 	downloadClientUsenetDownloadStationImplementation = "UsenetDownloadStation"
-	downloadClientUsenetDownloadStationConfigContrat  = "DownloadStationSettings"
-	DownloadClientUsenetDownloadStationProtocol       = "usenet"
+	downloadClientUsenetDownloadStationConfigContract = "DownloadStationSettings"
+	downloadClientUsenetDownloadStationProtocol       = "usenet"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -336,10 +336,10 @@ func (d *DownloadClientUsenetDownloadStation) read(ctx context.Context) *sonarr.
 		RemoveFailedDownloads:    d.RemoveFailedDownloads.ValueBool(),
 		Priority:                 int(d.Priority.ValueInt64()),
 		ID:                       d.ID.ValueInt64(),
-		ConfigContract:           downloadClientUsenetDownloadStationConfigContrat,
+		ConfigContract:           downloadClientUsenetDownloadStationConfigContract,
 		Implementation:           downloadClientUsenetDownloadStationImplementation,
 		Name:                     d.Name.ValueString(),
-		Protocol:                 DownloadClientUsenetDownloadStationProtocol,
+		Protocol:                 downloadClientUsenetDownloadStationProtocol,
 		Tags:                     tags,
 		Fields:                   d.toDownloadClient().readFields(ctx),
 	}

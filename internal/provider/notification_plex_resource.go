@@ -20,7 +20,7 @@ import (
 const (
 	notificationPlexResourceName   = "notification_plex"
 	notificationPlexImplementation = "PlexServer"
-	notificationPlexConfigContrat  = "PlexServerSettings"
+	notificationPlexConfigContract = "PlexServerSettings"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -342,7 +342,7 @@ func (n *NotificationPlex) read(ctx context.Context) *sonarr.NotificationInput {
 		OnEpisodeFileDelete:           n.OnEpisodeFileDelete.ValueBool(),
 		OnEpisodeFileDeleteForUpgrade: n.OnEpisodeFileDeleteForUpgrade.ValueBool(),
 		IncludeHealthWarnings:         n.IncludeHealthWarnings.ValueBool(),
-		ConfigContract:                notificationPlexConfigContrat,
+		ConfigContract:                notificationPlexConfigContract,
 		Implementation:                notificationPlexImplementation,
 		ID:                            n.ID.ValueInt64(),
 		Name:                          n.Name.ValueString(),

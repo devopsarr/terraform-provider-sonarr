@@ -20,7 +20,7 @@ import (
 const (
 	notificationSynologyResourceName   = "notification_synology_indexer"
 	notificationSynologyImplementation = "SynologyIndexer"
-	notificationSynologyConfigContrat  = "SynologyIndexerSettings"
+	notificationSynologyConfigContract = "SynologyIndexerSettings"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -311,7 +311,7 @@ func (n *NotificationSynology) read(ctx context.Context) *sonarr.NotificationInp
 		OnEpisodeFileDelete:           n.OnEpisodeFileDelete.ValueBool(),
 		OnEpisodeFileDeleteForUpgrade: n.OnEpisodeFileDeleteForUpgrade.ValueBool(),
 		IncludeHealthWarnings:         n.IncludeHealthWarnings.ValueBool(),
-		ConfigContract:                notificationSynologyConfigContrat,
+		ConfigContract:                notificationSynologyConfigContract,
 		Implementation:                notificationSynologyImplementation,
 		ID:                            n.ID.ValueInt64(),
 		Name:                          n.Name.ValueString(),

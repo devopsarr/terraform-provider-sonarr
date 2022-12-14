@@ -22,8 +22,8 @@ import (
 const (
 	downloadClientVuzeResourceName   = "download_client_vuze"
 	downloadClientVuzeImplementation = "Vuze"
-	downloadClientVuzeConfigContrat  = "TransmissionSettings"
-	DownloadClientVuzeProtocol       = "torrent"
+	downloadClientVuzeConfigContract = "TransmissionSettings"
+	downloadClientVuzeProtocol       = "torrent"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -376,10 +376,10 @@ func (d *DownloadClientVuze) read(ctx context.Context) *sonarr.DownloadClientInp
 		RemoveFailedDownloads:    d.RemoveFailedDownloads.ValueBool(),
 		Priority:                 int(d.Priority.ValueInt64()),
 		ID:                       d.ID.ValueInt64(),
-		ConfigContract:           downloadClientVuzeConfigContrat,
+		ConfigContract:           downloadClientVuzeConfigContract,
 		Implementation:           downloadClientVuzeImplementation,
 		Name:                     d.Name.ValueString(),
-		Protocol:                 DownloadClientVuzeProtocol,
+		Protocol:                 downloadClientVuzeProtocol,
 		Tags:                     tags,
 		Fields:                   d.toDownloadClient().readFields(ctx),
 	}

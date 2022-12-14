@@ -21,8 +21,8 @@ import (
 
 const (
 	notificationWebhookResourceName   = "notification_webhook"
-	NotificationWebhookImplementation = "Webhook"
-	NotificationWebhookConfigContrat  = "WebhookSettings"
+	notificationWebhookImplementation = "Webhook"
+	notificationWebhookConfigContract = "WebhookSettings"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -363,8 +363,8 @@ func (n *NotificationWebhook) read(ctx context.Context) *sonarr.NotificationInpu
 		OnHealthIssue:                 n.OnHealthIssue.ValueBool(),
 		OnApplicationUpdate:           n.OnApplicationUpdate.ValueBool(),
 		IncludeHealthWarnings:         n.IncludeHealthWarnings.ValueBool(),
-		ConfigContract:                NotificationWebhookConfigContrat,
-		Implementation:                NotificationWebhookImplementation,
+		ConfigContract:                notificationWebhookConfigContract,
+		Implementation:                notificationWebhookImplementation,
 		ID:                            n.ID.ValueInt64(),
 		Name:                          n.Name.ValueString(),
 		Tags:                          tags,

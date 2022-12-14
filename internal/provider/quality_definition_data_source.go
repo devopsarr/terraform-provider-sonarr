@@ -32,7 +32,7 @@ func (d *QualityDefinitionDataSource) Metadata(ctx context.Context, req datasour
 func (d *QualityDefinitionDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the quality server.
-		MarkdownDescription: "<!-- subcategory:Definitions -->Single [Quality Definition](../resources/quality_definition).",
+		MarkdownDescription: "<!-- subcategory:Profiles -->Single [Quality Definition](../resources/quality_definition).",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
 				MarkdownDescription: "Quality Definition ID.",

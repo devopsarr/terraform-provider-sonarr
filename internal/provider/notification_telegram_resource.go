@@ -20,7 +20,7 @@ import (
 const (
 	notificationTelegramResourceName   = "notification_telegram"
 	notificationTelegramImplementation = "Telegram"
-	notificationTelegramConfigContrat  = "TelegramSettings"
+	notificationTelegramConfigContract = "TelegramSettings"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -341,7 +341,7 @@ func (n *NotificationTelegram) read(ctx context.Context) *sonarr.NotificationInp
 		OnHealthIssue:                 n.OnHealthIssue.ValueBool(),
 		OnApplicationUpdate:           n.OnApplicationUpdate.ValueBool(),
 		IncludeHealthWarnings:         n.IncludeHealthWarnings.ValueBool(),
-		ConfigContract:                notificationTelegramConfigContrat,
+		ConfigContract:                notificationTelegramConfigContract,
 		Implementation:                notificationTelegramImplementation,
 		ID:                            n.ID.ValueInt64(),
 		Name:                          n.Name.ValueString(),

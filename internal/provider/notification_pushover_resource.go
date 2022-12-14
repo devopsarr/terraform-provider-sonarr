@@ -22,7 +22,7 @@ import (
 const (
 	notificationPushoverResourceName   = "notification_pushover"
 	notificationPushoverImplementation = "Pushover"
-	notificationPushoverConfigContrat  = "PushoverSettings"
+	notificationPushoverConfigContract = "PushoverSettings"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
@@ -380,7 +380,7 @@ func (n *NotificationPushover) read(ctx context.Context) *sonarr.NotificationInp
 		OnHealthIssue:                 n.OnHealthIssue.ValueBool(),
 		OnApplicationUpdate:           n.OnApplicationUpdate.ValueBool(),
 		IncludeHealthWarnings:         n.IncludeHealthWarnings.ValueBool(),
-		ConfigContract:                notificationPushoverConfigContrat,
+		ConfigContract:                notificationPushoverConfigContract,
 		Implementation:                notificationPushoverImplementation,
 		ID:                            n.ID.ValueInt64(),
 		Name:                          n.Name.ValueString(),
