@@ -43,17 +43,7 @@ resource "sonarr_notification" "example" {
 
 - `config_contract` (String) Notification configuration template.
 - `implementation` (String) Notification implementation name.
-- `include_health_warnings` (Boolean) Include health warnings.
 - `name` (String) Notification name.
-- `on_application_update` (Boolean) On application update flag.
-- `on_download` (Boolean) On download flag.
-- `on_episode_file_delete` (Boolean) On episode file delete flag.
-- `on_episode_file_delete_for_upgrade` (Boolean) On episode file delete for upgrade flag.
-- `on_grab` (Boolean) On grab flag.
-- `on_health_issue` (Boolean) On health issue flag.
-- `on_rename` (Boolean) On rename flag.
-- `on_series_delete` (Boolean) On series delete flag.
-- `on_upgrade` (Boolean) On upgrade flag.
 
 ### Optional
 
@@ -88,9 +78,19 @@ resource "sonarr_notification" "example" {
 - `host` (String) Host.
 - `icon` (String) Icon.
 - `import_fields` (Set of Number) Import fields. `0` Overview, `1` Rating, `2` Genres, `3` Quality, `4` Codecs, `5` Group, `6` Size, `7` Languages, `8` Subtitles, `9` Links, `10` Release, `11` Poster, `12` Fanart.
+- `include_health_warnings` (Boolean) Include health warnings.
 - `mention` (String) Mention.
 - `method` (Number) Method. `1` POST, `2` PUT.
 - `notify` (Boolean) Notify flag.
+- `on_application_update` (Boolean) On application update flag.
+- `on_download` (Boolean) On download flag.
+- `on_episode_file_delete` (Boolean) On episode file delete flag.
+- `on_episode_file_delete_for_upgrade` (Boolean) On episode file delete for upgrade flag.
+- `on_grab` (Boolean) On grab flag.
+- `on_health_issue` (Boolean) On health issue flag.
+- `on_rename` (Boolean) On rename flag.
+- `on_series_delete` (Boolean) On series delete flag.
+- `on_upgrade` (Boolean) On upgrade flag.
 - `password` (String, Sensitive) password.
 - `path` (String) Path.
 - `port` (Number) Port.

@@ -40,8 +40,11 @@ resource "sonarr_notification_telegram" "example" {
 
 - `bot_token` (String, Sensitive) Bot token.
 - `chat_id` (String) Chat ID.
-- `include_health_warnings` (Boolean) Include health warnings.
 - `name` (String) NotificationTelegram name.
+
+### Optional
+
+- `include_health_warnings` (Boolean) Include health warnings.
 - `on_application_update` (Boolean) On application update flag.
 - `on_download` (Boolean) On download flag.
 - `on_episode_file_delete` (Boolean) On episode file delete flag.
@@ -50,9 +53,6 @@ resource "sonarr_notification_telegram" "example" {
 - `on_health_issue` (Boolean) On health issue flag.
 - `on_series_delete` (Boolean) On series delete flag.
 - `on_upgrade` (Boolean) On upgrade flag.
-
-### Optional
-
 - `send_silently` (Boolean) Send silently flag.
 - `tags` (Set of Number) List of associated tags.
 

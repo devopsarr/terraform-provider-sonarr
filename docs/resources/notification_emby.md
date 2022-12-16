@@ -42,8 +42,12 @@ resource "sonarr_notification_emby" "example" {
 
 - `api_key` (String, Sensitive) API key.
 - `host` (String) Host.
-- `include_health_warnings` (Boolean) Include health warnings.
 - `name` (String) NotificationEmby name.
+
+### Optional
+
+- `include_health_warnings` (Boolean) Include health warnings.
+- `notify` (Boolean) Notify flag.
 - `on_application_update` (Boolean) On application update flag.
 - `on_download` (Boolean) On download flag.
 - `on_episode_file_delete` (Boolean) On episode file delete flag.
@@ -53,10 +57,6 @@ resource "sonarr_notification_emby" "example" {
 - `on_rename` (Boolean) On rename flag.
 - `on_series_delete` (Boolean) On series delete flag.
 - `on_upgrade` (Boolean) On upgrade flag.
-
-### Optional
-
-- `notify` (Boolean) Notify flag.
 - `port` (Number) Port.
 - `tags` (Set of Number) List of associated tags.
 - `update_library` (Boolean) Update library flag.

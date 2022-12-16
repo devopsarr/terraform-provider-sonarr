@@ -38,8 +38,13 @@ resource "sonarr_notification_custom_script" "example" {
 
 ### Required
 
-- `include_health_warnings` (Boolean) Include health warnings.
 - `name` (String) NotificationCustomScript name.
+- `path` (String) Path.
+
+### Optional
+
+- `arguments` (String) Arguments.
+- `include_health_warnings` (Boolean) Include health warnings.
 - `on_application_update` (Boolean) On application update flag.
 - `on_download` (Boolean) On download flag.
 - `on_episode_file_delete` (Boolean) On episode file delete flag.
@@ -49,11 +54,6 @@ resource "sonarr_notification_custom_script" "example" {
 - `on_rename` (Boolean) On rename flag.
 - `on_series_delete` (Boolean) On series delete flag.
 - `on_upgrade` (Boolean) On upgrade flag.
-- `path` (String) Path.
-
-### Optional
-
-- `arguments` (String) Arguments.
 - `tags` (Set of Number) List of associated tags.
 
 ### Read-Only

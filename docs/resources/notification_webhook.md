@@ -41,9 +41,13 @@ resource "sonarr_notification_webhook" "example" {
 
 ### Required
 
-- `include_health_warnings` (Boolean) Include health warnings.
 - `method` (Number) Method. `1` POST, `2` PUT.
 - `name` (String) NotificationWebhook name.
+- `url` (String) URL.
+
+### Optional
+
+- `include_health_warnings` (Boolean) Include health warnings.
 - `on_application_update` (Boolean) On application update flag.
 - `on_download` (Boolean) On download flag.
 - `on_episode_file_delete` (Boolean) On episode file delete flag.
@@ -53,10 +57,6 @@ resource "sonarr_notification_webhook" "example" {
 - `on_rename` (Boolean) On rename flag.
 - `on_series_delete` (Boolean) On series delete flag.
 - `on_upgrade` (Boolean) On upgrade flag.
-- `url` (String) URL.
-
-### Optional
-
 - `password` (String, Sensitive) password.
 - `tags` (Set of Number) List of associated tags.
 - `username` (String) Username.
