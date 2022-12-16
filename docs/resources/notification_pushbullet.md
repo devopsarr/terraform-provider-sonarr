@@ -39,8 +39,13 @@ resource "sonarr_notification_pushbullet" "example" {
 ### Required
 
 - `api_key` (String, Sensitive) API key.
-- `include_health_warnings` (Boolean) Include health warnings.
 - `name` (String) NotificationPushbullet name.
+
+### Optional
+
+- `channel_tags` (Set of String) List of channel tags.
+- `device_ids` (Set of String) List of devices IDs.
+- `include_health_warnings` (Boolean) Include health warnings.
 - `on_application_update` (Boolean) On application update flag.
 - `on_download` (Boolean) On download flag.
 - `on_episode_file_delete` (Boolean) On episode file delete flag.
@@ -49,11 +54,6 @@ resource "sonarr_notification_pushbullet" "example" {
 - `on_health_issue` (Boolean) On health issue flag.
 - `on_series_delete` (Boolean) On series delete flag.
 - `on_upgrade` (Boolean) On upgrade flag.
-
-### Optional
-
-- `channel_tags` (Set of String) List of channel tags.
-- `device_ids` (Set of String) List of devices IDs.
 - `sender_id` (String) Sender ID.
 - `tags` (Set of Number) List of associated tags.
 

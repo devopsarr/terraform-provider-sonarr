@@ -43,8 +43,16 @@ resource "sonarr_notification_kodi" "example" {
 ### Required
 
 - `host` (String) Host.
-- `include_health_warnings` (Boolean) Include health warnings.
 - `name` (String) NotificationKodi name.
+- `port` (Number) Port.
+
+### Optional
+
+- `always_update` (Boolean) Always update flag.
+- `clean_library` (Boolean) Clean library flag.
+- `display_time` (Number) Display time.
+- `include_health_warnings` (Boolean) Include health warnings.
+- `notify` (Boolean) Notification flag.
 - `on_application_update` (Boolean) On application update flag.
 - `on_download` (Boolean) On download flag.
 - `on_episode_file_delete` (Boolean) On episode file delete flag.
@@ -54,14 +62,6 @@ resource "sonarr_notification_kodi" "example" {
 - `on_rename` (Boolean) On rename flag.
 - `on_series_delete` (Boolean) On series delete flag.
 - `on_upgrade` (Boolean) On upgrade flag.
-- `port` (Number) Port.
-
-### Optional
-
-- `always_update` (Boolean) Always update flag.
-- `clean_library` (Boolean) Clean library flag.
-- `display_time` (Number) Display time.
-- `notify` (Boolean) Notification flag.
 - `password` (String, Sensitive) Password.
 - `tags` (Set of Number) List of associated tags.
 - `update_library` (Boolean) Update library flag.

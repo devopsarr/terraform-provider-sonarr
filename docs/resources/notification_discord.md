@@ -42,8 +42,16 @@ resource "sonarr_notification_discord" "example" {
 
 ### Required
 
-- `include_health_warnings` (Boolean) Include health warnings.
 - `name` (String) NotificationDiscord name.
+- `web_hook_url` (String) Web hook URL.
+
+### Optional
+
+- `author` (String) Author.
+- `avatar` (String) Avatar.
+- `grab_fields` (Set of Number) Grab fields. `0` Overview, `1` Rating, `2` Genres, `3` Quality, `4` Group, `5` Size, `6` Links, `7` Release, `8` Poster, `9` Fanart.
+- `import_fields` (Set of Number) Import fields. `0` Overview, `1` Rating, `2` Genres, `3` Quality, `4` Codecs, `5` Group, `6` Size, `7` Languages, `8` Subtitles, `9` Links, `10` Release, `11` Poster, `12` Fanart.
+- `include_health_warnings` (Boolean) Include health warnings.
 - `on_application_update` (Boolean) On application update flag.
 - `on_download` (Boolean) On download flag.
 - `on_episode_file_delete` (Boolean) On episode file delete flag.
@@ -53,14 +61,6 @@ resource "sonarr_notification_discord" "example" {
 - `on_rename` (Boolean) On rename flag.
 - `on_series_delete` (Boolean) On series delete flag.
 - `on_upgrade` (Boolean) On upgrade flag.
-- `web_hook_url` (String) Web hook URL.
-
-### Optional
-
-- `author` (String) Author.
-- `avatar` (String) Avatar.
-- `grab_fields` (Set of Number) Grab fields. `0` Overview, `1` Rating, `2` Genres, `3` Quality, `4` Group, `5` Size, `6` Links, `7` Release, `8` Poster, `9` Fanart.
-- `import_fields` (Set of Number) Import fields. `0` Overview, `1` Rating, `2` Genres, `3` Quality, `4` Codecs, `5` Group, `6` Size, `7` Languages, `8` Subtitles, `9` Links, `10` Release, `11` Poster, `12` Fanart.
 - `tags` (Set of Number) List of associated tags.
 - `username` (String) Username.
 

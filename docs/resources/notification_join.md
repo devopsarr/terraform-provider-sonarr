@@ -39,8 +39,13 @@ resource "sonarr_notification_join" "example" {
 
 ### Required
 
-- `include_health_warnings` (Boolean) Include health warnings.
 - `name` (String) NotificationJoin name.
+
+### Optional
+
+- `api_key` (String, Sensitive) API key.
+- `device_names` (String) Device names. Comma separated list.
+- `include_health_warnings` (Boolean) Include health warnings.
 - `on_application_update` (Boolean) On application update flag.
 - `on_download` (Boolean) On download flag.
 - `on_episode_file_delete` (Boolean) On episode file delete flag.
@@ -49,11 +54,6 @@ resource "sonarr_notification_join" "example" {
 - `on_health_issue` (Boolean) On health issue flag.
 - `on_series_delete` (Boolean) On series delete flag.
 - `on_upgrade` (Boolean) On upgrade flag.
-
-### Optional
-
-- `api_key` (String, Sensitive) API key.
-- `device_names` (String) Device names. Comma separated list.
 - `priority` (Number) Priority. `-2` Silent, `-1` Quiet, `0` Normal, `1` High, `2` Emergency.
 - `tags` (Set of Number) List of associated tags.
 

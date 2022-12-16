@@ -37,16 +37,16 @@ resource "sonarr_notification_trakt" "example" {
 
 - `access_token` (String, Sensitive) Access Token.
 - `auth_user` (String) Auth user.
-- `include_health_warnings` (Boolean) Include health warnings.
 - `name` (String) NotificationTrakt name.
+
+### Optional
+
+- `include_health_warnings` (Boolean) Include health warnings.
 - `on_download` (Boolean) On download flag.
 - `on_episode_file_delete` (Boolean) On episode file delete flag.
 - `on_episode_file_delete_for_upgrade` (Boolean) On episode file delete for upgrade flag.
 - `on_series_delete` (Boolean) On series delete flag.
 - `on_upgrade` (Boolean) On upgrade flag.
-
-### Optional
-
 - `refresh_token` (String, Sensitive) Access Token.
 - `tags` (Set of Number) List of associated tags.
 

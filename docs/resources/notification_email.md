@@ -41,8 +41,15 @@ resource "sonarr_notification_email" "example" {
 ### Required
 
 - `from` (String) From.
-- `include_health_warnings` (Boolean) Include health warnings.
 - `name` (String) NotificationEmail name.
+- `server` (String) Server.
+- `to` (Set of String) To.
+
+### Optional
+
+- `bcc` (Set of String) Bcc.
+- `cc` (Set of String) Cc.
+- `include_health_warnings` (Boolean) Include health warnings.
 - `on_application_update` (Boolean) On application update flag.
 - `on_download` (Boolean) On download flag.
 - `on_episode_file_delete` (Boolean) On episode file delete flag.
@@ -51,13 +58,6 @@ resource "sonarr_notification_email" "example" {
 - `on_health_issue` (Boolean) On health issue flag.
 - `on_series_delete` (Boolean) On series delete flag.
 - `on_upgrade` (Boolean) On upgrade flag.
-- `server` (String) Server.
-- `to` (Set of String) To.
-
-### Optional
-
-- `bcc` (Set of String) Bcc.
-- `cc` (Set of String) Cc.
 - `password` (String, Sensitive) Password.
 - `port` (Number) Port.
 - `require_encryption` (Boolean) Require encryption flag.

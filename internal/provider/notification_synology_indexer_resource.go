@@ -93,31 +93,38 @@ func (r *NotificationSynologyResource) Schema(ctx context.Context, req resource.
 		Attributes: map[string]schema.Attribute{
 			"on_download": schema.BoolAttribute{
 				MarkdownDescription: "On download flag.",
-				Required:            true,
+				Optional:            true,
+				Computed:            true,
 			},
 			"on_upgrade": schema.BoolAttribute{
 				MarkdownDescription: "On upgrade flag.",
-				Required:            true,
+				Optional:            true,
+				Computed:            true,
 			},
 			"on_rename": schema.BoolAttribute{
 				MarkdownDescription: "On rename flag.",
-				Required:            true,
+				Optional:            true,
+				Computed:            true,
 			},
 			"on_series_delete": schema.BoolAttribute{
 				MarkdownDescription: "On series delete flag.",
-				Required:            true,
+				Optional:            true,
+				Computed:            true,
 			},
 			"on_episode_file_delete": schema.BoolAttribute{
 				MarkdownDescription: "On episode file delete flag.",
-				Required:            true,
+				Optional:            true,
+				Computed:            true,
 			},
 			"on_episode_file_delete_for_upgrade": schema.BoolAttribute{
 				MarkdownDescription: "On episode file delete for upgrade flag.",
-				Required:            true,
+				Optional:            true,
+				Computed:            true,
 			},
 			"include_health_warnings": schema.BoolAttribute{
 				MarkdownDescription: "Include health warnings.",
-				Required:            true,
+				Optional:            true,
+				Computed:            true,
 			},
 			"name": schema.StringAttribute{
 				MarkdownDescription: "NotificationSynology name.",
@@ -280,15 +287,12 @@ func (r *NotificationSynologyResource) ImportState(ctx context.Context, req reso
 
 func (n *NotificationSynology) write(ctx context.Context, notification *sonarr.NotificationOutput) {
 	genericNotification := Notification{
-		OnGrab:                        types.BoolValue(notification.OnGrab),
 		OnDownload:                    types.BoolValue(notification.OnDownload),
 		OnUpgrade:                     types.BoolValue(notification.OnUpgrade),
 		OnRename:                      types.BoolValue(notification.OnRename),
 		OnSeriesDelete:                types.BoolValue(notification.OnSeriesDelete),
 		OnEpisodeFileDelete:           types.BoolValue(notification.OnEpisodeFileDelete),
 		OnEpisodeFileDeleteForUpgrade: types.BoolValue(notification.OnEpisodeFileDeleteForUpgrade),
-		OnHealthIssue:                 types.BoolValue(notification.OnHealthIssue),
-		OnApplicationUpdate:           types.BoolValue(notification.OnApplicationUpdate),
 		IncludeHealthWarnings:         types.BoolValue(notification.IncludeHealthWarnings),
 		ID:                            types.Int64Value(notification.ID),
 		Name:                          types.StringValue(notification.Name),

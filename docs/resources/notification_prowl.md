@@ -39,8 +39,11 @@ resource "sonarr_notification_prowl" "example" {
 ### Required
 
 - `api_key` (String, Sensitive) API key.
-- `include_health_warnings` (Boolean) Include health warnings.
 - `name` (String) NotificationProwl name.
+
+### Optional
+
+- `include_health_warnings` (Boolean) Include health warnings.
 - `on_application_update` (Boolean) On application update flag.
 - `on_download` (Boolean) On download flag.
 - `on_episode_file_delete` (Boolean) On episode file delete flag.
@@ -49,9 +52,6 @@ resource "sonarr_notification_prowl" "example" {
 - `on_health_issue` (Boolean) On health issue flag.
 - `on_series_delete` (Boolean) On series delete flag.
 - `on_upgrade` (Boolean) On upgrade flag.
-
-### Optional
-
 - `priority` (Number) Priority.`-2` Very Low, `-1` Low, `0` Normal, `1` High, `2` Emergency.
 - `tags` (Set of Number) List of associated tags.
 
