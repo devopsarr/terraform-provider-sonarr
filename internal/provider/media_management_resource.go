@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -15,7 +16,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"golift.io/starr/sonarr"
 )
 
 const mediaManagementResourceName = "media_management"
@@ -32,7 +32,7 @@ func NewMediaManagementResource() resource.Resource {
 
 // MediaManagementResource defines the media management implementation.
 type MediaManagementResource struct {
-	client *sonarr.Sonarr
+	client *sonarr.APIClient
 }
 
 // MediaManagement describes the media management data model.
@@ -167,11 +167,11 @@ func (r *MediaManagementResource) Configure(ctx context.Context, req resource.Co
 		return
 	}
 
-	client, ok := req.ProviderData.(*sonarr.Sonarr)
+	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
 			tools.UnexpectedResourceConfigureType,
-			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return
@@ -191,18 +191,18 @@ func (r *MediaManagementResource) Create(ctx context.Context, req resource.Creat
 	}
 
 	// Build Create resource
-	data := management.read()
-	data.ID = 1
+	request := management.read()
+	request.SetId(1)
 
 	// Create new MediaManagement
-	response, err := r.client.UpdateMediaManagementContext(ctx, data)
+	response, _, err := r.client.MediaManagementConfigApi.UpdateConfigMediamanagement(ctx, strconv.Itoa(int(request.GetId()))).MediaManagementConfigResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create mediamanagement, got error: %s", err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "created media_management: "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "created media_management: "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
 	management.write(response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &management)...)
@@ -219,14 +219,14 @@ func (r *MediaManagementResource) Read(ctx context.Context, req resource.ReadReq
 	}
 
 	// Get mediamanagement current value
-	response, err := r.client.GetMediaManagementContext(ctx)
+	response, _, err := r.client.MediaManagementConfigApi.GetConfigMediamanagement(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", mediaManagementResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read "+mediaManagementResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "read "+mediaManagementResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
 	management.write(response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &management)...)
@@ -243,17 +243,17 @@ func (r *MediaManagementResource) Update(ctx context.Context, req resource.Updat
 	}
 
 	// Build Update resource
-	data := management.read()
+	request := management.read()
 
 	// Update MediaManagement
-	response, err := r.client.UpdateMediaManagementContext(ctx, data)
+	response, _, err := r.client.MediaManagementConfigApi.UpdateConfigMediamanagement(ctx, strconv.Itoa(int(request.GetId()))).MediaManagementConfigResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", mediaManagementResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "updated "+mediaManagementResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "updated "+mediaManagementResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
 	management.write(response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &management)...)
@@ -271,48 +271,49 @@ func (r *MediaManagementResource) ImportState(ctx context.Context, req resource.
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), 1)...)
 }
 
-func (m *MediaManagement) write(mediaMgt *sonarr.MediaManagement) {
-	m.UnmonitorPreviousEpisodes = types.BoolValue(mediaMgt.AutoUnmonitorPreviouslyDownloadedEpisodes)
-	m.HardlinksCopy = types.BoolValue(mediaMgt.CopyUsingHardlinks)
-	m.CreateEmptyFolders = types.BoolValue(mediaMgt.CreateEmptySeriesFolders)
-	m.DeleteEmptyFolders = types.BoolValue(mediaMgt.DeleteEmptyFolders)
-	m.EnableMediaInfo = types.BoolValue(mediaMgt.EnableMediaInfo)
-	m.ImportExtraFiles = types.BoolValue(mediaMgt.ImportExtraFiles)
-	m.SetPermissions = types.BoolValue(mediaMgt.SetPermissionsLinux)
-	m.SkipFreeSpaceCheck = types.BoolValue(mediaMgt.SkipFreeSpaceCheckWhenImporting)
-	m.ID = types.Int64Value(mediaMgt.ID)
-	m.MinimumFreeSpace = types.Int64Value(mediaMgt.MinimumFreeSpaceWhenImporting)
-	m.RecycleBinDays = types.Int64Value(mediaMgt.RecycleBinCleanupDays)
-	m.ChmodFolder = types.StringValue(mediaMgt.ChmodFolder)
-	m.ChownGroup = types.StringValue(mediaMgt.ChownGroup)
-	m.DownloadPropersRepacks = types.StringValue(mediaMgt.DownloadPropersAndRepacks)
-	m.EpisodeTitleRequired = types.StringValue(mediaMgt.EpisodeTitleRequired)
-	m.ExtraFileExtensions = types.StringValue(mediaMgt.ExtraFileExtensions)
-	m.FileDate = types.StringValue(mediaMgt.FileDate)
-	m.RecycleBinPath = types.StringValue(mediaMgt.RecycleBin)
-	m.RescanAfterRefresh = types.StringValue(mediaMgt.RescanAfterRefresh)
+func (m *MediaManagement) write(mediaMgt *sonarr.MediaManagementConfigResource) {
+	m.UnmonitorPreviousEpisodes = types.BoolValue(mediaMgt.GetAutoUnmonitorPreviouslyDownloadedEpisodes())
+	m.HardlinksCopy = types.BoolValue(mediaMgt.GetCopyUsingHardlinks())
+	m.CreateEmptyFolders = types.BoolValue(mediaMgt.GetCreateEmptySeriesFolders())
+	m.DeleteEmptyFolders = types.BoolValue(mediaMgt.GetDeleteEmptyFolders())
+	m.EnableMediaInfo = types.BoolValue(mediaMgt.GetEnableMediaInfo())
+	m.ImportExtraFiles = types.BoolValue(mediaMgt.GetImportExtraFiles())
+	m.SetPermissions = types.BoolValue(mediaMgt.GetSetPermissionsLinux())
+	m.SkipFreeSpaceCheck = types.BoolValue(mediaMgt.GetSkipFreeSpaceCheckWhenImporting())
+	m.ID = types.Int64Value(int64(mediaMgt.GetId()))
+	m.MinimumFreeSpace = types.Int64Value(int64(mediaMgt.GetMinimumFreeSpaceWhenImporting()))
+	m.RecycleBinDays = types.Int64Value(int64(mediaMgt.GetRecycleBinCleanupDays()))
+	m.ChmodFolder = types.StringValue(mediaMgt.GetChmodFolder())
+	m.ChownGroup = types.StringValue(mediaMgt.GetChownGroup())
+	m.DownloadPropersRepacks = types.StringValue(string(mediaMgt.GetDownloadPropersAndRepacks()))
+	m.EpisodeTitleRequired = types.StringValue(string(mediaMgt.GetEpisodeTitleRequired()))
+	m.ExtraFileExtensions = types.StringValue(mediaMgt.GetExtraFileExtensions())
+	m.FileDate = types.StringValue(string(mediaMgt.GetFileDate()))
+	m.RecycleBinPath = types.StringValue(mediaMgt.GetRecycleBin())
+	m.RescanAfterRefresh = types.StringValue(string(mediaMgt.GetRescanAfterRefresh()))
 }
 
-func (m *MediaManagement) read() *sonarr.MediaManagement {
-	return &sonarr.MediaManagement{
-		AutoUnmonitorPreviouslyDownloadedEpisodes: m.UnmonitorPreviousEpisodes.ValueBool(),
-		CopyUsingHardlinks:                        m.HardlinksCopy.ValueBool(),
-		CreateEmptySeriesFolders:                  m.CreateEmptyFolders.ValueBool(),
-		DeleteEmptyFolders:                        m.DeleteEmptyFolders.ValueBool(),
-		EnableMediaInfo:                           m.EnableMediaInfo.ValueBool(),
-		ImportExtraFiles:                          m.ImportExtraFiles.ValueBool(),
-		SetPermissionsLinux:                       m.SetPermissions.ValueBool(),
-		SkipFreeSpaceCheckWhenImporting:           m.SkipFreeSpaceCheck.ValueBool(),
-		ID:                                        m.ID.ValueInt64(),
-		MinimumFreeSpaceWhenImporting:             m.MinimumFreeSpace.ValueInt64(),
-		RecycleBinCleanupDays:                     m.RecycleBinDays.ValueInt64(),
-		ChmodFolder:                               m.ChmodFolder.ValueString(),
-		ChownGroup:                                m.ChownGroup.ValueString(),
-		DownloadPropersAndRepacks:                 m.DownloadPropersRepacks.ValueString(),
-		EpisodeTitleRequired:                      m.EpisodeTitleRequired.ValueString(),
-		ExtraFileExtensions:                       m.ExtraFileExtensions.ValueString(),
-		FileDate:                                  m.FileDate.ValueString(),
-		RecycleBin:                                m.RecycleBinPath.ValueString(),
-		RescanAfterRefresh:                        m.RescanAfterRefresh.ValueString(),
-	}
+func (m *MediaManagement) read() *sonarr.MediaManagementConfigResource {
+	mediaMgt := sonarr.NewMediaManagementConfigResource()
+	mediaMgt.SetAutoUnmonitorPreviouslyDownloadedEpisodes(m.UnmonitorPreviousEpisodes.ValueBool())
+	mediaMgt.SetCopyUsingHardlinks(m.HardlinksCopy.ValueBool())
+	mediaMgt.SetCreateEmptySeriesFolders(m.CreateEmptyFolders.ValueBool())
+	mediaMgt.SetDeleteEmptyFolders(m.DeleteEmptyFolders.ValueBool())
+	mediaMgt.SetEnableMediaInfo(m.EnableMediaInfo.ValueBool())
+	mediaMgt.SetImportExtraFiles(m.ImportExtraFiles.ValueBool())
+	mediaMgt.SetSetPermissionsLinux(m.SetPermissions.ValueBool())
+	mediaMgt.SetSkipFreeSpaceCheckWhenImporting(m.SkipFreeSpaceCheck.ValueBool())
+	mediaMgt.SetId(int32(m.ID.ValueInt64()))
+	mediaMgt.SetMinimumFreeSpaceWhenImporting(int32(m.MinimumFreeSpace.ValueInt64()))
+	mediaMgt.SetRecycleBinCleanupDays(int32(m.RecycleBinDays.ValueInt64()))
+	mediaMgt.SetChmodFolder(m.ChmodFolder.ValueString())
+	mediaMgt.SetChownGroup(m.ChownGroup.ValueString())
+	mediaMgt.SetDownloadPropersAndRepacks(sonarr.ProperDownloadTypes(m.DownloadPropersRepacks.ValueString()))
+	mediaMgt.SetEpisodeTitleRequired(sonarr.EpisodeTitleRequiredType(m.EpisodeTitleRequired.ValueString()))
+	mediaMgt.SetExtraFileExtensions(m.ExtraFileExtensions.ValueString())
+	mediaMgt.SetFileDate(sonarr.FileDateType(m.FileDate.ValueString()))
+	mediaMgt.SetRecycleBin(m.RecycleBinPath.ValueString())
+	mediaMgt.SetRescanAfterRefresh(sonarr.RescanAfterRefreshType(m.RescanAfterRefresh.ValueString()))
+
+	return mediaMgt
 }

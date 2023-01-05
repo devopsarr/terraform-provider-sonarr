@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -14,7 +15,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"golift.io/starr/sonarr"
 )
 
 const (
@@ -36,7 +36,7 @@ func NewIndexerFanzubResource() resource.Resource {
 
 // IndexerFanzubResource defines the Fanzub indexer implementation.
 type IndexerFanzubResource struct {
-	client *sonarr.Sonarr
+	client *sonarr.APIClient
 }
 
 // IndexerFanzub describes the Fanzub indexer data model.
@@ -152,11 +152,11 @@ func (r *IndexerFanzubResource) Configure(ctx context.Context, req resource.Conf
 		return
 	}
 
-	client, ok := req.ProviderData.(*sonarr.Sonarr)
+	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
 			tools.UnexpectedResourceConfigureType,
-			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return
@@ -178,14 +178,14 @@ func (r *IndexerFanzubResource) Create(ctx context.Context, req resource.CreateR
 	// Create new IndexerFanzub
 	request := indexer.read(ctx)
 
-	response, err := r.client.AddIndexerContext(ctx, request)
+	response, _, err := r.client.IndexerApi.CreateIndexer(ctx).IndexerResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", indexerFanzubResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "created "+indexerFanzubResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "created "+indexerFanzubResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
 	indexer.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &indexer)...)
@@ -202,14 +202,14 @@ func (r *IndexerFanzubResource) Read(ctx context.Context, req resource.ReadReque
 	}
 
 	// Get IndexerFanzub current value
-	response, err := r.client.GetIndexerContext(ctx, indexer.ID.ValueInt64())
+	response, _, err := r.client.IndexerApi.GetIndexerById(ctx, int32(indexer.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerFanzubResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read "+indexerFanzubResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "read "+indexerFanzubResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
 	indexer.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &indexer)...)
@@ -228,14 +228,14 @@ func (r *IndexerFanzubResource) Update(ctx context.Context, req resource.UpdateR
 	// Update IndexerFanzub
 	request := indexer.read(ctx)
 
-	response, err := r.client.UpdateIndexerContext(ctx, request)
+	response, _, err := r.client.IndexerApi.UpdateIndexer(ctx, strconv.Itoa(int(request.GetId()))).IndexerResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", indexerFanzubResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "updated "+indexerFanzubResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "updated "+indexerFanzubResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
 	indexer.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &indexer)...)
@@ -251,7 +251,7 @@ func (r *IndexerFanzubResource) Delete(ctx context.Context, req resource.DeleteR
 	}
 
 	// Delete IndexerFanzub current value
-	err := r.client.DeleteIndexerContext(ctx, indexer.ID.ValueInt64())
+	_, err := r.client.IndexerApi.DeleteIndexer(ctx, int32(indexer.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerFanzubResourceName, err))
 
@@ -278,15 +278,15 @@ func (r *IndexerFanzubResource) ImportState(ctx context.Context, req resource.Im
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 
-func (i *IndexerFanzub) write(ctx context.Context, indexer *sonarr.IndexerOutput) {
+func (i *IndexerFanzub) write(ctx context.Context, indexer *sonarr.IndexerResource) {
 	genericIndexer := Indexer{
-		EnableAutomaticSearch:   types.BoolValue(indexer.EnableAutomaticSearch),
-		EnableInteractiveSearch: types.BoolValue(indexer.EnableInteractiveSearch),
-		EnableRss:               types.BoolValue(indexer.EnableRss),
-		Priority:                types.Int64Value(indexer.Priority),
-		DownloadClientID:        types.Int64Value(indexer.DownloadClientID),
-		ID:                      types.Int64Value(indexer.ID),
-		Name:                    types.StringValue(indexer.Name),
+		EnableAutomaticSearch:   types.BoolValue(indexer.GetEnableAutomaticSearch()),
+		EnableInteractiveSearch: types.BoolValue(indexer.GetEnableInteractiveSearch()),
+		EnableRss:               types.BoolValue(indexer.GetEnableRss()),
+		Priority:                types.Int64Value(int64(indexer.GetPriority())),
+		DownloadClientID:        types.Int64Value(int64(indexer.GetDownloadClientId())),
+		ID:                      types.Int64Value(int64(indexer.GetId())),
+		Name:                    types.StringValue(indexer.GetName()),
 		AnimeCategories:         types.SetValueMust(types.Int64Type, nil),
 		Categories:              types.SetValueMust(types.Int64Type, nil),
 	}
@@ -295,23 +295,24 @@ func (i *IndexerFanzub) write(ctx context.Context, indexer *sonarr.IndexerOutput
 	i.fromIndexer(&genericIndexer)
 }
 
-func (i *IndexerFanzub) read(ctx context.Context) *sonarr.IndexerInput {
-	var tags []int
+func (i *IndexerFanzub) read(ctx context.Context) *sonarr.IndexerResource {
+	var tags []*int32
 
 	tfsdk.ValueAs(ctx, i.Tags, &tags)
 
-	return &sonarr.IndexerInput{
-		EnableAutomaticSearch:   i.EnableAutomaticSearch.ValueBool(),
-		EnableInteractiveSearch: i.EnableInteractiveSearch.ValueBool(),
-		EnableRss:               i.EnableRss.ValueBool(),
-		Priority:                i.Priority.ValueInt64(),
-		DownloadClientID:        i.DownloadClientID.ValueInt64(),
-		ID:                      i.ID.ValueInt64(),
-		ConfigContract:          indexerFanzubConfigContract,
-		Implementation:          indexerFanzubImplementation,
-		Name:                    i.Name.ValueString(),
-		Protocol:                indexerFanzubProtocol,
-		Tags:                    tags,
-		Fields:                  i.toIndexer().readFields(ctx),
-	}
+	indexer := sonarr.NewIndexerResource()
+	indexer.SetEnableAutomaticSearch(i.EnableAutomaticSearch.ValueBool())
+	indexer.SetEnableInteractiveSearch(i.EnableInteractiveSearch.ValueBool())
+	indexer.SetEnableRss(i.EnableRss.ValueBool())
+	indexer.SetPriority(int32(i.Priority.ValueInt64()))
+	indexer.SetDownloadClientId(int32(i.DownloadClientID.ValueInt64()))
+	indexer.SetId(int32(i.ID.ValueInt64()))
+	indexer.SetConfigContract(indexerFanzubConfigContract)
+	indexer.SetImplementation(indexerFanzubImplementation)
+	indexer.SetName(i.Name.ValueString())
+	indexer.SetProtocol(indexerFanzubProtocol)
+	indexer.SetTags(tags)
+	indexer.SetFields(i.toIndexer().readFields(ctx))
+
+	return indexer
 }

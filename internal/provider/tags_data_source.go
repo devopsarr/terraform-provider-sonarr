@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"golift.io/starr/sonarr"
 )
 
 const tagsDataSourceName = "tags"
@@ -25,7 +25,7 @@ func NewTagsDataSource() datasource.DataSource {
 
 // TagsDataSource defines the tags implementation.
 type TagsDataSource struct {
-	client *sonarr.Sonarr
+	client *sonarr.APIClient
 }
 
 // Tags describes the tags data model.
@@ -73,11 +73,11 @@ func (d *TagsDataSource) Configure(ctx context.Context, req datasource.Configure
 		return
 	}
 
-	client, ok := req.ProviderData.(*sonarr.Sonarr)
+	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
 			tools.UnexpectedDataSourceConfigureType,
-			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return
@@ -96,7 +96,7 @@ func (d *TagsDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 	}
 
 	// Get tags current value
-	response, err := d.client.GetTagsContext(ctx)
+	response, _, err := d.client.TagApi.ListTag(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", tagsDataSourceName, err))
 
@@ -110,7 +110,7 @@ func (d *TagsDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 		tags[i].write(t)
 	}
 
-	tfsdk.ValueFrom(ctx, tags, data.Tags.Type(context.Background()), &data.Tags)
+	tfsdk.ValueFrom(ctx, tags, data.Tags.Type(ctx), &data.Tags)
 	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 	data.ID = types.StringValue(strconv.Itoa(len(response)))
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

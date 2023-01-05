@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"strconv"
 
+	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -16,8 +17,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"golift.io/starr"
-	"golift.io/starr/sonarr"
 )
 
 const tagResourceName = "tag"
@@ -34,7 +33,7 @@ func NewTagResource() resource.Resource {
 
 // TagResource defines the tag implementation.
 type TagResource struct {
-	client *sonarr.Sonarr
+	client *sonarr.APIClient
 }
 
 // Tag describes the tag data model.
@@ -78,11 +77,11 @@ func (r *TagResource) Configure(ctx context.Context, req resource.ConfigureReque
 		return
 	}
 
-	client, ok := req.ProviderData.(*sonarr.Sonarr)
+	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
 			tools.UnexpectedResourceConfigureType,
-			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return
@@ -102,18 +101,17 @@ func (r *TagResource) Create(ctx context.Context, req resource.CreateRequest, re
 	}
 
 	// Create new Tag
-	request := starr.Tag{
-		Label: tag.Label.ValueString(),
-	}
+	request := *sonarr.NewTagResource()
+	request.SetLabel(tag.Label.ValueString())
 
-	response, err := r.client.AddTagContext(ctx, &request)
+	response, _, err := r.client.TagApi.CreateTag(ctx).TagResource(request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", tagResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "created tag: "+strconv.Itoa(response.ID))
+	tflog.Trace(ctx, "created tag: "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
 	tag.write(response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &tag)...)
@@ -130,14 +128,14 @@ func (r *TagResource) Read(ctx context.Context, req resource.ReadRequest, resp *
 	}
 
 	// Get tag current value
-	response, err := r.client.GetTagContext(ctx, int(tag.ID.ValueInt64()))
+	response, _, err := r.client.TagApi.GetTagById(ctx, int32(tag.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", tagResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read "+tagResourceName+": "+strconv.Itoa(response.ID))
+	tflog.Trace(ctx, "read "+tagResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
 	tag.write(response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &tag)...)
@@ -154,19 +152,18 @@ func (r *TagResource) Update(ctx context.Context, req resource.UpdateRequest, re
 	}
 
 	// Update Tag
-	request := starr.Tag{
-		Label: tag.Label.ValueString(),
-		ID:    int(tag.ID.ValueInt64()),
-	}
+	tagResource := *sonarr.NewTagResource()
+	tagResource.SetLabel(tag.Label.ValueString())
+	tagResource.SetId(int32(tag.ID.ValueInt64()))
 
-	response, err := r.client.UpdateTagContext(ctx, &request)
+	response, _, err := r.client.TagApi.UpdateTag(ctx, fmt.Sprint(tagResource.GetId())).TagResource(tagResource).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", tagResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "updated "+tagResourceName+": "+strconv.Itoa(response.ID))
+	tflog.Trace(ctx, "updated "+tagResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
 	tag.write(response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &tag)...)
@@ -182,7 +179,7 @@ func (r *TagResource) Delete(ctx context.Context, req resource.DeleteRequest, re
 	}
 
 	// Delete tag current value
-	err := r.client.DeleteTagContext(ctx, int(tag.ID.ValueInt64()))
+	_, err := r.client.TagApi.DeleteTag(ctx, int32(tag.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", tagResourceName, err))
 
@@ -209,7 +206,7 @@ func (r *TagResource) ImportState(ctx context.Context, req resource.ImportStateR
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 
-func (t *Tag) write(tag *starr.Tag) {
-	t.ID = types.Int64Value(int64(tag.ID))
-	t.Label = types.StringValue(tag.Label)
+func (t *Tag) write(tag *sonarr.TagResource) {
+	t.ID = types.Int64Value(int64(tag.GetId()))
+	t.Label = types.StringValue(tag.GetLabel())
 }

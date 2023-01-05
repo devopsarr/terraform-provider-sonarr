@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"golift.io/starr/sonarr"
 )
 
 const qualityProfilesDataSourceName = "quality_profiles"
@@ -25,7 +25,7 @@ func NewQualityProfilesDataSource() datasource.DataSource {
 
 // QualityProfilesDataSource defines the qyality profiles implementation.
 type QualityProfilesDataSource struct {
-	client *sonarr.Sonarr
+	client *sonarr.APIClient
 }
 
 // QualityProfiles describes the qyality profiles data model.
@@ -121,11 +121,11 @@ func (d *QualityProfilesDataSource) Configure(ctx context.Context, req datasourc
 		return
 	}
 
-	client, ok := req.ProviderData.(*sonarr.Sonarr)
+	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
 			tools.UnexpectedDataSourceConfigureType,
-			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return
@@ -143,7 +143,7 @@ func (d *QualityProfilesDataSource) Read(ctx context.Context, req datasource.Rea
 		return
 	}
 	// Get qualityprofiles current value
-	response, err := d.client.GetQualityProfilesContext(ctx)
+	response, _, err := d.client.QualityProfileApi.ListQualityprofile(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", qualityProfilesDataSourceName, err))
 
@@ -153,14 +153,14 @@ func (d *QualityProfilesDataSource) Read(ctx context.Context, req datasource.Rea
 	tflog.Trace(ctx, "read "+qualityProfilesDataSourceName)
 	// Map response body to resource schema attribute
 	profiles := *writeQualitiyprofiles(ctx, response)
-	tfsdk.ValueFrom(ctx, profiles, data.QualityProfiles.Type(context.Background()), &data.QualityProfiles)
+	tfsdk.ValueFrom(ctx, profiles, data.QualityProfiles.Type(ctx), &data.QualityProfiles)
 
 	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 	data.ID = types.StringValue(strconv.Itoa(len(response)))
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func writeQualitiyprofiles(ctx context.Context, qualities []*sonarr.QualityProfile) *[]QualityProfile {
+func writeQualitiyprofiles(ctx context.Context, qualities []*sonarr.QualityProfileResource) *[]QualityProfile {
 	output := make([]QualityProfile, len(qualities))
 	for i, p := range qualities {
 		output[i].write(ctx, p)

@@ -6,9 +6,9 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"golift.io/starr"
 )
 
 type fieldException struct {
@@ -57,9 +57,9 @@ func selectAPIName(name string) string {
 	return name
 }
 
-func WriteStringField(fieldOutput *starr.FieldOutput, fieldCase interface{}) {
-	fieldName := selectTFName(fieldOutput.Name)
-	stringValue := fmt.Sprint(fieldOutput.Value)
+func WriteStringField(fieldOutput *sonarr.Field, fieldCase interface{}) {
+	fieldName := selectTFName(fieldOutput.GetName())
+	stringValue := fmt.Sprint(fieldOutput.GetValue())
 	value := reflect.ValueOf(fieldCase)
 	value = value.Elem()
 	field := value.FieldByNameFunc(func(n string) bool { return strings.EqualFold(n, fieldName) })
@@ -67,9 +67,9 @@ func WriteStringField(fieldOutput *starr.FieldOutput, fieldCase interface{}) {
 	field.Set(v)
 }
 
-func WriteBoolField(fieldOutput *starr.FieldOutput, fieldCase interface{}) {
-	fieldName := selectTFName(fieldOutput.Name)
-	boolValue, _ := fieldOutput.Value.(bool)
+func WriteBoolField(fieldOutput *sonarr.Field, fieldCase interface{}) {
+	fieldName := selectTFName(fieldOutput.GetName())
+	boolValue, _ := fieldOutput.GetValue().(bool)
 	value := reflect.ValueOf(fieldCase)
 	value = value.Elem()
 	field := value.FieldByNameFunc(func(n string) bool { return strings.EqualFold(n, fieldName) })
@@ -77,9 +77,9 @@ func WriteBoolField(fieldOutput *starr.FieldOutput, fieldCase interface{}) {
 	field.Set(v)
 }
 
-func WriteIntField(fieldOutput *starr.FieldOutput, fieldCase interface{}) {
-	fieldName := selectTFName(fieldOutput.Name)
-	intValue, _ := fieldOutput.Value.(float64)
+func WriteIntField(fieldOutput *sonarr.Field, fieldCase interface{}) {
+	fieldName := selectTFName(fieldOutput.GetName())
+	intValue, _ := fieldOutput.GetValue().(float64)
 	value := reflect.ValueOf(fieldCase)
 	value = value.Elem()
 	field := value.FieldByNameFunc(func(n string) bool { return strings.EqualFold(n, fieldName) })
@@ -87,9 +87,9 @@ func WriteIntField(fieldOutput *starr.FieldOutput, fieldCase interface{}) {
 	field.Set(v)
 }
 
-func WriteFloatField(fieldOutput *starr.FieldOutput, fieldCase interface{}) {
-	fieldName := selectTFName(fieldOutput.Name)
-	floatValue, _ := fieldOutput.Value.(float64)
+func WriteFloatField(fieldOutput *sonarr.Field, fieldCase interface{}) {
+	fieldName := selectTFName(fieldOutput.GetName())
+	floatValue, _ := fieldOutput.GetValue().(float64)
 	value := reflect.ValueOf(fieldCase)
 	value = value.Elem()
 	field := value.FieldByNameFunc(func(n string) bool { return strings.EqualFold(n, fieldName) })
@@ -97,9 +97,9 @@ func WriteFloatField(fieldOutput *starr.FieldOutput, fieldCase interface{}) {
 	field.Set(v)
 }
 
-func WriteStringSliceField(ctx context.Context, fieldOutput *starr.FieldOutput, fieldCase interface{}) {
-	fieldName := selectTFName(fieldOutput.Name)
-	sliceValue, _ := fieldOutput.Value.([]interface{})
+func WriteStringSliceField(ctx context.Context, fieldOutput *sonarr.Field, fieldCase interface{}) {
+	fieldName := selectTFName(fieldOutput.GetName())
+	sliceValue, _ := fieldOutput.GetValue().([]interface{})
 	value := reflect.ValueOf(fieldCase)
 	value = value.Elem()
 	setValue := types.SetValueMust(types.StringType, nil)
@@ -110,19 +110,19 @@ func WriteStringSliceField(ctx context.Context, fieldOutput *starr.FieldOutput, 
 	field.Set(v)
 }
 
-func WriteIntSliceField(ctx context.Context, fieldOutput *starr.FieldOutput, fieldCase interface{}) {
-	sliceValue, _ := fieldOutput.Value.([]interface{})
+func WriteIntSliceField(ctx context.Context, fieldOutput *sonarr.Field, fieldCase interface{}) {
+	sliceValue, _ := fieldOutput.GetValue().([]interface{})
 	value := reflect.ValueOf(fieldCase)
 	value = value.Elem()
 	setValue := types.SetValueMust(types.Int64Type, nil)
 	tfsdk.ValueFrom(ctx, sliceValue, setValue.Type(ctx), &setValue)
 
-	field := value.FieldByNameFunc(func(n string) bool { return strings.EqualFold(n, fieldOutput.Name) })
+	field := value.FieldByNameFunc(func(n string) bool { return strings.EqualFold(n, fieldOutput.GetName()) })
 	v := reflect.ValueOf(setValue)
 	field.Set(v)
 }
 
-func ReadStringField(name string, fieldCase interface{}) *starr.FieldInput {
+func ReadStringField(name string, fieldCase interface{}) *sonarr.Field {
 	fieldName := selectAPIName(name)
 	value := reflect.ValueOf(fieldCase)
 	value = value.Elem()
@@ -130,16 +130,17 @@ func ReadStringField(name string, fieldCase interface{}) *starr.FieldInput {
 	stringField := (*types.String)(field.Addr().UnsafePointer())
 
 	if !stringField.IsNull() && !stringField.IsUnknown() {
-		return &starr.FieldInput{
-			Name:  fieldName,
-			Value: stringField.ValueString(),
-		}
+		field := sonarr.NewField()
+		field.SetName(fieldName)
+		field.SetValue(stringField.ValueString())
+
+		return field
 	}
 
 	return nil
 }
 
-func ReadBoolField(name string, fieldCase interface{}) *starr.FieldInput {
+func ReadBoolField(name string, fieldCase interface{}) *sonarr.Field {
 	fieldName := selectAPIName(name)
 	value := reflect.ValueOf(fieldCase)
 	value = value.Elem()
@@ -147,16 +148,17 @@ func ReadBoolField(name string, fieldCase interface{}) *starr.FieldInput {
 	boolField := (*types.Bool)(field.Addr().UnsafePointer())
 
 	if !boolField.IsNull() && !boolField.IsUnknown() {
-		return &starr.FieldInput{
-			Name:  fieldName,
-			Value: boolField.ValueBool(),
-		}
+		field := sonarr.NewField()
+		field.SetName(fieldName)
+		field.SetValue(boolField.ValueBool())
+
+		return field
 	}
 
 	return nil
 }
 
-func ReadIntField(name string, fieldCase interface{}) *starr.FieldInput {
+func ReadIntField(name string, fieldCase interface{}) *sonarr.Field {
 	fieldName := selectAPIName(name)
 	value := reflect.ValueOf(fieldCase)
 	value = value.Elem()
@@ -164,33 +166,35 @@ func ReadIntField(name string, fieldCase interface{}) *starr.FieldInput {
 	intField := (*types.Int64)(field.Addr().UnsafePointer())
 
 	if !intField.IsNull() && !intField.IsUnknown() {
-		return &starr.FieldInput{
-			Name:  fieldName,
-			Value: intField.ValueInt64(),
-		}
+		field := sonarr.NewField()
+		field.SetName(fieldName)
+		field.SetValue(intField.ValueInt64())
+
+		return field
 	}
 
 	return nil
 }
 
-func ReadFloatField(name string, fieldCase interface{}) *starr.FieldInput {
+func ReadFloatField(name string, fieldCase interface{}) *sonarr.Field {
 	fieldName := selectAPIName(name)
 	value := reflect.ValueOf(fieldCase)
 	value = value.Elem()
 	field := value.FieldByNameFunc(func(n string) bool { return strings.EqualFold(n, name) })
-	intField := (*types.Float64)(field.Addr().UnsafePointer())
+	floatField := (*types.Float64)(field.Addr().UnsafePointer())
 
-	if !intField.IsNull() && !intField.IsUnknown() {
-		return &starr.FieldInput{
-			Name:  fieldName,
-			Value: intField.ValueFloat64(),
-		}
+	if !floatField.IsNull() && !floatField.IsUnknown() {
+		field := sonarr.NewField()
+		field.SetName(fieldName)
+		field.SetValue(floatField.ValueFloat64())
+
+		return field
 	}
 
 	return nil
 }
 
-func ReadStringSliceField(ctx context.Context, name string, fieldCase interface{}) *starr.FieldInput {
+func ReadStringSliceField(ctx context.Context, name string, fieldCase interface{}) *sonarr.Field {
 	fieldName := selectAPIName(name)
 	value := reflect.ValueOf(fieldCase)
 	value = value.Elem()
@@ -201,16 +205,17 @@ func ReadStringSliceField(ctx context.Context, name string, fieldCase interface{
 		slice := make([]string, len(sliceField.Elements()))
 		tfsdk.ValueAs(ctx, sliceField, &slice)
 
-		return &starr.FieldInput{
-			Name:  fieldName,
-			Value: slice,
-		}
+		field := sonarr.NewField()
+		field.SetName(fieldName)
+		field.SetValue(slice)
+
+		return field
 	}
 
 	return nil
 }
 
-func ReadIntSliceField(ctx context.Context, name string, fieldCase interface{}) *starr.FieldInput {
+func ReadIntSliceField(ctx context.Context, name string, fieldCase interface{}) *sonarr.Field {
 	fieldName := selectAPIName(name)
 	value := reflect.ValueOf(fieldCase)
 	value = value.Elem()
@@ -221,10 +226,11 @@ func ReadIntSliceField(ctx context.Context, name string, fieldCase interface{}) 
 		slice := make([]int64, len(sliceField.Elements()))
 		tfsdk.ValueAs(ctx, sliceField, &slice)
 
-		return &starr.FieldInput{
-			Name:  fieldName,
-			Value: slice,
-		}
+		field := sonarr.NewField()
+		field.SetName(fieldName)
+		field.SetValue(slice)
+
+		return field
 	}
 
 	return nil

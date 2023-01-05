@@ -4,6 +4,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
 )
@@ -26,4 +27,12 @@ func testAccPreCheck(t *testing.T) {
 	if v := os.Getenv("SONARR_API_KEY"); v == "" {
 		t.Skip("SONARR_API_KEY must be set for acceptance tests")
 	}
+}
+
+func testAccAPIClient() *sonarr.APIClient {
+	config := sonarr.NewConfiguration()
+	config.AddDefaultHeader("X-Api-Key", os.Getenv("SONARR_API_KEY"))
+	config.Servers[0].URL = os.Getenv("SONARR_URL")
+
+	return sonarr.NewAPIClient(config)
 }

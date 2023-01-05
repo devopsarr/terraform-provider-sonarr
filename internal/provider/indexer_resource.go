@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -17,8 +18,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golang.org/x/exp/slices"
-	"golift.io/starr"
-	"golift.io/starr/sonarr"
 )
 
 const indexerResourceName = "indexer"
@@ -43,7 +42,7 @@ func NewIndexerResource() resource.Resource {
 
 // IndexerResource defines the indexer implementation.
 type IndexerResource struct {
-	client *sonarr.Sonarr
+	client *sonarr.APIClient
 }
 
 // Indexer describes the indexer data model.
@@ -249,11 +248,11 @@ func (r *IndexerResource) Configure(ctx context.Context, req resource.ConfigureR
 		return
 	}
 
-	client, ok := req.ProviderData.(*sonarr.Sonarr)
+	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
 			tools.UnexpectedResourceConfigureType,
-			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return
@@ -275,14 +274,14 @@ func (r *IndexerResource) Create(ctx context.Context, req resource.CreateRequest
 	// Create new Indexer
 	request := indexer.read(ctx)
 
-	response, err := r.client.AddIndexerContext(ctx, request)
+	response, _, err := r.client.IndexerApi.CreateIndexer(ctx).IndexerResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", indexerResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "created "+indexerResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "created "+indexerResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct.
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state Indexer
@@ -303,14 +302,14 @@ func (r *IndexerResource) Read(ctx context.Context, req resource.ReadRequest, re
 	}
 
 	// Get Indexer current value
-	response, err := r.client.GetIndexerContext(ctx, indexer.ID.ValueInt64())
+	response, _, err := r.client.IndexerApi.GetIndexerById(ctx, int32(indexer.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read "+indexerResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "read "+indexerResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct.
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state Indexer
@@ -333,14 +332,14 @@ func (r *IndexerResource) Update(ctx context.Context, req resource.UpdateRequest
 	// Update Indexer
 	request := indexer.read(ctx)
 
-	response, err := r.client.UpdateIndexerContext(ctx, request)
+	response, _, err := r.client.IndexerApi.UpdateIndexer(ctx, strconv.Itoa(int(request.GetId()))).IndexerResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", indexerResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "updated "+indexerResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "updated "+indexerResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct.
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state Indexer
@@ -360,7 +359,7 @@ func (r *IndexerResource) Delete(ctx context.Context, req resource.DeleteRequest
 	}
 
 	// Delete Indexer current value
-	err := r.client.DeleteIndexerContext(ctx, indexer.ID.ValueInt64())
+	_, err := r.client.IndexerApi.DeleteIndexer(ctx, int32(indexer.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerResourceName, err))
 
@@ -387,82 +386,83 @@ func (r *IndexerResource) ImportState(ctx context.Context, req resource.ImportSt
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 
-func (i *Indexer) write(ctx context.Context, indexer *sonarr.IndexerOutput) {
+func (i *Indexer) write(ctx context.Context, indexer *sonarr.IndexerResource) {
 	i.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, indexer.Tags)
-	i.EnableAutomaticSearch = types.BoolValue(indexer.EnableAutomaticSearch)
-	i.EnableInteractiveSearch = types.BoolValue(indexer.EnableInteractiveSearch)
-	i.EnableRss = types.BoolValue(indexer.EnableRss)
-	i.Priority = types.Int64Value(indexer.Priority)
-	i.DownloadClientID = types.Int64Value(indexer.DownloadClientID)
-	i.ID = types.Int64Value(indexer.ID)
-	i.ConfigContract = types.StringValue(indexer.ConfigContract)
-	i.Implementation = types.StringValue(indexer.Implementation)
-	i.Name = types.StringValue(indexer.Name)
-	i.Protocol = types.StringValue(indexer.Protocol)
+	i.EnableAutomaticSearch = types.BoolValue(indexer.GetEnableAutomaticSearch())
+	i.EnableInteractiveSearch = types.BoolValue(indexer.GetEnableInteractiveSearch())
+	i.EnableRss = types.BoolValue(indexer.GetEnableRss())
+	i.Priority = types.Int64Value(int64(indexer.GetPriority()))
+	i.DownloadClientID = types.Int64Value(int64(indexer.GetDownloadClientId()))
+	i.ID = types.Int64Value(int64(indexer.GetId()))
+	i.ConfigContract = types.StringValue(indexer.GetConfigContract())
+	i.Implementation = types.StringValue(indexer.GetImplementation())
+	i.Name = types.StringValue(indexer.GetName())
+	i.Protocol = types.StringValue(string(indexer.GetProtocol()))
 	i.AnimeCategories = types.SetValueMust(types.Int64Type, nil)
 	i.Categories = types.SetValueMust(types.Int64Type, nil)
 	i.writeFields(ctx, indexer.Fields)
 }
 
-func (i *Indexer) writeFields(ctx context.Context, fields []*starr.FieldOutput) {
+func (i *Indexer) writeFields(ctx context.Context, fields []*sonarr.Field) {
 	for _, f := range fields {
 		if f.Value == nil {
 			continue
 		}
 
-		if slices.Contains(indexerStringFields, f.Name) {
+		if slices.Contains(indexerStringFields, f.GetName()) {
 			tools.WriteStringField(f, i)
 
 			continue
 		}
 
-		if slices.Contains(indexerBoolFields, f.Name) {
+		if slices.Contains(indexerBoolFields, f.GetName()) {
 			tools.WriteBoolField(f, i)
 
 			continue
 		}
 
-		if slices.Contains(indexerIntFields, f.Name) || f.Name == "seedCriteria.seedTime" || f.Name == "seedCriteria.seasonPackSeedTime" {
+		if slices.Contains(indexerIntFields, f.GetName()) || f.GetName() == "seedCriteria.seedTime" || f.GetName() == "seedCriteria.seasonPackSeedTime" {
 			tools.WriteIntField(f, i)
 
 			continue
 		}
 
-		if slices.Contains(indexerFloatFields, f.Name) || f.Name == "seedCriteria.seedRatio" {
+		if slices.Contains(indexerFloatFields, f.GetName()) || f.GetName() == "seedCriteria.seedRatio" {
 			tools.WriteFloatField(f, i)
 
 			continue
 		}
 
-		if slices.Contains(indexerIntSliceFields, f.Name) {
+		if slices.Contains(indexerIntSliceFields, f.GetName()) {
 			tools.WriteIntSliceField(ctx, f, i)
 		}
 	}
 }
 
-func (i *Indexer) read(ctx context.Context) *sonarr.IndexerInput {
-	var tags []int
+func (i *Indexer) read(ctx context.Context) *sonarr.IndexerResource {
+	var tags []*int32
 
 	tfsdk.ValueAs(ctx, i.Tags, &tags)
 
-	return &sonarr.IndexerInput{
-		EnableAutomaticSearch:   i.EnableAutomaticSearch.ValueBool(),
-		EnableInteractiveSearch: i.EnableInteractiveSearch.ValueBool(),
-		EnableRss:               i.EnableRss.ValueBool(),
-		Priority:                i.Priority.ValueInt64(),
-		DownloadClientID:        i.DownloadClientID.ValueInt64(),
-		ID:                      i.ID.ValueInt64(),
-		ConfigContract:          i.ConfigContract.ValueString(),
-		Implementation:          i.Implementation.ValueString(),
-		Name:                    i.Name.ValueString(),
-		Protocol:                i.Protocol.ValueString(),
-		Tags:                    tags,
-		Fields:                  i.readFields(ctx),
-	}
+	indexer := sonarr.NewIndexerResource()
+	indexer.SetEnableAutomaticSearch(i.EnableAutomaticSearch.ValueBool())
+	indexer.SetEnableInteractiveSearch(i.EnableInteractiveSearch.ValueBool())
+	indexer.SetEnableRss(i.EnableRss.ValueBool())
+	indexer.SetPriority(int32(i.Priority.ValueInt64()))
+	indexer.SetDownloadClientId(int32(i.DownloadClientID.ValueInt64()))
+	indexer.SetId(int32(i.ID.ValueInt64()))
+	indexer.SetConfigContract(i.ConfigContract.ValueString())
+	indexer.SetImplementation(i.Implementation.ValueString())
+	indexer.SetName(i.Name.ValueString())
+	indexer.SetProtocol(sonarr.DownloadProtocol(i.Protocol.ValueString()))
+	indexer.SetTags(tags)
+	indexer.SetFields(i.readFields(ctx))
+
+	return indexer
 }
 
-func (i *Indexer) readFields(ctx context.Context) []*starr.FieldInput {
-	var output []*starr.FieldInput
+func (i *Indexer) readFields(ctx context.Context) []*sonarr.Field {
+	var output []*sonarr.Field
 
 	for _, b := range indexerBoolFields {
 		if field := tools.ReadBoolField(b, i); field != nil {

@@ -4,11 +4,11 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"golift.io/starr/sonarr"
 )
 
 const qualityDefinitionDataSourceName = "quality_definition"
@@ -22,7 +22,7 @@ func NewQualityDefinitionDataSource() datasource.DataSource {
 
 // QualityDefinitionDataSource defines the quality definitions implementation.
 type QualityDefinitionDataSource struct {
-	client *sonarr.Sonarr
+	client *sonarr.APIClient
 }
 
 func (d *QualityDefinitionDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
@@ -77,11 +77,11 @@ func (d *QualityDefinitionDataSource) Configure(ctx context.Context, req datasou
 		return
 	}
 
-	client, ok := req.ProviderData.(*sonarr.Sonarr)
+	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
 			tools.UnexpectedDataSourceConfigureType,
-			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return
@@ -99,7 +99,7 @@ func (d *QualityDefinitionDataSource) Read(ctx context.Context, req datasource.R
 		return
 	}
 	// Get qualitydefinitions current value
-	response, err := d.client.GetQualityDefinitionsContext(ctx)
+	response, _, err := d.client.QualityDefinitionApi.ListQualitydefinition(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", qualityDefinitionDataSourceName, err))
 
@@ -118,9 +118,9 @@ func (d *QualityDefinitionDataSource) Read(ctx context.Context, req datasource.R
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func findQualityDefinition(id int64, definitions []*sonarr.QualityDefinition) (*sonarr.QualityDefinition, error) {
+func findQualityDefinition(id int64, definitions []*sonarr.QualityDefinitionResource) (*sonarr.QualityDefinitionResource, error) {
 	for _, p := range definitions {
-		if p.ID == id {
+		if int64(p.GetId()) == id {
 			return p, nil
 		}
 	}

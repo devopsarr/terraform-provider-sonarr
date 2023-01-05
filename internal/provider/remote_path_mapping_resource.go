@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -13,8 +14,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"golift.io/starr"
-	"golift.io/starr/sonarr"
 )
 
 const remotePathMappingResourceName = "remote_path_mapping"
@@ -31,7 +30,7 @@ func NewRemotePathMappingResource() resource.Resource {
 
 // RemotePathMappingResource defines the remote path mapping implementation.
 type RemotePathMappingResource struct {
-	client *sonarr.Sonarr
+	client *sonarr.APIClient
 }
 
 // RemotePathMapping describes the remote path mapping data model.
@@ -79,11 +78,11 @@ func (r *RemotePathMappingResource) Configure(ctx context.Context, req resource.
 		return
 	}
 
-	client, ok := req.ProviderData.(*sonarr.Sonarr)
+	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
 			tools.UnexpectedResourceConfigureType,
-			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return
@@ -105,14 +104,14 @@ func (r *RemotePathMappingResource) Create(ctx context.Context, req resource.Cre
 	// Create new RemotePathMapping
 	request := mapping.read()
 
-	response, err := r.client.AddRemotePathMappingContext(ctx, request)
+	response, _, err := r.client.RemotePathMappingApi.CreateRemotepathmapping(ctx).RemotePathMappingResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", remotePathMappingResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "created "+remotePathMappingResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "created "+remotePathMappingResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
 	mapping.write(response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &mapping)...)
@@ -129,14 +128,14 @@ func (r *RemotePathMappingResource) Read(ctx context.Context, req resource.ReadR
 	}
 
 	// Get remotePathMapping current value
-	response, err := r.client.GetRemotePathMappingContext(ctx, mapping.ID.ValueInt64())
+	response, _, err := r.client.RemotePathMappingApi.GetRemotepathmappingById(ctx, int32(mapping.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", remotePathMappingResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read "+remotePathMappingResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "read "+remotePathMappingResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
 	mapping.write(response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &mapping)...)
@@ -155,14 +154,14 @@ func (r *RemotePathMappingResource) Update(ctx context.Context, req resource.Upd
 	// Update RemotePathMapping
 	request := mapping.read()
 
-	response, err := r.client.UpdateRemotePathMappingContext(ctx, request)
+	response, _, err := r.client.RemotePathMappingApi.UpdateRemotepathmapping(ctx, strconv.Itoa(int(request.GetId()))).RemotePathMappingResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", remotePathMappingResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "updated "+remotePathMappingResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "updated "+remotePathMappingResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
 	mapping.write(response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &mapping)...)
@@ -179,7 +178,7 @@ func (r *RemotePathMappingResource) Delete(ctx context.Context, req resource.Del
 	}
 
 	// Delete remotePathMapping current value
-	err := r.client.DeleteRemotePathMappingContext(ctx, mapping.ID.ValueInt64())
+	_, err := r.client.RemotePathMappingApi.DeleteRemotepathmapping(ctx, int32(mapping.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", remotePathMappingResourceName, err))
 
@@ -206,18 +205,19 @@ func (r *RemotePathMappingResource) ImportState(ctx context.Context, req resourc
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 
-func (r *RemotePathMapping) write(remotePathMapping *starr.RemotePathMapping) {
-	r.ID = types.Int64Value(remotePathMapping.ID)
-	r.Host = types.StringValue(remotePathMapping.Host)
-	r.RemotePath = types.StringValue(remotePathMapping.RemotePath)
-	r.LocalPath = types.StringValue(remotePathMapping.LocalPath)
+func (r *RemotePathMapping) write(remotePathMapping *sonarr.RemotePathMappingResource) {
+	r.ID = types.Int64Value(int64(remotePathMapping.GetId()))
+	r.Host = types.StringValue(remotePathMapping.GetHost())
+	r.RemotePath = types.StringValue(remotePathMapping.GetRemotePath())
+	r.LocalPath = types.StringValue(remotePathMapping.GetLocalPath())
 }
 
-func (r *RemotePathMapping) read() *starr.RemotePathMapping {
-	return &starr.RemotePathMapping{
-		ID:         r.ID.ValueInt64(),
-		Host:       r.Host.ValueString(),
-		RemotePath: r.RemotePath.ValueString(),
-		LocalPath:  r.LocalPath.ValueString(),
-	}
+func (r *RemotePathMapping) read() *sonarr.RemotePathMappingResource {
+	mapping := sonarr.NewRemotePathMappingResource()
+	mapping.SetHost(r.Host.ValueString())
+	mapping.SetLocalPath(r.LocalPath.ValueString())
+	mapping.SetRemotePath(r.RemotePath.ValueString())
+	mapping.SetId(int32(r.ID.ValueInt64()))
+
+	return mapping
 }

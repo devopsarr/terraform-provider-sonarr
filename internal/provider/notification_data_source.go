@@ -4,12 +4,12 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"golift.io/starr/sonarr"
 )
 
 const notificationDataSourceName = "notification"
@@ -23,7 +23,7 @@ func NewNotificationDataSource() datasource.DataSource {
 
 // NotificationDataSource defines the notification implementation.
 type NotificationDataSource struct {
-	client *sonarr.Sonarr
+	client *sonarr.APIClient
 }
 
 func (d *NotificationDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
@@ -350,11 +350,11 @@ func (d *NotificationDataSource) Configure(ctx context.Context, req datasource.C
 		return
 	}
 
-	client, ok := req.ProviderData.(*sonarr.Sonarr)
+	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
 			tools.UnexpectedDataSourceConfigureType,
-			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return
@@ -372,7 +372,7 @@ func (d *NotificationDataSource) Read(ctx context.Context, req datasource.ReadRe
 		return
 	}
 	// Get notification current value
-	response, err := d.client.GetNotificationsContext(ctx)
+	response, _, err := d.client.NotificationApi.ListNotification(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", notificationDataSourceName, err))
 
@@ -391,9 +391,9 @@ func (d *NotificationDataSource) Read(ctx context.Context, req datasource.ReadRe
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func findNotification(name string, notifications []*sonarr.NotificationOutput) (*sonarr.NotificationOutput, error) {
+func findNotification(name string, notifications []*sonarr.NotificationResource) (*sonarr.NotificationResource, error) {
 	for _, i := range notifications {
-		if i.Name == name {
+		if i.GetName() == name {
 			return i, nil
 		}
 	}

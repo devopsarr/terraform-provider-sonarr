@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -14,7 +15,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"golift.io/starr/sonarr"
 )
 
 const (
@@ -36,7 +36,7 @@ func NewIndexerIptorrentsResource() resource.Resource {
 
 // IndexerIptorrentsResource defines the Iptorrents indexer implementation.
 type IndexerIptorrentsResource struct {
-	client *sonarr.Sonarr
+	client *sonarr.APIClient
 }
 
 // IndexerIptorrents describes the Iptorrents indexer data model.
@@ -175,11 +175,11 @@ func (r *IndexerIptorrentsResource) Configure(ctx context.Context, req resource.
 		return
 	}
 
-	client, ok := req.ProviderData.(*sonarr.Sonarr)
+	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
 			tools.UnexpectedResourceConfigureType,
-			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return
@@ -201,14 +201,14 @@ func (r *IndexerIptorrentsResource) Create(ctx context.Context, req resource.Cre
 	// Create new IndexerIptorrents
 	request := indexer.read(ctx)
 
-	response, err := r.client.AddIndexerContext(ctx, request)
+	response, _, err := r.client.IndexerApi.CreateIndexer(ctx).IndexerResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", indexerIptorrentsResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "created "+indexerIptorrentsResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "created "+indexerIptorrentsResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
 	indexer.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &indexer)...)
@@ -225,14 +225,14 @@ func (r *IndexerIptorrentsResource) Read(ctx context.Context, req resource.ReadR
 	}
 
 	// Get IndexerIptorrents current value
-	response, err := r.client.GetIndexerContext(ctx, indexer.ID.ValueInt64())
+	response, _, err := r.client.IndexerApi.GetIndexerById(ctx, int32(indexer.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerIptorrentsResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read "+indexerIptorrentsResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "read "+indexerIptorrentsResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
 	indexer.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &indexer)...)
@@ -251,14 +251,14 @@ func (r *IndexerIptorrentsResource) Update(ctx context.Context, req resource.Upd
 	// Update IndexerIptorrents
 	request := indexer.read(ctx)
 
-	response, err := r.client.UpdateIndexerContext(ctx, request)
+	response, _, err := r.client.IndexerApi.UpdateIndexer(ctx, strconv.Itoa(int(request.GetId()))).IndexerResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update "+indexerIptorrentsResourceName+", got error: %s", err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "updated "+indexerIptorrentsResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "updated "+indexerIptorrentsResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
 	indexer.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &indexer)...)
@@ -274,7 +274,7 @@ func (r *IndexerIptorrentsResource) Delete(ctx context.Context, req resource.Del
 	}
 
 	// Delete IndexerIptorrents current value
-	err := r.client.DeleteIndexerContext(ctx, indexer.ID.ValueInt64())
+	_, err := r.client.IndexerApi.DeleteIndexer(ctx, int32(indexer.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerIptorrentsResourceName, err))
 
@@ -301,38 +301,39 @@ func (r *IndexerIptorrentsResource) ImportState(ctx context.Context, req resourc
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 
-func (i *IndexerIptorrents) write(ctx context.Context, indexer *sonarr.IndexerOutput) {
+func (i *IndexerIptorrents) write(ctx context.Context, indexer *sonarr.IndexerResource) {
 	genericIndexer := Indexer{
-		EnableAutomaticSearch:   types.BoolValue(indexer.EnableAutomaticSearch),
-		EnableInteractiveSearch: types.BoolValue(indexer.EnableInteractiveSearch),
-		EnableRss:               types.BoolValue(indexer.EnableRss),
-		Priority:                types.Int64Value(indexer.Priority),
-		DownloadClientID:        types.Int64Value(indexer.DownloadClientID),
-		ID:                      types.Int64Value(indexer.ID),
-		Name:                    types.StringValue(indexer.Name),
+		EnableAutomaticSearch:   types.BoolValue(indexer.GetEnableAutomaticSearch()),
+		EnableInteractiveSearch: types.BoolValue(indexer.GetEnableInteractiveSearch()),
+		EnableRss:               types.BoolValue(indexer.GetEnableRss()),
+		Priority:                types.Int64Value(int64(indexer.GetPriority())),
+		DownloadClientID:        types.Int64Value(int64(indexer.GetDownloadClientId())),
+		ID:                      types.Int64Value(int64(indexer.GetId())),
+		Name:                    types.StringValue(indexer.GetName()),
 	}
 	genericIndexer.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, indexer.Tags)
 	genericIndexer.writeFields(ctx, indexer.Fields)
 	i.fromIndexer(&genericIndexer)
 }
 
-func (i *IndexerIptorrents) read(ctx context.Context) *sonarr.IndexerInput {
-	var tags []int
+func (i *IndexerIptorrents) read(ctx context.Context) *sonarr.IndexerResource {
+	var tags []*int32
 
 	tfsdk.ValueAs(ctx, i.Tags, &tags)
 
-	return &sonarr.IndexerInput{
-		EnableAutomaticSearch:   i.EnableAutomaticSearch.ValueBool(),
-		EnableInteractiveSearch: i.EnableInteractiveSearch.ValueBool(),
-		EnableRss:               i.EnableRss.ValueBool(),
-		Priority:                i.Priority.ValueInt64(),
-		DownloadClientID:        i.DownloadClientID.ValueInt64(),
-		ID:                      i.ID.ValueInt64(),
-		ConfigContract:          indexerIptorrentsConfigContract,
-		Implementation:          indexerIptorrentsImplementation,
-		Name:                    i.Name.ValueString(),
-		Protocol:                indexerIptorrentsProtocol,
-		Tags:                    tags,
-		Fields:                  i.toIndexer().readFields(ctx),
-	}
+	indexer := sonarr.NewIndexerResource()
+	indexer.SetEnableAutomaticSearch(i.EnableAutomaticSearch.ValueBool())
+	indexer.SetEnableInteractiveSearch(i.EnableInteractiveSearch.ValueBool())
+	indexer.SetEnableRss(i.EnableRss.ValueBool())
+	indexer.SetPriority(int32(i.Priority.ValueInt64()))
+	indexer.SetDownloadClientId(int32(i.DownloadClientID.ValueInt64()))
+	indexer.SetId(int32(i.ID.ValueInt64()))
+	indexer.SetConfigContract(indexerIptorrentsConfigContract)
+	indexer.SetImplementation(indexerIptorrentsImplementation)
+	indexer.SetName(i.Name.ValueString())
+	indexer.SetProtocol(indexerIptorrentsProtocol)
+	indexer.SetTags(tags)
+	indexer.SetFields(i.toIndexer().readFields(ctx))
+
+	return indexer
 }

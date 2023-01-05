@@ -1,12 +1,10 @@
 package provider
 
 import (
-	"os"
+	"context"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
-	"golift.io/starr"
-	"golift.io/starr/sonarr"
 )
 
 func TestAccQualityProfilesDataSource(t *testing.T) {
@@ -35,8 +33,8 @@ data "sonarr_quality_profiles" "test" {
 
 func qualityprofilesDSInit() {
 	// keep only first two profiles to avoid longer tests
-	client := *sonarr.New(starr.New(os.Getenv("SONARR_API_KEY"), os.Getenv("SONARR_URL"), 0))
+	client := testAccAPIClient()
 	for i := 3; i < 7; i++ {
-		_ = client.DeleteQualityProfile(int64(i))
+		client.QualityProfileApi.DeleteQualityprofile(context.TODO(), int32(i))
 	}
 }

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -14,8 +15,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"golift.io/starr"
-	"golift.io/starr/sonarr"
 )
 
 const qualityProfileResourceName = "quality_profile"
@@ -32,7 +31,7 @@ func NewQualityProfileResource() resource.Resource {
 
 // QualityProfileResource defines the quality profile implementation.
 type QualityProfileResource struct {
-	client *sonarr.Sonarr
+	client *sonarr.APIClient
 }
 
 // QualityProfile describes the quality profile data model.
@@ -156,11 +155,11 @@ func (r *QualityProfileResource) Configure(ctx context.Context, req resource.Con
 		return
 	}
 
-	client, ok := req.ProviderData.(*sonarr.Sonarr)
+	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
 			tools.UnexpectedResourceConfigureType,
-			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return
@@ -180,17 +179,17 @@ func (r *QualityProfileResource) Create(ctx context.Context, req resource.Create
 	}
 
 	// Build Create resource
-	data := profile.read(ctx)
+	request := profile.read(ctx)
 
 	// Create new QualityProfile
-	response, err := r.client.AddQualityProfileContext(ctx, data)
+	response, _, err := r.client.QualityProfileApi.CreateQualityprofile(ctx).QualityProfileResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", qualityProfileResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "created "+qualityProfileResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "created "+qualityProfileResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
 	profile.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &profile)...)
@@ -207,14 +206,14 @@ func (r *QualityProfileResource) Read(ctx context.Context, req resource.ReadRequ
 	}
 
 	// Get qualityprofile current value
-	response, err := r.client.GetQualityProfileContext(ctx, profile.ID.ValueInt64())
+	response, _, err := r.client.QualityProfileApi.GetQualityprofileById(ctx, int32(profile.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", qualityProfileResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read "+qualityProfileResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "read "+qualityProfileResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
 	profile.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &profile)...)
@@ -231,17 +230,17 @@ func (r *QualityProfileResource) Update(ctx context.Context, req resource.Update
 	}
 
 	// Build Update resource
-	data := profile.read(ctx)
+	request := profile.read(ctx)
 
 	// Update QualityProfile
-	response, err := r.client.UpdateQualityProfileContext(ctx, data)
+	response, _, err := r.client.QualityProfileApi.UpdateQualityprofile(ctx, strconv.Itoa(int(request.GetId()))).QualityProfileResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", qualityProfileResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "updated "+qualityProfileResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "updated "+qualityProfileResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
 	profile.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &profile)...)
@@ -257,7 +256,7 @@ func (r *QualityProfileResource) Delete(ctx context.Context, req resource.Delete
 	}
 
 	// Delete qualityprofile current value
-	err := r.client.DeleteQualityProfileContext(ctx, profile.ID.ValueInt64())
+	_, err := r.client.QualityProfileApi.DeleteQualityprofile(ctx, int32(profile.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", qualityProfileResourceName, err))
 
@@ -284,22 +283,22 @@ func (r *QualityProfileResource) ImportState(ctx context.Context, req resource.I
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 
-func (p *QualityProfile) write(ctx context.Context, profile *sonarr.QualityProfile) {
-	p.UpgradeAllowed = types.BoolValue(profile.UpgradeAllowed)
-	p.ID = types.Int64Value(profile.ID)
-	p.Name = types.StringValue(profile.Name)
-	p.Cutoff = types.Int64Value(profile.Cutoff)
+func (p *QualityProfile) write(ctx context.Context, profile *sonarr.QualityProfileResource) {
+	p.UpgradeAllowed = types.BoolValue(profile.GetUpgradeAllowed())
+	p.ID = types.Int64Value(int64(profile.GetId()))
+	p.Name = types.StringValue(profile.GetName())
+	p.Cutoff = types.Int64Value(int64(profile.GetCutoff()))
 	p.QualityGroups = types.SetValueMust(QualityProfileResource{}.getQualityGroupSchema().Type(), nil)
 
-	qualityGroups := make([]QualityGroup, len(profile.Qualities))
-	for n, g := range profile.Qualities {
+	qualityGroups := make([]QualityGroup, len(profile.GetItems()))
+	for n, g := range profile.GetItems() {
 		qualityGroups[n].write(ctx, g)
 	}
 
 	tfsdk.ValueFrom(ctx, qualityGroups, p.QualityGroups.Type(ctx), &p.QualityGroups)
 }
 
-func (q *QualityGroup) write(ctx context.Context, group *starr.Quality) {
+func (q *QualityGroup) write(ctx context.Context, group *sonarr.QualityProfileQualityItemResource) {
 	var (
 		name      string
 		id        int64
@@ -307,17 +306,17 @@ func (q *QualityGroup) write(ctx context.Context, group *starr.Quality) {
 	)
 
 	if len(group.Items) == 0 {
-		name = group.Quality.Name
-		id = group.Quality.ID
+		name = group.Quality.GetName()
+		id = int64(group.Quality.GetId())
 		qualities = []Quality{{
-			ID:         types.Int64Value(group.Quality.ID),
-			Name:       types.StringValue(group.Quality.Name),
-			Source:     types.StringValue(group.Quality.Source),
-			Resolution: types.Int64Value(int64(group.Quality.Resolution)),
+			ID:         types.Int64Value(int64(group.Quality.GetId())),
+			Name:       types.StringValue(group.Quality.GetName()),
+			Source:     types.StringValue(string(group.Quality.GetSource())),
+			Resolution: types.Int64Value(int64(group.Quality.GetResolution())),
 		}}
 	} else {
-		name = group.Name
-		id = int64(group.ID)
+		name = group.GetName()
+		id = int64(group.GetId())
 		qualities = make([]Quality, len(group.Items))
 		for m, q := range group.Items {
 			qualities[m].write(q)
@@ -331,64 +330,69 @@ func (q *QualityGroup) write(ctx context.Context, group *starr.Quality) {
 	tfsdk.ValueFrom(ctx, qualities, q.Qualities.Type(ctx), &q.Qualities)
 }
 
-func (q *Quality) write(quality *starr.Quality) {
-	q.ID = types.Int64Value(quality.Quality.ID)
-	q.Name = types.StringValue(quality.Quality.Name)
-	q.Source = types.StringValue(quality.Quality.Source)
-	q.Resolution = types.Int64Value(int64(quality.Quality.Resolution))
+func (q *Quality) write(quality *sonarr.QualityProfileQualityItemResource) {
+	q.ID = types.Int64Value(int64(quality.Quality.GetId()))
+	q.Name = types.StringValue(quality.Quality.GetName())
+	q.Source = types.StringValue(string(quality.Quality.GetSource()))
+	q.Resolution = types.Int64Value(int64(quality.Quality.GetResolution()))
 }
 
-func (p *QualityProfile) read(ctx context.Context) *sonarr.QualityProfile {
+func (p *QualityProfile) read(ctx context.Context) *sonarr.QualityProfileResource {
 	groups := make([]QualityGroup, len(p.QualityGroups.Elements()))
 	tfsdk.ValueAs(ctx, p.QualityGroups, &groups)
-	qualities := make([]*starr.Quality, len(groups))
+	qualities := make([]*sonarr.QualityProfileQualityItemResource, len(groups))
 
 	for n, g := range groups {
 		q := make([]Quality, len(g.Qualities.Elements()))
 		tfsdk.ValueAs(ctx, g.Qualities, &q)
 
 		if len(q) == 0 {
-			qualities[n] = &starr.Quality{
-				Allowed: true,
-				Quality: &starr.BaseQuality{
-					ID:   g.ID.ValueInt64(),
-					Name: g.Name.ValueString(),
-				},
-			}
+			quality := sonarr.NewQuality()
+			quality.SetId(int32(g.ID.ValueInt64()))
+			quality.SetName(g.Name.ValueString())
+
+			item := sonarr.NewQualityProfileQualityItemResource()
+			item.SetAllowed(true)
+			item.SetQuality(*quality)
+
+			qualities[n] = item
 
 			continue
 		}
 
-		items := make([]*starr.Quality, len(q))
+		items := make([]*sonarr.QualityProfileQualityItemResource, len(q))
 		for m, q := range q {
 			items[m] = q.read()
 		}
 
-		qualities[n] = &starr.Quality{
-			Name:    g.Name.ValueString(),
-			ID:      int(g.ID.ValueInt64()),
-			Allowed: true,
-			Items:   items,
-		}
+		quality := sonarr.NewQualityProfileQualityItemResource()
+		quality.SetId(int32(g.ID.ValueInt64()))
+		quality.SetName(g.Name.ValueString())
+		quality.SetAllowed(true)
+		quality.SetItems(items)
+		qualities[n] = quality
 	}
 
-	return &sonarr.QualityProfile{
-		UpgradeAllowed: p.UpgradeAllowed.ValueBool(),
-		ID:             p.ID.ValueInt64(),
-		Cutoff:         p.Cutoff.ValueInt64(),
-		Name:           p.Name.ValueString(),
-		Qualities:      qualities,
-	}
+	profile := sonarr.NewQualityProfileResource()
+	profile.SetUpgradeAllowed(p.UpgradeAllowed.ValueBool())
+	profile.SetId(int32(p.ID.ValueInt64()))
+	profile.SetCutoff(int32(p.Cutoff.ValueInt64()))
+	profile.SetName(p.Name.ValueString())
+	profile.SetItems(qualities)
+
+	return profile
 }
 
-func (q *Quality) read() *starr.Quality {
-	return &starr.Quality{
-		Allowed: true,
-		Quality: &starr.BaseQuality{
-			Name:       q.Name.ValueString(),
-			ID:         q.ID.ValueInt64(),
-			Source:     q.Source.ValueString(),
-			Resolution: int(q.Resolution.ValueInt64()),
-		},
-	}
+func (q *Quality) read() *sonarr.QualityProfileQualityItemResource {
+	quality := sonarr.NewQuality()
+	quality.SetId(int32(q.ID.ValueInt64()))
+	quality.SetName(q.Name.ValueString())
+	quality.SetResolution(int32(q.Resolution.ValueInt64()))
+	quality.SetSource(sonarr.QualitySource(q.Source.ValueString()))
+
+	item := sonarr.NewQualityProfileQualityItemResource()
+	item.SetAllowed(true)
+	item.SetQuality(*quality)
+
+	return item
 }

@@ -4,11 +4,11 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"golift.io/starr/sonarr"
 )
 
 const namingDataSourceName = "naming"
@@ -22,7 +22,7 @@ func NewNamingDataSource() datasource.DataSource {
 
 // NamingDataSource defines the naming implementation.
 type NamingDataSource struct {
-	client *sonarr.Sonarr
+	client *sonarr.APIClient
 }
 
 func (d *NamingDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
@@ -84,11 +84,11 @@ func (d *NamingDataSource) Configure(ctx context.Context, req datasource.Configu
 		return
 	}
 
-	client, ok := req.ProviderData.(*sonarr.Sonarr)
+	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
 			tools.UnexpectedDataSourceConfigureType,
-			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return
@@ -99,7 +99,7 @@ func (d *NamingDataSource) Configure(ctx context.Context, req datasource.Configu
 
 func (d *NamingDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 	// Get naming current value
-	response, err := d.client.GetNamingContext(ctx)
+	response, _, err := d.client.NamingConfigApi.GetConfigNaming(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", namingDataSourceName, err))
 

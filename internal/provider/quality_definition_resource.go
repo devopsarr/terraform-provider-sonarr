@@ -5,16 +5,16 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"golift.io/starr"
-	"golift.io/starr/sonarr"
 )
 
 const qualityDefinitionResourceName = "quality_definition"
@@ -31,7 +31,7 @@ func NewQualityDefinitionResource() resource.Resource {
 
 // QualityDefinitionResource defines the quality definition implementation.
 type QualityDefinitionResource struct {
-	client *sonarr.Sonarr
+	client *sonarr.APIClient
 }
 
 // QualityDefinition describes the quality definition data model.
@@ -90,6 +90,9 @@ func (r *QualityDefinitionResource) Schema(ctx context.Context, req resource.Sch
 			"source": schema.StringAttribute{
 				MarkdownDescription: "Quality source.",
 				Computed:            true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 		},
 	}
@@ -101,11 +104,11 @@ func (r *QualityDefinitionResource) Configure(ctx context.Context, req resource.
 		return
 	}
 
-	client, ok := req.ProviderData.(*sonarr.Sonarr)
+	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
 			tools.UnexpectedResourceConfigureType,
-			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return
@@ -125,27 +128,28 @@ func (r *QualityDefinitionResource) Create(ctx context.Context, req resource.Cre
 	}
 
 	// Build Create resource
-	data := definition.read()
+	request := definition.read()
 
 	// Read to get the quality ID
-	read, err := r.client.GetQualityDefinitionContext(ctx, data.ID)
+	read, _, err := r.client.QualityDefinitionApi.GetQualitydefinitionById(ctx, request.GetId()).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", qualityDefinitionResourceName, err))
 
 		return
 	}
 
-	data.Quality.ID = read.Quality.ID
+	request.Quality.SetId(read.Quality.GetId())
+	request.Quality.SetSource(read.Quality.GetSource())
 
 	// Create new QualityDefinition
-	response, err := r.client.UpdateQualityDefinitionContext(ctx, data)
+	response, _, err := r.client.QualityDefinitionApi.UpdateQualitydefinition(ctx, strconv.Itoa(int(request.GetId()))).QualityDefinitionResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", qualityDefinitionResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "created "+qualityDefinitionResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "created "+qualityDefinitionResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
 	definition.write(response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &definition)...)
@@ -162,14 +166,14 @@ func (r *QualityDefinitionResource) Read(ctx context.Context, req resource.ReadR
 	}
 
 	// Get qualitydefinition current value
-	response, err := r.client.GetQualityDefinitionContext(ctx, definition.ID.ValueInt64())
+	response, _, err := r.client.QualityDefinitionApi.GetQualitydefinitionById(ctx, int32(definition.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", qualityDefinitionResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read "+qualityDefinitionResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "read "+qualityDefinitionResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
 	definition.write(response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &definition)...)
@@ -186,17 +190,17 @@ func (r *QualityDefinitionResource) Update(ctx context.Context, req resource.Upd
 	}
 
 	// Build Update resource
-	data := definition.read()
+	request := definition.read()
 
 	// Update QualityDefinition
-	response, err := r.client.UpdateQualityDefinitionContext(ctx, data)
+	response, _, err := r.client.QualityDefinitionApi.UpdateQualitydefinition(ctx, strconv.Itoa(int(request.GetId()))).QualityDefinitionResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", qualityDefinitionResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "updated "+qualityDefinitionResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "updated "+qualityDefinitionResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
 	definition.write(response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &definition)...)
@@ -232,28 +236,30 @@ func (r *QualityDefinitionResource) ImportState(ctx context.Context, req resourc
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 
-func (p *QualityDefinition) write(definition *sonarr.QualityDefinition) {
-	p.ID = types.Int64Value(definition.ID)
-	p.MinSize = types.Float64Value(definition.MinSize)
-	p.MaxSize = types.Float64Value(definition.MaxSize)
-	p.Title = types.StringValue(definition.Title)
-	p.QualityName = types.StringValue(definition.Quality.Name)
-	p.QualityID = types.Int64Value(definition.Quality.ID)
-	p.Source = types.StringValue(definition.Quality.Source)
-	p.Resolution = types.Int64Value(int64(definition.Quality.Resolution))
+func (p *QualityDefinition) write(definition *sonarr.QualityDefinitionResource) {
+	p.ID = types.Int64Value(int64(definition.GetId()))
+	p.MinSize = types.Float64Value(definition.GetMinSize())
+	p.MaxSize = types.Float64Value(definition.GetMaxSize())
+	p.Title = types.StringValue(definition.GetTitle())
+	p.QualityName = types.StringValue(definition.Quality.GetName())
+	p.QualityID = types.Int64Value(int64(definition.Quality.GetId()))
+	p.Source = types.StringValue(string(definition.Quality.GetSource()))
+	p.Resolution = types.Int64Value(int64(definition.Quality.GetResolution()))
 }
 
-func (p *QualityDefinition) read() *sonarr.QualityDefinition {
-	return &sonarr.QualityDefinition{
-		ID:      p.ID.ValueInt64(),
-		MinSize: p.MinSize.ValueFloat64(),
-		MaxSize: p.MaxSize.ValueFloat64(),
-		Title:   p.Title.ValueString(),
-		Quality: &starr.BaseQuality{
-			ID:         p.QualityID.ValueInt64(),
-			Name:       p.QualityName.ValueString(),
-			Source:     p.Source.ValueString(),
-			Resolution: int(p.Resolution.ValueInt64()),
-		},
-	}
+func (p *QualityDefinition) read() *sonarr.QualityDefinitionResource {
+	quality := sonarr.NewQuality()
+	quality.SetId(int32(p.QualityID.ValueInt64()))
+	quality.SetName(p.QualityName.ValueString())
+	quality.SetResolution(int32(p.Resolution.ValueInt64()))
+	quality.SetSource(sonarr.QualitySource(p.Source.ValueString()))
+
+	definition := sonarr.NewQualityDefinitionResource()
+	definition.SetId(int32(p.ID.ValueInt64()))
+	definition.SetMaxSize(p.MaxSize.ValueFloat64())
+	definition.SetMinSize(p.MinSize.ValueFloat64())
+	definition.SetTitle(p.Title.ValueString())
+	definition.SetQuality(*quality)
+
+	return definition
 }

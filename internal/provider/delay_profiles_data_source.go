@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"golift.io/starr/sonarr"
 )
 
 const delayProfilesDataSourceName = "delay_profiles"
@@ -25,7 +25,7 @@ func NewDelayProfilesDataSource() datasource.DataSource {
 
 // DelayProfilesDataSource defines the delay profiles implementation.
 type DelayProfilesDataSource struct {
-	client *sonarr.Sonarr
+	client *sonarr.APIClient
 }
 
 // DelayProfiles describes the delay profiles data model.
@@ -102,11 +102,11 @@ func (d *DelayProfilesDataSource) Configure(ctx context.Context, req datasource.
 		return
 	}
 
-	client, ok := req.ProviderData.(*sonarr.Sonarr)
+	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
 			tools.UnexpectedDataSourceConfigureType,
-			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return
@@ -124,7 +124,7 @@ func (d *DelayProfilesDataSource) Read(ctx context.Context, req datasource.ReadR
 		return
 	}
 	// Get delayprofiles current value
-	response, err := d.client.GetDelayProfilesContext(ctx)
+	response, _, err := d.client.DelayProfileApi.ListDelayprofile(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", delayProfileResourceName, err))
 
@@ -138,7 +138,7 @@ func (d *DelayProfilesDataSource) Read(ctx context.Context, req datasource.ReadR
 		profiles[i].write(ctx, p)
 	}
 
-	tfsdk.ValueFrom(ctx, profiles, data.DelayProfiles.Type(context.Background()), &data.DelayProfiles)
+	tfsdk.ValueFrom(ctx, profiles, data.DelayProfiles.Type(ctx), &data.DelayProfiles)
 	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 	data.ID = types.StringValue(strconv.Itoa(len(response)))
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

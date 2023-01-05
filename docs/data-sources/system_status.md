@@ -32,8 +32,6 @@ data "sonarr_system_status" "example" {
 - `is_admin` (Boolean) Is admin flag.
 - `is_debug` (Boolean) Is debug flag.
 - `is_linux` (Boolean) Is linux flag.
-- `is_mono` (Boolean) Is mono flag.
-- `is_mono_runtime` (Boolean) Is mono runtime flag.
 - `is_osx` (Boolean) Is osx flag.
 - `is_production` (Boolean) Is production flag.
 - `is_user_interactive` (Boolean) Is user interactive flag.
@@ -49,7 +47,6 @@ data "sonarr_system_status" "example" {
 - `sqlite_version` (String) SQLite version.
 - `start_time` (String) Start time.
 - `startup_path` (String) Startup path.
-- `url_base` (String) Base URL.
 - `version` (String) Version.
 
 

@@ -25,18 +25,6 @@ func TestAccRemotePathMappingDataSource(t *testing.T) {
 }
 
 const testAccRemotePathMappingDataSourceConfig = `
-resource "sonarr_download_client" "test" {
-	enable = false
-	priority = 1
-	name = "remotepatdstest"
-	implementation = "Transmission"
-	protocol = "torrent"
-	config_contract = "TransmissionSettings"
-	host = "transmission"
-	url_base = "/transmission/"
-	port = 9091
-}
-
 resource "sonarr_remote_path_mapping" "test" {
 	host = "transmission"
 	remote_path = "/datatest/"

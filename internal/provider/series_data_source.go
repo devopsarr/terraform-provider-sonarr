@@ -4,12 +4,12 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"golift.io/starr/sonarr"
 )
 
 const seriesDataSourceName = "series"
@@ -23,7 +23,7 @@ func NewSeriesDataSource() datasource.DataSource {
 
 // SeriesDataSource defines the tags implementation.
 type SeriesDataSource struct {
-	client *sonarr.Sonarr
+	client *sonarr.APIClient
 }
 
 func (d *SeriesDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
@@ -94,11 +94,11 @@ func (d *SeriesDataSource) Configure(ctx context.Context, req datasource.Configu
 		return
 	}
 
-	client, ok := req.ProviderData.(*sonarr.Sonarr)
+	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
 			tools.UnexpectedDataSourceConfigureType,
-			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return
@@ -116,7 +116,7 @@ func (d *SeriesDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 		return
 	}
 	// Get series current value
-	response, err := d.client.GetAllSeriesContext(ctx)
+	response, _, err := d.client.SeriesApi.ListSeries(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", seriesDataSourceName, err))
 
@@ -135,9 +135,9 @@ func (d *SeriesDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func findSeries(title string, series []*sonarr.Series) (*sonarr.Series, error) {
+func findSeries(title string, series []*sonarr.SeriesResource) (*sonarr.SeriesResource, error) {
 	for _, s := range series {
-		if s.Title == title {
+		if s.GetTitle() == title {
 			return s, nil
 		}
 	}

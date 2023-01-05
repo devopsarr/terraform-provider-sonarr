@@ -4,11 +4,11 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"golift.io/starr/sonarr"
 )
 
 const qualityProfileDataSourceName = "quality_profile"
@@ -22,7 +22,7 @@ func NewQualityProfileDataSource() datasource.DataSource {
 
 // QualityProfileDataSource defines the quality profiles implementation.
 type QualityProfileDataSource struct {
-	client *sonarr.Sonarr
+	client *sonarr.APIClient
 }
 
 func (d *QualityProfileDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
@@ -100,11 +100,11 @@ func (d *QualityProfileDataSource) Configure(ctx context.Context, req datasource
 		return
 	}
 
-	client, ok := req.ProviderData.(*sonarr.Sonarr)
+	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
 			tools.UnexpectedDataSourceConfigureType,
-			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return
@@ -122,7 +122,7 @@ func (d *QualityProfileDataSource) Read(ctx context.Context, req datasource.Read
 		return
 	}
 	// Get qualityprofiles current value
-	response, err := d.client.GetQualityProfilesContext(ctx)
+	response, _, err := d.client.QualityProfileApi.ListQualityprofile(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", qualityProfileDataSourceName, err))
 
@@ -141,9 +141,9 @@ func (d *QualityProfileDataSource) Read(ctx context.Context, req datasource.Read
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func findQualityProfile(name string, profiles []*sonarr.QualityProfile) (*sonarr.QualityProfile, error) {
+func findQualityProfile(name string, profiles []*sonarr.QualityProfileResource) (*sonarr.QualityProfileResource, error) {
 	for _, p := range profiles {
-		if p.Name == name {
+		if p.GetName() == name {
 			return p, nil
 		}
 	}

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -14,7 +15,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"golift.io/starr/sonarr"
 )
 
 const (
@@ -36,7 +36,7 @@ func NewIndexerBroadcastheNetResource() resource.Resource {
 
 // IndexerBroadcastheNetResource defines the BroadcastheNet indexer implementation.
 type IndexerBroadcastheNetResource struct {
-	client *sonarr.Sonarr
+	client *sonarr.APIClient
 }
 
 // IndexerBroadcastheNet describes the BroadcastheNet indexer data model.
@@ -183,11 +183,11 @@ func (r *IndexerBroadcastheNetResource) Configure(ctx context.Context, req resou
 		return
 	}
 
-	client, ok := req.ProviderData.(*sonarr.Sonarr)
+	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
 			tools.UnexpectedResourceConfigureType,
-			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return
@@ -209,14 +209,14 @@ func (r *IndexerBroadcastheNetResource) Create(ctx context.Context, req resource
 	// Create new IndexerBroadcastheNet
 	request := indexer.read(ctx)
 
-	response, err := r.client.AddIndexerContext(ctx, request)
+	response, _, err := r.client.IndexerApi.CreateIndexer(ctx).IndexerResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", indexerBroadcastheNetResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "created "+indexerBroadcastheNetResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "created "+indexerBroadcastheNetResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
 	indexer.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &indexer)...)
@@ -233,14 +233,14 @@ func (r *IndexerBroadcastheNetResource) Read(ctx context.Context, req resource.R
 	}
 
 	// Get IndexerBroadcastheNet current value
-	response, err := r.client.GetIndexerContext(ctx, indexer.ID.ValueInt64())
+	response, _, err := r.client.IndexerApi.GetIndexerById(ctx, int32(indexer.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerBroadcastheNetResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read "+indexerBroadcastheNetResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "read "+indexerBroadcastheNetResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
 	indexer.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &indexer)...)
@@ -259,14 +259,14 @@ func (r *IndexerBroadcastheNetResource) Update(ctx context.Context, req resource
 	// Update IndexerBroadcastheNet
 	request := indexer.read(ctx)
 
-	response, err := r.client.UpdateIndexerContext(ctx, request)
+	response, _, err := r.client.IndexerApi.UpdateIndexer(ctx, strconv.Itoa(int(request.GetId()))).IndexerResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update "+indexerBroadcastheNetResourceName+", got error: %s", err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "updated "+indexerBroadcastheNetResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "updated "+indexerBroadcastheNetResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
 	indexer.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &indexer)...)
@@ -282,7 +282,7 @@ func (r *IndexerBroadcastheNetResource) Delete(ctx context.Context, req resource
 	}
 
 	// Delete IndexerBroadcastheNet current value
-	err := r.client.DeleteIndexerContext(ctx, indexer.ID.ValueInt64())
+	_, err := r.client.IndexerApi.DeleteIndexer(ctx, int32(indexer.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerBroadcastheNetResourceName, err))
 
@@ -309,38 +309,39 @@ func (r *IndexerBroadcastheNetResource) ImportState(ctx context.Context, req res
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 
-func (i *IndexerBroadcastheNet) write(ctx context.Context, indexer *sonarr.IndexerOutput) {
+func (i *IndexerBroadcastheNet) write(ctx context.Context, indexer *sonarr.IndexerResource) {
 	genericIndexer := Indexer{
-		EnableAutomaticSearch:   types.BoolValue(indexer.EnableAutomaticSearch),
-		EnableInteractiveSearch: types.BoolValue(indexer.EnableInteractiveSearch),
-		EnableRss:               types.BoolValue(indexer.EnableRss),
-		Priority:                types.Int64Value(indexer.Priority),
-		DownloadClientID:        types.Int64Value(indexer.DownloadClientID),
-		ID:                      types.Int64Value(indexer.ID),
-		Name:                    types.StringValue(indexer.Name),
+		EnableAutomaticSearch:   types.BoolValue(indexer.GetEnableAutomaticSearch()),
+		EnableInteractiveSearch: types.BoolValue(indexer.GetEnableInteractiveSearch()),
+		EnableRss:               types.BoolValue(indexer.GetEnableRss()),
+		Priority:                types.Int64Value(int64(indexer.GetPriority())),
+		DownloadClientID:        types.Int64Value(int64(indexer.GetDownloadClientId())),
+		ID:                      types.Int64Value(int64(indexer.GetId())),
+		Name:                    types.StringValue(indexer.GetName()),
 	}
 	genericIndexer.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, indexer.Tags)
 	genericIndexer.writeFields(ctx, indexer.Fields)
 	i.fromIndexer(&genericIndexer)
 }
 
-func (i *IndexerBroadcastheNet) read(ctx context.Context) *sonarr.IndexerInput {
-	var tags []int
+func (i *IndexerBroadcastheNet) read(ctx context.Context) *sonarr.IndexerResource {
+	var tags []*int32
 
 	tfsdk.ValueAs(ctx, i.Tags, &tags)
 
-	return &sonarr.IndexerInput{
-		EnableAutomaticSearch:   i.EnableAutomaticSearch.ValueBool(),
-		EnableInteractiveSearch: i.EnableInteractiveSearch.ValueBool(),
-		EnableRss:               i.EnableRss.ValueBool(),
-		Priority:                i.Priority.ValueInt64(),
-		DownloadClientID:        i.DownloadClientID.ValueInt64(),
-		ID:                      i.ID.ValueInt64(),
-		ConfigContract:          indexerBroadcastheNetConfigContract,
-		Implementation:          indexerBroadcastheNetImplementation,
-		Name:                    i.Name.ValueString(),
-		Protocol:                indexerBroadcastheNetProtocol,
-		Tags:                    tags,
-		Fields:                  i.toIndexer().readFields(ctx),
-	}
+	indexer := sonarr.NewIndexerResource()
+	indexer.SetEnableAutomaticSearch(i.EnableAutomaticSearch.ValueBool())
+	indexer.SetEnableInteractiveSearch(i.EnableInteractiveSearch.ValueBool())
+	indexer.SetEnableRss(i.EnableRss.ValueBool())
+	indexer.SetPriority(int32(i.Priority.ValueInt64()))
+	indexer.SetDownloadClientId(int32(i.DownloadClientID.ValueInt64()))
+	indexer.SetId(int32(i.ID.ValueInt64()))
+	indexer.SetConfigContract(indexerBroadcastheNetConfigContract)
+	indexer.SetImplementation(indexerBroadcastheNetImplementation)
+	indexer.SetName(i.Name.ValueString())
+	indexer.SetProtocol(indexerBroadcastheNetProtocol)
+	indexer.SetTags(tags)
+	indexer.SetFields(i.toIndexer().readFields(ctx))
+
+	return indexer
 }

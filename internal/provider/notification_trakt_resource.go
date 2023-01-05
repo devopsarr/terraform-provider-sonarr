@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -14,7 +15,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"golift.io/starr/sonarr"
 )
 
 const (
@@ -35,7 +35,7 @@ func NewNotificationTraktResource() resource.Resource {
 
 // NotificationTraktResource defines the notification implementation.
 type NotificationTraktResource struct {
-	client *sonarr.Sonarr
+	client *sonarr.APIClient
 }
 
 // NotificationTrakt describes the notification data model.
@@ -174,11 +174,11 @@ func (r *NotificationTraktResource) Configure(ctx context.Context, req resource.
 		return
 	}
 
-	client, ok := req.ProviderData.(*sonarr.Sonarr)
+	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
 			tools.UnexpectedResourceConfigureType,
-			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return
@@ -200,14 +200,14 @@ func (r *NotificationTraktResource) Create(ctx context.Context, req resource.Cre
 	// Create new NotificationTrakt
 	request := notification.read(ctx)
 
-	response, err := r.client.AddNotificationContext(ctx, request)
+	response, _, err := r.client.NotificationApi.CreateNotification(ctx).NotificationResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", notificationTraktResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "created "+notificationTraktResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "created "+notificationTraktResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
 	notification.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &notification)...)
@@ -224,14 +224,14 @@ func (r *NotificationTraktResource) Read(ctx context.Context, req resource.ReadR
 	}
 
 	// Get NotificationTrakt current value
-	response, err := r.client.GetNotificationContext(ctx, int(notification.ID.ValueInt64()))
+	response, _, err := r.client.NotificationApi.GetNotificationById(ctx, int32(notification.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", notificationTraktResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read "+notificationTraktResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "read "+notificationTraktResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
 	notification.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &notification)...)
@@ -250,14 +250,14 @@ func (r *NotificationTraktResource) Update(ctx context.Context, req resource.Upd
 	// Update NotificationTrakt
 	request := notification.read(ctx)
 
-	response, err := r.client.UpdateNotificationContext(ctx, request)
+	response, _, err := r.client.NotificationApi.UpdateNotification(ctx, strconv.Itoa(int(request.GetId()))).NotificationResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", notificationTraktResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "updated "+notificationTraktResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "updated "+notificationTraktResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
 	notification.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &notification)...)
@@ -273,7 +273,7 @@ func (r *NotificationTraktResource) Delete(ctx context.Context, req resource.Del
 	}
 
 	// Delete NotificationTrakt current value
-	err := r.client.DeleteNotificationContext(ctx, notification.ID.ValueInt64())
+	_, err := r.client.NotificationApi.DeleteNotification(ctx, int32(notification.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", notificationTraktResourceName, err))
 
@@ -300,39 +300,40 @@ func (r *NotificationTraktResource) ImportState(ctx context.Context, req resourc
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 
-func (n *NotificationTrakt) write(ctx context.Context, notification *sonarr.NotificationOutput) {
+func (n *NotificationTrakt) write(ctx context.Context, notification *sonarr.NotificationResource) {
 	genericNotification := Notification{
-		OnDownload:                    types.BoolValue(notification.OnDownload),
-		OnUpgrade:                     types.BoolValue(notification.OnUpgrade),
-		OnSeriesDelete:                types.BoolValue(notification.OnSeriesDelete),
-		OnEpisodeFileDelete:           types.BoolValue(notification.OnEpisodeFileDelete),
-		OnEpisodeFileDeleteForUpgrade: types.BoolValue(notification.OnEpisodeFileDeleteForUpgrade),
-		IncludeHealthWarnings:         types.BoolValue(notification.IncludeHealthWarnings),
-		ID:                            types.Int64Value(notification.ID),
-		Name:                          types.StringValue(notification.Name),
+		OnDownload:                    types.BoolValue(notification.GetOnDownload()),
+		OnUpgrade:                     types.BoolValue(notification.GetOnUpgrade()),
+		OnSeriesDelete:                types.BoolValue(notification.GetOnSeriesDelete()),
+		OnEpisodeFileDelete:           types.BoolValue(notification.GetOnEpisodeFileDelete()),
+		OnEpisodeFileDeleteForUpgrade: types.BoolValue(notification.GetOnEpisodeFileDeleteForUpgrade()),
+		IncludeHealthWarnings:         types.BoolValue(notification.GetIncludeHealthWarnings()),
+		ID:                            types.Int64Value(int64(notification.GetId())),
+		Name:                          types.StringValue(notification.GetName()),
 	}
 	genericNotification.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, notification.Tags)
 	genericNotification.writeFields(ctx, notification.Fields)
 	n.fromNotification(&genericNotification)
 }
 
-func (n *NotificationTrakt) read(ctx context.Context) *sonarr.NotificationInput {
-	var tags []int
+func (n *NotificationTrakt) read(ctx context.Context) *sonarr.NotificationResource {
+	var tags []*int32
 
 	tfsdk.ValueAs(ctx, n.Tags, &tags)
 
-	return &sonarr.NotificationInput{
-		OnDownload:                    n.OnDownload.ValueBool(),
-		OnUpgrade:                     n.OnUpgrade.ValueBool(),
-		OnSeriesDelete:                n.OnSeriesDelete.ValueBool(),
-		OnEpisodeFileDelete:           n.OnEpisodeFileDelete.ValueBool(),
-		OnEpisodeFileDeleteForUpgrade: n.OnEpisodeFileDeleteForUpgrade.ValueBool(),
-		IncludeHealthWarnings:         n.IncludeHealthWarnings.ValueBool(),
-		ConfigContract:                notificationTraktConfigContract,
-		Implementation:                notificationTraktImplementation,
-		ID:                            n.ID.ValueInt64(),
-		Name:                          n.Name.ValueString(),
-		Tags:                          tags,
-		Fields:                        n.toNotification().readFields(ctx),
-	}
+	notification := sonarr.NewNotificationResource()
+	notification.SetOnDownload(n.OnDownload.ValueBool())
+	notification.SetOnUpgrade(n.OnUpgrade.ValueBool())
+	notification.SetOnSeriesDelete(n.OnSeriesDelete.ValueBool())
+	notification.SetOnEpisodeFileDelete(n.OnEpisodeFileDelete.ValueBool())
+	notification.SetOnEpisodeFileDeleteForUpgrade(n.OnEpisodeFileDeleteForUpgrade.ValueBool())
+	notification.SetIncludeHealthWarnings(n.IncludeHealthWarnings.ValueBool())
+	notification.SetConfigContract(notificationTraktConfigContract)
+	notification.SetImplementation(notificationTraktImplementation)
+	notification.SetId(int32(n.ID.ValueInt64()))
+	notification.SetName(n.Name.ValueString())
+	notification.SetTags(tags)
+	notification.SetFields(n.toNotification().readFields(ctx))
+
+	return notification
 }

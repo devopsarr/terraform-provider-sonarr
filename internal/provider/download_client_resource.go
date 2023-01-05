@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
@@ -18,8 +19,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"golang.org/x/exp/slices"
-	"golift.io/starr"
-	"golift.io/starr/sonarr"
 )
 
 const downloadClientResourceName = "download_client"
@@ -44,7 +43,7 @@ func NewDownloadClientResource() resource.Resource {
 
 // DownloadClientResource defines the download client implementation.
 type DownloadClientResource struct {
-	client *sonarr.Sonarr
+	client *sonarr.APIClient
 }
 
 // DownloadClient describes the download client data model.
@@ -345,11 +344,11 @@ func (r *DownloadClientResource) Configure(ctx context.Context, req resource.Con
 		return
 	}
 
-	client, ok := req.ProviderData.(*sonarr.Sonarr)
+	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
 			tools.UnexpectedResourceConfigureType,
-			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return
@@ -371,14 +370,14 @@ func (r *DownloadClientResource) Create(ctx context.Context, req resource.Create
 	// Create new DownloadClient
 	request := client.read(ctx)
 
-	response, err := r.client.AddDownloadClientContext(ctx, request)
+	response, _, err := r.client.DownloadClientApi.CreateDownloadclient(ctx).DownloadClientResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", downloadClientResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "created "+downloadClientResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "created "+downloadClientResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state DownloadClient
@@ -398,14 +397,14 @@ func (r *DownloadClientResource) Read(ctx context.Context, req resource.ReadRequ
 	}
 
 	// Get DownloadClient current value
-	response, err := r.client.GetDownloadClientContext(ctx, client.ID.ValueInt64())
+	response, _, err := r.client.DownloadClientApi.GetDownloadclientById(ctx, int32(client.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", downloadClientResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read "+downloadClientResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "read "+downloadClientResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state DownloadClient
@@ -427,14 +426,14 @@ func (r *DownloadClientResource) Update(ctx context.Context, req resource.Update
 	// Update DownloadClient
 	request := client.read(ctx)
 
-	response, err := r.client.UpdateDownloadClientContext(ctx, request)
+	response, _, err := r.client.DownloadClientApi.UpdateDownloadclient(ctx, strconv.Itoa(int(request.GetId()))).DownloadClientResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", downloadClientResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "updated "+downloadClientResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "updated "+downloadClientResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state DownloadClient
@@ -453,7 +452,7 @@ func (r *DownloadClientResource) Delete(ctx context.Context, req resource.Delete
 	}
 
 	// Delete DownloadClient current value
-	err := r.client.DeleteDownloadClientContext(ctx, client.ID.ValueInt64())
+	_, err := r.client.DownloadClientApi.DeleteDownloadclient(ctx, int32(client.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", downloadClientResourceName, err))
 
@@ -480,82 +479,83 @@ func (r *DownloadClientResource) ImportState(ctx context.Context, req resource.I
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 
-func (d *DownloadClient) write(ctx context.Context, downloadClient *sonarr.DownloadClientOutput) {
+func (d *DownloadClient) write(ctx context.Context, downloadClient *sonarr.DownloadClientResource) {
 	d.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, downloadClient.Tags)
-	d.Enable = types.BoolValue(downloadClient.Enable)
-	d.RemoveCompletedDownloads = types.BoolValue(downloadClient.RemoveCompletedDownloads)
-	d.RemoveFailedDownloads = types.BoolValue(downloadClient.RemoveFailedDownloads)
-	d.Priority = types.Int64Value(int64(downloadClient.Priority))
-	d.ID = types.Int64Value(downloadClient.ID)
-	d.ConfigContract = types.StringValue(downloadClient.ConfigContract)
-	d.Implementation = types.StringValue(downloadClient.Implementation)
-	d.Name = types.StringValue(downloadClient.Name)
-	d.Protocol = types.StringValue(downloadClient.Protocol)
+	d.Enable = types.BoolValue(downloadClient.GetEnable())
+	d.RemoveCompletedDownloads = types.BoolValue(downloadClient.GetRemoveCompletedDownloads())
+	d.RemoveFailedDownloads = types.BoolValue(downloadClient.GetRemoveFailedDownloads())
+	d.Priority = types.Int64Value(int64(downloadClient.GetPriority()))
+	d.ID = types.Int64Value(int64(downloadClient.GetId()))
+	d.ConfigContract = types.StringValue(downloadClient.GetConfigContract())
+	d.Implementation = types.StringValue(downloadClient.GetImplementation())
+	d.Name = types.StringValue(downloadClient.GetName())
+	d.Protocol = types.StringValue(string(downloadClient.GetProtocol()))
 	d.AdditionalTags = types.SetValueMust(types.Int64Type, nil)
 	d.FieldTags = types.SetValueMust(types.StringType, nil)
 	d.PostImportTags = types.SetValueMust(types.StringType, nil)
 	d.writeFields(ctx, downloadClient.Fields)
 }
 
-func (d *DownloadClient) writeFields(ctx context.Context, fields []*starr.FieldOutput) {
+func (d *DownloadClient) writeFields(ctx context.Context, fields []*sonarr.Field) {
 	for _, f := range fields {
 		if f.Value == nil {
 			continue
 		}
 
-		if slices.Contains(downloadClientStringFields, f.Name) {
+		if slices.Contains(downloadClientStringFields, f.GetName()) {
 			tools.WriteStringField(f, d)
 
 			continue
 		}
 
-		if slices.Contains(downloadClientBoolFields, f.Name) {
+		if slices.Contains(downloadClientBoolFields, f.GetName()) {
 			tools.WriteBoolField(f, d)
 
 			continue
 		}
 
-		if slices.Contains(downloadClientIntFields, f.Name) {
+		if slices.Contains(downloadClientIntFields, f.GetName()) {
 			tools.WriteIntField(f, d)
 
 			continue
 		}
 
-		if slices.Contains(downloadClientIntSliceFields, f.Name) {
+		if slices.Contains(downloadClientIntSliceFields, f.GetName()) {
 			tools.WriteIntSliceField(ctx, f, d)
 
 			continue
 		}
 
 		// add specific check for tags to map field_tags
-		if slices.Contains(downloadClientStringSliceFields, f.Name) || f.Name == "tags" {
+		if slices.Contains(downloadClientStringSliceFields, f.GetName()) || f.GetName() == "tags" {
 			tools.WriteStringSliceField(ctx, f, d)
 		}
 	}
 }
 
-func (d *DownloadClient) read(ctx context.Context) *sonarr.DownloadClientInput {
-	var tags []int
+func (d *DownloadClient) read(ctx context.Context) *sonarr.DownloadClientResource {
+	var tags []*int32
 
 	tfsdk.ValueAs(ctx, d.Tags, &tags)
 
-	return &sonarr.DownloadClientInput{
-		Enable:                   d.Enable.ValueBool(),
-		RemoveCompletedDownloads: d.RemoveCompletedDownloads.ValueBool(),
-		RemoveFailedDownloads:    d.RemoveFailedDownloads.ValueBool(),
-		Priority:                 int(d.Priority.ValueInt64()),
-		ID:                       d.ID.ValueInt64(),
-		ConfigContract:           d.ConfigContract.ValueString(),
-		Implementation:           d.Implementation.ValueString(),
-		Name:                     d.Name.ValueString(),
-		Protocol:                 d.Protocol.ValueString(),
-		Tags:                     tags,
-		Fields:                   d.readFields(ctx),
-	}
+	client := sonarr.NewDownloadClientResource()
+	client.SetEnable(d.Enable.ValueBool())
+	client.SetRemoveCompletedDownloads(d.RemoveCompletedDownloads.ValueBool())
+	client.SetRemoveFailedDownloads(d.RemoveFailedDownloads.ValueBool())
+	client.SetPriority(int32(d.Priority.ValueInt64()))
+	client.SetId(int32(d.ID.ValueInt64()))
+	client.SetConfigContract(d.ConfigContract.ValueString())
+	client.SetImplementation(d.Implementation.ValueString())
+	client.SetName(d.Name.ValueString())
+	client.SetProtocol(sonarr.DownloadProtocol(d.Protocol.ValueString()))
+	client.SetTags(tags)
+	client.SetFields(d.readFields(ctx))
+
+	return client
 }
 
-func (d *DownloadClient) readFields(ctx context.Context) []*starr.FieldInput {
-	var output []*starr.FieldInput
+func (d *DownloadClient) readFields(ctx context.Context) []*sonarr.Field {
+	var output []*sonarr.Field
 
 	for _, b := range downloadClientBoolFields {
 		if field := tools.ReadBoolField(b, d); field != nil {

@@ -4,12 +4,12 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"golift.io/starr/sonarr"
 )
 
 const indexerDataSourceName = "indexer"
@@ -23,7 +23,7 @@ func NewIndexerDataSource() datasource.DataSource {
 
 // IndexerDataSource defines the indexer implementation.
 type IndexerDataSource struct {
-	client *sonarr.Sonarr
+	client *sonarr.APIClient
 }
 
 func (d *IndexerDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
@@ -167,11 +167,11 @@ func (d *IndexerDataSource) Configure(ctx context.Context, req datasource.Config
 		return
 	}
 
-	client, ok := req.ProviderData.(*sonarr.Sonarr)
+	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
 			tools.UnexpectedDataSourceConfigureType,
-			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return
@@ -189,7 +189,7 @@ func (d *IndexerDataSource) Read(ctx context.Context, req datasource.ReadRequest
 		return
 	}
 	// Get indexer current value
-	response, err := d.client.GetIndexersContext(ctx)
+	response, _, err := d.client.IndexerApi.ListIndexer(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerDataSourceName, err))
 
@@ -208,9 +208,9 @@ func (d *IndexerDataSource) Read(ctx context.Context, req datasource.ReadRequest
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func findIndexer(name string, indexers []*sonarr.IndexerOutput) (*sonarr.IndexerOutput, error) {
+func findIndexer(name string, indexers []*sonarr.IndexerResource) (*sonarr.IndexerResource, error) {
 	for _, i := range indexers {
-		if i.Name == name {
+		if i.GetName() == name {
 			return i, nil
 		}
 	}
