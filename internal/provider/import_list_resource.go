@@ -392,6 +392,7 @@ func (i *ImportList) write(ctx context.Context, importList *sonarr.ImportListRes
 	i.RootFolderPath = types.StringValue(importList.GetRootFolderPath())
 	i.SeriesType = types.StringValue(string(importList.GetSeriesType()))
 	i.Name = types.StringValue(importList.GetName())
+	i.LanguageProfileIds = types.SetValueMust(types.Int64Type, nil)
 	i.ProfileIds = types.SetValueMust(types.Int64Type, nil)
 	i.TagIds = types.SetValueMust(types.Int64Type, nil)
 	i.writeFields(ctx, importList.Fields)
