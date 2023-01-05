@@ -4,10 +4,10 @@ import (
 	"context"
 	"testing"
 
+	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/stretchr/testify/assert"
-	"golift.io/starr"
 )
 
 type Test struct {
@@ -21,18 +21,19 @@ type Test struct {
 func TestWriteStringField(t *testing.T) {
 	t.Parallel()
 
+	field := sonarr.NewField()
+	field.SetName("str")
+	field.SetValue("string")
+
 	tests := map[string]struct {
-		fieldOutput starr.FieldOutput
+		fieldOutput sonarr.Field
 		written     Test
 		expected    Test
 	}{
 		"working": {
-			fieldOutput: starr.FieldOutput{
-				Name:  "str",
-				Value: "string",
-			},
-			written:  Test{},
-			expected: Test{Str: types.StringValue("string")},
+			fieldOutput: *field,
+			written:     Test{},
+			expected:    Test{Str: types.StringValue("string")},
 		},
 	}
 	for name, test := range tests {
@@ -49,18 +50,19 @@ func TestWriteStringField(t *testing.T) {
 func TestWriteBoolField(t *testing.T) {
 	t.Parallel()
 
+	field := sonarr.NewField()
+	field.SetName("boo")
+	field.SetValue(true)
+
 	tests := map[string]struct {
-		fieldOutput starr.FieldOutput
+		fieldOutput sonarr.Field
 		written     Test
 		expected    Test
 	}{
 		"working": {
-			fieldOutput: starr.FieldOutput{
-				Name:  "boo",
-				Value: true,
-			},
-			written:  Test{},
-			expected: Test{Boo: types.BoolValue(true)},
+			fieldOutput: *field,
+			written:     Test{},
+			expected:    Test{Boo: types.BoolValue(true)},
 		},
 	}
 	for name, test := range tests {
@@ -77,19 +79,20 @@ func TestWriteBoolField(t *testing.T) {
 func TestWriteIntField(t *testing.T) {
 	t.Parallel()
 
+	field := sonarr.NewField()
+	field.SetName("in")
+	// use float to simulate unmarshal response
+	field.SetValue(float64(50))
+
 	tests := map[string]struct {
-		fieldOutput starr.FieldOutput
+		fieldOutput sonarr.Field
 		written     Test
 		expected    Test
 	}{
 		"working": {
-			fieldOutput: starr.FieldOutput{
-				Name: "in",
-				// use float to match unmarshal response
-				Value: float64(50),
-			},
-			written:  Test{},
-			expected: Test{In: types.Int64Value(50)},
+			fieldOutput: *field,
+			written:     Test{},
+			expected:    Test{In: types.Int64Value(50)},
 		},
 	}
 	for name, test := range tests {
@@ -106,18 +109,19 @@ func TestWriteIntField(t *testing.T) {
 func TestWriteFloatField(t *testing.T) {
 	t.Parallel()
 
+	field := sonarr.NewField()
+	field.SetName("fl")
+	field.SetValue(float64(3.5))
+
 	tests := map[string]struct {
-		fieldOutput starr.FieldOutput
+		fieldOutput sonarr.Field
 		written     Test
 		expected    Test
 	}{
 		"working": {
-			fieldOutput: starr.FieldOutput{
-				Name:  "fl",
-				Value: float64(3.5),
-			},
-			written:  Test{},
-			expected: Test{Fl: types.Float64Value(3.5)},
+			fieldOutput: *field,
+			written:     Test{},
+			expected:    Test{Fl: types.Float64Value(3.5)},
 		},
 	}
 	for name, test := range tests {
@@ -134,21 +138,22 @@ func TestWriteFloatField(t *testing.T) {
 func TestWriteIntSliceField(t *testing.T) {
 	t.Parallel()
 
+	field := sonarr.NewField()
+	field.SetName("set")
+	// use interface to simulate unmarshal response
+	field.SetValue(append(make([]interface{}, 0), 1, 2))
+
 	tests := map[string]struct {
-		fieldOutput starr.FieldOutput
+		fieldOutput sonarr.Field
 		set         []int64
 		written     Test
 		expected    Test
 	}{
 		"working": {
-			fieldOutput: starr.FieldOutput{
-				Name: "set",
-				// use interface to match unmarshal response
-				Value: append(make([]interface{}, 0), 1, 2),
-			},
-			written:  Test{},
-			set:      []int64{1, 2},
-			expected: Test{Set: types.SetValueMust(types.Int64Type, nil)},
+			fieldOutput: *field,
+			written:     Test{},
+			set:         []int64{1, 2},
+			expected:    Test{Set: types.SetValueMust(types.Int64Type, nil)},
 		},
 	}
 	for name, test := range tests {
@@ -166,21 +171,22 @@ func TestWriteIntSliceField(t *testing.T) {
 func TestWriteStringSliceField(t *testing.T) {
 	t.Parallel()
 
+	field := sonarr.NewField()
+	field.SetName("set")
+	// use interface to simulate unmarshal response
+	field.SetValue(append(make([]interface{}, 0), "test1", "test2"))
+
 	tests := map[string]struct {
-		fieldOutput starr.FieldOutput
+		fieldOutput sonarr.Field
 		set         []string
 		written     Test
 		expected    Test
 	}{
 		"working": {
-			fieldOutput: starr.FieldOutput{
-				Name: "set",
-				// use interface to match unmarshal response
-				Value: append(make([]interface{}, 0), "test1", "test2"),
-			},
-			written:  Test{},
-			set:      []string{"test1", "test2"},
-			expected: Test{Set: types.SetValueMust(types.StringType, nil)},
+			fieldOutput: *field,
+			written:     Test{},
+			set:         []string{"test1", "test2"},
+			expected:    Test{Set: types.SetValueMust(types.StringType, nil)},
 		},
 	}
 	for name, test := range tests {
@@ -198,8 +204,12 @@ func TestWriteStringSliceField(t *testing.T) {
 func TestReadStringField(t *testing.T) {
 	t.Parallel()
 
+	field := sonarr.NewField()
+	field.SetName("str")
+	field.SetValue("string")
+
 	tests := map[string]struct {
-		expected  starr.FieldInput
+		expected  sonarr.Field
 		name      string
 		fieldCase Test
 	}{
@@ -207,11 +217,8 @@ func TestReadStringField(t *testing.T) {
 			fieldCase: Test{
 				Str: types.StringValue("string"),
 			},
-			name: "str",
-			expected: starr.FieldInput{
-				Name:  "str",
-				Value: "string",
-			},
+			name:     "str",
+			expected: *field,
 		},
 	}
 	for name, test := range tests {
@@ -228,8 +235,12 @@ func TestReadStringField(t *testing.T) {
 func TestReadIntField(t *testing.T) {
 	t.Parallel()
 
+	field := sonarr.NewField()
+	field.SetName("in")
+	field.SetValue(int64(10))
+
 	tests := map[string]struct {
-		expected  starr.FieldInput
+		expected  sonarr.Field
 		name      string
 		fieldCase Test
 	}{
@@ -237,11 +248,8 @@ func TestReadIntField(t *testing.T) {
 			fieldCase: Test{
 				In: types.Int64Value(10),
 			},
-			name: "in",
-			expected: starr.FieldInput{
-				Name:  "in",
-				Value: int64(10),
-			},
+			name:     "in",
+			expected: *field,
 		},
 	}
 	for name, test := range tests {
@@ -258,8 +266,12 @@ func TestReadIntField(t *testing.T) {
 func TestReadBoolField(t *testing.T) {
 	t.Parallel()
 
+	field := sonarr.NewField()
+	field.SetName("boo")
+	field.SetValue(true)
+
 	tests := map[string]struct {
-		expected  starr.FieldInput
+		expected  sonarr.Field
 		name      string
 		fieldCase Test
 	}{
@@ -267,11 +279,8 @@ func TestReadBoolField(t *testing.T) {
 			fieldCase: Test{
 				Boo: types.BoolValue(true),
 			},
-			name: "boo",
-			expected: starr.FieldInput{
-				Name:  "boo",
-				Value: true,
-			},
+			name:     "boo",
+			expected: *field,
 		},
 	}
 	for name, test := range tests {
@@ -288,8 +297,12 @@ func TestReadBoolField(t *testing.T) {
 func TestReadFloatField(t *testing.T) {
 	t.Parallel()
 
+	field := sonarr.NewField()
+	field.SetName("fl")
+	field.SetValue(3.5)
+
 	tests := map[string]struct {
-		expected  starr.FieldInput
+		expected  sonarr.Field
 		name      string
 		fieldCase Test
 	}{
@@ -297,11 +310,8 @@ func TestReadFloatField(t *testing.T) {
 			fieldCase: Test{
 				Fl: types.Float64Value(3.5),
 			},
-			name: "fl",
-			expected: starr.FieldInput{
-				Name:  "fl",
-				Value: 3.5,
-			},
+			name:     "fl",
+			expected: *field,
 		},
 	}
 	for name, test := range tests {
@@ -318,8 +328,12 @@ func TestReadFloatField(t *testing.T) {
 func TestReadStringSliceField(t *testing.T) {
 	t.Parallel()
 
+	field := sonarr.NewField()
+	field.SetName("set")
+	field.SetValue([]string{"test1", "test2"})
+
 	tests := map[string]struct {
-		expected  starr.FieldInput
+		expected  sonarr.Field
 		name      string
 		set       []string
 		fieldCase Test
@@ -328,12 +342,9 @@ func TestReadStringSliceField(t *testing.T) {
 			fieldCase: Test{
 				Set: types.SetValueMust(types.StringType, nil),
 			},
-			name: "set",
-			expected: starr.FieldInput{
-				Name:  "set",
-				Value: []string{"test1", "test2"},
-			},
-			set: []string{"test1", "test2"},
+			name:     "set",
+			expected: *field,
+			set:      []string{"test1", "test2"},
 		},
 	}
 	for name, test := range tests {
@@ -351,8 +362,12 @@ func TestReadStringSliceField(t *testing.T) {
 func TestReadIntSliceField(t *testing.T) {
 	t.Parallel()
 
+	field := sonarr.NewField()
+	field.SetName("set")
+	field.SetValue([]int64{1, 2})
+
 	tests := map[string]struct {
-		expected  starr.FieldInput
+		expected  sonarr.Field
 		name      string
 		set       []int64
 		fieldCase Test
@@ -361,12 +376,9 @@ func TestReadIntSliceField(t *testing.T) {
 			fieldCase: Test{
 				Set: types.SetValueMust(types.Int64Type, nil),
 			},
-			name: "set",
-			expected: starr.FieldInput{
-				Name:  "set",
-				Value: []int64{1, 2},
-			},
-			set: []int64{1, 2},
+			name:     "set",
+			expected: *field,
+			set:      []int64{1, 2},
 		},
 	}
 	for name, test := range tests {

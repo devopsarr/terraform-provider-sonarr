@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"golift.io/starr/sonarr"
 )
 
 const releaseProfileDataSourceName = "release_profile"
@@ -24,7 +24,7 @@ func NewReleaseProfileDataSource() datasource.DataSource {
 
 // ReleaseProfileDataSource defines the release profile implementation.
 type ReleaseProfileDataSource struct {
-	client *sonarr.Sonarr
+	client *sonarr.APIClient
 }
 
 func (d *ReleaseProfileDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
@@ -77,11 +77,11 @@ func (d *ReleaseProfileDataSource) Configure(ctx context.Context, req datasource
 		return
 	}
 
-	client, ok := req.ProviderData.(*sonarr.Sonarr)
+	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
 			tools.UnexpectedDataSourceConfigureType,
-			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return
@@ -99,7 +99,7 @@ func (d *ReleaseProfileDataSource) Read(ctx context.Context, req datasource.Read
 		return
 	}
 	// Get releaseprofiles current value
-	response, err := d.client.GetReleaseProfilesContext(ctx)
+	response, _, err := d.client.ReleaseProfileApi.ListReleaseprofile(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", releaseProfileDataSourceName, err))
 
@@ -118,9 +118,9 @@ func (d *ReleaseProfileDataSource) Read(ctx context.Context, req datasource.Read
 	resp.Diagnostics.Append(resp.State.Set(ctx, &releaseProfile)...)
 }
 
-func findReleaseProfile(id int64, profiles []*sonarr.ReleaseProfile) (*sonarr.ReleaseProfile, error) {
+func findReleaseProfile(id int64, profiles []*sonarr.ReleaseProfileResource) (*sonarr.ReleaseProfileResource, error) {
 	for _, p := range profiles {
-		if p.ID == id {
+		if int64(p.GetId()) == id {
 			return p, nil
 		}
 	}

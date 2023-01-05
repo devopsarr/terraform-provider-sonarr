@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"golift.io/starr/sonarr"
 )
 
 const importListsDataSourceName = "import_lists"
@@ -25,7 +25,7 @@ func NewImportListsDataSource() datasource.DataSource {
 
 // ImportListsDataSource defines the import lists implementation.
 type ImportListsDataSource struct {
-	client *sonarr.Sonarr
+	client *sonarr.APIClient
 }
 
 // ImportLists describes the import lists data model.
@@ -189,11 +189,11 @@ func (d *ImportListsDataSource) Configure(ctx context.Context, req datasource.Co
 		return
 	}
 
-	client, ok := req.ProviderData.(*sonarr.Sonarr)
+	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
 			tools.UnexpectedDataSourceConfigureType,
-			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return
@@ -211,7 +211,7 @@ func (d *ImportListsDataSource) Read(ctx context.Context, req datasource.ReadReq
 		return
 	}
 	// Get import lists current value
-	response, err := d.client.GetImportListsContext(ctx)
+	response, _, err := d.client.ImportListApi.ListImportlist(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", importListsDataSourceName, err))
 
@@ -226,7 +226,7 @@ func (d *ImportListsDataSource) Read(ctx context.Context, req datasource.ReadReq
 		importLists[i].write(ctx, d)
 	}
 
-	tfsdk.ValueFrom(ctx, importLists, data.ImportLists.Type(context.Background()), &data.ImportLists)
+	tfsdk.ValueFrom(ctx, importLists, data.ImportLists.Type(ctx), &data.ImportLists)
 	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 	data.ID = types.StringValue(strconv.Itoa(len(response)))
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

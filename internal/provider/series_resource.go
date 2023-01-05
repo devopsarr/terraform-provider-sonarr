@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -14,7 +15,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"golift.io/starr/sonarr"
 )
 
 const seriesResourceName = "series"
@@ -31,7 +31,7 @@ func NewSeriesResource() resource.Resource {
 
 // SeriesResource defines the series implementation.
 type SeriesResource struct {
-	client *sonarr.Sonarr
+	client *sonarr.APIClient
 }
 
 // Series describes the series data model.
@@ -144,11 +144,11 @@ func (r *SeriesResource) Configure(ctx context.Context, req resource.ConfigureRe
 		return
 	}
 
-	client, ok := req.ProviderData.(*sonarr.Sonarr)
+	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
 			tools.UnexpectedResourceConfigureType,
-			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return
@@ -170,21 +170,22 @@ func (r *SeriesResource) Create(ctx context.Context, req resource.CreateRequest,
 	// Create new Series
 	request := series.read(ctx)
 	// TODO: can parametrize AddSeriesOptions
-	request.AddOptions = &sonarr.AddSeriesOptions{
-		SearchForMissingEpisodes:     true,
-		SearchForCutoffUnmetEpisodes: true,
-		IgnoreEpisodesWithFiles:      false,
-		IgnoreEpisodesWithoutFiles:   false,
-	}
+	options := sonarr.NewAddSeriesOptions()
+	options.SetSearchForMissingEpisodes(true)
+	options.SetSearchForCutoffUnmetEpisodes(true)
+	options.SetIgnoreEpisodesWithFiles(false)
+	options.SetIgnoreEpisodesWithoutFiles(false)
 
-	response, err := r.client.AddSeriesContext(ctx, request)
+	request.SetAddOptions(*options)
+
+	response, _, err := r.client.SeriesApi.CreateSeries(ctx).SeriesResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", seriesResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "created "+seriesResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "created "+seriesResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
 	series.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &series)...)
@@ -201,14 +202,14 @@ func (r *SeriesResource) Read(ctx context.Context, req resource.ReadRequest, res
 	}
 
 	// Get series current value
-	response, err := r.client.GetSeriesByIDContext(ctx, series.ID.ValueInt64())
+	response, _, err := r.client.SeriesApi.GetSeriesById(ctx, int32(series.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", seriesResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read "+seriesResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "read "+seriesResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
 	series.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &series)...)
@@ -227,14 +228,15 @@ func (r *SeriesResource) Update(ctx context.Context, req resource.UpdateRequest,
 	// Update Series
 	request := series.read(ctx)
 
-	response, err := r.client.UpdateSeriesContext(ctx, request, true)
+	// TODO: manage movefiles on sdk
+	response, _, err := r.client.SeriesApi.UpdateSeries(ctx, strconv.Itoa(int(request.GetId()))).SeriesResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", seriesResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "updated "+seriesResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "updated "+seriesResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
 	series.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &series)...)
@@ -250,7 +252,8 @@ func (r *SeriesResource) Delete(ctx context.Context, req resource.DeleteRequest,
 	}
 
 	// Delete series current value
-	err := r.client.DeleteSeriesContext(ctx, int(series.ID.ValueInt64()), true, false)
+	// TODO: manage delete parameters on SDK
+	_, err := r.client.SeriesApi.DeleteSeries(ctx, int32(series.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to delete %s, got error: %s", seriesResourceName, err))
 
@@ -277,37 +280,38 @@ func (r *SeriesResource) ImportState(ctx context.Context, req resource.ImportSta
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 
-func (s *Series) write(ctx context.Context, series *sonarr.Series) {
+func (s *Series) write(ctx context.Context, series *sonarr.SeriesResource) {
 	s.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, series.Tags)
-	s.Monitored = types.BoolValue(series.Monitored)
-	s.SeasonFolder = types.BoolValue(series.SeasonFolder)
-	s.UseSceneNumbering = types.BoolValue(series.UseSceneNumbering)
-	s.ID = types.Int64Value(series.ID)
-	s.LanguageProfileID = types.Int64Value(series.LanguageProfileID)
-	s.QualityProfileID = types.Int64Value(series.QualityProfileID)
-	s.TvdbID = types.Int64Value(series.TvdbID)
-	s.Path = types.StringValue(series.Path)
-	s.Title = types.StringValue(series.Title)
-	s.TitleSlug = types.StringValue(series.TitleSlug)
-	s.RootFolderPath = types.StringValue(series.RootFolderPath)
+	s.Monitored = types.BoolValue(series.GetMonitored())
+	s.SeasonFolder = types.BoolValue(series.GetSeasonFolder())
+	s.UseSceneNumbering = types.BoolValue(series.GetUseSceneNumbering())
+	s.ID = types.Int64Value(int64(series.GetId()))
+	s.LanguageProfileID = types.Int64Value(int64(series.GetLanguageProfileId()))
+	s.QualityProfileID = types.Int64Value(int64(series.GetQualityProfileId()))
+	s.TvdbID = types.Int64Value(int64(series.GetTvdbId()))
+	s.Path = types.StringValue(series.GetPath())
+	s.Title = types.StringValue(series.GetTitle())
+	s.TitleSlug = types.StringValue(series.GetTitleSlug())
+	s.RootFolderPath = types.StringValue(series.GetRootFolderPath())
 }
 
-func (s *Series) read(ctx context.Context) *sonarr.AddSeriesInput {
-	tags := make([]int, len(s.Tags.Elements()))
+func (s *Series) read(ctx context.Context) *sonarr.SeriesResource {
+	tags := make([]*int32, len(s.Tags.Elements()))
 	tfsdk.ValueAs(ctx, s.Tags, &tags)
 
-	return &sonarr.AddSeriesInput{
-		ID:                s.ID.ValueInt64(),
-		TvdbID:            s.TvdbID.ValueInt64(),
-		Title:             s.Title.ValueString(),
-		TitleSlug:         s.TitleSlug.ValueString(),
-		QualityProfileID:  s.QualityProfileID.ValueInt64(),
-		LanguageProfileID: s.LanguageProfileID.ValueInt64(),
-		Monitored:         s.Monitored.ValueBool(),
-		SeasonFolder:      s.SeasonFolder.ValueBool(),
-		Path:              s.Path.ValueString(),
-		RootFolderPath:    s.Path.ValueString(),
-		UseSceneNumbering: s.UseSceneNumbering.ValueBool(),
-		Tags:              tags,
-	}
+	series := sonarr.NewSeriesResource()
+	series.SetId(int32(s.ID.ValueInt64()))
+	series.SetTvdbId(int32(s.TvdbID.ValueInt64()))
+	series.SetTitle(s.Title.ValueString())
+	series.SetTitleSlug(s.TitleSlug.ValueString())
+	series.SetQualityProfileId(int32(s.QualityProfileID.ValueInt64()))
+	series.SetLanguageProfileId(int32(s.LanguageProfileID.ValueInt64()))
+	series.SetMonitored(s.Monitored.ValueBool())
+	series.SetSeasonFolder(s.SeasonFolder.ValueBool())
+	series.SetPath(s.Path.ValueString())
+	series.SetRootFolderPath(s.Path.ValueString())
+	series.SetUseSceneNumbering(s.UseSceneNumbering.ValueBool())
+	series.SetTags(tags)
+
+	return series
 }

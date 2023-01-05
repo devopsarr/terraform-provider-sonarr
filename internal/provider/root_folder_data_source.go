@@ -4,11 +4,11 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"golift.io/starr/sonarr"
 )
 
 const rootFolderDataSourceName = "root_folder"
@@ -22,7 +22,7 @@ func NewRootFolderDataSource() datasource.DataSource {
 
 // RootFolderDataSource defines the root folders implementation.
 type RootFolderDataSource struct {
-	client *sonarr.Sonarr
+	client *sonarr.APIClient
 }
 
 func (d *RootFolderDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
@@ -72,11 +72,11 @@ func (d *RootFolderDataSource) Configure(ctx context.Context, req datasource.Con
 		return
 	}
 
-	client, ok := req.ProviderData.(*sonarr.Sonarr)
+	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
 			tools.UnexpectedDataSourceConfigureType,
-			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return
@@ -94,7 +94,7 @@ func (d *RootFolderDataSource) Read(ctx context.Context, req datasource.ReadRequ
 		return
 	}
 	// Get rootfolders current value
-	response, err := d.client.GetRootFoldersContext(ctx)
+	response, _, err := d.client.RootFolderApi.ListRootfolder(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", rootFolderDataSourceName, err))
 
@@ -114,9 +114,9 @@ func (d *RootFolderDataSource) Read(ctx context.Context, req datasource.ReadRequ
 	resp.Diagnostics.Append(resp.State.Set(ctx, &folder)...)
 }
 
-func findRootFolder(path string, folders []*sonarr.RootFolder) (*sonarr.RootFolder, error) {
+func findRootFolder(path string, folders []*sonarr.RootFolderResource) (*sonarr.RootFolderResource, error) {
 	for _, f := range folders {
-		if f.Path == path {
+		if f.GetPath() == path {
 			return f, nil
 		}
 	}

@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"golift.io/starr/sonarr"
 )
 
 const languageProfilesDataSourceName = "language_profiles"
@@ -25,7 +25,7 @@ func NewLanguageProfilesDataSource() datasource.DataSource {
 
 // LanguageProfilesDataSource defines the tags implementation.
 type LanguageProfilesDataSource struct {
-	client *sonarr.Sonarr
+	client *sonarr.APIClient
 }
 
 // LanguageProfiles is a list of Languag profile.
@@ -86,11 +86,11 @@ func (d *LanguageProfilesDataSource) Configure(ctx context.Context, req datasour
 		return
 	}
 
-	client, ok := req.ProviderData.(*sonarr.Sonarr)
+	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
 			tools.UnexpectedDataSourceConfigureType,
-			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return
@@ -108,7 +108,7 @@ func (d *LanguageProfilesDataSource) Read(ctx context.Context, req datasource.Re
 		return
 	}
 	// Get languageprofiles current value
-	response, err := d.client.GetLanguageProfilesContext(ctx)
+	response, _, err := d.client.LanguageProfileApi.ListLanguageprofile(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", languageProfilesDataSourceName, err))
 
@@ -122,7 +122,7 @@ func (d *LanguageProfilesDataSource) Read(ctx context.Context, req datasource.Re
 		profiles[i].write(ctx, p)
 	}
 
-	tfsdk.ValueFrom(ctx, profiles, data.LanguageProfiles.Type(context.Background()), &data.LanguageProfiles)
+	tfsdk.ValueFrom(ctx, profiles, data.LanguageProfiles.Type(ctx), &data.LanguageProfiles)
 	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 	data.ID = types.StringValue(strconv.Itoa(len(response)))
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

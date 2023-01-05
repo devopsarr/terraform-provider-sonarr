@@ -4,12 +4,12 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"golift.io/starr/sonarr"
 )
 
 const languageProfileDataSourceName = "language_profile"
@@ -23,7 +23,7 @@ func NewLanguageProfileDataSource() datasource.DataSource {
 
 // LanguageProfileDataSource defines the language profile implementation.
 type LanguageProfileDataSource struct {
-	client *sonarr.Sonarr
+	client *sonarr.APIClient
 }
 
 func (d *LanguageProfileDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
@@ -66,11 +66,11 @@ func (d *LanguageProfileDataSource) Configure(ctx context.Context, req datasourc
 		return
 	}
 
-	client, ok := req.ProviderData.(*sonarr.Sonarr)
+	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
 			tools.UnexpectedDataSourceConfigureType,
-			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return
@@ -88,7 +88,7 @@ func (d *LanguageProfileDataSource) Read(ctx context.Context, req datasource.Rea
 		return
 	}
 	// Get languageprofiles current value
-	response, err := d.client.GetLanguageProfilesContext(ctx)
+	response, _, err := d.client.LanguageProfileApi.ListLanguageprofile(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", languageProfileDataSourceName, err))
 
@@ -107,9 +107,9 @@ func (d *LanguageProfileDataSource) Read(ctx context.Context, req datasource.Rea
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func findLanguageProfile(name string, profiles []*sonarr.LanguageProfile) (*sonarr.LanguageProfile, error) {
+func findLanguageProfile(name string, profiles []*sonarr.LanguageProfileResource) (*sonarr.LanguageProfileResource, error) {
 	for _, p := range profiles {
-		if p.Name == name {
+		if p.GetName() == name {
 			return p, nil
 		}
 	}

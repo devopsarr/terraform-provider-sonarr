@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -15,8 +16,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"golift.io/starr"
-	"golift.io/starr/sonarr"
 )
 
 const rootFolderResourceName = "root_folder"
@@ -33,7 +32,7 @@ func NewRootFolderResource() resource.Resource {
 
 // RootFolderResource defines the root folder implementation.
 type RootFolderResource struct {
-	client *sonarr.Sonarr
+	client *sonarr.APIClient
 }
 
 // RootFolder describes the root folder data model.
@@ -109,11 +108,11 @@ func (r *RootFolderResource) Configure(ctx context.Context, req resource.Configu
 		return
 	}
 
-	client, ok := req.ProviderData.(*sonarr.Sonarr)
+	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
 			tools.UnexpectedResourceConfigureType,
-			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return
@@ -133,18 +132,17 @@ func (r *RootFolderResource) Create(ctx context.Context, req resource.CreateRequ
 	}
 
 	// Create new RootFolder
-	request := sonarr.RootFolder{
-		Path: folder.Path.ValueString(),
-	}
+	request := *sonarr.NewRootFolderResource()
+	request.SetPath(folder.Path.ValueString())
 
-	response, err := r.client.AddRootFolderContext(ctx, &request)
+	response, _, err := r.client.RootFolderApi.CreateRootfolder(ctx).RootFolderResource(request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", rootFolderResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "created "+rootFolderResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "created "+rootFolderResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
 	folder.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &folder)...)
@@ -161,14 +159,14 @@ func (r *RootFolderResource) Read(ctx context.Context, req resource.ReadRequest,
 	}
 
 	// Get rootFolder current value
-	response, err := r.client.GetRootFolderContext(ctx, folder.ID.ValueInt64())
+	response, _, err := r.client.RootFolderApi.GetRootfolderById(ctx, int32(folder.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", rootFolderResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read "+rootFolderResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "read "+rootFolderResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
 	folder.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &folder)...)
@@ -188,7 +186,7 @@ func (r *RootFolderResource) Delete(ctx context.Context, req resource.DeleteRequ
 	}
 
 	// Delete rootFolder current value
-	err := r.client.DeleteRootFolderContext(ctx, folder.ID.ValueInt64())
+	_, err := r.client.RootFolderApi.DeleteRootfolder(ctx, int32(folder.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", rootFolderResourceName, err))
 
@@ -215,13 +213,13 @@ func (r *RootFolderResource) ImportState(ctx context.Context, req resource.Impor
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 
-func (r *RootFolder) write(ctx context.Context, rootFolder *sonarr.RootFolder) {
-	r.Accessible = types.BoolValue(rootFolder.Accessible)
-	r.ID = types.Int64Value(rootFolder.ID)
-	r.Path = types.StringValue(rootFolder.Path)
+func (r *RootFolder) write(ctx context.Context, rootFolder *sonarr.RootFolderResource) {
+	r.Accessible = types.BoolValue(rootFolder.GetAccessible())
+	r.ID = types.Int64Value(int64(rootFolder.GetId()))
+	r.Path = types.StringValue(rootFolder.GetPath())
 	r.UnmappedFolders = types.SetValueMust(RootFolderResource{}.getUnmappedFolderSchema().Type(), nil)
 
-	unmapped := make([]Path, len(rootFolder.UnmappedFolders))
+	unmapped := make([]Path, len(rootFolder.GetUnmappedFolders()))
 	for i, f := range rootFolder.UnmappedFolders {
 		unmapped[i].write(f)
 	}
@@ -229,7 +227,7 @@ func (r *RootFolder) write(ctx context.Context, rootFolder *sonarr.RootFolder) {
 	tfsdk.ValueFrom(ctx, unmapped, r.UnmappedFolders.Type(ctx), r.UnmappedFolders)
 }
 
-func (p *Path) write(folder *starr.Path) {
-	p.Name = types.StringValue(folder.Name)
-	p.Path = types.StringValue(folder.Path)
+func (p *Path) write(folder *sonarr.UnmappedFolder) {
+	p.Name = types.StringValue(folder.GetName())
+	p.Path = types.StringValue(folder.GetPath())
 }

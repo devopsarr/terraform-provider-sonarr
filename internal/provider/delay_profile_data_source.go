@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"golift.io/starr/sonarr"
 )
 
 const delayProfileDataSourceName = "delay_profile"
@@ -24,7 +24,7 @@ func NewDelayProfileDataSource() datasource.DataSource {
 
 // DelayProfileDataSource defines the delay profile implementation.
 type DelayProfileDataSource struct {
-	client *sonarr.Sonarr
+	client *sonarr.APIClient
 }
 
 func (d *DelayProfileDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
@@ -83,11 +83,11 @@ func (d *DelayProfileDataSource) Configure(ctx context.Context, req datasource.C
 		return
 	}
 
-	client, ok := req.ProviderData.(*sonarr.Sonarr)
+	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
 			tools.UnexpectedDataSourceConfigureType,
-			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return
@@ -105,7 +105,7 @@ func (d *DelayProfileDataSource) Read(ctx context.Context, req datasource.ReadRe
 		return
 	}
 	// Get delayprofiles current value
-	response, err := d.client.GetDelayProfilesContext(ctx)
+	response, _, err := d.client.DelayProfileApi.ListDelayprofile(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", delayProfileDataSourceName, err))
 
@@ -124,9 +124,9 @@ func (d *DelayProfileDataSource) Read(ctx context.Context, req datasource.ReadRe
 	resp.Diagnostics.Append(resp.State.Set(ctx, &delayProfile)...)
 }
 
-func findDelayProfile(id int64, profiles []*sonarr.DelayProfile) (*sonarr.DelayProfile, error) {
+func findDelayProfile(id int64, profiles []*sonarr.DelayProfileResource) (*sonarr.DelayProfileResource, error) {
 	for _, p := range profiles {
-		if p.ID == id {
+		if int64(p.GetId()) == id {
 			return p, nil
 		}
 	}

@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"golift.io/starr/sonarr"
 )
 
 const qualityDefinitionsDataSourceName = "quality_definitions"
@@ -25,7 +25,7 @@ func NewQualityDefinitionsDataSource() datasource.DataSource {
 
 // QualityDefinitionsDataSource defines the qyality definitions implementation.
 type QualityDefinitionsDataSource struct {
-	client *sonarr.Sonarr
+	client *sonarr.APIClient
 }
 
 // QualityDefinitions describes the qyality definitions data model.
@@ -98,11 +98,11 @@ func (d *QualityDefinitionsDataSource) Configure(ctx context.Context, req dataso
 		return
 	}
 
-	client, ok := req.ProviderData.(*sonarr.Sonarr)
+	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
 			tools.UnexpectedDataSourceConfigureType,
-			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return
@@ -120,7 +120,7 @@ func (d *QualityDefinitionsDataSource) Read(ctx context.Context, req datasource.
 		return
 	}
 	// Get qualitydefinitions current value
-	response, err := d.client.GetQualityDefinitionsContext(ctx)
+	response, _, err := d.client.QualityDefinitionApi.ListQualitydefinition(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", qualityDefinitionsDataSourceName, err))
 
@@ -130,14 +130,14 @@ func (d *QualityDefinitionsDataSource) Read(ctx context.Context, req datasource.
 	tflog.Trace(ctx, "read "+qualityDefinitionsDataSourceName)
 	// Map response body to resource schema attribute
 	definitions := *writeQualitiydefinitions(response)
-	tfsdk.ValueFrom(ctx, definitions, data.QualityDefinitions.Type(context.Background()), &data.QualityDefinitions)
+	tfsdk.ValueFrom(ctx, definitions, data.QualityDefinitions.Type(ctx), &data.QualityDefinitions)
 
 	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 	data.ID = types.StringValue(strconv.Itoa(len(response)))
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func writeQualitiydefinitions(qualities []*sonarr.QualityDefinition) *[]QualityDefinition {
+func writeQualitiydefinitions(qualities []*sonarr.QualityDefinitionResource) *[]QualityDefinition {
 	output := make([]QualityDefinition, len(qualities))
 	for i, p := range qualities {
 		output[i].write(p)

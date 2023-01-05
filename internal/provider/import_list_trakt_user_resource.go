@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
@@ -17,7 +18,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"golift.io/starr/sonarr"
 )
 
 const (
@@ -38,7 +38,7 @@ func NewImportListTraktUserResource() resource.Resource {
 
 // ImportListTraktUserResource defines the import list implementation.
 type ImportListTraktUserResource struct {
-	client *sonarr.Sonarr
+	client *sonarr.APIClient
 }
 
 // ImportListTraktUser describes the import list data model.
@@ -244,11 +244,11 @@ func (r *ImportListTraktUserResource) Configure(ctx context.Context, req resourc
 		return
 	}
 
-	client, ok := req.ProviderData.(*sonarr.Sonarr)
+	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
 			tools.UnexpectedResourceConfigureType,
-			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return
@@ -270,14 +270,14 @@ func (r *ImportListTraktUserResource) Create(ctx context.Context, req resource.C
 	// Create new ImportListTraktUser
 	request := importList.read(ctx)
 
-	response, err := r.client.AddImportListContext(ctx, request)
+	response, _, err := r.client.ImportListApi.CreateImportlist(ctx).ImportListResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", importListTraktUserResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "created "+importListTraktUserResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "created "+importListTraktUserResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
 	importList.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &importList)...)
@@ -294,14 +294,14 @@ func (r *ImportListTraktUserResource) Read(ctx context.Context, req resource.Rea
 	}
 
 	// Get ImportListTraktUser current value
-	response, err := r.client.GetImportListContext(ctx, importList.ID.ValueInt64())
+	response, _, err := r.client.ImportListApi.GetImportlistById(ctx, int32(importList.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", importListTraktUserResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read "+importListTraktUserResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "read "+importListTraktUserResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
 	importList.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &importList)...)
@@ -320,14 +320,14 @@ func (r *ImportListTraktUserResource) Update(ctx context.Context, req resource.U
 	// Update ImportListTraktUser
 	request := importList.read(ctx)
 
-	response, err := r.client.UpdateImportListContext(ctx, request)
+	response, _, err := r.client.ImportListApi.UpdateImportlist(ctx, strconv.Itoa(int(request.GetId()))).ImportListResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", importListTraktUserResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "updated "+importListTraktUserResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "updated "+importListTraktUserResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
 	importList.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &importList)...)
@@ -343,7 +343,7 @@ func (r *ImportListTraktUserResource) Delete(ctx context.Context, req resource.D
 	}
 
 	// Delete ImportListTraktUser current value
-	err := r.client.DeleteImportListContext(ctx, importList.ID.ValueInt64())
+	_, err := r.client.ImportListApi.DeleteImportlist(ctx, int32(importList.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", importListTraktUserResourceName, err))
 
@@ -370,41 +370,42 @@ func (r *ImportListTraktUserResource) ImportState(ctx context.Context, req resou
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 
-func (i *ImportListTraktUser) write(ctx context.Context, importList *sonarr.ImportListOutput) {
+func (i *ImportListTraktUser) write(ctx context.Context, importList *sonarr.ImportListResource) {
 	genericImportList := ImportList{
-		Name:               types.StringValue(importList.Name),
-		ShouldMonitor:      types.StringValue(importList.ShouldMonitor),
-		RootFolderPath:     types.StringValue(importList.RootFolderPath),
-		SeriesType:         types.StringValue(importList.SeriesType),
-		LanguageProfileID:  types.Int64Value(importList.LanguageProfileID),
-		QualityProfileID:   types.Int64Value(importList.QualityProfileID),
-		ID:                 types.Int64Value(importList.ID),
-		EnableAutomaticAdd: types.BoolValue(importList.EnableAutomaticAdd),
-		SeasonFolder:       types.BoolValue(importList.SeasonFolder),
+		Name:               types.StringValue(importList.GetName()),
+		ShouldMonitor:      types.StringValue(string(importList.GetShouldMonitor())),
+		RootFolderPath:     types.StringValue(importList.GetRootFolderPath()),
+		SeriesType:         types.StringValue(string(importList.GetSeriesType())),
+		LanguageProfileID:  types.Int64Value(int64(importList.GetLanguageProfileId())),
+		QualityProfileID:   types.Int64Value(int64(importList.GetQualityProfileId())),
+		ID:                 types.Int64Value(int64(importList.GetId())),
+		EnableAutomaticAdd: types.BoolValue(importList.GetEnableAutomaticAdd()),
+		SeasonFolder:       types.BoolValue(importList.GetSeasonFolder()),
 	}
 	genericImportList.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, importList.Tags)
 	genericImportList.writeFields(ctx, importList.Fields)
 	i.fromImportList(&genericImportList)
 }
 
-func (i *ImportListTraktUser) read(ctx context.Context) *sonarr.ImportListInput {
-	var tags []int
+func (i *ImportListTraktUser) read(ctx context.Context) *sonarr.ImportListResource {
+	var tags []*int32
 
 	tfsdk.ValueAs(ctx, i.Tags, &tags)
 
-	return &sonarr.ImportListInput{
-		ShouldMonitor:      i.ShouldMonitor.ValueString(),
-		RootFolderPath:     i.RootFolderPath.ValueString(),
-		SeriesType:         i.SeriesType.ValueString(),
-		LanguageProfileID:  i.LanguageProfileID.ValueInt64(),
-		QualityProfileID:   i.QualityProfileID.ValueInt64(),
-		EnableAutomaticAdd: i.EnableAutomaticAdd.ValueBool(),
-		SeasonFolder:       i.SeasonFolder.ValueBool(),
-		ConfigContract:     importListTraktUserConfigContract,
-		Implementation:     importListTraktUserImplementation,
-		ID:                 i.ID.ValueInt64(),
-		Name:               i.Name.ValueString(),
-		Tags:               tags,
-		Fields:             i.toImportList().readFields(ctx),
-	}
+	list := sonarr.NewImportListResource()
+	list.SetShouldMonitor(sonarr.MonitorTypes(i.ShouldMonitor.ValueString()))
+	list.SetRootFolderPath(i.RootFolderPath.ValueString())
+	list.SetSeriesType(sonarr.SeriesTypes(i.SeriesType.ValueString()))
+	list.SetLanguageProfileId(int32(i.LanguageProfileID.ValueInt64()))
+	list.SetQualityProfileId(int32(i.QualityProfileID.ValueInt64()))
+	list.SetEnableAutomaticAdd(i.EnableAutomaticAdd.ValueBool())
+	list.SetSeasonFolder(i.SeasonFolder.ValueBool())
+	list.SetConfigContract(importListTraktUserConfigContract)
+	list.SetImplementation(importListTraktUserImplementation)
+	list.SetId(int32(i.ID.ValueInt64()))
+	list.SetName(i.Name.ValueString())
+	list.SetTags(tags)
+	list.SetFields(i.toImportList().readFields(ctx))
+
+	return list
 }

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -14,7 +15,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"golift.io/starr/sonarr"
 )
 
 const (
@@ -36,7 +36,7 @@ func NewIndexerTorznabResource() resource.Resource {
 
 // IndexerTorznabResource defines the Torznab indexer implementation.
 type IndexerTorznabResource struct {
-	client *sonarr.Sonarr
+	client *sonarr.APIClient
 }
 
 // IndexerTorznab describes the Torznab indexer data model.
@@ -226,11 +226,11 @@ func (r *IndexerTorznabResource) Configure(ctx context.Context, req resource.Con
 		return
 	}
 
-	client, ok := req.ProviderData.(*sonarr.Sonarr)
+	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
 			tools.UnexpectedResourceConfigureType,
-			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return
@@ -252,14 +252,14 @@ func (r *IndexerTorznabResource) Create(ctx context.Context, req resource.Create
 	// Create new IndexerTorznab
 	request := indexer.read(ctx)
 
-	response, err := r.client.AddIndexerContext(ctx, request)
+	response, _, err := r.client.IndexerApi.CreateIndexer(ctx).IndexerResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", indexerTorznabResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "created "+indexerTorznabResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "created "+indexerTorznabResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
 	indexer.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &indexer)...)
@@ -276,14 +276,14 @@ func (r *IndexerTorznabResource) Read(ctx context.Context, req resource.ReadRequ
 	}
 
 	// Get IndexerTorznab current value
-	response, err := r.client.GetIndexerContext(ctx, indexer.ID.ValueInt64())
+	response, _, err := r.client.IndexerApi.GetIndexerById(ctx, int32(indexer.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerTorznabResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read "+indexerTorznabResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "read "+indexerTorznabResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
 	indexer.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &indexer)...)
@@ -302,14 +302,14 @@ func (r *IndexerTorznabResource) Update(ctx context.Context, req resource.Update
 	// Update IndexerTorznab
 	request := indexer.read(ctx)
 
-	response, err := r.client.UpdateIndexerContext(ctx, request)
+	response, _, err := r.client.IndexerApi.UpdateIndexer(ctx, strconv.Itoa(int(request.GetId()))).IndexerResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update "+indexerTorznabResourceName+", got error: %s", err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "updated "+indexerTorznabResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "updated "+indexerTorznabResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
 	indexer.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &indexer)...)
@@ -325,7 +325,7 @@ func (r *IndexerTorznabResource) Delete(ctx context.Context, req resource.Delete
 	}
 
 	// Delete IndexerTorznab current value
-	err := r.client.DeleteIndexerContext(ctx, indexer.ID.ValueInt64())
+	_, err := r.client.IndexerApi.DeleteIndexer(ctx, int32(indexer.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerTorznabResourceName, err))
 
@@ -352,38 +352,39 @@ func (r *IndexerTorznabResource) ImportState(ctx context.Context, req resource.I
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 
-func (i *IndexerTorznab) write(ctx context.Context, indexer *sonarr.IndexerOutput) {
+func (i *IndexerTorznab) write(ctx context.Context, indexer *sonarr.IndexerResource) {
 	genericIndexer := Indexer{
-		EnableAutomaticSearch:   types.BoolValue(indexer.EnableAutomaticSearch),
-		EnableInteractiveSearch: types.BoolValue(indexer.EnableInteractiveSearch),
-		EnableRss:               types.BoolValue(indexer.EnableRss),
-		Priority:                types.Int64Value(indexer.Priority),
-		DownloadClientID:        types.Int64Value(indexer.DownloadClientID),
-		ID:                      types.Int64Value(indexer.ID),
-		Name:                    types.StringValue(indexer.Name),
+		EnableAutomaticSearch:   types.BoolValue(indexer.GetEnableAutomaticSearch()),
+		EnableInteractiveSearch: types.BoolValue(indexer.GetEnableInteractiveSearch()),
+		EnableRss:               types.BoolValue(indexer.GetEnableRss()),
+		Priority:                types.Int64Value(int64(indexer.GetPriority())),
+		DownloadClientID:        types.Int64Value(int64(indexer.GetDownloadClientId())),
+		ID:                      types.Int64Value(int64(indexer.GetId())),
+		Name:                    types.StringValue(indexer.GetName()),
 	}
 	genericIndexer.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, indexer.Tags)
 	genericIndexer.writeFields(ctx, indexer.Fields)
 	i.fromIndexer(&genericIndexer)
 }
 
-func (i *IndexerTorznab) read(ctx context.Context) *sonarr.IndexerInput {
-	var tags []int
+func (i *IndexerTorznab) read(ctx context.Context) *sonarr.IndexerResource {
+	var tags []*int32
 
 	tfsdk.ValueAs(ctx, i.Tags, &tags)
 
-	return &sonarr.IndexerInput{
-		EnableAutomaticSearch:   i.EnableAutomaticSearch.ValueBool(),
-		EnableInteractiveSearch: i.EnableInteractiveSearch.ValueBool(),
-		EnableRss:               i.EnableRss.ValueBool(),
-		Priority:                i.Priority.ValueInt64(),
-		DownloadClientID:        i.DownloadClientID.ValueInt64(),
-		ID:                      i.ID.ValueInt64(),
-		ConfigContract:          indexerTorznabConfigContract,
-		Implementation:          indexerTorznabImplementation,
-		Name:                    i.Name.ValueString(),
-		Protocol:                indexerTorznabProtocol,
-		Tags:                    tags,
-		Fields:                  i.toIndexer().readFields(ctx),
-	}
+	indexer := sonarr.NewIndexerResource()
+	indexer.SetEnableAutomaticSearch(i.EnableAutomaticSearch.ValueBool())
+	indexer.SetEnableInteractiveSearch(i.EnableInteractiveSearch.ValueBool())
+	indexer.SetEnableRss(i.EnableRss.ValueBool())
+	indexer.SetPriority(int32(i.Priority.ValueInt64()))
+	indexer.SetDownloadClientId(int32(i.DownloadClientID.ValueInt64()))
+	indexer.SetId(int32(i.ID.ValueInt64()))
+	indexer.SetConfigContract(indexerTorznabConfigContract)
+	indexer.SetImplementation(indexerTorznabImplementation)
+	indexer.SetName(i.Name.ValueString())
+	indexer.SetProtocol(indexerTorznabProtocol)
+	indexer.SetTags(tags)
+	indexer.SetFields(i.toIndexer().readFields(ctx))
+
+	return indexer
 }

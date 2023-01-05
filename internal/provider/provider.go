@@ -4,13 +4,12 @@ import (
 	"context"
 	"os"
 
+	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/provider"
 	"github.com/hashicorp/terraform-plugin-framework/provider/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
-	"golift.io/starr"
-	"golift.io/starr/sonarr"
 )
 
 // needed for tf debug mode
@@ -120,8 +119,12 @@ func (p *SonarrProvider) Configure(ctx context.Context, req provider.ConfigureRe
 		return
 	}
 
-	// init sonarr sdk client
-	client := sonarr.New(starr.New(key, url, 0))
+	// Configuring client. API Key management could be changed once new options avail in sdk.
+	config := sonarr.NewConfiguration()
+	config.AddDefaultHeader("X-Api-Key", key)
+	config.Servers[0].URL = url
+	client := sonarr.NewAPIClient(config)
+
 	resp.DataSourceData = client
 	resp.ResourceData = client
 }

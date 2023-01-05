@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"golift.io/starr/sonarr"
 )
 
 const allSeriesDataSourceName = "all_series"
@@ -25,7 +25,7 @@ func NewAllSeriessDataSource() datasource.DataSource {
 
 // AllSeriessDataSource defines the tags implementation.
 type AllSeriessDataSource struct {
-	client *sonarr.Sonarr
+	client *sonarr.APIClient
 }
 
 // AllSeriess describes the series(es) data model.
@@ -114,11 +114,11 @@ func (d *AllSeriessDataSource) Configure(ctx context.Context, req datasource.Con
 		return
 	}
 
-	client, ok := req.ProviderData.(*sonarr.Sonarr)
+	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
 			tools.UnexpectedDataSourceConfigureType,
-			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return
@@ -136,7 +136,7 @@ func (d *AllSeriessDataSource) Read(ctx context.Context, req datasource.ReadRequ
 		return
 	}
 	// Get series current value
-	response, err := d.client.GetAllSeriesContext(ctx)
+	response, _, err := d.client.SeriesApi.ListSeries(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", allSeriesDataSourceName, err))
 
@@ -150,7 +150,7 @@ func (d *AllSeriessDataSource) Read(ctx context.Context, req datasource.ReadRequ
 		series[i].write(ctx, t)
 	}
 
-	tfsdk.ValueFrom(ctx, series, data.Series.Type(context.Background()), &data.Series)
+	tfsdk.ValueFrom(ctx, series, data.Series.Type(ctx), &data.Series)
 	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 	data.ID = types.StringValue(strconv.Itoa(len(response)))
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

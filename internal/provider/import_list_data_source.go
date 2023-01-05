@@ -4,12 +4,12 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"golift.io/starr/sonarr"
 )
 
 const importListDataSourceName = "import_list"
@@ -23,7 +23,7 @@ func NewImportListDataSource() datasource.DataSource {
 
 // ImportListDataSource defines the import_list implementation.
 type ImportListDataSource struct {
-	client *sonarr.Sonarr
+	client *sonarr.APIClient
 }
 
 func (d *ImportListDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
@@ -169,11 +169,11 @@ func (d *ImportListDataSource) Configure(ctx context.Context, req datasource.Con
 		return
 	}
 
-	client, ok := req.ProviderData.(*sonarr.Sonarr)
+	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
 			tools.UnexpectedDataSourceConfigureType,
-			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return
@@ -191,7 +191,7 @@ func (d *ImportListDataSource) Read(ctx context.Context, req datasource.ReadRequ
 		return
 	}
 	// Get importList current value
-	response, err := d.client.GetImportListsContext(ctx)
+	response, _, err := d.client.ImportListApi.ListImportlist(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", importListDataSourceName, err))
 
@@ -210,9 +210,9 @@ func (d *ImportListDataSource) Read(ctx context.Context, req datasource.ReadRequ
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func findImportList(name string, importLists []*sonarr.ImportListOutput) (*sonarr.ImportListOutput, error) {
+func findImportList(name string, importLists []*sonarr.ImportListResource) (*sonarr.ImportListResource, error) {
 	for _, i := range importLists {
-		if i.Name == name {
+		if i.GetName() == name {
 			return i, nil
 		}
 	}

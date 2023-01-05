@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"golift.io/starr/sonarr"
 )
 
 const rootFoldersDataSourceName = "root_folders"
@@ -25,7 +25,7 @@ func NewRootFoldersDataSource() datasource.DataSource {
 
 // RootFoldersDataSource defines the root folders implementation.
 type RootFoldersDataSource struct {
-	client *sonarr.Sonarr
+	client *sonarr.APIClient
 }
 
 // RootFolders describes the root folders data model.
@@ -93,11 +93,11 @@ func (d *RootFoldersDataSource) Configure(ctx context.Context, req datasource.Co
 		return
 	}
 
-	client, ok := req.ProviderData.(*sonarr.Sonarr)
+	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
 			tools.UnexpectedDataSourceConfigureType,
-			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return
@@ -115,7 +115,7 @@ func (d *RootFoldersDataSource) Read(ctx context.Context, req datasource.ReadReq
 		return
 	}
 	// Get rootfolders current value
-	response, err := d.client.GetRootFoldersContext(ctx)
+	response, _, err := d.client.RootFolderApi.ListRootfolder(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", rootFoldersDataSourceName, err))
 
@@ -125,13 +125,13 @@ func (d *RootFoldersDataSource) Read(ctx context.Context, req datasource.ReadReq
 	tflog.Trace(ctx, "read "+rootFoldersDataSourceName)
 	// Map response body to resource schema attribute
 	rootFolders := *writes(ctx, response)
-	tfsdk.ValueFrom(ctx, rootFolders, data.RootFolders.Type(context.Background()), &data.RootFolders)
+	tfsdk.ValueFrom(ctx, rootFolders, data.RootFolders.Type(ctx), &data.RootFolders)
 	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 	data.ID = types.StringValue(strconv.Itoa(len(response)))
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func writes(ctx context.Context, folders []*sonarr.RootFolder) *[]RootFolder {
+func writes(ctx context.Context, folders []*sonarr.RootFolderResource) *[]RootFolder {
 	output := make([]RootFolder, len(folders))
 	for i, f := range folders {
 		output[i].write(ctx, f)

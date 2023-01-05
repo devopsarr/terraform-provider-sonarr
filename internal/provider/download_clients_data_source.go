@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"golift.io/starr/sonarr"
 )
 
 const downloadClientsDataSourceName = "download_clients"
@@ -25,7 +25,7 @@ func NewDownloadClientsDataSource() datasource.DataSource {
 
 // DownloadClientsDataSource defines the download clients implementation.
 type DownloadClientsDataSource struct {
-	client *sonarr.Sonarr
+	client *sonarr.APIClient
 }
 
 // DownloadClients describes the download clients data model.
@@ -245,11 +245,11 @@ func (d *DownloadClientsDataSource) Configure(ctx context.Context, req datasourc
 		return
 	}
 
-	client, ok := req.ProviderData.(*sonarr.Sonarr)
+	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
 			tools.UnexpectedDataSourceConfigureType,
-			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return
@@ -267,7 +267,7 @@ func (d *DownloadClientsDataSource) Read(ctx context.Context, req datasource.Rea
 		return
 	}
 	// Get download clients current value
-	response, err := d.client.GetDownloadClientsContext(ctx)
+	response, _, err := d.client.DownloadClientApi.ListDownloadclient(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", downloadClientsDataSourceName, err))
 
@@ -282,7 +282,7 @@ func (d *DownloadClientsDataSource) Read(ctx context.Context, req datasource.Rea
 		downloadClients[i].write(ctx, d)
 	}
 
-	tfsdk.ValueFrom(ctx, downloadClients, data.DownloadClients.Type(context.Background()), &data.DownloadClients)
+	tfsdk.ValueFrom(ctx, downloadClients, data.DownloadClients.Type(ctx), &data.DownloadClients)
 	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 	data.ID = types.StringValue(strconv.Itoa(len(response)))
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

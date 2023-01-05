@@ -1,12 +1,11 @@
 package provider
 
 import (
-	"os"
+	"context"
 	"testing"
 
+	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
-	"golift.io/starr"
-	"golift.io/starr/sonarr"
 )
 
 func TestAccRootFolderDataSource(t *testing.T) {
@@ -36,6 +35,8 @@ data "sonarr_root_folder" "test" {
 
 func rootFolderDSInit() {
 	// ensure a /defaults root path is configured
-	client := *sonarr.New(starr.New(os.Getenv("SONARR_API_KEY"), os.Getenv("SONARR_URL"), 0))
-	_, _ = client.AddRootFolder(&sonarr.RootFolder{Path: "/defaults"})
+	client := testAccAPIClient()
+	folder := sonarr.NewRootFolderResource()
+	folder.SetPath("/defaults")
+	_, _, _ = client.RootFolderApi.CreateRootfolder(context.TODO()).RootFolderResource(*folder).Execute()
 }

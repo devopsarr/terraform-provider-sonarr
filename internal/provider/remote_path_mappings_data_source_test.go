@@ -15,7 +15,7 @@ func TestAccRemotePathMappingsDataSource(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Create a tag to have a value to check
 			{
-				Config: testAccDownloadClientResourceConfig("remotemapDataSourceTest", "false") + testAccRemotePathMappingResourceConfig("remotemapDataSourceTest", "/test3/"),
+				Config: testAccRemotePathMappingResourceConfig("remotemapDataSourceTest", "/test3/"),
 			},
 			// Read testing
 			{

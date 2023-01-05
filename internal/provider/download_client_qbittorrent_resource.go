@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -16,7 +17,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"golift.io/starr/sonarr"
 )
 
 const (
@@ -40,7 +40,7 @@ func NewDownloadClientQbittorrentResource() resource.Resource {
 
 // DownloadClientQbittorrentResource defines the download client implementation.
 type DownloadClientQbittorrentResource struct {
-	client *sonarr.Sonarr
+	client *sonarr.APIClient
 }
 
 // DownloadClientQbittorrent describes the download client data model.
@@ -254,11 +254,11 @@ func (r *DownloadClientQbittorrentResource) Configure(ctx context.Context, req r
 		return
 	}
 
-	client, ok := req.ProviderData.(*sonarr.Sonarr)
+	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
 			tools.UnexpectedResourceConfigureType,
-			fmt.Sprintf("Expected *sonarr.Sonarr, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return
@@ -280,14 +280,14 @@ func (r *DownloadClientQbittorrentResource) Create(ctx context.Context, req reso
 	// Create new DownloadClientQbittorrent
 	request := client.read(ctx)
 
-	response, err := r.client.AddDownloadClientContext(ctx, request)
+	response, _, err := r.client.DownloadClientApi.CreateDownloadclient(ctx).DownloadClientResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", downloadClientQbittorrentResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "created "+downloadClientQbittorrentResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "created "+downloadClientQbittorrentResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
 	client.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &client)...)
@@ -304,14 +304,14 @@ func (r *DownloadClientQbittorrentResource) Read(ctx context.Context, req resour
 	}
 
 	// Get DownloadClientQbittorrent current value
-	response, err := r.client.GetDownloadClientContext(ctx, client.ID.ValueInt64())
+	response, _, err := r.client.DownloadClientApi.GetDownloadclientById(ctx, int32(client.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", downloadClientQbittorrentResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read "+downloadClientQbittorrentResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "read "+downloadClientQbittorrentResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
 	client.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &client)...)
@@ -330,14 +330,14 @@ func (r *DownloadClientQbittorrentResource) Update(ctx context.Context, req reso
 	// Update DownloadClientQbittorrent
 	request := client.read(ctx)
 
-	response, err := r.client.UpdateDownloadClientContext(ctx, request)
+	response, _, err := r.client.DownloadClientApi.UpdateDownloadclient(ctx, strconv.Itoa(int(request.GetId()))).DownloadClientResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", downloadClientQbittorrentResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "updated "+downloadClientQbittorrentResourceName+": "+strconv.Itoa(int(response.ID)))
+	tflog.Trace(ctx, "updated "+downloadClientQbittorrentResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
 	client.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &client)...)
@@ -353,7 +353,7 @@ func (r *DownloadClientQbittorrentResource) Delete(ctx context.Context, req reso
 	}
 
 	// Delete DownloadClientQbittorrent current value
-	err := r.client.DeleteDownloadClientContext(ctx, client.ID.ValueInt64())
+	_, err := r.client.DownloadClientApi.DeleteDownloadclient(ctx, int32(client.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", downloadClientQbittorrentResourceName, err))
 
@@ -380,36 +380,37 @@ func (r *DownloadClientQbittorrentResource) ImportState(ctx context.Context, req
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
 }
 
-func (d *DownloadClientQbittorrent) write(ctx context.Context, downloadClient *sonarr.DownloadClientOutput) {
+func (d *DownloadClientQbittorrent) write(ctx context.Context, downloadClient *sonarr.DownloadClientResource) {
 	genericDownloadClient := DownloadClient{
-		Enable:                   types.BoolValue(downloadClient.Enable),
-		RemoveCompletedDownloads: types.BoolValue(downloadClient.RemoveCompletedDownloads),
-		RemoveFailedDownloads:    types.BoolValue(downloadClient.RemoveFailedDownloads),
-		Priority:                 types.Int64Value(int64(downloadClient.Priority)),
-		ID:                       types.Int64Value(downloadClient.ID),
-		Name:                     types.StringValue(downloadClient.Name),
+		Enable:                   types.BoolValue(downloadClient.GetEnable()),
+		RemoveCompletedDownloads: types.BoolValue(downloadClient.GetRemoveCompletedDownloads()),
+		RemoveFailedDownloads:    types.BoolValue(downloadClient.GetRemoveFailedDownloads()),
+		Priority:                 types.Int64Value(int64(downloadClient.GetPriority())),
+		ID:                       types.Int64Value(int64(downloadClient.GetId())),
+		Name:                     types.StringValue(downloadClient.GetName()),
 	}
 	genericDownloadClient.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, downloadClient.Tags)
 	genericDownloadClient.writeFields(ctx, downloadClient.Fields)
 	d.fromDownloadClient(&genericDownloadClient)
 }
 
-func (d *DownloadClientQbittorrent) read(ctx context.Context) *sonarr.DownloadClientInput {
-	var tags []int
+func (d *DownloadClientQbittorrent) read(ctx context.Context) *sonarr.DownloadClientResource {
+	var tags []*int32
 
 	tfsdk.ValueAs(ctx, d.Tags, &tags)
 
-	return &sonarr.DownloadClientInput{
-		Enable:                   d.Enable.ValueBool(),
-		RemoveCompletedDownloads: d.RemoveCompletedDownloads.ValueBool(),
-		RemoveFailedDownloads:    d.RemoveFailedDownloads.ValueBool(),
-		Priority:                 int(d.Priority.ValueInt64()),
-		ID:                       d.ID.ValueInt64(),
-		ConfigContract:           downloadClientQbittorrentConfigContract,
-		Implementation:           downloadClientQbittorrentImplementation,
-		Name:                     d.Name.ValueString(),
-		Protocol:                 downloadClientQbittorrentProtocol,
-		Tags:                     tags,
-		Fields:                   d.toDownloadClient().readFields(ctx),
-	}
+	client := sonarr.NewDownloadClientResource()
+	client.SetEnable(d.Enable.ValueBool())
+	client.SetRemoveCompletedDownloads(d.RemoveCompletedDownloads.ValueBool())
+	client.SetRemoveFailedDownloads(d.RemoveFailedDownloads.ValueBool())
+	client.SetPriority(int32(d.Priority.ValueInt64()))
+	client.SetId(int32(d.ID.ValueInt64()))
+	client.SetConfigContract(downloadClientQbittorrentConfigContract)
+	client.SetImplementation(downloadClientQbittorrentImplementation)
+	client.SetName(d.Name.ValueString())
+	client.SetProtocol(downloadClientQbittorrentProtocol)
+	client.SetTags(tags)
+	client.SetFields(d.toDownloadClient().readFields(ctx))
+
+	return client
 }
