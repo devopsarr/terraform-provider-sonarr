@@ -119,7 +119,7 @@ func (r *LanguageProfileResource) Create(ctx context.Context, req resource.Creat
 	request := profile.read(ctx)
 
 	// Create new LanguageProfile
-	response, _, err := r.client.LanguageProfileApi.CreateLanguageprofile(ctx).LanguageProfileResource(*request).Execute()
+	response, _, err := r.client.LanguageProfileApi.CreateLanguageProfile(ctx).LanguageProfileResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", languageProfileResourceName, err))
 
@@ -143,7 +143,7 @@ func (r *LanguageProfileResource) Read(ctx context.Context, req resource.ReadReq
 	}
 
 	// Get languageprofile current value
-	response, _, err := r.client.LanguageProfileApi.GetLanguageprofileById(ctx, int32(profile.ID.ValueInt64())).Execute()
+	response, _, err := r.client.LanguageProfileApi.GetLanguageProfileById(ctx, int32(profile.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", languageProfileResourceName, err))
 
@@ -170,7 +170,7 @@ func (r *LanguageProfileResource) Update(ctx context.Context, req resource.Updat
 	request := profile.read(ctx)
 
 	// Update LanguageProfile
-	response, _, err := r.client.LanguageProfileApi.UpdateLanguageprofile(ctx, strconv.Itoa(int(request.GetId()))).LanguageProfileResource(*request).Execute()
+	response, _, err := r.client.LanguageProfileApi.UpdateLanguageProfile(ctx, strconv.Itoa(int(request.GetId()))).LanguageProfileResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", languageProfileResourceName, err))
 
@@ -193,7 +193,7 @@ func (r *LanguageProfileResource) Delete(ctx context.Context, req resource.Delet
 	}
 
 	// Delete languageprofile current value
-	_, err := r.client.LanguageProfileApi.DeleteLanguageprofile(ctx, int32(profile.ID.ValueInt64())).Execute()
+	_, err := r.client.LanguageProfileApi.DeleteLanguageProfile(ctx, int32(profile.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", languageProfileResourceName, err))
 

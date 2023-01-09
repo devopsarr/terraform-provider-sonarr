@@ -83,7 +83,7 @@ func (d *RemotePathMappingDataSource) Read(ctx context.Context, req datasource.R
 		return
 	}
 	// Get remote path mapping current value
-	response, _, err := d.client.RemotePathMappingApi.ListRemotepathmapping(ctx).Execute()
+	response, _, err := d.client.RemotePathMappingApi.ListRemotePathMapping(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", remotePathMappingDataSourceName, err))
 

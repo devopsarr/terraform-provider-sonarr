@@ -131,7 +131,7 @@ func (r *QualityDefinitionResource) Create(ctx context.Context, req resource.Cre
 	request := definition.read()
 
 	// Read to get the quality ID
-	read, _, err := r.client.QualityDefinitionApi.GetQualitydefinitionById(ctx, request.GetId()).Execute()
+	read, _, err := r.client.QualityDefinitionApi.GetQualityDefinitionById(ctx, request.GetId()).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", qualityDefinitionResourceName, err))
 
@@ -142,7 +142,7 @@ func (r *QualityDefinitionResource) Create(ctx context.Context, req resource.Cre
 	request.Quality.SetSource(read.Quality.GetSource())
 
 	// Create new QualityDefinition
-	response, _, err := r.client.QualityDefinitionApi.UpdateQualitydefinition(ctx, strconv.Itoa(int(request.GetId()))).QualityDefinitionResource(*request).Execute()
+	response, _, err := r.client.QualityDefinitionApi.UpdateQualityDefinition(ctx, strconv.Itoa(int(request.GetId()))).QualityDefinitionResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", qualityDefinitionResourceName, err))
 
@@ -166,7 +166,7 @@ func (r *QualityDefinitionResource) Read(ctx context.Context, req resource.ReadR
 	}
 
 	// Get qualitydefinition current value
-	response, _, err := r.client.QualityDefinitionApi.GetQualitydefinitionById(ctx, int32(definition.ID.ValueInt64())).Execute()
+	response, _, err := r.client.QualityDefinitionApi.GetQualityDefinitionById(ctx, int32(definition.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", qualityDefinitionResourceName, err))
 
@@ -193,7 +193,7 @@ func (r *QualityDefinitionResource) Update(ctx context.Context, req resource.Upd
 	request := definition.read()
 
 	// Update QualityDefinition
-	response, _, err := r.client.QualityDefinitionApi.UpdateQualitydefinition(ctx, strconv.Itoa(int(request.GetId()))).QualityDefinitionResource(*request).Execute()
+	response, _, err := r.client.QualityDefinitionApi.UpdateQualityDefinition(ctx, strconv.Itoa(int(request.GetId()))).QualityDefinitionResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", qualityDefinitionResourceName, err))
 

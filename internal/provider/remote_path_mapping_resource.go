@@ -104,7 +104,7 @@ func (r *RemotePathMappingResource) Create(ctx context.Context, req resource.Cre
 	// Create new RemotePathMapping
 	request := mapping.read()
 
-	response, _, err := r.client.RemotePathMappingApi.CreateRemotepathmapping(ctx).RemotePathMappingResource(*request).Execute()
+	response, _, err := r.client.RemotePathMappingApi.CreateRemotePathMapping(ctx).RemotePathMappingResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", remotePathMappingResourceName, err))
 
@@ -128,7 +128,7 @@ func (r *RemotePathMappingResource) Read(ctx context.Context, req resource.ReadR
 	}
 
 	// Get remotePathMapping current value
-	response, _, err := r.client.RemotePathMappingApi.GetRemotepathmappingById(ctx, int32(mapping.ID.ValueInt64())).Execute()
+	response, _, err := r.client.RemotePathMappingApi.GetRemotePathMappingById(ctx, int32(mapping.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", remotePathMappingResourceName, err))
 
@@ -154,7 +154,7 @@ func (r *RemotePathMappingResource) Update(ctx context.Context, req resource.Upd
 	// Update RemotePathMapping
 	request := mapping.read()
 
-	response, _, err := r.client.RemotePathMappingApi.UpdateRemotepathmapping(ctx, strconv.Itoa(int(request.GetId()))).RemotePathMappingResource(*request).Execute()
+	response, _, err := r.client.RemotePathMappingApi.UpdateRemotePathMapping(ctx, strconv.Itoa(int(request.GetId()))).RemotePathMappingResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", remotePathMappingResourceName, err))
 
@@ -178,7 +178,7 @@ func (r *RemotePathMappingResource) Delete(ctx context.Context, req resource.Del
 	}
 
 	// Delete remotePathMapping current value
-	_, err := r.client.RemotePathMappingApi.DeleteRemotepathmapping(ctx, int32(mapping.ID.ValueInt64())).Execute()
+	_, err := r.client.RemotePathMappingApi.DeleteRemotePathMapping(ctx, int32(mapping.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", remotePathMappingResourceName, err))
 

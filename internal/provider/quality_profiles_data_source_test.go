@@ -35,6 +35,6 @@ func qualityprofilesDSInit() {
 	// keep only first two profiles to avoid longer tests
 	client := testAccAPIClient()
 	for i := 3; i < 7; i++ {
-		client.QualityProfileApi.DeleteQualityprofile(context.TODO(), int32(i))
+		client.QualityProfileApi.DeleteQualityProfile(context.TODO(), int32(i))
 	}
 }

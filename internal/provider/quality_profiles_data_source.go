@@ -143,7 +143,7 @@ func (d *QualityProfilesDataSource) Read(ctx context.Context, req datasource.Rea
 		return
 	}
 	// Get qualityprofiles current value
-	response, _, err := d.client.QualityProfileApi.ListQualityprofile(ctx).Execute()
+	response, _, err := d.client.QualityProfileApi.ListQualityProfile(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", qualityProfilesDataSourceName, err))
 

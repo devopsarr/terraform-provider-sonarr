@@ -135,7 +135,7 @@ func (d *MediaManagementDataSource) Configure(ctx context.Context, req datasourc
 
 func (d *MediaManagementDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 	// Get indexer config current value
-	response, _, err := d.client.MediaManagementConfigApi.GetConfigMediamanagement(ctx).Execute()
+	response, _, err := d.client.MediaManagementConfigApi.GetMediaManagementConfig(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", mediaManagementDataSourceName, err))
 

@@ -225,7 +225,7 @@ func (r *DownloadClientNzbvortexResource) Create(ctx context.Context, req resour
 	// Create new DownloadClientNzbvortex
 	request := client.read(ctx)
 
-	response, _, err := r.client.DownloadClientApi.CreateDownloadclient(ctx).DownloadClientResource(*request).Execute()
+	response, _, err := r.client.DownloadClientApi.CreateDownloadClient(ctx).DownloadClientResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", downloadClientNzbvortexResourceName, err))
 
@@ -249,7 +249,7 @@ func (r *DownloadClientNzbvortexResource) Read(ctx context.Context, req resource
 	}
 
 	// Get DownloadClientNzbvortex current value
-	response, _, err := r.client.DownloadClientApi.GetDownloadclientById(ctx, int32(client.ID.ValueInt64())).Execute()
+	response, _, err := r.client.DownloadClientApi.GetDownloadClientById(ctx, int32(client.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", downloadClientNzbvortexResourceName, err))
 
@@ -275,7 +275,7 @@ func (r *DownloadClientNzbvortexResource) Update(ctx context.Context, req resour
 	// Update DownloadClientNzbvortex
 	request := client.read(ctx)
 
-	response, _, err := r.client.DownloadClientApi.UpdateDownloadclient(ctx, strconv.Itoa(int(request.GetId()))).DownloadClientResource(*request).Execute()
+	response, _, err := r.client.DownloadClientApi.UpdateDownloadClient(ctx, strconv.Itoa(int(request.GetId()))).DownloadClientResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", downloadClientNzbvortexResourceName, err))
 
@@ -298,7 +298,7 @@ func (r *DownloadClientNzbvortexResource) Delete(ctx context.Context, req resour
 	}
 
 	// Delete DownloadClientNzbvortex current value
-	_, err := r.client.DownloadClientApi.DeleteDownloadclient(ctx, int32(client.ID.ValueInt64())).Execute()
+	_, err := r.client.DownloadClientApi.DeleteDownloadClient(ctx, int32(client.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", downloadClientNzbvortexResourceName, err))
 
