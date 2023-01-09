@@ -38,6 +38,8 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/devopsarr/sonarr-go v0.0.0-20230105111052-dce627372a10 h1:LxPJ0z9OcMLPyHY1A2DBEgEuYhmuJ9OmfmUdmGazsUk=
 github.com/devopsarr/sonarr-go v0.0.0-20230105111052-dce627372a10/go.mod h1:Yee9Np/YReYqQQCXZnmlgv9oJPWLwLD5lTXGEIInwB8=
+github.com/devopsarr/sonarr-go v0.0.0-20230108112157-1a55b9b11b09 h1:gRqRW5R5oVTnqEUa/MyqXv2drKnWgy36JhKDTcISKIY=
+github.com/devopsarr/sonarr-go v0.0.0-20230108112157-1a55b9b11b09/go.mod h1:Yee9Np/YReYqQQCXZnmlgv9oJPWLwLD5lTXGEIInwB8=
 github.com/emirpasic/gods v1.12.0 h1:QAUIPSaCu4G+POclxeqb3F+WPpdKqFGlw36+yOzGlrg=
 github.com/emirpasic/gods v1.12.0/go.mod h1:YfzfFFoVP/catgzJb4IKIqXjX78Ha8FMSDh3ymbK86o=
 github.com/envoyproxy/go-control-plane v0.9.1-0.20191026205805-5f8ba28d4473/go.mod h1:YTl/9mNaCwkRvm6d1a2C3ymFceY/DCBVvsKhRF0iEA4=

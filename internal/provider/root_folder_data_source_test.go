@@ -38,5 +38,5 @@ func rootFolderDSInit() {
 	client := testAccAPIClient()
 	folder := sonarr.NewRootFolderResource()
 	folder.SetPath("/defaults")
-	_, _, _ = client.RootFolderApi.CreateRootfolder(context.TODO()).RootFolderResource(*folder).Execute()
+	_, _, _ = client.RootFolderApi.CreateRootFolder(context.TODO()).RootFolderResource(*folder).Execute()
 }

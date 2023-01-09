@@ -75,7 +75,7 @@ func (d *DownloadClientConfigDataSource) Configure(ctx context.Context, req data
 
 func (d *DownloadClientConfigDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 	// Get indexer config current value
-	response, _, err := d.client.DownloadClientConfigApi.GetConfigDownloadclient(ctx).Execute()
+	response, _, err := d.client.DownloadClientConfigApi.GetDownloadClientConfig(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", downloadClientConfigDataSourceName, err))
 

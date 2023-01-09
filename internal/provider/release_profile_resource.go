@@ -130,7 +130,7 @@ func (r *ReleaseProfileResource) Create(ctx context.Context, req resource.Create
 	request := profile.read(ctx)
 
 	// Create new ReleaseProfile
-	response, _, err := r.client.ReleaseProfileApi.CreateReleaseprofile(ctx).ReleaseProfileResource(*request).Execute()
+	response, _, err := r.client.ReleaseProfileApi.CreateReleaseProfile(ctx).ReleaseProfileResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", releaseProfileResourceName, err))
 
@@ -154,7 +154,7 @@ func (r *ReleaseProfileResource) Read(ctx context.Context, req resource.ReadRequ
 	}
 
 	// Get releaseprofile current value
-	response, _, err := r.client.ReleaseProfileApi.GetReleaseprofileById(ctx, int32(profile.ID.ValueInt64())).Execute()
+	response, _, err := r.client.ReleaseProfileApi.GetReleaseProfileById(ctx, int32(profile.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", releaseProfileResourceName, err))
 
@@ -181,7 +181,7 @@ func (r *ReleaseProfileResource) Update(ctx context.Context, req resource.Update
 	request := profile.read(ctx)
 
 	// Update ReleaseProfile
-	response, _, err := r.client.ReleaseProfileApi.UpdateReleaseprofile(ctx, strconv.Itoa(int(request.GetId()))).ReleaseProfileResource(*request).Execute()
+	response, _, err := r.client.ReleaseProfileApi.UpdateReleaseProfile(ctx, strconv.Itoa(int(request.GetId()))).ReleaseProfileResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", releaseProfileResourceName, err))
 
@@ -204,7 +204,7 @@ func (r *ReleaseProfileResource) Delete(ctx context.Context, req resource.Delete
 	}
 
 	// Delete releaseprofile current value
-	_, err := r.client.ReleaseProfileApi.DeleteReleaseprofile(ctx, int32(profile.ID.ValueInt64())).Execute()
+	_, err := r.client.ReleaseProfileApi.DeleteReleaseProfile(ctx, int32(profile.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", releaseProfileResourceName, err))
 

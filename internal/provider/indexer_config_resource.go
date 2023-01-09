@@ -111,7 +111,7 @@ func (r *IndexerConfigResource) Create(ctx context.Context, req resource.CreateR
 	request.SetId(1)
 
 	// Create new IndexerConfig
-	response, _, err := r.client.IndexerConfigApi.UpdateConfigIndexer(ctx, strconv.Itoa(int(request.GetId()))).IndexerConfigResource(*request).Execute()
+	response, _, err := r.client.IndexerConfigApi.UpdateIndexerConfig(ctx, strconv.Itoa(int(request.GetId()))).IndexerConfigResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", indexerConfigResourceName, err))
 
@@ -135,7 +135,7 @@ func (r *IndexerConfigResource) Read(ctx context.Context, req resource.ReadReque
 	}
 
 	// Get indexerConfig current value
-	response, _, err := r.client.IndexerConfigApi.GetConfigIndexer(ctx).Execute()
+	response, _, err := r.client.IndexerConfigApi.GetIndexerConfig(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerConfigResourceName, err))
 
@@ -162,7 +162,7 @@ func (r *IndexerConfigResource) Update(ctx context.Context, req resource.UpdateR
 	request := config.read()
 
 	// Update IndexerConfig
-	response, _, err := r.client.IndexerConfigApi.UpdateConfigIndexer(ctx, strconv.Itoa(int(request.GetId()))).IndexerConfigResource(*request).Execute()
+	response, _, err := r.client.IndexerConfigApi.UpdateIndexerConfig(ctx, strconv.Itoa(int(request.GetId()))).IndexerConfigResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", indexerConfigResourceName, err))
 

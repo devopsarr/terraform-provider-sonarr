@@ -99,7 +99,7 @@ func (d *ReleaseProfileDataSource) Read(ctx context.Context, req datasource.Read
 		return
 	}
 	// Get releaseprofiles current value
-	response, _, err := d.client.ReleaseProfileApi.ListReleaseprofile(ctx).Execute()
+	response, _, err := d.client.ReleaseProfileApi.ListReleaseProfile(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", releaseProfileDataSourceName, err))
 

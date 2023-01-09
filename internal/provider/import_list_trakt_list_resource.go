@@ -266,7 +266,7 @@ func (r *ImportListTraktListResource) Create(ctx context.Context, req resource.C
 	// Create new ImportListTraktList
 	request := importList.read(ctx)
 
-	response, _, err := r.client.ImportListApi.CreateImportlist(ctx).ImportListResource(*request).Execute()
+	response, _, err := r.client.ImportListApi.CreateImportList(ctx).ImportListResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", importListTraktListResourceName, err))
 
@@ -290,7 +290,7 @@ func (r *ImportListTraktListResource) Read(ctx context.Context, req resource.Rea
 	}
 
 	// Get ImportListTraktList current value
-	response, _, err := r.client.ImportListApi.GetImportlistById(ctx, int32(importList.ID.ValueInt64())).Execute()
+	response, _, err := r.client.ImportListApi.GetImportListById(ctx, int32(importList.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", importListTraktListResourceName, err))
 
@@ -316,7 +316,7 @@ func (r *ImportListTraktListResource) Update(ctx context.Context, req resource.U
 	// Update ImportListTraktList
 	request := importList.read(ctx)
 
-	response, _, err := r.client.ImportListApi.UpdateImportlist(ctx, strconv.Itoa(int(request.GetId()))).ImportListResource(*request).Execute()
+	response, _, err := r.client.ImportListApi.UpdateImportList(ctx, strconv.Itoa(int(request.GetId()))).ImportListResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", importListTraktListResourceName, err))
 
@@ -339,7 +339,7 @@ func (r *ImportListTraktListResource) Delete(ctx context.Context, req resource.D
 	}
 
 	// Delete ImportListTraktList current value
-	_, err := r.client.ImportListApi.DeleteImportlist(ctx, int32(importList.ID.ValueInt64())).Execute()
+	_, err := r.client.ImportListApi.DeleteImportList(ctx, int32(importList.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", importListTraktListResourceName, err))
 

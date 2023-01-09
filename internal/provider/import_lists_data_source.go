@@ -211,7 +211,7 @@ func (d *ImportListsDataSource) Read(ctx context.Context, req datasource.ReadReq
 		return
 	}
 	// Get import lists current value
-	response, _, err := d.client.ImportListApi.ListImportlist(ctx).Execute()
+	response, _, err := d.client.ImportListApi.ListImportList(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", importListsDataSourceName, err))
 

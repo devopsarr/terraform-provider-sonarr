@@ -144,7 +144,7 @@ func (r *DelayProfileResource) Create(ctx context.Context, req resource.CreateRe
 	request := profile.read(ctx)
 
 	// Create new DelayProfile
-	response, _, err := r.client.DelayProfileApi.CreateDelayprofile(ctx).DelayProfileResource(*request).Execute()
+	response, _, err := r.client.DelayProfileApi.CreateDelayProfile(ctx).DelayProfileResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", delayProfileResourceName, err))
 
@@ -157,7 +157,7 @@ func (r *DelayProfileResource) Create(ctx context.Context, req resource.CreateRe
 	if !profile.Order.IsUnknown() {
 		response.Order = request.Order
 
-		response, _, err = r.client.DelayProfileApi.UpdateDelayprofile(ctx, strconv.Itoa(int(response.GetId()))).DelayProfileResource(*response).Execute()
+		response, _, err = r.client.DelayProfileApi.UpdateDelayProfile(ctx, strconv.Itoa(int(response.GetId()))).DelayProfileResource(*response).Execute()
 		if err != nil {
 			resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", delayProfileResourceName, err))
 
@@ -181,7 +181,7 @@ func (r *DelayProfileResource) Read(ctx context.Context, req resource.ReadReques
 	}
 
 	// Get delayprofile current value
-	response, _, err := r.client.DelayProfileApi.GetDelayprofileById(ctx, int32(profile.ID.ValueInt64())).Execute()
+	response, _, err := r.client.DelayProfileApi.GetDelayProfileById(ctx, int32(profile.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", delayProfileResourceName, err))
 
@@ -208,7 +208,7 @@ func (r *DelayProfileResource) Update(ctx context.Context, req resource.UpdateRe
 	request := profile.read(ctx)
 
 	// Update DelayProfile
-	response, _, err := r.client.DelayProfileApi.UpdateDelayprofile(ctx, strconv.Itoa(int(request.GetId()))).DelayProfileResource(*request).Execute()
+	response, _, err := r.client.DelayProfileApi.UpdateDelayProfile(ctx, strconv.Itoa(int(request.GetId()))).DelayProfileResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", delayProfileResourceName, err))
 
@@ -231,7 +231,7 @@ func (r *DelayProfileResource) Delete(ctx context.Context, req resource.DeleteRe
 	}
 
 	// Delete delayprofile current value
-	_, err := r.client.DelayProfileApi.DeleteDelayprofile(ctx, int32(profile.ID.ValueInt64())).Execute()
+	_, err := r.client.DelayProfileApi.DeleteDelayProfile(ctx, int32(profile.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", delayProfileResourceName, err))
 
