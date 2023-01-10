@@ -9,9 +9,11 @@
   <AuthenticationMethod>None</AuthenticationMethod>
   <UpdateMechanism>Docker</UpdateMechanism>
   <LaunchBrowser>True</LaunchBrowser>
-  <Branch>main</Branch>
-  <SslCertHash></SslCertHash>
+  <Branch>develop</Branch>
   <AnalyticsEnabled>False</AnalyticsEnabled>
   <UpdateAutomatically>False</UpdateAutomatically>
   <InstanceName>Sonarr</InstanceName>
+  <AuthenticationRequired>Enabled</AuthenticationRequired>
+  <SslCertPath></SslCertPath>
+  <SslCertPassword></SslCertPassword>
 </Config>
