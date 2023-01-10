@@ -49,7 +49,7 @@ func testAccImportListPlexResourceConfig(name, folder string) string {
 		season_folder = %s
 		should_monitor = "all"
 		series_type = "standard"
-		root_folder_path = "/defaults"
+		root_folder_path = "/config"
 		quality_profile_id = 1
 		name = "%s"
 		access_token = "Token"

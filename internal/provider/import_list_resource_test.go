@@ -49,7 +49,7 @@ func testAccImportListResourceConfig(name, enable string) string {
 		season_folder = true
 		should_monitor = "all"
 		series_type = "standard"
-		root_folder_path = "/defaults"
+		root_folder_path = "/config"
 		quality_profile_id = 1
 		name = "%s"
 		implementation = "SonarrImport"

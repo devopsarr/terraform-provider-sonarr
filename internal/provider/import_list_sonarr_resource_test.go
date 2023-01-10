@@ -48,7 +48,7 @@ func testAccImportListSonarrResourceConfig(name, add string) string {
 		season_folder = true
 		should_monitor = "all"
 		series_type = "standard"
-		root_folder_path = "/defaults"
+		root_folder_path = "/config"
 		quality_profile_id = 1
 		name = "%s"
 		base_url = "http://127.0.0.1:8989"

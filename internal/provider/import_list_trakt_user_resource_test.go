@@ -43,16 +43,12 @@ func TestAccImportListTraktUserResource(t *testing.T) {
 
 func testAccImportListTraktUserResourceConfig(name, folder string) string {
 	return fmt.Sprintf(`
-	data "sonarr_root_folder" "test" {
-		path = "/defaults"
-  	}
-
 	resource "sonarr_import_list_trakt_user" "test" {
 		enable_automatic_add = false
 		season_folder = %s
 		should_monitor = "all"
 		series_type = "standard"
-		root_folder_path = data.sonarr_root_folder.test.path
+		root_folder_path = "/config"
 		quality_profile_id = 1
 		name = "%s"
 		access_token = "Token"
