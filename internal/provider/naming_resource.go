@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/devopsarr/sonarr-go/sonarr"
-	"github.com/devopsarr/terraform-provider-sonarr/tools"
+	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -111,7 +111,7 @@ func (r *NamingResource) Configure(ctx context.Context, req resource.ConfigureRe
 	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
-			tools.UnexpectedResourceConfigureType,
+			helpers.UnexpectedResourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -133,7 +133,7 @@ func (r *NamingResource) Create(ctx context.Context, req resource.CreateRequest,
 
 	// Init call if we remove this it the very first update on a brand new instance will fail
 	if _, _, err := r.client.NamingConfigApi.GetNamingConfig(ctx).Execute(); err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to init %s, got error: %s", namingResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to init %s, got error: %s", namingResourceName, err))
 
 		return
 	}
@@ -145,7 +145,7 @@ func (r *NamingResource) Create(ctx context.Context, req resource.CreateRequest,
 	// Create new Naming
 	response, _, err := r.client.NamingConfigApi.UpdateNamingConfig(ctx, strconv.Itoa(int(request.GetId()))).NamingConfigResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", namingResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", namingResourceName, err))
 
 		return
 	}
@@ -169,7 +169,7 @@ func (r *NamingResource) Read(ctx context.Context, req resource.ReadRequest, res
 	// Get naming current value
 	response, _, err := r.client.NamingConfigApi.GetNamingConfig(ctx).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", namingResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", namingResourceName, err))
 
 		return
 	}
@@ -196,7 +196,7 @@ func (r *NamingResource) Update(ctx context.Context, req resource.UpdateRequest,
 	// Update Naming
 	response, _, err := r.client.NamingConfigApi.UpdateNamingConfig(ctx, strconv.Itoa(int(request.GetId()))).NamingConfigResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", namingResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", namingResourceName, err))
 
 		return
 	}

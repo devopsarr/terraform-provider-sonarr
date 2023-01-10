@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/devopsarr/sonarr-go/sonarr"
-	"github.com/devopsarr/terraform-provider-sonarr/tools"
+	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -228,7 +228,7 @@ func (d *DownloadClientDataSource) Configure(ctx context.Context, req datasource
 	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
-			tools.UnexpectedDataSourceConfigureType,
+			helpers.UnexpectedDataSourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -249,14 +249,14 @@ func (d *DownloadClientDataSource) Read(ctx context.Context, req datasource.Read
 	// Get downloadClient current value
 	response, _, err := d.client.DownloadClientApi.ListDownloadClient(ctx).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", downloadClientDataSourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", downloadClientDataSourceName, err))
 
 		return
 	}
 
 	downloadClient, err := findDownloadClient(data.Name.ValueString(), response)
 	if err != nil {
-		resp.Diagnostics.AddError(tools.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", downloadClientDataSourceName, err))
+		resp.Diagnostics.AddError(helpers.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", downloadClientDataSourceName, err))
 
 		return
 	}
@@ -273,5 +273,5 @@ func findDownloadClient(name string, downloadClients []*sonarr.DownloadClientRes
 		}
 	}
 
-	return nil, tools.ErrDataNotFoundError(downloadClientDataSourceName, "name", name)
+	return nil, helpers.ErrDataNotFoundError(downloadClientDataSourceName, "name", name)
 }

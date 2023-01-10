@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/devopsarr/sonarr-go/sonarr"
-	"github.com/devopsarr/terraform-provider-sonarr/tools"
+	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -170,7 +170,7 @@ func (r *MediaManagementResource) Configure(ctx context.Context, req resource.Co
 	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
-			tools.UnexpectedResourceConfigureType,
+			helpers.UnexpectedResourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -197,7 +197,7 @@ func (r *MediaManagementResource) Create(ctx context.Context, req resource.Creat
 	// Create new MediaManagement
 	response, _, err := r.client.MediaManagementConfigApi.UpdateMediaManagementConfig(ctx, strconv.Itoa(int(request.GetId()))).MediaManagementConfigResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create mediamanagement, got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to create mediamanagement, got error: %s", err))
 
 		return
 	}
@@ -221,7 +221,7 @@ func (r *MediaManagementResource) Read(ctx context.Context, req resource.ReadReq
 	// Get mediamanagement current value
 	response, _, err := r.client.MediaManagementConfigApi.GetMediaManagementConfig(ctx).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", mediaManagementResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", mediaManagementResourceName, err))
 
 		return
 	}
@@ -248,7 +248,7 @@ func (r *MediaManagementResource) Update(ctx context.Context, req resource.Updat
 	// Update MediaManagement
 	response, _, err := r.client.MediaManagementConfigApi.UpdateMediaManagementConfig(ctx, strconv.Itoa(int(request.GetId()))).MediaManagementConfigResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", mediaManagementResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", mediaManagementResourceName, err))
 
 		return
 	}

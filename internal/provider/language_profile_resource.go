@@ -7,7 +7,6 @@ import (
 
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
-	"github.com/devopsarr/terraform-provider-sonarr/tools"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -95,7 +94,7 @@ func (r *LanguageProfileResource) Configure(ctx context.Context, req resource.Co
 	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
-			tools.UnexpectedResourceConfigureType,
+			helpers.UnexpectedResourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -121,7 +120,7 @@ func (r *LanguageProfileResource) Create(ctx context.Context, req resource.Creat
 	// Create new LanguageProfile
 	response, _, err := r.client.LanguageProfileApi.CreateLanguageProfile(ctx).LanguageProfileResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", languageProfileResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", languageProfileResourceName, err))
 
 		return
 	}
@@ -145,7 +144,7 @@ func (r *LanguageProfileResource) Read(ctx context.Context, req resource.ReadReq
 	// Get languageprofile current value
 	response, _, err := r.client.LanguageProfileApi.GetLanguageProfileById(ctx, int32(profile.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", languageProfileResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", languageProfileResourceName, err))
 
 		return
 	}
@@ -172,7 +171,7 @@ func (r *LanguageProfileResource) Update(ctx context.Context, req resource.Updat
 	// Update LanguageProfile
 	response, _, err := r.client.LanguageProfileApi.UpdateLanguageProfile(ctx, strconv.Itoa(int(request.GetId()))).LanguageProfileResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", languageProfileResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", languageProfileResourceName, err))
 
 		return
 	}
@@ -195,7 +194,7 @@ func (r *LanguageProfileResource) Delete(ctx context.Context, req resource.Delet
 	// Delete languageprofile current value
 	_, err := r.client.LanguageProfileApi.DeleteLanguageProfile(ctx, int32(profile.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", languageProfileResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", languageProfileResourceName, err))
 
 		return
 	}
@@ -209,7 +208,7 @@ func (r *LanguageProfileResource) ImportState(ctx context.Context, req resource.
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			tools.UnexpectedImportIdentifier,
+			helpers.UnexpectedImportIdentifier,
 			fmt.Sprintf("Expected import identifier with format: ID. Got: %q", req.ID),
 		)
 

@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/devopsarr/sonarr-go/sonarr"
-	"github.com/devopsarr/terraform-provider-sonarr/tools"
+	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -243,7 +243,7 @@ func (r *ImportListTraktListResource) Configure(ctx context.Context, req resourc
 	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
-			tools.UnexpectedResourceConfigureType,
+			helpers.UnexpectedResourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -268,7 +268,7 @@ func (r *ImportListTraktListResource) Create(ctx context.Context, req resource.C
 
 	response, _, err := r.client.ImportListApi.CreateImportList(ctx).ImportListResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", importListTraktListResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", importListTraktListResourceName, err))
 
 		return
 	}
@@ -292,7 +292,7 @@ func (r *ImportListTraktListResource) Read(ctx context.Context, req resource.Rea
 	// Get ImportListTraktList current value
 	response, _, err := r.client.ImportListApi.GetImportListById(ctx, int32(importList.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", importListTraktListResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", importListTraktListResourceName, err))
 
 		return
 	}
@@ -318,7 +318,7 @@ func (r *ImportListTraktListResource) Update(ctx context.Context, req resource.U
 
 	response, _, err := r.client.ImportListApi.UpdateImportList(ctx, strconv.Itoa(int(request.GetId()))).ImportListResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", importListTraktListResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", importListTraktListResourceName, err))
 
 		return
 	}
@@ -341,7 +341,7 @@ func (r *ImportListTraktListResource) Delete(ctx context.Context, req resource.D
 	// Delete ImportListTraktList current value
 	_, err := r.client.ImportListApi.DeleteImportList(ctx, int32(importList.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", importListTraktListResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", importListTraktListResourceName, err))
 
 		return
 	}
@@ -355,7 +355,7 @@ func (r *ImportListTraktListResource) ImportState(ctx context.Context, req resou
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			tools.UnexpectedImportIdentifier,
+			helpers.UnexpectedImportIdentifier,
 			fmt.Sprintf("Expected import identifier with format: ID. Got: %q", req.ID),
 		)
 

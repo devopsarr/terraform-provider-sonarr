@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/devopsarr/sonarr-go/sonarr"
-	"github.com/devopsarr/terraform-provider-sonarr/tools"
+	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -97,7 +97,7 @@ func (d *SeriesDataSource) Configure(ctx context.Context, req datasource.Configu
 	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
-			tools.UnexpectedDataSourceConfigureType,
+			helpers.UnexpectedDataSourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -118,14 +118,14 @@ func (d *SeriesDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 	// Get series current value
 	response, _, err := d.client.SeriesApi.ListSeries(ctx).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", seriesDataSourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", seriesDataSourceName, err))
 
 		return
 	}
 
 	series, err := findSeries(data.Title.ValueString(), response)
 	if err != nil {
-		resp.Diagnostics.AddError(tools.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", seriesDataSourceName, err))
+		resp.Diagnostics.AddError(helpers.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", seriesDataSourceName, err))
 
 		return
 	}
@@ -142,5 +142,5 @@ func findSeries(title string, series []*sonarr.SeriesResource) (*sonarr.SeriesRe
 		}
 	}
 
-	return nil, tools.ErrDataNotFoundError(seriesDataSourceName, "title", title)
+	return nil, helpers.ErrDataNotFoundError(seriesDataSourceName, "title", title)
 }

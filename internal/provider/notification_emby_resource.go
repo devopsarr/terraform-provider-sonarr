@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/devopsarr/sonarr-go/sonarr"
-	"github.com/devopsarr/terraform-provider-sonarr/tools"
+	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -225,7 +225,7 @@ func (r *NotificationEmbyResource) Configure(ctx context.Context, req resource.C
 	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
-			tools.UnexpectedResourceConfigureType,
+			helpers.UnexpectedResourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -250,7 +250,7 @@ func (r *NotificationEmbyResource) Create(ctx context.Context, req resource.Crea
 
 	response, _, err := r.client.NotificationApi.CreateNotification(ctx).NotificationResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", notificationEmbyResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", notificationEmbyResourceName, err))
 
 		return
 	}
@@ -274,7 +274,7 @@ func (r *NotificationEmbyResource) Read(ctx context.Context, req resource.ReadRe
 	// Get NotificationEmby current value
 	response, _, err := r.client.NotificationApi.GetNotificationById(ctx, int32(notification.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", notificationEmbyResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", notificationEmbyResourceName, err))
 
 		return
 	}
@@ -300,7 +300,7 @@ func (r *NotificationEmbyResource) Update(ctx context.Context, req resource.Upda
 
 	response, _, err := r.client.NotificationApi.UpdateNotification(ctx, strconv.Itoa(int(request.GetId()))).NotificationResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", notificationEmbyResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", notificationEmbyResourceName, err))
 
 		return
 	}
@@ -323,7 +323,7 @@ func (r *NotificationEmbyResource) Delete(ctx context.Context, req resource.Dele
 	// Delete NotificationEmby current value
 	_, err := r.client.NotificationApi.DeleteNotification(ctx, int32(notification.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", notificationEmbyResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", notificationEmbyResourceName, err))
 
 		return
 	}
@@ -337,7 +337,7 @@ func (r *NotificationEmbyResource) ImportState(ctx context.Context, req resource
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			tools.UnexpectedImportIdentifier,
+			helpers.UnexpectedImportIdentifier,
 			fmt.Sprintf("Expected import identifier with format: ID. Got: %q", req.ID),
 		)
 

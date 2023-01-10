@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/devopsarr/sonarr-go/sonarr"
-	"github.com/devopsarr/terraform-provider-sonarr/tools"
+	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -147,7 +147,7 @@ func (r *SeriesResource) Configure(ctx context.Context, req resource.ConfigureRe
 	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
-			tools.UnexpectedResourceConfigureType,
+			helpers.UnexpectedResourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -180,7 +180,7 @@ func (r *SeriesResource) Create(ctx context.Context, req resource.CreateRequest,
 
 	response, _, err := r.client.SeriesApi.CreateSeries(ctx).SeriesResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", seriesResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", seriesResourceName, err))
 
 		return
 	}
@@ -204,7 +204,7 @@ func (r *SeriesResource) Read(ctx context.Context, req resource.ReadRequest, res
 	// Get series current value
 	response, _, err := r.client.SeriesApi.GetSeriesById(ctx, int32(series.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", seriesResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", seriesResourceName, err))
 
 		return
 	}
@@ -231,7 +231,7 @@ func (r *SeriesResource) Update(ctx context.Context, req resource.UpdateRequest,
 	// TODO: manage movefiles on sdk
 	response, _, err := r.client.SeriesApi.UpdateSeries(ctx, strconv.Itoa(int(request.GetId()))).SeriesResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", seriesResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", seriesResourceName, err))
 
 		return
 	}
@@ -255,7 +255,7 @@ func (r *SeriesResource) Delete(ctx context.Context, req resource.DeleteRequest,
 	// TODO: manage delete parameters on SDK
 	_, err := r.client.SeriesApi.DeleteSeries(ctx, int32(series.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to delete %s, got error: %s", seriesResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to delete %s, got error: %s", seriesResourceName, err))
 
 		return
 	}
@@ -269,7 +269,7 @@ func (r *SeriesResource) ImportState(ctx context.Context, req resource.ImportSta
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			tools.UnexpectedImportIdentifier,
+			helpers.UnexpectedImportIdentifier,
 			fmt.Sprintf("Expected import identifier with format: ID. Got: %q", req.ID),
 		)
 

@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/devopsarr/sonarr-go/sonarr"
-	"github.com/devopsarr/terraform-provider-sonarr/tools"
+	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -170,7 +170,7 @@ func (d *IndexerDataSource) Configure(ctx context.Context, req datasource.Config
 	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
-			tools.UnexpectedDataSourceConfigureType,
+			helpers.UnexpectedDataSourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -191,14 +191,14 @@ func (d *IndexerDataSource) Read(ctx context.Context, req datasource.ReadRequest
 	// Get indexer current value
 	response, _, err := d.client.IndexerApi.ListIndexer(ctx).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerDataSourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerDataSourceName, err))
 
 		return
 	}
 
 	indexer, err := findIndexer(data.Name.ValueString(), response)
 	if err != nil {
-		resp.Diagnostics.AddError(tools.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", indexerDataSourceName, err))
+		resp.Diagnostics.AddError(helpers.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", indexerDataSourceName, err))
 
 		return
 	}
@@ -215,5 +215,5 @@ func findIndexer(name string, indexers []*sonarr.IndexerResource) (*sonarr.Index
 		}
 	}
 
-	return nil, tools.ErrDataNotFoundError(indexerDataSourceName, "name", name)
+	return nil, helpers.ErrDataNotFoundError(indexerDataSourceName, "name", name)
 }

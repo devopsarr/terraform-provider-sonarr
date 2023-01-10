@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/devopsarr/sonarr-go/sonarr"
-	"github.com/devopsarr/terraform-provider-sonarr/tools"
+	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -525,7 +525,7 @@ func (r *NotificationResource) Configure(ctx context.Context, req resource.Confi
 	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
-			tools.UnexpectedResourceConfigureType,
+			helpers.UnexpectedResourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -550,7 +550,7 @@ func (r *NotificationResource) Create(ctx context.Context, req resource.CreateRe
 
 	response, _, err := r.client.NotificationApi.CreateNotification(ctx).NotificationResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", notificationResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", notificationResourceName, err))
 
 		return
 	}
@@ -577,7 +577,7 @@ func (r *NotificationResource) Read(ctx context.Context, req resource.ReadReques
 	// Get Notification current value
 	response, _, err := r.client.NotificationApi.GetNotificationById(ctx, int32(notification.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", notificationResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", notificationResourceName, err))
 
 		return
 	}
@@ -606,7 +606,7 @@ func (r *NotificationResource) Update(ctx context.Context, req resource.UpdateRe
 
 	response, _, err := r.client.NotificationApi.UpdateNotification(ctx, strconv.Itoa(int(request.GetId()))).NotificationResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", notificationResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", notificationResourceName, err))
 
 		return
 	}
@@ -632,7 +632,7 @@ func (r *NotificationResource) Delete(ctx context.Context, req resource.DeleteRe
 	// Delete Notification current value
 	_, err := r.client.NotificationApi.DeleteNotification(ctx, int32(notification.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", notificationResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", notificationResourceName, err))
 
 		return
 	}
@@ -646,7 +646,7 @@ func (r *NotificationResource) ImportState(ctx context.Context, req resource.Imp
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			tools.UnexpectedImportIdentifier,
+			helpers.UnexpectedImportIdentifier,
 			fmt.Sprintf("Expected import identifier with format: ID. Got: %q", req.ID),
 		)
 
@@ -692,31 +692,31 @@ func (n *Notification) writeFields(ctx context.Context, fields []*sonarr.Field) 
 		}
 
 		if slices.Contains(notificationStringFields, f.GetName()) {
-			tools.WriteStringField(f, n)
+			helpers.WriteStringField(f, n)
 
 			continue
 		}
 
 		if slices.Contains(notificationBoolFields, f.GetName()) {
-			tools.WriteBoolField(f, n)
+			helpers.WriteBoolField(f, n)
 
 			continue
 		}
 
 		if slices.Contains(notificationIntFields, f.GetName()) {
-			tools.WriteIntField(f, n)
+			helpers.WriteIntField(f, n)
 
 			continue
 		}
 
 		if slices.Contains(notificationStringSliceFields, f.GetName()) {
-			tools.WriteStringSliceField(ctx, f, n)
+			helpers.WriteStringSliceField(ctx, f, n)
 
 			continue
 		}
 
 		if slices.Contains(notificationIntSliceFields, f.GetName()) {
-			tools.WriteIntSliceField(ctx, f, n)
+			helpers.WriteIntSliceField(ctx, f, n)
 
 			continue
 		}
@@ -753,31 +753,31 @@ func (n *Notification) readFields(ctx context.Context) []*sonarr.Field {
 	var output []*sonarr.Field
 
 	for _, b := range notificationBoolFields {
-		if field := tools.ReadBoolField(b, n); field != nil {
+		if field := helpers.ReadBoolField(b, n); field != nil {
 			output = append(output, field)
 		}
 	}
 
 	for _, i := range notificationIntFields {
-		if field := tools.ReadIntField(i, n); field != nil {
+		if field := helpers.ReadIntField(i, n); field != nil {
 			output = append(output, field)
 		}
 	}
 
 	for _, s := range notificationStringFields {
-		if field := tools.ReadStringField(s, n); field != nil {
+		if field := helpers.ReadStringField(s, n); field != nil {
 			output = append(output, field)
 		}
 	}
 
 	for _, s := range notificationStringSliceFields {
-		if field := tools.ReadStringSliceField(ctx, s, n); field != nil {
+		if field := helpers.ReadStringSliceField(ctx, s, n); field != nil {
 			output = append(output, field)
 		}
 	}
 
 	for _, i := range notificationIntSliceFields {
-		if field := tools.ReadIntSliceField(ctx, i, n); field != nil {
+		if field := helpers.ReadIntSliceField(ctx, i, n); field != nil {
 			output = append(output, field)
 		}
 	}

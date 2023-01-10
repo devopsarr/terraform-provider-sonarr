@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/devopsarr/sonarr-go/sonarr"
-	"github.com/devopsarr/terraform-provider-sonarr/tools"
+	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -75,7 +75,7 @@ func (d *RootFolderDataSource) Configure(ctx context.Context, req datasource.Con
 	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
-			tools.UnexpectedDataSourceConfigureType,
+			helpers.UnexpectedDataSourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -96,7 +96,7 @@ func (d *RootFolderDataSource) Read(ctx context.Context, req datasource.ReadRequ
 	// Get rootfolders current value
 	response, _, err := d.client.RootFolderApi.ListRootFolder(ctx).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", rootFolderDataSourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", rootFolderDataSourceName, err))
 
 		return
 	}
@@ -104,7 +104,7 @@ func (d *RootFolderDataSource) Read(ctx context.Context, req datasource.ReadRequ
 	// Map response body to resource schema attribute
 	rootFolder, err := findRootFolder(folder.Path.ValueString(), response)
 	if err != nil {
-		resp.Diagnostics.AddError(tools.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", rootFolderDataSourceName, err))
+		resp.Diagnostics.AddError(helpers.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", rootFolderDataSourceName, err))
 
 		return
 	}
@@ -121,5 +121,5 @@ func findRootFolder(path string, folders []*sonarr.RootFolderResource) (*sonarr.
 		}
 	}
 
-	return nil, tools.ErrDataNotFoundError(rootFolderDataSourceName, "path", path)
+	return nil, helpers.ErrDataNotFoundError(rootFolderDataSourceName, "path", path)
 }

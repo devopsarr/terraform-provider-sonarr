@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/devopsarr/sonarr-go/sonarr"
-	"github.com/devopsarr/terraform-provider-sonarr/tools"
+	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -98,7 +98,7 @@ func (d *SearchSeriesDataSource) Configure(ctx context.Context, req datasource.C
 	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
-			tools.UnexpectedDataSourceConfigureType,
+			helpers.UnexpectedDataSourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -119,13 +119,13 @@ func (d *SearchSeriesDataSource) Read(ctx context.Context, req datasource.ReadRe
 	// Get series current value
 	response, _, err := d.client.SeriesLookupApi.ListSeriesLookup(ctx).Term(strconv.Itoa(int(data.TvdbID.ValueInt64()))).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", searchSearchSeriesDataSourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", searchSearchSeriesDataSourceName, err))
 
 		return
 	}
 
 	if !(int64(response[0].GetTvdbId()) == data.TvdbID.ValueInt64()) {
-		resp.Diagnostics.AddError(tools.DataSourceError, fmt.Sprintf("Unable to find %s with TVDBID: %d", searchSearchSeriesDataSourceName, data.TvdbID.ValueInt64()))
+		resp.Diagnostics.AddError(helpers.DataSourceError, fmt.Sprintf("Unable to find %s with TVDBID: %d", searchSearchSeriesDataSourceName, data.TvdbID.ValueInt64()))
 
 		return
 	}

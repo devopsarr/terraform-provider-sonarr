@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/devopsarr/sonarr-go/sonarr"
-	"github.com/devopsarr/terraform-provider-sonarr/tools"
+	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -55,7 +55,7 @@ func (d *TagDataSource) Configure(ctx context.Context, req datasource.ConfigureR
 	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
-			tools.UnexpectedDataSourceConfigureType,
+			helpers.UnexpectedDataSourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -77,14 +77,14 @@ func (d *TagDataSource) Read(ctx context.Context, req datasource.ReadRequest, re
 	// Get tags current value
 	response, _, err := d.client.TagApi.ListTag(ctx).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, tools.UnableToRead(tagDataSourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.UnableToRead(tagDataSourceName, err))
 
 		return
 	}
 
 	value, err := findTag(tag.Label.ValueString(), response)
 	if err != nil {
-		resp.Diagnostics.AddError(tools.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", tagDataSourceName, err))
+		resp.Diagnostics.AddError(helpers.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", tagDataSourceName, err))
 
 		return
 	}
@@ -102,5 +102,5 @@ func findTag(label string, tags []*sonarr.TagResource) (*sonarr.TagResource, err
 		}
 	}
 
-	return nil, tools.ErrDataNotFoundError(tagDataSourceName, "label", label)
+	return nil, helpers.ErrDataNotFoundError(tagDataSourceName, "label", label)
 }

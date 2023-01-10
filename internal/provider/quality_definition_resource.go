@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/devopsarr/sonarr-go/sonarr"
-	"github.com/devopsarr/terraform-provider-sonarr/tools"
+	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -107,7 +107,7 @@ func (r *QualityDefinitionResource) Configure(ctx context.Context, req resource.
 	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
-			tools.UnexpectedResourceConfigureType,
+			helpers.UnexpectedResourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -133,7 +133,7 @@ func (r *QualityDefinitionResource) Create(ctx context.Context, req resource.Cre
 	// Read to get the quality ID
 	read, _, err := r.client.QualityDefinitionApi.GetQualityDefinitionById(ctx, request.GetId()).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", qualityDefinitionResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", qualityDefinitionResourceName, err))
 
 		return
 	}
@@ -144,7 +144,7 @@ func (r *QualityDefinitionResource) Create(ctx context.Context, req resource.Cre
 	// Create new QualityDefinition
 	response, _, err := r.client.QualityDefinitionApi.UpdateQualityDefinition(ctx, strconv.Itoa(int(request.GetId()))).QualityDefinitionResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", qualityDefinitionResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", qualityDefinitionResourceName, err))
 
 		return
 	}
@@ -168,7 +168,7 @@ func (r *QualityDefinitionResource) Read(ctx context.Context, req resource.ReadR
 	// Get qualitydefinition current value
 	response, _, err := r.client.QualityDefinitionApi.GetQualityDefinitionById(ctx, int32(definition.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", qualityDefinitionResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", qualityDefinitionResourceName, err))
 
 		return
 	}
@@ -195,7 +195,7 @@ func (r *QualityDefinitionResource) Update(ctx context.Context, req resource.Upd
 	// Update QualityDefinition
 	response, _, err := r.client.QualityDefinitionApi.UpdateQualityDefinition(ctx, strconv.Itoa(int(request.GetId()))).QualityDefinitionResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", qualityDefinitionResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", qualityDefinitionResourceName, err))
 
 		return
 	}
@@ -225,7 +225,7 @@ func (r *QualityDefinitionResource) ImportState(ctx context.Context, req resourc
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			tools.UnexpectedImportIdentifier,
+			helpers.UnexpectedImportIdentifier,
 			fmt.Sprintf("Expected import identifier with format: ID. Got: %q", req.ID),
 		)
 
