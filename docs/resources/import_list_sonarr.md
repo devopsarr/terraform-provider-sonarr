@@ -22,7 +22,6 @@ resource "sonarr_import_list_sonarr" "example" {
   series_type          = "standard"
   root_folder_path     = sonarr_root_folder.example.path
   quality_profile_id   = 1
-  language_profile_id  = 1
   name                 = "Example"
   base_url             = "http://127.0.0.1:8989"
   api_key              = "APIKey"
@@ -41,7 +40,6 @@ resource "sonarr_import_list_sonarr" "example" {
 - `api_key` (String, Sensitive) API key.
 - `base_url` (String) Base URL.
 - `enable_automatic_add` (Boolean) Enable automatic add flag.
-- `language_profile_id` (Number) Language profile ID.
 - `name` (String) Import List name.
 - `quality_profile_id` (Number) Quality profile ID.
 - `root_folder_path` (String) Root folder path.

@@ -213,6 +213,7 @@ func (r *IndexerTorrentleechResource) Create(ctx context.Context, req resource.C
 	response, _, err := r.client.IndexerApi.CreateIndexer(ctx).IndexerResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, indexerTorrentleechResourceName, err))
+
 		return
 	}
 
@@ -236,6 +237,7 @@ func (r *IndexerTorrentleechResource) Read(ctx context.Context, req resource.Rea
 	response, _, err := r.client.IndexerApi.GetIndexerById(ctx, int32(indexer.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerTorrentleechResourceName, err))
+
 		return
 	}
 
@@ -284,6 +286,7 @@ func (r *IndexerTorrentleechResource) Delete(ctx context.Context, req resource.D
 	_, err := r.client.IndexerApi.DeleteIndexer(ctx, int32(indexer.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerTorrentleechResourceName, err))
+
 		return
 	}
 

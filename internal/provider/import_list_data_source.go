@@ -43,10 +43,6 @@ func (d *ImportListDataSource) Schema(ctx context.Context, req datasource.Schema
 				MarkdownDescription: "Season folder flag.",
 				Computed:            true,
 			},
-			"language_profile_id": schema.Int64Attribute{
-				MarkdownDescription: "Language profile ID.",
-				Computed:            true,
-			},
 			"quality_profile_id": schema.Int64Attribute{
 				MarkdownDescription: "Quality profile ID.",
 				Computed:            true,
@@ -194,6 +190,7 @@ func (d *ImportListDataSource) Read(ctx context.Context, req datasource.ReadRequ
 	response, _, err := d.client.ImportListApi.ListImportList(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, importListDataSourceName, err))
+
 		return
 	}
 

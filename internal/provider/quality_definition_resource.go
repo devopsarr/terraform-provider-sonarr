@@ -134,6 +134,7 @@ func (r *QualityDefinitionResource) Create(ctx context.Context, req resource.Cre
 	read, _, err := r.client.QualityDefinitionApi.GetQualityDefinitionById(ctx, request.GetId()).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, qualityDefinitionResourceName, err))
+
 		return
 	}
 
@@ -144,6 +145,7 @@ func (r *QualityDefinitionResource) Create(ctx context.Context, req resource.Cre
 	response, _, err := r.client.QualityDefinitionApi.UpdateQualityDefinition(ctx, strconv.Itoa(int(request.GetId()))).QualityDefinitionResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, qualityDefinitionResourceName, err))
+
 		return
 	}
 
@@ -167,6 +169,7 @@ func (r *QualityDefinitionResource) Read(ctx context.Context, req resource.ReadR
 	response, _, err := r.client.QualityDefinitionApi.GetQualityDefinitionById(ctx, int32(definition.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, qualityDefinitionResourceName, err))
+
 		return
 	}
 
@@ -193,6 +196,7 @@ func (r *QualityDefinitionResource) Update(ctx context.Context, req resource.Upd
 	response, _, err := r.client.QualityDefinitionApi.UpdateQualityDefinition(ctx, strconv.Itoa(int(request.GetId()))).QualityDefinitionResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, qualityDefinitionResourceName, err))
+
 		return
 	}
 

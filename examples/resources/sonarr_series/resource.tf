@@ -9,7 +9,6 @@ resource "sonarr_series" "example" {
   path                = "/tmp/breaking_bad"
   root_folder_path    = "/tmp/"
 
-  language_profile_id = 1
-  quality_profile_id  = 1
-  tags                = [1]
+  quality_profile_id = 1
+  tags               = [1]
 }

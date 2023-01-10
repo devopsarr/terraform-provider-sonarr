@@ -375,6 +375,7 @@ func (d *NotificationDataSource) Read(ctx context.Context, req datasource.ReadRe
 	response, _, err := d.client.NotificationApi.ListNotification(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, notificationDataSourceName, err))
+
 		return
 	}
 

@@ -82,6 +82,7 @@ func (d *IndexerConfigDataSource) Read(ctx context.Context, req datasource.ReadR
 	response, _, err := d.client.IndexerConfigApi.GetIndexerConfig(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerConfigDataSourceName, err))
+
 		return
 	}
 

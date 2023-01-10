@@ -220,6 +220,7 @@ func (r *IndexerNyaaResource) Create(ctx context.Context, req resource.CreateReq
 	response, _, err := r.client.IndexerApi.CreateIndexer(ctx).IndexerResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, indexerNyaaResourceName, err))
+
 		return
 	}
 
@@ -243,6 +244,7 @@ func (r *IndexerNyaaResource) Read(ctx context.Context, req resource.ReadRequest
 	response, _, err := r.client.IndexerApi.GetIndexerById(ctx, int32(indexer.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerNyaaResourceName, err))
+
 		return
 	}
 
@@ -291,6 +293,7 @@ func (r *IndexerNyaaResource) Delete(ctx context.Context, req resource.DeleteReq
 	_, err := r.client.IndexerApi.DeleteIndexer(ctx, int32(indexer.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerNyaaResourceName, err))
+
 		return
 	}
 

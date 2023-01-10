@@ -65,7 +65,6 @@ type ImportList struct {
 	Years                     types.String `tfsdk:"years"`
 	APIKey                    types.String `tfsdk:"api_key"`
 	TraktAdditionalParameters types.String `tfsdk:"trakt_additional_parameters"`
-	LanguageProfileID         types.Int64  `tfsdk:"language_profile_id"`
 	QualityProfileID          types.Int64  `tfsdk:"quality_profile_id"`
 	ID                        types.Int64  `tfsdk:"id"`
 	Limit                     types.Int64  `tfsdk:"limit"`
@@ -89,11 +88,6 @@ func (r *ImportListResource) Schema(ctx context.Context, req resource.SchemaRequ
 			},
 			"season_folder": schema.BoolAttribute{
 				MarkdownDescription: "Season folder flag.",
-				Optional:            true,
-				Computed:            true,
-			},
-			"language_profile_id": schema.Int64Attribute{
-				MarkdownDescription: "Language profile ID.",
 				Optional:            true,
 				Computed:            true,
 			},
@@ -273,6 +267,7 @@ func (r *ImportListResource) Create(ctx context.Context, req resource.CreateRequ
 	response, _, err := r.client.ImportListApi.CreateImportList(ctx).ImportListResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, importListResourceName, err))
+
 		return
 	}
 
@@ -299,6 +294,7 @@ func (r *ImportListResource) Read(ctx context.Context, req resource.ReadRequest,
 	response, _, err := r.client.ImportListApi.GetImportListById(ctx, int32(importList.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, importListResourceName, err))
+
 		return
 	}
 
@@ -327,6 +323,7 @@ func (r *ImportListResource) Update(ctx context.Context, req resource.UpdateRequ
 	response, _, err := r.client.ImportListApi.UpdateImportList(ctx, strconv.Itoa(int(request.GetId()))).ImportListResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, importListResourceName, err))
+
 		return
 	}
 
@@ -352,6 +349,7 @@ func (r *ImportListResource) Delete(ctx context.Context, req resource.DeleteRequ
 	_, err := r.client.ImportListApi.DeleteImportList(ctx, int32(importList.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, importListResourceName, err))
+
 		return
 	}
 
@@ -379,7 +377,6 @@ func (i *ImportList) write(ctx context.Context, importList *sonarr.ImportListRes
 	i.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, importList.Tags)
 	i.EnableAutomaticAdd = types.BoolValue(importList.GetEnableAutomaticAdd())
 	i.SeasonFolder = types.BoolValue(importList.GetSeasonFolder())
-	i.LanguageProfileID = types.Int64Value(int64(importList.GetLanguageProfileId()))
 	i.QualityProfileID = types.Int64Value(int64(importList.GetQualityProfileId()))
 	i.ID = types.Int64Value(int64(importList.GetId()))
 	i.ConfigContract = types.StringValue(importList.GetConfigContract())
@@ -428,7 +425,6 @@ func (i *ImportList) read(ctx context.Context) *sonarr.ImportListResource {
 	list := sonarr.NewImportListResource()
 	list.SetEnableAutomaticAdd(i.EnableAutomaticAdd.ValueBool())
 	list.SetSeasonFolder(i.SeasonFolder.ValueBool())
-	list.SetLanguageProfileId(int32(i.LanguageProfileID.ValueInt64()))
 	list.SetQualityProfileId(int32(i.QualityProfileID.ValueInt64()))
 	list.SetId(int32(i.ID.ValueInt64()))
 	list.SetShouldMonitor(sonarr.MonitorTypes(i.ShouldMonitor.ValueString()))

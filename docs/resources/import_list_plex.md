@@ -22,7 +22,6 @@ resource "sonarr_import_list_plex" "example" {
   series_type          = "standard"
   root_folder_path     = sonarr_root_folder.example.path
   quality_profile_id   = 1
-  language_profile_id  = 1
   name                 = "Example"
   access_token         = "Token"
 }
@@ -35,7 +34,6 @@ resource "sonarr_import_list_plex" "example" {
 
 - `access_token` (String, Sensitive) Access token.
 - `enable_automatic_add` (Boolean) Enable automatic add flag.
-- `language_profile_id` (Number) Language profile ID.
 - `name` (String) Import List name.
 - `quality_profile_id` (Number) Quality profile ID.
 - `root_folder_path` (String) Root folder path.

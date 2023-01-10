@@ -51,7 +51,6 @@ func testAccImportListPlexResourceConfig(name, folder string) string {
 		series_type = "standard"
 		root_folder_path = "/defaults"
 		quality_profile_id = 1
-		language_profile_id = 1
 		name = "%s"
 		access_token = "Token"
 		tags = []

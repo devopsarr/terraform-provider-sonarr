@@ -56,7 +56,6 @@ type ImportListTraktPopular struct {
 	Genres                    types.String `tfsdk:"genres"`
 	Years                     types.String `tfsdk:"years"`
 	TraktAdditionalParameters types.String `tfsdk:"trakt_additional_parameters"`
-	LanguageProfileID         types.Int64  `tfsdk:"language_profile_id"`
 	QualityProfileID          types.Int64  `tfsdk:"quality_profile_id"`
 	ID                        types.Int64  `tfsdk:"id"`
 	Limit                     types.Int64  `tfsdk:"limit"`
@@ -82,7 +81,6 @@ func (i ImportListTraktPopular) toImportList() *ImportList {
 		Years:                     i.Years,
 		TraktAdditionalParameters: i.TraktAdditionalParameters,
 		Limit:                     i.Limit,
-		LanguageProfileID:         i.LanguageProfileID,
 		QualityProfileID:          i.QualityProfileID,
 		ID:                        i.ID,
 		EnableAutomaticAdd:        i.EnableAutomaticAdd,
@@ -106,7 +104,6 @@ func (i *ImportListTraktPopular) fromImportList(importList *ImportList) {
 	i.Years = importList.Years
 	i.TraktAdditionalParameters = importList.TraktAdditionalParameters
 	i.Limit = importList.Limit
-	i.LanguageProfileID = importList.LanguageProfileID
 	i.QualityProfileID = importList.QualityProfileID
 	i.ID = importList.ID
 	i.EnableAutomaticAdd = importList.EnableAutomaticAdd
@@ -127,10 +124,6 @@ func (r *ImportListTraktPopularResource) Schema(ctx context.Context, req resourc
 			},
 			"season_folder": schema.BoolAttribute{
 				MarkdownDescription: "Season folder flag.",
-				Required:            true,
-			},
-			"language_profile_id": schema.Int64Attribute{
-				MarkdownDescription: "Language profile ID.",
 				Required:            true,
 			},
 			"quality_profile_id": schema.Int64Attribute{
@@ -266,6 +259,7 @@ func (r *ImportListTraktPopularResource) Create(ctx context.Context, req resourc
 	response, _, err := r.client.ImportListApi.CreateImportList(ctx).ImportListResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, importListTraktPopularResourceName, err))
+
 		return
 	}
 
@@ -289,6 +283,7 @@ func (r *ImportListTraktPopularResource) Read(ctx context.Context, req resource.
 	response, _, err := r.client.ImportListApi.GetImportListById(ctx, int32(importList.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, importListTraktPopularResourceName, err))
+
 		return
 	}
 
@@ -314,6 +309,7 @@ func (r *ImportListTraktPopularResource) Update(ctx context.Context, req resourc
 	response, _, err := r.client.ImportListApi.UpdateImportList(ctx, strconv.Itoa(int(request.GetId()))).ImportListResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, importListTraktPopularResourceName, err))
+
 		return
 	}
 
@@ -336,6 +332,7 @@ func (r *ImportListTraktPopularResource) Delete(ctx context.Context, req resourc
 	_, err := r.client.ImportListApi.DeleteImportList(ctx, int32(importList.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, importListTraktPopularResourceName, err))
+
 		return
 	}
 
@@ -365,7 +362,6 @@ func (i *ImportListTraktPopular) write(ctx context.Context, importList *sonarr.I
 		ShouldMonitor:      types.StringValue(string(importList.GetShouldMonitor())),
 		RootFolderPath:     types.StringValue(importList.GetRootFolderPath()),
 		SeriesType:         types.StringValue(string(importList.GetSeriesType())),
-		LanguageProfileID:  types.Int64Value(int64(importList.GetLanguageProfileId())),
 		QualityProfileID:   types.Int64Value(int64(importList.GetQualityProfileId())),
 		ID:                 types.Int64Value(int64(importList.GetId())),
 		EnableAutomaticAdd: types.BoolValue(importList.GetEnableAutomaticAdd()),
@@ -385,7 +381,6 @@ func (i *ImportListTraktPopular) read(ctx context.Context) *sonarr.ImportListRes
 	list.SetShouldMonitor(sonarr.MonitorTypes(i.ShouldMonitor.ValueString()))
 	list.SetRootFolderPath(i.RootFolderPath.ValueString())
 	list.SetSeriesType(sonarr.SeriesTypes(i.SeriesType.ValueString()))
-	list.SetLanguageProfileId(int32(i.LanguageProfileID.ValueInt64()))
 	list.SetQualityProfileId(int32(i.QualityProfileID.ValueInt64()))
 	list.SetEnableAutomaticAdd(i.EnableAutomaticAdd.ValueBool())
 	list.SetSeasonFolder(i.SeasonFolder.ValueBool())

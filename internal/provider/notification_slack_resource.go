@@ -234,6 +234,7 @@ func (r *NotificationSlackResource) Create(ctx context.Context, req resource.Cre
 	response, _, err := r.client.NotificationApi.CreateNotification(ctx).NotificationResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, notificationSlackResourceName, err))
+
 		return
 	}
 
@@ -257,6 +258,7 @@ func (r *NotificationSlackResource) Read(ctx context.Context, req resource.ReadR
 	response, _, err := r.client.NotificationApi.GetNotificationById(ctx, int32(notification.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, notificationSlackResourceName, err))
+
 		return
 	}
 
@@ -282,6 +284,7 @@ func (r *NotificationSlackResource) Update(ctx context.Context, req resource.Upd
 	response, _, err := r.client.NotificationApi.UpdateNotification(ctx, strconv.Itoa(int(request.GetId()))).NotificationResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, notificationSlackResourceName, err))
+
 		return
 	}
 
@@ -304,6 +307,7 @@ func (r *NotificationSlackResource) Delete(ctx context.Context, req resource.Del
 	_, err := r.client.NotificationApi.DeleteNotification(ctx, int32(notification.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, notificationSlackResourceName, err))
+
 		return
 	}
 

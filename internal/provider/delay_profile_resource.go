@@ -147,6 +147,7 @@ func (r *DelayProfileResource) Create(ctx context.Context, req resource.CreateRe
 	response, _, err := r.client.DelayProfileApi.CreateDelayProfile(ctx).DelayProfileResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, delayProfileResourceName, err))
+
 		return
 	}
 
@@ -159,6 +160,7 @@ func (r *DelayProfileResource) Create(ctx context.Context, req resource.CreateRe
 		response, _, err = r.client.DelayProfileApi.UpdateDelayProfile(ctx, strconv.Itoa(int(response.GetId()))).DelayProfileResource(*response).Execute()
 		if err != nil {
 			resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, delayProfileResourceName, err))
+
 			return
 		}
 	}
@@ -182,6 +184,7 @@ func (r *DelayProfileResource) Read(ctx context.Context, req resource.ReadReques
 	response, _, err := r.client.DelayProfileApi.GetDelayProfileById(ctx, int32(profile.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, delayProfileResourceName, err))
+
 		return
 	}
 
@@ -208,6 +211,7 @@ func (r *DelayProfileResource) Update(ctx context.Context, req resource.UpdateRe
 	response, _, err := r.client.DelayProfileApi.UpdateDelayProfile(ctx, strconv.Itoa(int(request.GetId()))).DelayProfileResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, delayProfileResourceName, err))
+
 		return
 	}
 
@@ -230,6 +234,7 @@ func (r *DelayProfileResource) Delete(ctx context.Context, req resource.DeleteRe
 	_, err := r.client.DelayProfileApi.DeleteDelayProfile(ctx, int32(profile.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, delayProfileResourceName, err))
+
 		return
 	}
 

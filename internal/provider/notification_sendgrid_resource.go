@@ -220,6 +220,7 @@ func (r *NotificationSendgridResource) Create(ctx context.Context, req resource.
 	response, _, err := r.client.NotificationApi.CreateNotification(ctx).NotificationResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, notificationSendgridResourceName, err))
+
 		return
 	}
 
@@ -243,6 +244,7 @@ func (r *NotificationSendgridResource) Read(ctx context.Context, req resource.Re
 	response, _, err := r.client.NotificationApi.GetNotificationById(ctx, int32(notification.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, notificationSendgridResourceName, err))
+
 		return
 	}
 
@@ -268,6 +270,7 @@ func (r *NotificationSendgridResource) Update(ctx context.Context, req resource.
 	response, _, err := r.client.NotificationApi.UpdateNotification(ctx, strconv.Itoa(int(request.GetId()))).NotificationResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, notificationSendgridResourceName, err))
+
 		return
 	}
 
@@ -290,6 +293,7 @@ func (r *NotificationSendgridResource) Delete(ctx context.Context, req resource.
 	_, err := r.client.NotificationApi.DeleteNotification(ctx, int32(notification.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, notificationSendgridResourceName, err))
+
 		return
 	}
 

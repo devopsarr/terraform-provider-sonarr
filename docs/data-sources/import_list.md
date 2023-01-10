@@ -37,7 +37,6 @@ data "sonarr_import_list" "example" {
 - `genres` (String) Expires.
 - `id` (Number) Import List ID.
 - `implementation` (String) ImportList implementation name.
-- `language_profile_id` (Number) Language profile ID.
 - `language_profile_ids` (Set of Number) Language profile IDs.
 - `limit` (Number) Limit.
 - `listname` (String) Expires.

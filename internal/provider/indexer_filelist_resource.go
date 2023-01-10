@@ -238,6 +238,7 @@ func (r *IndexerFilelistResource) Create(ctx context.Context, req resource.Creat
 	response, _, err := r.client.IndexerApi.CreateIndexer(ctx).IndexerResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, indexerFilelistResourceName, err))
+
 		return
 	}
 
@@ -261,6 +262,7 @@ func (r *IndexerFilelistResource) Read(ctx context.Context, req resource.ReadReq
 	response, _, err := r.client.IndexerApi.GetIndexerById(ctx, int32(indexer.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerFilelistResourceName, err))
+
 		return
 	}
 
@@ -309,6 +311,7 @@ func (r *IndexerFilelistResource) Delete(ctx context.Context, req resource.Delet
 	_, err := r.client.IndexerApi.DeleteIndexer(ctx, int32(indexer.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerFilelistResourceName, err))
+
 		return
 	}
 

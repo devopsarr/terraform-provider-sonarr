@@ -222,6 +222,7 @@ func (r *MediaManagementResource) Read(ctx context.Context, req resource.ReadReq
 	response, _, err := r.client.MediaManagementConfigApi.GetMediaManagementConfig(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, mediaManagementResourceName, err))
+
 		return
 	}
 
@@ -248,6 +249,7 @@ func (r *MediaManagementResource) Update(ctx context.Context, req resource.Updat
 	response, _, err := r.client.MediaManagementConfigApi.UpdateMediaManagementConfig(ctx, strconv.Itoa(int(request.GetId()))).MediaManagementConfigResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, mediaManagementResourceName, err))
+
 		return
 	}
 

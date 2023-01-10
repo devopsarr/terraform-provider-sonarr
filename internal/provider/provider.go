@@ -207,7 +207,6 @@ func (p *SonarrProvider) Resources(ctx context.Context) []func() resource.Resour
 
 		// Profiles
 		NewDelayProfileResource,
-		NewLanguageProfileResource,
 		NewQualityProfileResource,
 		NewReleaseProfileResource,
 		NewQualityDefinitionResource,
@@ -251,8 +250,6 @@ func (p *SonarrProvider) DataSources(ctx context.Context) []func() datasource.Da
 		// Profiles
 		NewDelayProfileDataSource,
 		NewDelayProfilesDataSource,
-		NewLanguageProfileDataSource,
-		NewLanguageProfilesDataSource,
 		NewQualityProfileDataSource,
 		NewQualityProfilesDataSource,
 		NewReleaseProfileDataSource,

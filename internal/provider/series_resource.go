@@ -42,7 +42,6 @@ type Series struct {
 	TitleSlug         types.String `tfsdk:"title_slug"`
 	RootFolderPath    types.String `tfsdk:"root_folder_path"`
 	ID                types.Int64  `tfsdk:"id"`
-	LanguageProfileID types.Int64  `tfsdk:"language_profile_id"`
 	QualityProfileID  types.Int64  `tfsdk:"quality_profile_id"`
 	TvdbID            types.Int64  `tfsdk:"tvdb_id"`
 	Monitored         types.Bool   `tfsdk:"monitored"`
@@ -99,10 +98,6 @@ func (r *SeriesResource) Schema(ctx context.Context, req resource.SchemaRequest,
 			},
 			"use_scene_numbering": schema.BoolAttribute{
 				MarkdownDescription: "Scene numbering flag.",
-				Required:            true,
-			},
-			"language_profile_id": schema.Int64Attribute{
-				MarkdownDescription: "Language Profile ID .",
 				Required:            true,
 			},
 			"quality_profile_id": schema.Int64Attribute{
@@ -181,6 +176,7 @@ func (r *SeriesResource) Create(ctx context.Context, req resource.CreateRequest,
 	response, _, err := r.client.SeriesApi.CreateSeries(ctx).SeriesResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, seriesResourceName, err))
+
 		return
 	}
 
@@ -204,6 +200,7 @@ func (r *SeriesResource) Read(ctx context.Context, req resource.ReadRequest, res
 	response, _, err := r.client.SeriesApi.GetSeriesById(ctx, int32(series.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, seriesResourceName, err))
+
 		return
 	}
 
@@ -230,6 +227,7 @@ func (r *SeriesResource) Update(ctx context.Context, req resource.UpdateRequest,
 	response, _, err := r.client.SeriesApi.UpdateSeries(ctx, strconv.Itoa(int(request.GetId()))).SeriesResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, seriesResourceName, err))
+
 		return
 	}
 
@@ -253,6 +251,7 @@ func (r *SeriesResource) Delete(ctx context.Context, req resource.DeleteRequest,
 	_, err := r.client.SeriesApi.DeleteSeries(ctx, int32(series.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, seriesResourceName, err))
+
 		return
 	}
 
@@ -282,7 +281,6 @@ func (s *Series) write(ctx context.Context, series *sonarr.SeriesResource) {
 	s.SeasonFolder = types.BoolValue(series.GetSeasonFolder())
 	s.UseSceneNumbering = types.BoolValue(series.GetUseSceneNumbering())
 	s.ID = types.Int64Value(int64(series.GetId()))
-	s.LanguageProfileID = types.Int64Value(int64(series.GetLanguageProfileId()))
 	s.QualityProfileID = types.Int64Value(int64(series.GetQualityProfileId()))
 	s.TvdbID = types.Int64Value(int64(series.GetTvdbId()))
 	s.Path = types.StringValue(series.GetPath())
@@ -301,7 +299,6 @@ func (s *Series) read(ctx context.Context) *sonarr.SeriesResource {
 	series.SetTitle(s.Title.ValueString())
 	series.SetTitleSlug(s.TitleSlug.ValueString())
 	series.SetQualityProfileId(int32(s.QualityProfileID.ValueInt64()))
-	series.SetLanguageProfileId(int32(s.LanguageProfileID.ValueInt64()))
 	series.SetMonitored(s.Monitored.ValueBool())
 	series.SetSeasonFolder(s.SeasonFolder.ValueBool())
 	series.SetPath(s.Path.ValueString())

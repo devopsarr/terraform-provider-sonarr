@@ -59,10 +59,6 @@ func (d *SeriesDataSource) Schema(ctx context.Context, req datasource.SchemaRequ
 				MarkdownDescription: "Scene numbering flag.",
 				Computed:            true,
 			},
-			"language_profile_id": schema.Int64Attribute{
-				MarkdownDescription: "Language Profile ID .",
-				Computed:            true,
-			},
 			"quality_profile_id": schema.Int64Attribute{
 				MarkdownDescription: "Quality Profile ID.",
 				Computed:            true,
@@ -119,6 +115,7 @@ func (d *SeriesDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 	response, _, err := d.client.SeriesApi.ListSeries(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, seriesDataSourceName, err))
+
 		return
 	}
 

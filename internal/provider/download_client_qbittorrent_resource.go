@@ -283,6 +283,7 @@ func (r *DownloadClientQbittorrentResource) Create(ctx context.Context, req reso
 	response, _, err := r.client.DownloadClientApi.CreateDownloadClient(ctx).DownloadClientResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, downloadClientQbittorrentResourceName, err))
+
 		return
 	}
 
@@ -306,6 +307,7 @@ func (r *DownloadClientQbittorrentResource) Read(ctx context.Context, req resour
 	response, _, err := r.client.DownloadClientApi.GetDownloadClientById(ctx, int32(client.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, downloadClientQbittorrentResourceName, err))
+
 		return
 	}
 
@@ -331,6 +333,7 @@ func (r *DownloadClientQbittorrentResource) Update(ctx context.Context, req reso
 	response, _, err := r.client.DownloadClientApi.UpdateDownloadClient(ctx, strconv.Itoa(int(request.GetId()))).DownloadClientResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, downloadClientQbittorrentResourceName, err))
+
 		return
 	}
 
@@ -353,6 +356,7 @@ func (r *DownloadClientQbittorrentResource) Delete(ctx context.Context, req reso
 	_, err := r.client.DownloadClientApi.DeleteDownloadClient(ctx, int32(client.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, downloadClientQbittorrentResourceName, err))
+
 		return
 	}
 

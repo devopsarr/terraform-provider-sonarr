@@ -220,6 +220,7 @@ func (r *IndexerTorrentRssResource) Create(ctx context.Context, req resource.Cre
 	response, _, err := r.client.IndexerApi.CreateIndexer(ctx).IndexerResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, indexerTorrentRssResourceName, err))
+
 		return
 	}
 
@@ -243,6 +244,7 @@ func (r *IndexerTorrentRssResource) Read(ctx context.Context, req resource.ReadR
 	response, _, err := r.client.IndexerApi.GetIndexerById(ctx, int32(indexer.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerTorrentRssResourceName, err))
+
 		return
 	}
 
@@ -291,6 +293,7 @@ func (r *IndexerTorrentRssResource) Delete(ctx context.Context, req resource.Del
 	_, err := r.client.IndexerApi.DeleteIndexer(ctx, int32(indexer.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerTorrentRssResourceName, err))
+
 		return
 	}
 

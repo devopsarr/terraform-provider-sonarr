@@ -162,6 +162,7 @@ func (r *RootFolderResource) Read(ctx context.Context, req resource.ReadRequest,
 	response, _, err := r.client.RootFolderApi.GetRootFolderById(ctx, int32(folder.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, rootFolderResourceName, err))
+
 		return
 	}
 
@@ -188,6 +189,7 @@ func (r *RootFolderResource) Delete(ctx context.Context, req resource.DeleteRequ
 	_, err := r.client.RootFolderApi.DeleteRootFolder(ctx, int32(folder.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, rootFolderResourceName, err))
+
 		return
 	}
 

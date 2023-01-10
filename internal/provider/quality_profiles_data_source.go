@@ -146,6 +146,7 @@ func (d *QualityProfilesDataSource) Read(ctx context.Context, req datasource.Rea
 	response, _, err := d.client.QualityProfileApi.ListQualityProfile(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, qualityProfilesDataSourceName, err))
+
 		return
 	}
 

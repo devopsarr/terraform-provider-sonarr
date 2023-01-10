@@ -255,6 +255,7 @@ func (r *IndexerTorznabResource) Create(ctx context.Context, req resource.Create
 	response, _, err := r.client.IndexerApi.CreateIndexer(ctx).IndexerResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, indexerTorznabResourceName, err))
+
 		return
 	}
 
@@ -278,6 +279,7 @@ func (r *IndexerTorznabResource) Read(ctx context.Context, req resource.ReadRequ
 	response, _, err := r.client.IndexerApi.GetIndexerById(ctx, int32(indexer.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerTorznabResourceName, err))
+
 		return
 	}
 
@@ -326,6 +328,7 @@ func (r *IndexerTorznabResource) Delete(ctx context.Context, req resource.Delete
 	_, err := r.client.IndexerApi.DeleteIndexer(ctx, int32(indexer.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerTorznabResourceName, err))
+
 		return
 	}
 

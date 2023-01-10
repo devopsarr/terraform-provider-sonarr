@@ -33,7 +33,6 @@ resource "sonarr_import_list" "test" {
 	series_type = "standard"
 	root_folder_path = "/defaults"
 	quality_profile_id = 1
-	language_profile_id = 1
 	name = "importListDataTest"
 	implementation = "SonarrImport"
 	config_contract = "SonarrSettings"

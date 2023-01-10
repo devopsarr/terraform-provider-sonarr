@@ -78,6 +78,7 @@ func (d *DownloadClientConfigDataSource) Read(ctx context.Context, req datasourc
 	response, _, err := d.client.DownloadClientConfigApi.GetDownloadClientConfig(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, downloadClientConfigDataSourceName, err))
+
 		return
 	}
 

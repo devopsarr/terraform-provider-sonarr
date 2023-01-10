@@ -99,6 +99,7 @@ func (d *TagsDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 	response, _, err := d.client.TagApi.ListTag(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, tagsDataSourceName, err))
+
 		return
 	}
 

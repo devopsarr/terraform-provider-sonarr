@@ -134,6 +134,7 @@ func (r *NamingResource) Create(ctx context.Context, req resource.CreateRequest,
 	// Init call if we remove this it the very first update on a brand new instance will fail
 	if _, _, err := r.client.NamingConfigApi.GetNamingConfig(ctx).Execute(); err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError("init", namingResourceName, err))
+
 		return
 	}
 
@@ -145,6 +146,7 @@ func (r *NamingResource) Create(ctx context.Context, req resource.CreateRequest,
 	response, _, err := r.client.NamingConfigApi.UpdateNamingConfig(ctx, strconv.Itoa(int(request.GetId()))).NamingConfigResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, namingResourceName, err))
+
 		return
 	}
 
@@ -168,6 +170,7 @@ func (r *NamingResource) Read(ctx context.Context, req resource.ReadRequest, res
 	response, _, err := r.client.NamingConfigApi.GetNamingConfig(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, namingResourceName, err))
+
 		return
 	}
 
@@ -194,6 +197,7 @@ func (r *NamingResource) Update(ctx context.Context, req resource.UpdateRequest,
 	response, _, err := r.client.NamingConfigApi.UpdateNamingConfig(ctx, strconv.Itoa(int(request.GetId()))).NamingConfigResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, namingResourceName, err))
+
 		return
 	}
 

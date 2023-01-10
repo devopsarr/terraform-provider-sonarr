@@ -52,7 +52,6 @@ type ImportListSonarr struct {
 	SeriesType         types.String `tfsdk:"series_type"`
 	BaseURL            types.String `tfsdk:"base_url"`
 	APIKey             types.String `tfsdk:"api_key"`
-	LanguageProfileID  types.Int64  `tfsdk:"language_profile_id"`
 	QualityProfileID   types.Int64  `tfsdk:"quality_profile_id"`
 	ID                 types.Int64  `tfsdk:"id"`
 	EnableAutomaticAdd types.Bool   `tfsdk:"enable_automatic_add"`
@@ -71,7 +70,6 @@ func (i ImportListSonarr) toImportList() *ImportList {
 		SeriesType:         i.SeriesType,
 		BaseURL:            i.BaseURL,
 		APIKey:             i.APIKey,
-		LanguageProfileID:  i.LanguageProfileID,
 		QualityProfileID:   i.QualityProfileID,
 		ID:                 i.ID,
 		EnableAutomaticAdd: i.EnableAutomaticAdd,
@@ -90,7 +88,6 @@ func (i *ImportListSonarr) fromImportList(importList *ImportList) {
 	i.SeriesType = importList.SeriesType
 	i.BaseURL = importList.BaseURL
 	i.APIKey = importList.APIKey
-	i.LanguageProfileID = importList.LanguageProfileID
 	i.QualityProfileID = importList.QualityProfileID
 	i.ID = importList.ID
 	i.EnableAutomaticAdd = importList.EnableAutomaticAdd
@@ -111,10 +108,6 @@ func (r *ImportListSonarrResource) Schema(ctx context.Context, req resource.Sche
 			},
 			"season_folder": schema.BoolAttribute{
 				MarkdownDescription: "Season folder flag.",
-				Required:            true,
-			},
-			"language_profile_id": schema.Int64Attribute{
-				MarkdownDescription: "Language profile ID.",
 				Required:            true,
 			},
 			"quality_profile_id": schema.Int64Attribute{
@@ -223,6 +216,7 @@ func (r *ImportListSonarrResource) Create(ctx context.Context, req resource.Crea
 	response, _, err := r.client.ImportListApi.CreateImportList(ctx).ImportListResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, importListSonarrResourceName, err))
+
 		return
 	}
 
@@ -246,6 +240,7 @@ func (r *ImportListSonarrResource) Read(ctx context.Context, req resource.ReadRe
 	response, _, err := r.client.ImportListApi.GetImportListById(ctx, int32(importList.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, importListSonarrResourceName, err))
+
 		return
 	}
 
@@ -271,6 +266,7 @@ func (r *ImportListSonarrResource) Update(ctx context.Context, req resource.Upda
 	response, _, err := r.client.ImportListApi.UpdateImportList(ctx, strconv.Itoa(int(request.GetId()))).ImportListResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, importListSonarrResourceName, err))
+
 		return
 	}
 
@@ -293,6 +289,7 @@ func (r *ImportListSonarrResource) Delete(ctx context.Context, req resource.Dele
 	_, err := r.client.ImportListApi.DeleteImportList(ctx, int32(importList.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, importListSonarrResourceName, err))
+
 		return
 	}
 
@@ -322,7 +319,6 @@ func (i *ImportListSonarr) write(ctx context.Context, importList *sonarr.ImportL
 		ShouldMonitor:      types.StringValue(string(importList.GetShouldMonitor())),
 		RootFolderPath:     types.StringValue(importList.GetRootFolderPath()),
 		SeriesType:         types.StringValue(string(importList.GetSeriesType())),
-		LanguageProfileID:  types.Int64Value(int64(importList.GetLanguageProfileId())),
 		QualityProfileID:   types.Int64Value(int64(importList.GetQualityProfileId())),
 		ID:                 types.Int64Value(int64(importList.GetId())),
 		EnableAutomaticAdd: types.BoolValue(importList.GetEnableAutomaticAdd()),
@@ -342,7 +338,6 @@ func (i *ImportListSonarr) read(ctx context.Context) *sonarr.ImportListResource 
 	list.SetShouldMonitor(sonarr.MonitorTypes(i.ShouldMonitor.ValueString()))
 	list.SetRootFolderPath(i.RootFolderPath.ValueString())
 	list.SetSeriesType(sonarr.SeriesTypes(i.SeriesType.ValueString()))
-	list.SetLanguageProfileId(int32(i.LanguageProfileID.ValueInt64()))
 	list.SetQualityProfileId(int32(i.QualityProfileID.ValueInt64()))
 	list.SetEnableAutomaticAdd(i.EnableAutomaticAdd.ValueBool())
 	list.SetSeasonFolder(i.SeasonFolder.ValueBool())

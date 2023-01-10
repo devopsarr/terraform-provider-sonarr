@@ -224,6 +224,7 @@ func (r *NotificationJoinResource) Create(ctx context.Context, req resource.Crea
 	response, _, err := r.client.NotificationApi.CreateNotification(ctx).NotificationResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, notificationJoinResourceName, err))
+
 		return
 	}
 
@@ -247,6 +248,7 @@ func (r *NotificationJoinResource) Read(ctx context.Context, req resource.ReadRe
 	response, _, err := r.client.NotificationApi.GetNotificationById(ctx, int32(notification.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, notificationJoinResourceName, err))
+
 		return
 	}
 
@@ -272,6 +274,7 @@ func (r *NotificationJoinResource) Update(ctx context.Context, req resource.Upda
 	response, _, err := r.client.NotificationApi.UpdateNotification(ctx, strconv.Itoa(int(request.GetId()))).NotificationResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, notificationJoinResourceName, err))
+
 		return
 	}
 
@@ -294,6 +297,7 @@ func (r *NotificationJoinResource) Delete(ctx context.Context, req resource.Dele
 	_, err := r.client.NotificationApi.DeleteNotification(ctx, int32(notification.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, notificationJoinResourceName, err))
+
 		return
 	}
 

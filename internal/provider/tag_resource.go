@@ -107,6 +107,7 @@ func (r *TagResource) Create(ctx context.Context, req resource.CreateRequest, re
 	response, _, err := r.client.TagApi.CreateTag(ctx).TagResource(request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, tagResourceName, err))
+
 		return
 	}
 
@@ -130,6 +131,7 @@ func (r *TagResource) Read(ctx context.Context, req resource.ReadRequest, resp *
 	response, _, err := r.client.TagApi.GetTagById(ctx, int32(tag.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, tagResourceName, err))
+
 		return
 	}
 
@@ -157,6 +159,7 @@ func (r *TagResource) Update(ctx context.Context, req resource.UpdateRequest, re
 	response, _, err := r.client.TagApi.UpdateTag(ctx, fmt.Sprint(tagResource.GetId())).TagResource(tagResource).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, tagResourceName, err))
+
 		return
 	}
 
@@ -179,6 +182,7 @@ func (r *TagResource) Delete(ctx context.Context, req resource.DeleteRequest, re
 	_, err := r.client.TagApi.DeleteTag(ctx, int32(tag.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, tagResourceName, err))
+
 		return
 	}
 
