@@ -107,8 +107,7 @@ func (d *DelayProfileDataSource) Read(ctx context.Context, req datasource.ReadRe
 	// Get delayprofiles current value
 	response, _, err := d.client.DelayProfileApi.ListDelayProfile(ctx).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", delayProfileDataSourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, delayProfileDataSourceName, err))
 		return
 	}
 

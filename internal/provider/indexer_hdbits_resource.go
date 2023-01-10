@@ -219,8 +219,7 @@ func (r *IndexerHdbitsResource) Create(ctx context.Context, req resource.CreateR
 
 	response, _, err := r.client.IndexerApi.CreateIndexer(ctx).IndexerResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", indexerHdbitsResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, indexerHdbitsResourceName, err))
 		return
 	}
 
@@ -243,8 +242,7 @@ func (r *IndexerHdbitsResource) Read(ctx context.Context, req resource.ReadReque
 	// Get IndexerHdbits current value
 	response, _, err := r.client.IndexerApi.GetIndexerById(ctx, int32(indexer.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerHdbitsResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerHdbitsResourceName, err))
 		return
 	}
 
@@ -269,7 +267,7 @@ func (r *IndexerHdbitsResource) Update(ctx context.Context, req resource.UpdateR
 
 	response, _, err := r.client.IndexerApi.UpdateIndexer(ctx, strconv.Itoa(int(request.GetId()))).IndexerResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to update "+indexerHdbitsResourceName+", got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, indexerHdbitsResourceName, err))
 
 		return
 	}
@@ -292,8 +290,7 @@ func (r *IndexerHdbitsResource) Delete(ctx context.Context, req resource.DeleteR
 	// Delete IndexerHdbits current value
 	_, err := r.client.IndexerApi.DeleteIndexer(ctx, int32(indexer.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerHdbitsResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerHdbitsResourceName, err))
 		return
 	}
 

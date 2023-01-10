@@ -110,8 +110,7 @@ func (d *LanguageProfilesDataSource) Read(ctx context.Context, req datasource.Re
 	// Get languageprofiles current value
 	response, _, err := d.client.LanguageProfileApi.ListLanguageProfile(ctx).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", languageProfilesDataSourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, languageProfilesDataSourceName, err))
 		return
 	}
 

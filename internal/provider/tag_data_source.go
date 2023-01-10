@@ -77,7 +77,7 @@ func (d *TagDataSource) Read(ctx context.Context, req datasource.ReadRequest, re
 	// Get tags current value
 	response, _, err := d.client.TagApi.ListTag(ctx).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, helpers.UnableToRead(tagDataSourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, tagDataSourceName, err))
 
 		return
 	}

@@ -254,8 +254,7 @@ func (r *IndexerTorznabResource) Create(ctx context.Context, req resource.Create
 
 	response, _, err := r.client.IndexerApi.CreateIndexer(ctx).IndexerResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", indexerTorznabResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, indexerTorznabResourceName, err))
 		return
 	}
 
@@ -278,8 +277,7 @@ func (r *IndexerTorznabResource) Read(ctx context.Context, req resource.ReadRequ
 	// Get IndexerTorznab current value
 	response, _, err := r.client.IndexerApi.GetIndexerById(ctx, int32(indexer.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerTorznabResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerTorznabResourceName, err))
 		return
 	}
 
@@ -304,7 +302,7 @@ func (r *IndexerTorznabResource) Update(ctx context.Context, req resource.Update
 
 	response, _, err := r.client.IndexerApi.UpdateIndexer(ctx, strconv.Itoa(int(request.GetId()))).IndexerResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to update "+indexerTorznabResourceName+", got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, indexerTorznabResourceName, err))
 
 		return
 	}
@@ -327,8 +325,7 @@ func (r *IndexerTorznabResource) Delete(ctx context.Context, req resource.Delete
 	// Delete IndexerTorznab current value
 	_, err := r.client.IndexerApi.DeleteIndexer(ctx, int32(indexer.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerTorznabResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerTorznabResourceName, err))
 		return
 	}
 

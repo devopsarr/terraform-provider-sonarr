@@ -203,8 +203,7 @@ func (r *NotificationBoxcarResource) Create(ctx context.Context, req resource.Cr
 
 	response, _, err := r.client.NotificationApi.CreateNotification(ctx).NotificationResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", notificationBoxcarResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, notificationBoxcarResourceName, err))
 		return
 	}
 
@@ -227,8 +226,7 @@ func (r *NotificationBoxcarResource) Read(ctx context.Context, req resource.Read
 	// Get NotificationBoxcar current value
 	response, _, err := r.client.NotificationApi.GetNotificationById(ctx, int32(notification.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", notificationBoxcarResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, notificationBoxcarResourceName, err))
 		return
 	}
 
@@ -253,8 +251,7 @@ func (r *NotificationBoxcarResource) Update(ctx context.Context, req resource.Up
 
 	response, _, err := r.client.NotificationApi.UpdateNotification(ctx, strconv.Itoa(int(request.GetId()))).NotificationResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", notificationBoxcarResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, notificationBoxcarResourceName, err))
 		return
 	}
 
@@ -276,8 +273,7 @@ func (r *NotificationBoxcarResource) Delete(ctx context.Context, req resource.De
 	// Delete NotificationBoxcar current value
 	_, err := r.client.NotificationApi.DeleteNotification(ctx, int32(notification.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", notificationBoxcarResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, notificationBoxcarResourceName, err))
 		return
 	}
 

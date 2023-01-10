@@ -229,8 +229,7 @@ func (r *NotificationPushbulletResource) Create(ctx context.Context, req resourc
 
 	response, _, err := r.client.NotificationApi.CreateNotification(ctx).NotificationResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", notificationPushbulletResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, notificationPushbulletResourceName, err))
 		return
 	}
 
@@ -253,8 +252,7 @@ func (r *NotificationPushbulletResource) Read(ctx context.Context, req resource.
 	// Get NotificationPushbullet current value
 	response, _, err := r.client.NotificationApi.GetNotificationById(ctx, int32(notification.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", notificationPushbulletResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, notificationPushbulletResourceName, err))
 		return
 	}
 
@@ -279,8 +277,7 @@ func (r *NotificationPushbulletResource) Update(ctx context.Context, req resourc
 
 	response, _, err := r.client.NotificationApi.UpdateNotification(ctx, strconv.Itoa(int(request.GetId()))).NotificationResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", notificationPushbulletResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, notificationPushbulletResourceName, err))
 		return
 	}
 
@@ -302,8 +299,7 @@ func (r *NotificationPushbulletResource) Delete(ctx context.Context, req resourc
 	// Delete NotificationPushbullet current value
 	_, err := r.client.NotificationApi.DeleteNotification(ctx, int32(notification.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", notificationPushbulletResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, notificationPushbulletResourceName, err))
 		return
 	}
 

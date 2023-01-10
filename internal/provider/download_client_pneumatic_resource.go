@@ -170,8 +170,7 @@ func (r *DownloadClientPneumaticResource) Create(ctx context.Context, req resour
 
 	response, _, err := r.client.DownloadClientApi.CreateDownloadClient(ctx).DownloadClientResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", downloadClientPneumaticResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, downloadClientPneumaticResourceName, err))
 		return
 	}
 
@@ -194,8 +193,7 @@ func (r *DownloadClientPneumaticResource) Read(ctx context.Context, req resource
 	// Get DownloadClientPneumatic current value
 	response, _, err := r.client.DownloadClientApi.GetDownloadClientById(ctx, int32(client.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", downloadClientPneumaticResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, downloadClientPneumaticResourceName, err))
 		return
 	}
 
@@ -220,8 +218,7 @@ func (r *DownloadClientPneumaticResource) Update(ctx context.Context, req resour
 
 	response, _, err := r.client.DownloadClientApi.UpdateDownloadClient(ctx, strconv.Itoa(int(request.GetId()))).DownloadClientResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", downloadClientPneumaticResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, downloadClientPneumaticResourceName, err))
 		return
 	}
 
@@ -243,8 +240,7 @@ func (r *DownloadClientPneumaticResource) Delete(ctx context.Context, req resour
 	// Delete DownloadClientPneumatic current value
 	_, err := r.client.DownloadClientApi.DeleteDownloadClient(ctx, int32(client.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", downloadClientPneumaticResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, downloadClientPneumaticResourceName, err))
 		return
 	}
 

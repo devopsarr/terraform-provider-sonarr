@@ -96,8 +96,7 @@ func (d *RootFolderDataSource) Read(ctx context.Context, req datasource.ReadRequ
 	// Get rootfolders current value
 	response, _, err := d.client.RootFolderApi.ListRootFolder(ctx).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", rootFolderDataSourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, rootFolderDataSourceName, err))
 		return
 	}
 

@@ -212,8 +212,7 @@ func (r *IndexerTorrentleechResource) Create(ctx context.Context, req resource.C
 
 	response, _, err := r.client.IndexerApi.CreateIndexer(ctx).IndexerResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", indexerTorrentleechResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, indexerTorrentleechResourceName, err))
 		return
 	}
 
@@ -236,8 +235,7 @@ func (r *IndexerTorrentleechResource) Read(ctx context.Context, req resource.Rea
 	// Get IndexerTorrentleech current value
 	response, _, err := r.client.IndexerApi.GetIndexerById(ctx, int32(indexer.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerTorrentleechResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerTorrentleechResourceName, err))
 		return
 	}
 
@@ -262,7 +260,7 @@ func (r *IndexerTorrentleechResource) Update(ctx context.Context, req resource.U
 
 	response, _, err := r.client.IndexerApi.UpdateIndexer(ctx, strconv.Itoa(int(request.GetId()))).IndexerResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to update "+indexerTorrentleechResourceName+", got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, indexerTorrentleechResourceName, err))
 
 		return
 	}
@@ -285,8 +283,7 @@ func (r *IndexerTorrentleechResource) Delete(ctx context.Context, req resource.D
 	// Delete IndexerTorrentleech current value
 	_, err := r.client.IndexerApi.DeleteIndexer(ctx, int32(indexer.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerTorrentleechResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerTorrentleechResourceName, err))
 		return
 	}
 

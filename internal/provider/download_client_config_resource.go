@@ -108,8 +108,7 @@ func (r *DownloadClientConfigResource) Create(ctx context.Context, req resource.
 	// Create new DownloadClientConfig
 	response, _, err := r.client.DownloadClientConfigApi.UpdateDownloadClientConfig(ctx, strconv.Itoa(int(request.GetId()))).DownloadClientConfigResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", downloadClientConfigResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, downloadClientConfigResourceName, err))
 		return
 	}
 
@@ -132,8 +131,7 @@ func (r *DownloadClientConfigResource) Read(ctx context.Context, req resource.Re
 	// Get downloadClientConfig current value
 	response, _, err := r.client.DownloadClientConfigApi.GetDownloadClientConfig(ctx).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", downloadClientConfigResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, downloadClientConfigResourceName, err))
 		return
 	}
 
@@ -159,8 +157,7 @@ func (r *DownloadClientConfigResource) Update(ctx context.Context, req resource.
 	// Update DownloadClientConfig
 	response, _, err := r.client.DownloadClientConfigApi.UpdateDownloadClientConfig(ctx, strconv.Itoa(int(request.GetId()))).DownloadClientConfigResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", downloadClientConfigResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, downloadClientConfigResourceName, err))
 		return
 	}
 

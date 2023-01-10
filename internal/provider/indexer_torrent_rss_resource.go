@@ -219,8 +219,7 @@ func (r *IndexerTorrentRssResource) Create(ctx context.Context, req resource.Cre
 
 	response, _, err := r.client.IndexerApi.CreateIndexer(ctx).IndexerResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", indexerTorrentRssResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, indexerTorrentRssResourceName, err))
 		return
 	}
 
@@ -243,8 +242,7 @@ func (r *IndexerTorrentRssResource) Read(ctx context.Context, req resource.ReadR
 	// Get IndexerTorrentRss current value
 	response, _, err := r.client.IndexerApi.GetIndexerById(ctx, int32(indexer.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerTorrentRssResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerTorrentRssResourceName, err))
 		return
 	}
 
@@ -269,7 +267,7 @@ func (r *IndexerTorrentRssResource) Update(ctx context.Context, req resource.Upd
 
 	response, _, err := r.client.IndexerApi.UpdateIndexer(ctx, strconv.Itoa(int(request.GetId()))).IndexerResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to update "+indexerTorrentRssResourceName+", got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, indexerTorrentRssResourceName, err))
 
 		return
 	}
@@ -292,8 +290,7 @@ func (r *IndexerTorrentRssResource) Delete(ctx context.Context, req resource.Del
 	// Delete IndexerTorrentRss current value
 	_, err := r.client.IndexerApi.DeleteIndexer(ctx, int32(indexer.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerTorrentRssResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerTorrentRssResourceName, err))
 		return
 	}
 

@@ -120,8 +120,7 @@ func (r *LanguageProfileResource) Create(ctx context.Context, req resource.Creat
 	// Create new LanguageProfile
 	response, _, err := r.client.LanguageProfileApi.CreateLanguageProfile(ctx).LanguageProfileResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", languageProfileResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, languageProfileResourceName, err))
 		return
 	}
 
@@ -144,8 +143,7 @@ func (r *LanguageProfileResource) Read(ctx context.Context, req resource.ReadReq
 	// Get languageprofile current value
 	response, _, err := r.client.LanguageProfileApi.GetLanguageProfileById(ctx, int32(profile.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", languageProfileResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, languageProfileResourceName, err))
 		return
 	}
 
@@ -171,8 +169,7 @@ func (r *LanguageProfileResource) Update(ctx context.Context, req resource.Updat
 	// Update LanguageProfile
 	response, _, err := r.client.LanguageProfileApi.UpdateLanguageProfile(ctx, strconv.Itoa(int(request.GetId()))).LanguageProfileResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", languageProfileResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, languageProfileResourceName, err))
 		return
 	}
 
@@ -194,8 +191,7 @@ func (r *LanguageProfileResource) Delete(ctx context.Context, req resource.Delet
 	// Delete languageprofile current value
 	_, err := r.client.LanguageProfileApi.DeleteLanguageProfile(ctx, int32(profile.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", languageProfileResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, languageProfileResourceName, err))
 		return
 	}
 

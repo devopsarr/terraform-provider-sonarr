@@ -211,8 +211,7 @@ func (r *DownloadClientHadoukenResource) Create(ctx context.Context, req resourc
 
 	response, _, err := r.client.DownloadClientApi.CreateDownloadClient(ctx).DownloadClientResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", downloadClientHadoukenResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, downloadClientHadoukenResourceName, err))
 		return
 	}
 
@@ -235,8 +234,7 @@ func (r *DownloadClientHadoukenResource) Read(ctx context.Context, req resource.
 	// Get DownloadClientHadouken current value
 	response, _, err := r.client.DownloadClientApi.GetDownloadClientById(ctx, int32(client.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", downloadClientHadoukenResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, downloadClientHadoukenResourceName, err))
 		return
 	}
 
@@ -261,8 +259,7 @@ func (r *DownloadClientHadoukenResource) Update(ctx context.Context, req resourc
 
 	response, _, err := r.client.DownloadClientApi.UpdateDownloadClient(ctx, strconv.Itoa(int(request.GetId()))).DownloadClientResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", downloadClientHadoukenResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, downloadClientHadoukenResourceName, err))
 		return
 	}
 
@@ -284,8 +281,7 @@ func (r *DownloadClientHadoukenResource) Delete(ctx context.Context, req resourc
 	// Delete DownloadClientHadouken current value
 	_, err := r.client.DownloadClientApi.DeleteDownloadClient(ctx, int32(client.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", downloadClientHadoukenResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, downloadClientHadoukenResourceName, err))
 		return
 	}
 

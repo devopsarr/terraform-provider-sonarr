@@ -235,8 +235,7 @@ func (r *NotificationMailgunResource) Create(ctx context.Context, req resource.C
 
 	response, _, err := r.client.NotificationApi.CreateNotification(ctx).NotificationResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", notificationMailgunResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, notificationMailgunResourceName, err))
 		return
 	}
 
@@ -259,8 +258,7 @@ func (r *NotificationMailgunResource) Read(ctx context.Context, req resource.Rea
 	// Get NotificationMailgun current value
 	response, _, err := r.client.NotificationApi.GetNotificationById(ctx, int32(notification.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", notificationMailgunResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, notificationMailgunResourceName, err))
 		return
 	}
 
@@ -285,8 +283,7 @@ func (r *NotificationMailgunResource) Update(ctx context.Context, req resource.U
 
 	response, _, err := r.client.NotificationApi.UpdateNotification(ctx, strconv.Itoa(int(request.GetId()))).NotificationResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", notificationMailgunResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, notificationMailgunResourceName, err))
 		return
 	}
 
@@ -308,8 +305,7 @@ func (r *NotificationMailgunResource) Delete(ctx context.Context, req resource.D
 	// Delete NotificationMailgun current value
 	_, err := r.client.NotificationApi.DeleteNotification(ctx, int32(notification.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", notificationMailgunResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, notificationMailgunResourceName, err))
 		return
 	}
 

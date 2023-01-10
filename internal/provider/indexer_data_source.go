@@ -191,8 +191,7 @@ func (d *IndexerDataSource) Read(ctx context.Context, req datasource.ReadRequest
 	// Get indexer current value
 	response, _, err := d.client.IndexerApi.ListIndexer(ctx).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerDataSourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerDataSourceName, err))
 		return
 	}
 

@@ -180,8 +180,7 @@ func (r *SeriesResource) Create(ctx context.Context, req resource.CreateRequest,
 
 	response, _, err := r.client.SeriesApi.CreateSeries(ctx).SeriesResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", seriesResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, seriesResourceName, err))
 		return
 	}
 
@@ -204,8 +203,7 @@ func (r *SeriesResource) Read(ctx context.Context, req resource.ReadRequest, res
 	// Get series current value
 	response, _, err := r.client.SeriesApi.GetSeriesById(ctx, int32(series.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", seriesResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, seriesResourceName, err))
 		return
 	}
 
@@ -231,8 +229,7 @@ func (r *SeriesResource) Update(ctx context.Context, req resource.UpdateRequest,
 	// TODO: manage movefiles on sdk
 	response, _, err := r.client.SeriesApi.UpdateSeries(ctx, strconv.Itoa(int(request.GetId()))).SeriesResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", seriesResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, seriesResourceName, err))
 		return
 	}
 
@@ -255,8 +252,7 @@ func (r *SeriesResource) Delete(ctx context.Context, req resource.DeleteRequest,
 	// TODO: manage delete parameters on SDK
 	_, err := r.client.SeriesApi.DeleteSeries(ctx, int32(series.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to delete %s, got error: %s", seriesResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, seriesResourceName, err))
 		return
 	}
 

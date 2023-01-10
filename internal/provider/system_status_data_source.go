@@ -187,8 +187,7 @@ func (d *SystemStatusDataSource) Read(ctx context.Context, req datasource.ReadRe
 	// Get naming current value
 	response, _, err := d.client.SystemApi.GetSystemStatus(ctx).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", systemStatusDataSourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, systemStatusDataSourceName, err))
 		return
 	}
 

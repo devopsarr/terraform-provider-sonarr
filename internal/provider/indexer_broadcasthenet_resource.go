@@ -211,8 +211,7 @@ func (r *IndexerBroadcastheNetResource) Create(ctx context.Context, req resource
 
 	response, _, err := r.client.IndexerApi.CreateIndexer(ctx).IndexerResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", indexerBroadcastheNetResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, indexerBroadcastheNetResourceName, err))
 		return
 	}
 
@@ -235,8 +234,7 @@ func (r *IndexerBroadcastheNetResource) Read(ctx context.Context, req resource.R
 	// Get IndexerBroadcastheNet current value
 	response, _, err := r.client.IndexerApi.GetIndexerById(ctx, int32(indexer.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerBroadcastheNetResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerBroadcastheNetResourceName, err))
 		return
 	}
 
@@ -261,7 +259,7 @@ func (r *IndexerBroadcastheNetResource) Update(ctx context.Context, req resource
 
 	response, _, err := r.client.IndexerApi.UpdateIndexer(ctx, strconv.Itoa(int(request.GetId()))).IndexerResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to update "+indexerBroadcastheNetResourceName+", got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, indexerBroadcastheNetResourceName, err))
 
 		return
 	}
@@ -284,8 +282,7 @@ func (r *IndexerBroadcastheNetResource) Delete(ctx context.Context, req resource
 	// Delete IndexerBroadcastheNet current value
 	_, err := r.client.IndexerApi.DeleteIndexer(ctx, int32(indexer.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerBroadcastheNetResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerBroadcastheNetResourceName, err))
 		return
 	}
 

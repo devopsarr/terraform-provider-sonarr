@@ -220,8 +220,7 @@ func (r *IndexerRarbgResource) Create(ctx context.Context, req resource.CreateRe
 
 	response, _, err := r.client.IndexerApi.CreateIndexer(ctx).IndexerResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", indexerRarbgResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, indexerRarbgResourceName, err))
 		return
 	}
 
@@ -244,8 +243,7 @@ func (r *IndexerRarbgResource) Read(ctx context.Context, req resource.ReadReques
 	// Get IndexerRarbg current value
 	response, _, err := r.client.IndexerApi.GetIndexerById(ctx, int32(indexer.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerRarbgResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerRarbgResourceName, err))
 		return
 	}
 
@@ -270,7 +268,7 @@ func (r *IndexerRarbgResource) Update(ctx context.Context, req resource.UpdateRe
 
 	response, _, err := r.client.IndexerApi.UpdateIndexer(ctx, strconv.Itoa(int(request.GetId()))).IndexerResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to update "+indexerRarbgResourceName+", got error: %s", err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, indexerRarbgResourceName, err))
 
 		return
 	}
@@ -293,8 +291,7 @@ func (r *IndexerRarbgResource) Delete(ctx context.Context, req resource.DeleteRe
 	// Delete IndexerRarbg current value
 	_, err := r.client.IndexerApi.DeleteIndexer(ctx, int32(indexer.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerRarbgResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerRarbgResourceName, err))
 		return
 	}
 

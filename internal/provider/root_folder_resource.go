@@ -137,7 +137,7 @@ func (r *RootFolderResource) Create(ctx context.Context, req resource.CreateRequ
 
 	response, _, err := r.client.RootFolderApi.CreateRootFolder(ctx).RootFolderResource(request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", rootFolderResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, rootFolderResourceName, err))
 
 		return
 	}
@@ -161,8 +161,7 @@ func (r *RootFolderResource) Read(ctx context.Context, req resource.ReadRequest,
 	// Get rootFolder current value
 	response, _, err := r.client.RootFolderApi.GetRootFolderById(ctx, int32(folder.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", rootFolderResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, rootFolderResourceName, err))
 		return
 	}
 
@@ -188,8 +187,7 @@ func (r *RootFolderResource) Delete(ctx context.Context, req resource.DeleteRequ
 	// Delete rootFolder current value
 	_, err := r.client.RootFolderApi.DeleteRootFolder(ctx, int32(folder.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", rootFolderResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, rootFolderResourceName, err))
 		return
 	}
 

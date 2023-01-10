@@ -188,8 +188,7 @@ func (r *ImportListPlexResource) Create(ctx context.Context, req resource.Create
 
 	response, _, err := r.client.ImportListApi.CreateImportList(ctx).ImportListResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", importListPlexResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, importListPlexResourceName, err))
 		return
 	}
 
@@ -212,8 +211,7 @@ func (r *ImportListPlexResource) Read(ctx context.Context, req resource.ReadRequ
 	// Get ImportListPlex current value
 	response, _, err := r.client.ImportListApi.GetImportListById(ctx, int32(importList.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", importListPlexResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, importListPlexResourceName, err))
 		return
 	}
 
@@ -238,8 +236,7 @@ func (r *ImportListPlexResource) Update(ctx context.Context, req resource.Update
 
 	response, _, err := r.client.ImportListApi.UpdateImportList(ctx, strconv.Itoa(int(request.GetId()))).ImportListResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", importListPlexResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, importListPlexResourceName, err))
 		return
 	}
 
@@ -261,8 +258,7 @@ func (r *ImportListPlexResource) Delete(ctx context.Context, req resource.Delete
 	// Delete ImportListPlex current value
 	_, err := r.client.ImportListApi.DeleteImportList(ctx, int32(importList.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", importListPlexResourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, importListPlexResourceName, err))
 		return
 	}
 

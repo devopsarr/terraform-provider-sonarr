@@ -269,8 +269,7 @@ func (d *DownloadClientsDataSource) Read(ctx context.Context, req datasource.Rea
 	// Get download clients current value
 	response, _, err := d.client.DownloadClientApi.ListDownloadClient(ctx).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", downloadClientsDataSourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, downloadClientsDataSourceName, err))
 		return
 	}
 

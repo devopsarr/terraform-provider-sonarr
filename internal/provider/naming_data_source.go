@@ -101,8 +101,7 @@ func (d *NamingDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 	// Get naming current value
 	response, _, err := d.client.NamingConfigApi.GetNamingConfig(ctx).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", namingDataSourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, namingDataSourceName, err))
 		return
 	}
 

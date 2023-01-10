@@ -138,8 +138,7 @@ func (d *AllSeriessDataSource) Read(ctx context.Context, req datasource.ReadRequ
 	// Get series current value
 	response, _, err := d.client.SeriesApi.ListSeries(ctx).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", allSeriesDataSourceName, err))
-
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, allSeriesDataSourceName, err))
 		return
 	}
 
