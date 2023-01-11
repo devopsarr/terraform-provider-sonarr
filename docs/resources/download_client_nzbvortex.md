@@ -30,7 +30,7 @@ resource "sonarr_download_client_nzbvortex" "example" {
 
 ### Required
 
-- `api_key` (String) API key.
+- `api_key` (String, Sensitive) API key.
 - `name` (String) Download Client name.
 
 ### Optional

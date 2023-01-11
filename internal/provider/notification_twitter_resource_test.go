@@ -31,9 +31,10 @@ func TestAccNotificationTwitterResource(t *testing.T) {
 			},
 			// ImportState testing
 			{
-				ResourceName:      "sonarr_notification_twitter.test",
-				ImportState:       true,
-				ImportStateVerify: true,
+				ResourceName:            "sonarr_notification_twitter.test",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"access_token", "access_token_secret", "consumer_key", "consumer_secret"},
 			},
 			// Delete testing automatically occurs in TestCase
 		},

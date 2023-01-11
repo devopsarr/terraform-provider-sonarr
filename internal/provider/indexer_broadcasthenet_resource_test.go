@@ -31,9 +31,10 @@ func TestAccIndexerBroadcastheNetResource(t *testing.T) {
 			},
 			// ImportState testing
 			{
-				ResourceName:      "sonarr_indexer_broadcasthenet.test",
-				ImportState:       true,
-				ImportStateVerify: true,
+				ResourceName:            "sonarr_indexer_broadcasthenet.test",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"api_key"},
 			},
 			// Delete testing automatically occurs in TestCase
 		},

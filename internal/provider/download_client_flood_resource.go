@@ -399,6 +399,8 @@ func (d *DownloadClientFlood) write(ctx context.Context, downloadClient *sonarr.
 		FieldTags:                types.SetValueMust(types.StringType, nil),
 		PostImportTags:           types.SetValueMust(types.StringType, nil),
 	}
+	// Write sensitive data only if present
+	genericDownloadClient.writeSensitive(&DownloadClient{Password: d.Password})
 	genericDownloadClient.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, downloadClient.Tags)
 	genericDownloadClient.writeFields(ctx, downloadClient.Fields)
 	d.fromDownloadClient(&genericDownloadClient)

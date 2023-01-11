@@ -333,6 +333,8 @@ func (i *IndexerNewznab) write(ctx context.Context, indexer *sonarr.IndexerResou
 		AnimeCategories:         types.SetValueMust(types.Int64Type, nil),
 		Categories:              types.SetValueMust(types.Int64Type, nil),
 	}
+	// Write sensitive data only if present
+	genericIndexer.writeSensitive(&Indexer{APIKey: i.APIKey})
 	genericIndexer.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, indexer.Tags)
 	genericIndexer.writeFields(ctx, indexer.Fields)
 	i.fromIndexer(&genericIndexer)

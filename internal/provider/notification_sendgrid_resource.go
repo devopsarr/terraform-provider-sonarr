@@ -331,6 +331,8 @@ func (n *NotificationSendgrid) write(ctx context.Context, notification *sonarr.N
 		ID:                            types.Int64Value(int64(notification.GetId())),
 		Name:                          types.StringValue(notification.GetName()),
 	}
+	// Write sensitive data only if present
+	genericNotification.writeSensitive(&Notification{APIKey: n.APIKey})
 	genericNotification.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, notification.Tags)
 	genericNotification.writeFields(ctx, notification.Fields)
 	n.fromNotification(&genericNotification)

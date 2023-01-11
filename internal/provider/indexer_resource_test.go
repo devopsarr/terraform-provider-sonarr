@@ -36,6 +36,12 @@ func TestAccIndexerResource(t *testing.T) {
 				ImportState:       true,
 				ImportStateVerify: true,
 			},
+			{
+				ResourceName:            "sonarr_indexer.test_sensitive",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"passkey"},
+			},
 			// Delete testing automatically occurs in TestCase
 		},
 	})
@@ -53,5 +59,19 @@ func testAccIndexerResourceConfig(name, aSearch string) string {
 		api_path = "/api"
 		categories = [5030, 5040]
 		tags = []
-	}`, aSearch, name)
+	}
+
+	resource "sonarr_indexer" "test_sensitive" {
+		enable_automatic_search = false
+		name = "%sWithSensitive"
+		base_url = "https://filelist.io"
+		username = "test"
+		passkey = "Pass"
+		categories = [21,23,27]
+		minimum_seeders = 1
+		implementation = "FileList"
+		protocol = "torrent"
+    	config_contract = "FileListSettings"
+	}
+	`, aSearch, name, name)
 }

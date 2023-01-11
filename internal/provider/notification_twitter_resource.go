@@ -353,6 +353,11 @@ func (n *NotificationTwitter) write(ctx context.Context, notification *sonarr.No
 		IncludeHealthWarnings:         types.BoolValue(notification.GetIncludeHealthWarnings()),
 		ID:                            types.Int64Value(int64(notification.GetId())),
 		Name:                          types.StringValue(notification.GetName()),
+		// Pass along sensitive values.
+		ConsumerKey:       n.ConsumerKey,
+		ConsumerSecret:    n.ConsumerSecret,
+		AccessToken:       n.AccessToken,
+		AccessTokenSecret: n.AccessTokenSecret,
 	}
 	genericNotification.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, notification.Tags)
 	genericNotification.writeFields(ctx, notification.Fields)

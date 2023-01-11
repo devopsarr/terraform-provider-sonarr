@@ -59,7 +59,7 @@ func testAccMediaManagementResourceConfig(date string) string {
 		episode_title_required      = "always"
 		extra_file_extensions       = "srt,info"
 		file_date                   = "%s"
-		recycle_bin_path            = "/bin"
+		recycle_bin_path            = "/config/logs"
 		rescan_after_refresh        = "always"
 	}`, date)
 }

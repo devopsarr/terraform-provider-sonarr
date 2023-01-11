@@ -34,6 +34,7 @@ var (
 	notificationIntFields         = []string{"method", "port", "priority", "retry", "expire", "displayTime"}
 	notificationStringSliceFields = []string{"channelTags", "deviceIds", "devices", "recipients", "to", "cc", "bcc"}
 	notificationIntSliceFields    = []string{"grabFields", "importFields"}
+	notificationSensitiveFields   = []string{"apiKey", "token", "password", "appToken", "authToken", "botToken", "accessToken", "accessTokenSecret", "consumerKey", "consumerSecret"}
 )
 
 func NewNotificationResource() resource.Resource {
@@ -560,6 +561,7 @@ func (r *NotificationResource) Create(ctx context.Context, req resource.CreateRe
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state Notification
 
+	state.writeSensitive(notification)
 	state.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
@@ -587,6 +589,7 @@ func (r *NotificationResource) Read(ctx context.Context, req resource.ReadReques
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state Notification
 
+	state.writeSensitive(notification)
 	state.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
@@ -616,6 +619,7 @@ func (r *NotificationResource) Update(ctx context.Context, req resource.UpdateRe
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state Notification
 
+	state.writeSensitive(notification)
 	state.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
@@ -691,7 +695,7 @@ func (n *Notification) writeFields(ctx context.Context, fields []*sonarr.Field) 
 			continue
 		}
 
-		if slices.Contains(notificationStringFields, f.GetName()) {
+		if slices.Contains(notificationStringFields, f.GetName()) && !slices.Contains(notificationSensitiveFields, f.GetName()) {
 			helpers.WriteStringField(f, n)
 
 			continue
@@ -783,4 +787,19 @@ func (n *Notification) readFields(ctx context.Context) []*sonarr.Field {
 	}
 
 	return output
+}
+
+// writeSensitive copy sensitive data from another resource.
+func (n *Notification) writeSensitive(notification *Notification) {
+	if !notification.Token.IsUnknown() {
+		n.Token = notification.Token
+	}
+
+	if !notification.APIKey.IsUnknown() {
+		n.APIKey = notification.APIKey
+	}
+
+	if !notification.Password.IsUnknown() {
+		n.Password = notification.Password
+	}
 }

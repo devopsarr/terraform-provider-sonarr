@@ -36,6 +36,12 @@ func TestAccDownloadClientResource(t *testing.T) {
 				ImportState:       true,
 				ImportStateVerify: true,
 			},
+			{
+				ResourceName:            "sonarr_download_client.test_sensitive",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"password"},
+			},
 			// Delete testing automatically occurs in TestCase
 		},
 	})
@@ -54,5 +60,21 @@ func testAccDownloadClientResourceConfig(name, enable string) string {
 		url_base = "/transmission/"
 		port = 9091
 		tags = []
-	}`, enable, name)
+	}
+	
+	resource "sonarr_download_client" "test_sensitive" {
+		enable = false
+		priority = 1
+		name = "%sWithSensitive"
+		host = "hadouken"
+		url_base = "/hadouken/"
+		port = 9091
+		category = "sonarr-tv"
+		username = "username"
+		password = "password"
+		protocol = "torrent"
+    	config_contract = "HadoukenSettings"
+		implementation = "Hadouken"
+	}
+	`, enable, name, name)
 }

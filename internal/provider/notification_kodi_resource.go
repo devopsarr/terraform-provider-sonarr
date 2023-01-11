@@ -395,6 +395,8 @@ func (n *NotificationKodi) write(ctx context.Context, notification *sonarr.Notif
 		ID:                            types.Int64Value(int64(notification.GetId())),
 		Name:                          types.StringValue(notification.GetName()),
 	}
+	// Write sensitive data only if present
+	genericNotification.writeSensitive(&Notification{Password: n.Password})
 	genericNotification.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, notification.Tags)
 	genericNotification.writeFields(ctx, notification.Fields)
 	n.fromNotification(&genericNotification)

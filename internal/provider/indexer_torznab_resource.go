@@ -362,6 +362,8 @@ func (i *IndexerTorznab) write(ctx context.Context, indexer *sonarr.IndexerResou
 		ID:                      types.Int64Value(int64(indexer.GetId())),
 		Name:                    types.StringValue(indexer.GetName()),
 	}
+	// Write sensitive data only if present
+	genericIndexer.writeSensitive(&Indexer{APIKey: i.APIKey})
 	genericIndexer.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, indexer.Tags)
 	genericIndexer.writeFields(ctx, indexer.Fields)
 	i.fromIndexer(&genericIndexer)

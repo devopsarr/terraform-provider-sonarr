@@ -317,6 +317,8 @@ func (d *DownloadClientHadouken) write(ctx context.Context, downloadClient *sona
 		Priority:                 types.Int64Value(int64(downloadClient.GetPriority())),
 		ID:                       types.Int64Value(int64(downloadClient.GetId())),
 		Name:                     types.StringValue(downloadClient.GetName()),
+		// Pass along sensitive values.
+		Password: d.Password,
 	}
 	genericDownloadClient.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, downloadClient.Tags)
 	genericDownloadClient.writeFields(ctx, downloadClient.Fields)

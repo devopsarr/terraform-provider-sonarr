@@ -371,6 +371,8 @@ func (d *DownloadClientUtorrent) write(ctx context.Context, downloadClient *sona
 		ID:                       types.Int64Value(int64(downloadClient.GetId())),
 		Name:                     types.StringValue(downloadClient.GetName()),
 	}
+	// Write sensitive data only if present
+	genericDownloadClient.writeSensitive(&DownloadClient{Password: d.Password})
 	genericDownloadClient.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, downloadClient.Tags)
 	genericDownloadClient.writeFields(ctx, downloadClient.Fields)
 	d.fromDownloadClient(&genericDownloadClient)

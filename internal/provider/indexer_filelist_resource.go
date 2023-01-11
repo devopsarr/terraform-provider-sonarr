@@ -344,6 +344,8 @@ func (i *IndexerFilelist) write(ctx context.Context, indexer *sonarr.IndexerReso
 		DownloadClientID:        types.Int64Value(int64(indexer.GetDownloadClientId())),
 		ID:                      types.Int64Value(int64(indexer.GetId())),
 		Name:                    types.StringValue(indexer.GetName()),
+		// Pass along sensitive values.
+		Passkey: i.Passkey,
 	}
 	genericIndexer.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, indexer.Tags)
 	genericIndexer.writeFields(ctx, indexer.Fields)

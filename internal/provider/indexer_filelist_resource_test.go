@@ -31,9 +31,10 @@ func TestAccIndexerFilelistResource(t *testing.T) {
 			},
 			// ImportState testing
 			{
-				ResourceName:      "sonarr_indexer_filelist.test",
-				ImportState:       true,
-				ImportStateVerify: true,
+				ResourceName:            "sonarr_indexer_filelist.test",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"passkey"},
 			},
 			// Delete testing automatically occurs in TestCase
 		},

@@ -183,6 +183,7 @@ func (r *DownloadClientNzbvortexResource) Schema(ctx context.Context, req resour
 			"api_key": schema.StringAttribute{
 				MarkdownDescription: "API key.",
 				Required:            true,
+				Sensitive:           true,
 			},
 			"tv_category": schema.StringAttribute{
 				MarkdownDescription: "TV category.",
@@ -333,6 +334,8 @@ func (d *DownloadClientNzbvortex) write(ctx context.Context, downloadClient *son
 		Priority:                 types.Int64Value(int64(downloadClient.GetPriority())),
 		ID:                       types.Int64Value(int64(downloadClient.GetId())),
 		Name:                     types.StringValue(downloadClient.GetName()),
+		// Pass along sensitive values.
+		APIKey: d.APIKey,
 	}
 	genericDownloadClient.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, downloadClient.Tags)
 	genericDownloadClient.writeFields(ctx, downloadClient.Fields)

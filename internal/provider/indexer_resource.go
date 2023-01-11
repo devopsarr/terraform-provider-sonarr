@@ -29,11 +29,12 @@ var (
 )
 
 var (
-	indexerIntSliceFields = []string{"categories", "animeCategories"}
-	indexerBoolFields     = []string{"allowZeroSize", "animeStandardFormatSearch", "rankedOnly"}
-	indexerIntFields      = []string{"delay", "minimumSeeders", "seasonPackSeedTime", "seedTime"}
-	indexerStringFields   = []string{"additionalParameters", "apiKey", "apiPath", "baseUrl", "captchaToken", "cookie", "passkey", "username"}
-	indexerFloatFields    = []string{"seedRatio"}
+	indexerIntSliceFields  = []string{"categories", "animeCategories"}
+	indexerBoolFields      = []string{"allowZeroSize", "animeStandardFormatSearch", "rankedOnly"}
+	indexerIntFields       = []string{"delay", "minimumSeeders", "seasonPackSeedTime", "seedTime"}
+	indexerStringFields    = []string{"additionalParameters", "apiKey", "apiPath", "baseUrl", "captchaToken", "cookie", "passkey", "username"}
+	indexerFloatFields     = []string{"seedRatio"}
+	indexerSensitiveFields = []string{"apiKey", "passkey"}
 )
 
 func NewIndexerResource() resource.Resource {
@@ -285,8 +286,8 @@ func (r *IndexerResource) Create(ctx context.Context, req resource.CreateRequest
 	// Generate resource state struct.
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state Indexer
-	state.Tags = indexer.Tags
 
+	state.writeSensitive(indexer)
 	state.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
@@ -313,8 +314,8 @@ func (r *IndexerResource) Read(ctx context.Context, req resource.ReadRequest, re
 	// Generate resource state struct.
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state Indexer
-	state.Tags = indexer.Tags
 
+	state.writeSensitive(indexer)
 	state.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
@@ -343,8 +344,8 @@ func (r *IndexerResource) Update(ctx context.Context, req resource.UpdateRequest
 	// Generate resource state struct.
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state Indexer
-	state.Tags = indexer.Tags
 
+	state.writeSensitive(indexer)
 	state.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
@@ -409,7 +410,7 @@ func (i *Indexer) writeFields(ctx context.Context, fields []*sonarr.Field) {
 			continue
 		}
 
-		if slices.Contains(indexerStringFields, f.GetName()) {
+		if slices.Contains(indexerStringFields, f.GetName()) && !slices.Contains(indexerSensitiveFields, f.GetName()) {
 			helpers.WriteStringField(f, i)
 
 			continue
@@ -495,4 +496,15 @@ func (i *Indexer) readFields(ctx context.Context) []*sonarr.Field {
 	}
 
 	return output
+}
+
+// writeSensitive copy sensitive data from another resource.
+func (i *Indexer) writeSensitive(indexer *Indexer) {
+	if !indexer.Passkey.IsUnknown() {
+		i.Passkey = indexer.Passkey
+	}
+
+	if !indexer.APIKey.IsUnknown() {
+		i.APIKey = indexer.APIKey
+	}
 }

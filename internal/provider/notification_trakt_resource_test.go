@@ -31,9 +31,10 @@ func TestAccNotificationTraktResource(t *testing.T) {
 			},
 			// ImportState testing
 			{
-				ResourceName:      "sonarr_notification_trakt.test",
-				ImportState:       true,
-				ImportStateVerify: true,
+				ResourceName:            "sonarr_notification_trakt.test",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"access_token"},
 			},
 			// Delete testing automatically occurs in TestCase
 		},

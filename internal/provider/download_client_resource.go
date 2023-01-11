@@ -35,6 +35,7 @@ var (
 	downloadClientStringFields      = []string{"host", "apiKey", "urlBase", "rpcPath", "secretToken", "password", "username", "tvCategory", "tvImportedCategory", "tvDirectory", "destination", "category", "nzbFolder", "strmFolder", "torrentFolder", "magnetFileExtension", "watchFolder"}
 	downloadClientStringSliceFields = []string{"fieldTags", "postImportTags"}
 	downloadClientIntSliceFields    = []string{"additionalTags"}
+	downloadClientSensitiveFields   = []string{"apiKey", "password"}
 )
 
 func NewDownloadClientResource() resource.Resource {
@@ -382,13 +383,14 @@ func (r *DownloadClientResource) Create(ctx context.Context, req resource.Create
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state DownloadClient
 
+	state.writeSensitive(client)
 	state.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
 
 func (r *DownloadClientResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	// Get current state
-	var client DownloadClient
+	var client *DownloadClient
 
 	resp.Diagnostics.Append(req.State.Get(ctx, &client)...)
 
@@ -409,6 +411,7 @@ func (r *DownloadClientResource) Read(ctx context.Context, req resource.ReadRequ
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state DownloadClient
 
+	state.writeSensitive(client)
 	state.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
@@ -438,6 +441,7 @@ func (r *DownloadClientResource) Update(ctx context.Context, req resource.Update
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state DownloadClient
 
+	state.writeSensitive(client)
 	state.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
@@ -502,7 +506,7 @@ func (d *DownloadClient) writeFields(ctx context.Context, fields []*sonarr.Field
 			continue
 		}
 
-		if slices.Contains(downloadClientStringFields, f.GetName()) {
+		if slices.Contains(downloadClientStringFields, f.GetName()) && !slices.Contains(downloadClientSensitiveFields, f.GetName()) {
 			helpers.WriteStringField(f, d)
 
 			continue
@@ -588,4 +592,15 @@ func (d *DownloadClient) readFields(ctx context.Context) []*sonarr.Field {
 	}
 
 	return output
+}
+
+// writeSensitive copy sensitive data from another resource.
+func (d *DownloadClient) writeSensitive(client *DownloadClient) {
+	if !client.Password.IsUnknown() {
+		d.Password = client.Password
+	}
+
+	if !client.APIKey.IsUnknown() {
+		d.APIKey = client.APIKey
+	}
 }

@@ -329,6 +329,8 @@ func (n *NotificationTelegram) write(ctx context.Context, notification *sonarr.N
 		IncludeHealthWarnings:         types.BoolValue(notification.GetIncludeHealthWarnings()),
 		ID:                            types.Int64Value(int64(notification.GetId())),
 		Name:                          types.StringValue(notification.GetName()),
+		// Pass along sensitive values.
+		BotToken: n.BotToken,
 	}
 	genericNotification.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, notification.Tags)
 	genericNotification.writeFields(ctx, notification.Fields)
