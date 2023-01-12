@@ -54,10 +54,9 @@ func testAccSeriesResourceConfig(id int, title, slug, monitored string) string {
 		monitored           = %s
 		season_folder       = true
 		use_scene_numbering = false
-		path                = "/tmp/%s"
-		root_folder_path    = "/tmp"
+		path                = "/config/%s"
+		root_folder_path    = "/config"
 	  
-		language_profile_id = 1
 		quality_profile_id  = 1
 		tags                = [sonarr_tag.test.id]
 	}

@@ -44,54 +44,18 @@ func TestAccImportListResource(t *testing.T) {
 func testAccImportListResourceConfig(name, enable string) string {
 	return fmt.Sprintf(`
 
-
-	resource "sonarr_quality_profile" "test" {
-		name            = "%s"
-		upgrade_allowed = true
-		cutoff          = 1100
-
-		quality_groups = [
-			{
-				id   = 1100
-				name = "4k"
-				qualities = [
-					{
-						id         = 18
-						name       = "WEBDL-2160p"
-						source     = "web"
-						resolution = 2160
-					},
-					{
-						id         = 19
-						name       = "Bluray-2160p"
-						source     = "bluray"
-						resolution = 2160
-					}
-				]
-			}
-		]
-	}
-
-	resource "sonarr_language_profile" "test" {
-		upgrade_allowed = true
-		name = "%s"
-		cutoff_language = "English"
-		languages = [ "English" ]
-	}
-
 	resource "sonarr_import_list" "test" {
 		enable_automatic_add = %s
 		season_folder = true
 		should_monitor = "all"
 		series_type = "standard"
-		root_folder_path = "/defaults"
-		quality_profile_id = sonarr_quality_profile.test.id
-		language_profile_id = sonarr_language_profile.test.id
+		root_folder_path = "/config"
+		quality_profile_id = 1
 		name = "%s"
 		implementation = "SonarrImport"
     	config_contract = "SonarrSettings"
 		base_url = "http://127.0.0.1:8989"
 		api_key = "b01df9fca2e64e459d64a09888ce7451"
 		tags = []
-	}`, name, name, enable, name)
+	}`, enable, name)
 }

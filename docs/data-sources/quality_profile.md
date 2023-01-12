@@ -28,9 +28,22 @@ data "sonarr_quality_profile" "example" {
 ### Read-Only
 
 - `cutoff` (Number) Quality ID to which cutoff.
+- `cutoff_format_score` (Number) Cutoff format score.
+- `format_items` (Attributes Set) Quality groups. (see [below for nested schema](#nestedatt--format_items))
 - `id` (Number) Quality Profile ID.
+- `min_format_score` (Number) Min format score.
 - `quality_groups` (Attributes Set) Quality groups. (see [below for nested schema](#nestedatt--quality_groups))
 - `upgrade_allowed` (Boolean) Upgrade allowed flag.
+
+<a id="nestedatt--format_items"></a>
+### Nested Schema for `format_items`
+
+Read-Only:
+
+- `format` (Number) Format.
+- `name` (String) Name.
+- `score` (Number) Score.
+
 
 <a id="nestedatt--quality_groups"></a>
 ### Nested Schema for `quality_groups`

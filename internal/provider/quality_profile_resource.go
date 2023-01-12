@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/devopsarr/sonarr-go/sonarr"
-	"github.com/devopsarr/terraform-provider-sonarr/tools"
+	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -36,11 +36,14 @@ type QualityProfileResource struct {
 
 // QualityProfile describes the quality profile data model.
 type QualityProfile struct {
-	QualityGroups  types.Set    `tfsdk:"quality_groups"`
-	Name           types.String `tfsdk:"name"`
-	ID             types.Int64  `tfsdk:"id"`
-	Cutoff         types.Int64  `tfsdk:"cutoff"`
-	UpgradeAllowed types.Bool   `tfsdk:"upgrade_allowed"`
+	QualityGroups     types.Set    `tfsdk:"quality_groups"`
+	FormatItems       types.Set    `tfsdk:"format_items"`
+	Name              types.String `tfsdk:"name"`
+	ID                types.Int64  `tfsdk:"id"`
+	Cutoff            types.Int64  `tfsdk:"cutoff"`
+	MinFormatScore    types.Int64  `tfsdk:"min_format_score"`
+	CutoffFormatScore types.Int64  `tfsdk:"cutoff_format_score"`
+	UpgradeAllowed    types.Bool   `tfsdk:"upgrade_allowed"`
 }
 
 // QualityGroup is part of QualityProfile.
@@ -56,6 +59,13 @@ type Quality struct {
 	Source     types.String `tfsdk:"source"`
 	ID         types.Int64  `tfsdk:"id"`
 	Resolution types.Int64  `tfsdk:"resolution"`
+}
+
+// FormatItem is part of QualityProfile.
+type FormatItem struct {
+	Name   types.String `tfsdk:"name"`
+	Format types.Int64  `tfsdk:"format"`
+	Score  types.Int64  `tfsdk:"score"`
 }
 
 func (r *QualityProfileResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -87,11 +97,29 @@ func (r *QualityProfileResource) Schema(ctx context.Context, req resource.Schema
 				Optional:            true,
 				Computed:            true,
 			},
+			"cutoff_format_score": schema.Int64Attribute{
+				MarkdownDescription: "Cutoff format score.",
+				Optional:            true,
+				Computed:            true,
+			},
+			"min_format_score": schema.Int64Attribute{
+				MarkdownDescription: "Min format score.",
+				Optional:            true,
+				Computed:            true,
+			},
 			"quality_groups": schema.SetNestedAttribute{
 				MarkdownDescription: "Quality groups.",
 				Required:            true,
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: r.getQualityGroupSchema().Attributes,
+				},
+			},
+			"format_items": schema.SetNestedAttribute{
+				MarkdownDescription: "Format items.",
+				Optional:            true,
+				Computed:            true,
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: r.getFormatItemsSchema().Attributes,
 				},
 			},
 		},
@@ -149,6 +177,26 @@ func (r QualityProfileResource) getQualitySchema() schema.Schema {
 	}
 }
 
+func (r QualityProfileResource) getFormatItemsSchema() schema.Schema {
+	return schema.Schema{
+		Attributes: map[string]schema.Attribute{
+			"format": schema.Int64Attribute{
+				MarkdownDescription: "Format.",
+				Required:            true,
+			},
+			"score": schema.Int64Attribute{
+				MarkdownDescription: "Score.",
+				Required:            true,
+			},
+			"name": schema.StringAttribute{
+				MarkdownDescription: "Name.",
+				Optional:            true,
+				Computed:            true,
+			},
+		},
+	}
+}
+
 func (r *QualityProfileResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
 	// Prevent panic if the provider has not been configured.
 	if req.ProviderData == nil {
@@ -158,7 +206,7 @@ func (r *QualityProfileResource) Configure(ctx context.Context, req resource.Con
 	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
-			tools.UnexpectedResourceConfigureType,
+			helpers.UnexpectedResourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -184,7 +232,7 @@ func (r *QualityProfileResource) Create(ctx context.Context, req resource.Create
 	// Create new QualityProfile
 	response, _, err := r.client.QualityProfileApi.CreateQualityProfile(ctx).QualityProfileResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", qualityProfileResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, qualityProfileResourceName, err))
 
 		return
 	}
@@ -208,7 +256,7 @@ func (r *QualityProfileResource) Read(ctx context.Context, req resource.ReadRequ
 	// Get qualityprofile current value
 	response, _, err := r.client.QualityProfileApi.GetQualityProfileById(ctx, int32(profile.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", qualityProfileResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, qualityProfileResourceName, err))
 
 		return
 	}
@@ -235,7 +283,7 @@ func (r *QualityProfileResource) Update(ctx context.Context, req resource.Update
 	// Update QualityProfile
 	response, _, err := r.client.QualityProfileApi.UpdateQualityProfile(ctx, strconv.Itoa(int(request.GetId()))).QualityProfileResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", qualityProfileResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, qualityProfileResourceName, err))
 
 		return
 	}
@@ -258,7 +306,7 @@ func (r *QualityProfileResource) Delete(ctx context.Context, req resource.Delete
 	// Delete qualityprofile current value
 	_, err := r.client.QualityProfileApi.DeleteQualityProfile(ctx, int32(profile.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", qualityProfileResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, qualityProfileResourceName, err))
 
 		return
 	}
@@ -272,7 +320,7 @@ func (r *QualityProfileResource) ImportState(ctx context.Context, req resource.I
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			tools.UnexpectedImportIdentifier,
+			helpers.UnexpectedImportIdentifier,
 			fmt.Sprintf("Expected import identifier with format: ID. Got: %q", req.ID),
 		)
 
@@ -288,11 +336,19 @@ func (p *QualityProfile) write(ctx context.Context, profile *sonarr.QualityProfi
 	p.ID = types.Int64Value(int64(profile.GetId()))
 	p.Name = types.StringValue(profile.GetName())
 	p.Cutoff = types.Int64Value(int64(profile.GetCutoff()))
+	p.CutoffFormatScore = types.Int64Value(int64(profile.GetCutoffFormatScore()))
+	p.MinFormatScore = types.Int64Value(int64(profile.GetMinFormatScore()))
 	p.QualityGroups = types.SetValueMust(QualityProfileResource{}.getQualityGroupSchema().Type(), nil)
+	p.FormatItems = types.SetValueMust(QualityProfileResource{}.getFormatItemsSchema().Type(), nil)
 
 	qualityGroups := make([]QualityGroup, len(profile.GetItems()))
 	for n, g := range profile.GetItems() {
 		qualityGroups[n].write(ctx, g)
+	}
+
+	formatItems := make([]FormatItem, len(profile.FormatItems))
+	for n, f := range profile.FormatItems {
+		formatItems[n].write(f)
 	}
 
 	tfsdk.ValueFrom(ctx, qualityGroups, p.QualityGroups.Type(ctx), &p.QualityGroups)
@@ -337,6 +393,12 @@ func (q *Quality) write(quality *sonarr.QualityProfileQualityItemResource) {
 	q.Resolution = types.Int64Value(int64(quality.Quality.GetResolution()))
 }
 
+func (f *FormatItem) write(format *sonarr.ProfileFormatItemResource) {
+	f.Name = types.StringValue(format.GetName())
+	f.Format = types.Int64Value(int64(format.GetFormat()))
+	f.Score = types.Int64Value(int64(format.GetScore()))
+}
+
 func (p *QualityProfile) read(ctx context.Context) *sonarr.QualityProfileResource {
 	groups := make([]QualityGroup, len(p.QualityGroups.Elements()))
 	tfsdk.ValueAs(ctx, p.QualityGroups, &groups)
@@ -373,12 +435,23 @@ func (p *QualityProfile) read(ctx context.Context) *sonarr.QualityProfileResourc
 		qualities[n] = quality
 	}
 
+	formats := make([]FormatItem, len(p.FormatItems.Elements()))
+	tfsdk.ValueAs(ctx, p.FormatItems, &formats)
+	formatItems := make([]*sonarr.ProfileFormatItemResource, len(formats))
+
+	for n, f := range formats {
+		formatItems[n] = f.read()
+	}
+
 	profile := sonarr.NewQualityProfileResource()
 	profile.SetUpgradeAllowed(p.UpgradeAllowed.ValueBool())
 	profile.SetId(int32(p.ID.ValueInt64()))
 	profile.SetCutoff(int32(p.Cutoff.ValueInt64()))
+	profile.SetMinFormatScore(int32(p.MinFormatScore.ValueInt64()))
+	profile.SetCutoffFormatScore(int32(p.CutoffFormatScore.ValueInt64()))
 	profile.SetName(p.Name.ValueString())
 	profile.SetItems(qualities)
+	profile.SetFormatItems(formatItems)
 
 	return profile
 }
@@ -395,4 +468,13 @@ func (q *Quality) read() *sonarr.QualityProfileQualityItemResource {
 	item.SetQuality(*quality)
 
 	return item
+}
+
+func (f *FormatItem) read() *sonarr.ProfileFormatItemResource {
+	formatItem := sonarr.NewProfileFormatItemResource()
+	formatItem.SetFormat(int32(f.Format.ValueInt64()))
+	formatItem.SetName(f.Name.ValueString())
+	formatItem.SetScore(int32(f.Score.ValueInt64()))
+
+	return formatItem
 }

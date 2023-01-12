@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/devopsarr/sonarr-go/sonarr"
-	"github.com/devopsarr/terraform-provider-sonarr/tools"
+	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -220,7 +220,7 @@ func (r *DownloadClientNzbgetResource) Configure(ctx context.Context, req resour
 	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
-			tools.UnexpectedResourceConfigureType,
+			helpers.UnexpectedResourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -245,7 +245,7 @@ func (r *DownloadClientNzbgetResource) Create(ctx context.Context, req resource.
 
 	response, _, err := r.client.DownloadClientApi.CreateDownloadClient(ctx).DownloadClientResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", downloadClientNzbgetResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, downloadClientNzbgetResourceName, err))
 
 		return
 	}
@@ -269,7 +269,7 @@ func (r *DownloadClientNzbgetResource) Read(ctx context.Context, req resource.Re
 	// Get DownloadClientNzbget current value
 	response, _, err := r.client.DownloadClientApi.GetDownloadClientById(ctx, int32(client.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", downloadClientNzbgetResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, downloadClientNzbgetResourceName, err))
 
 		return
 	}
@@ -295,7 +295,7 @@ func (r *DownloadClientNzbgetResource) Update(ctx context.Context, req resource.
 
 	response, _, err := r.client.DownloadClientApi.UpdateDownloadClient(ctx, strconv.Itoa(int(request.GetId()))).DownloadClientResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", downloadClientNzbgetResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, downloadClientNzbgetResourceName, err))
 
 		return
 	}
@@ -318,7 +318,7 @@ func (r *DownloadClientNzbgetResource) Delete(ctx context.Context, req resource.
 	// Delete DownloadClientNzbget current value
 	_, err := r.client.DownloadClientApi.DeleteDownloadClient(ctx, int32(client.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", downloadClientNzbgetResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, downloadClientNzbgetResourceName, err))
 
 		return
 	}
@@ -332,7 +332,7 @@ func (r *DownloadClientNzbgetResource) ImportState(ctx context.Context, req reso
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			tools.UnexpectedImportIdentifier,
+			helpers.UnexpectedImportIdentifier,
 			fmt.Sprintf("Expected import identifier with format: ID. Got: %q", req.ID),
 		)
 
@@ -352,6 +352,8 @@ func (d *DownloadClientNzbget) write(ctx context.Context, downloadClient *sonarr
 		ID:                       types.Int64Value(int64(downloadClient.GetId())),
 		Name:                     types.StringValue(downloadClient.GetName()),
 	}
+	// Write sensitive data only if present
+	genericDownloadClient.writeSensitive(&DownloadClient{Password: d.Password})
 	genericDownloadClient.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, downloadClient.Tags)
 	genericDownloadClient.writeFields(ctx, downloadClient.Fields)
 	d.fromDownloadClient(&genericDownloadClient)

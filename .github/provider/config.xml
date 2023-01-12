@@ -6,12 +6,14 @@
   <UrlBase></UrlBase>
   <BindAddress>*</BindAddress>
   <ApiKey>b01df9fca2e64e459d64a09888ce7451</ApiKey>
-  <AuthenticationMethod>None</AuthenticationMethod>
+  <AuthenticationMethod>Basic</AuthenticationMethod>
   <UpdateMechanism>Docker</UpdateMechanism>
   <LaunchBrowser>True</LaunchBrowser>
-  <Branch>main</Branch>
-  <SslCertHash></SslCertHash>
+  <Branch>develop</Branch>
   <AnalyticsEnabled>False</AnalyticsEnabled>
   <UpdateAutomatically>False</UpdateAutomatically>
   <InstanceName>Sonarr</InstanceName>
+  <AuthenticationRequired>DisabledForLocalAddresses</AuthenticationRequired>
+  <SslCertPath></SslCertPath>
+  <SslCertPassword></SslCertPassword>
 </Config>

@@ -21,7 +21,7 @@ func TestAccRootFolderDataSource(t *testing.T) {
 				Config:    testAccRootFolderDataSourceConfig,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrSet("data.sonarr_root_folder.test", "id"),
-					resource.TestCheckResourceAttr("data.sonarr_root_folder.test", "path", "/defaults")),
+					resource.TestCheckResourceAttr("data.sonarr_root_folder.test", "path", "/config")),
 			},
 		},
 	})
@@ -29,14 +29,14 @@ func TestAccRootFolderDataSource(t *testing.T) {
 
 const testAccRootFolderDataSourceConfig = `
 data "sonarr_root_folder" "test" {
-	path = "/defaults"
+	path = "/config"
 }
 `
 
 func rootFolderDSInit() {
-	// ensure a /defaults root path is configured
+	// ensure a /config root path is configured
 	client := testAccAPIClient()
 	folder := sonarr.NewRootFolderResource()
-	folder.SetPath("/defaults")
+	folder.SetPath("/config")
 	_, _, _ = client.RootFolderApi.CreateRootFolder(context.TODO()).RootFolderResource(*folder).Execute()
 }

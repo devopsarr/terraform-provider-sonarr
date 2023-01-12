@@ -32,9 +32,10 @@ func TestAccDownloadClientSabnzbdResource(t *testing.T) {
 			},
 			// ImportState testing
 			{
-				ResourceName:      "sonarr_download_client_sabnzbd.test",
-				ImportState:       true,
-				ImportStateVerify: true,
+				ResourceName:            "sonarr_download_client_sabnzbd.test",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"api_key"},
 			},
 			// Delete testing automatically occurs in TestCase
 		},

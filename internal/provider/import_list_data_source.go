@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/devopsarr/sonarr-go/sonarr"
-	"github.com/devopsarr/terraform-provider-sonarr/tools"
+	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -41,10 +41,6 @@ func (d *ImportListDataSource) Schema(ctx context.Context, req datasource.Schema
 			},
 			"season_folder": schema.BoolAttribute{
 				MarkdownDescription: "Season folder flag.",
-				Computed:            true,
-			},
-			"language_profile_id": schema.Int64Attribute{
-				MarkdownDescription: "Language profile ID.",
 				Computed:            true,
 			},
 			"quality_profile_id": schema.Int64Attribute{
@@ -172,7 +168,7 @@ func (d *ImportListDataSource) Configure(ctx context.Context, req datasource.Con
 	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
-			tools.UnexpectedDataSourceConfigureType,
+			helpers.UnexpectedDataSourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -193,14 +189,14 @@ func (d *ImportListDataSource) Read(ctx context.Context, req datasource.ReadRequ
 	// Get importList current value
 	response, _, err := d.client.ImportListApi.ListImportList(ctx).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", importListDataSourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, importListDataSourceName, err))
 
 		return
 	}
 
 	importList, err := findImportList(data.Name.ValueString(), response)
 	if err != nil {
-		resp.Diagnostics.AddError(tools.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", importListDataSourceName, err))
+		resp.Diagnostics.AddError(helpers.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", importListDataSourceName, err))
 
 		return
 	}
@@ -217,5 +213,5 @@ func findImportList(name string, importLists []*sonarr.ImportListResource) (*son
 		}
 	}
 
-	return nil, tools.ErrDataNotFoundError(importListDataSourceName, "name", name)
+	return nil, helpers.ErrDataNotFoundError(importListDataSourceName, "name", name)
 }

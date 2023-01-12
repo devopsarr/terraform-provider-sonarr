@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/devopsarr/sonarr-go/sonarr"
-	"github.com/devopsarr/terraform-provider-sonarr/tools"
+	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
@@ -68,6 +68,14 @@ func (d *QualityProfilesDataSource) Schema(ctx context.Context, req datasource.S
 							MarkdownDescription: "Quality ID to which cutoff.",
 							Computed:            true,
 						},
+						"cutoff_format_score": schema.Int64Attribute{
+							MarkdownDescription: "Cutoff format score.",
+							Computed:            true,
+						},
+						"min_format_score": schema.Int64Attribute{
+							MarkdownDescription: "Min format score.",
+							Computed:            true,
+						},
 						"quality_groups": schema.SetNestedAttribute{
 							MarkdownDescription: "Quality groups.",
 							Computed:            true,
@@ -108,6 +116,26 @@ func (d *QualityProfilesDataSource) Schema(ctx context.Context, req datasource.S
 								},
 							},
 						},
+						"format_items": schema.SetNestedAttribute{
+							MarkdownDescription: "Quality groups.",
+							Computed:            true,
+							NestedObject: schema.NestedAttributeObject{
+								Attributes: map[string]schema.Attribute{
+									"format": schema.Int64Attribute{
+										MarkdownDescription: "Format.",
+										Computed:            true,
+									},
+									"score": schema.Int64Attribute{
+										MarkdownDescription: "Score.",
+										Computed:            true,
+									},
+									"name": schema.StringAttribute{
+										MarkdownDescription: "Name.",
+										Computed:            true,
+									},
+								},
+							},
+						},
 					},
 				},
 			},
@@ -124,7 +152,7 @@ func (d *QualityProfilesDataSource) Configure(ctx context.Context, req datasourc
 	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
-			tools.UnexpectedDataSourceConfigureType,
+			helpers.UnexpectedDataSourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -145,7 +173,7 @@ func (d *QualityProfilesDataSource) Read(ctx context.Context, req datasource.Rea
 	// Get qualityprofiles current value
 	response, _, err := d.client.QualityProfileApi.ListQualityProfile(ctx).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", qualityProfilesDataSourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, qualityProfilesDataSourceName, err))
 
 		return
 	}

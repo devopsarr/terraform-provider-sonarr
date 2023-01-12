@@ -158,7 +158,6 @@ func (p *SonarrProvider) Resources(ctx context.Context) []func() resource.Resour
 		NewIndexerResource,
 		NewIndexerFanzubResource,
 		NewIndexerNewznabResource,
-		NewIndexerOmgwtfnzbsResource,
 		NewIndexerBroadcastheNetResource,
 		NewIndexerFilelistResource,
 		NewIndexerHdbitsResource,
@@ -170,6 +169,7 @@ func (p *SonarrProvider) Resources(ctx context.Context) []func() resource.Resour
 		NewIndexerTorznabResource,
 
 		// Import Lists
+		NewImportListExclusionResource,
 		NewImportListResource,
 		NewImportListSonarrResource,
 		NewImportListPlexResource,
@@ -206,8 +206,8 @@ func (p *SonarrProvider) Resources(ctx context.Context) []func() resource.Resour
 		NewNotificationTwitterResource,
 
 		// Profiles
+		NewCustomFormatResource,
 		NewDelayProfileResource,
-		NewLanguageProfileResource,
 		NewQualityProfileResource,
 		NewReleaseProfileResource,
 		NewQualityDefinitionResource,
@@ -235,6 +235,8 @@ func (p *SonarrProvider) DataSources(ctx context.Context) []func() datasource.Da
 		NewIndexersDataSource,
 
 		// Import Lists
+		NewImportListExclusionDataSource,
+		NewImportListExclusionsDataSource,
 		NewImportListDataSource,
 		NewImportListsDataSource,
 
@@ -249,10 +251,10 @@ func (p *SonarrProvider) DataSources(ctx context.Context) []func() datasource.Da
 		NewNotificationsDataSource,
 
 		// Profiles
+		NewCustomFormatDataSource,
+		NewCustomFormatsDataSource,
 		NewDelayProfileDataSource,
 		NewDelayProfilesDataSource,
-		NewLanguageProfileDataSource,
-		NewLanguageProfilesDataSource,
 		NewQualityProfileDataSource,
 		NewQualityProfilesDataSource,
 		NewReleaseProfileDataSource,

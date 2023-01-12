@@ -16,9 +16,9 @@ func TestAccRootFolderResource(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Create and Read testing
 			{
-				Config: testAccRootFolderResourceConfig("/config"),
+				Config: testAccRootFolderResourceConfig("/config/asp"),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("sonarr_root_folder.test", "path", "/config"),
+					resource.TestCheckResourceAttr("sonarr_root_folder.test", "path", "/config/asp"),
 					resource.TestCheckResourceAttrSet("sonarr_root_folder.test", "id"),
 				),
 			},

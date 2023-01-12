@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/devopsarr/sonarr-go/sonarr"
-	"github.com/devopsarr/terraform-provider-sonarr/tools"
+	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
@@ -353,7 +353,7 @@ func (d *NotificationDataSource) Configure(ctx context.Context, req datasource.C
 	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
-			tools.UnexpectedDataSourceConfigureType,
+			helpers.UnexpectedDataSourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -374,14 +374,14 @@ func (d *NotificationDataSource) Read(ctx context.Context, req datasource.ReadRe
 	// Get notification current value
 	response, _, err := d.client.NotificationApi.ListNotification(ctx).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", notificationDataSourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, notificationDataSourceName, err))
 
 		return
 	}
 
 	notification, err := findNotification(data.Name.ValueString(), response)
 	if err != nil {
-		resp.Diagnostics.AddError(tools.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", notificationDataSourceName, err))
+		resp.Diagnostics.AddError(helpers.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", notificationDataSourceName, err))
 
 		return
 	}
@@ -398,5 +398,5 @@ func findNotification(name string, notifications []*sonarr.NotificationResource)
 		}
 	}
 
-	return nil, tools.ErrDataNotFoundError(notificationDataSourceName, "name", name)
+	return nil, helpers.ErrDataNotFoundError(notificationDataSourceName, "name", name)
 }

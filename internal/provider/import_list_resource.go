@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/devopsarr/sonarr-go/sonarr"
-	"github.com/devopsarr/terraform-provider-sonarr/tools"
+	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -65,7 +65,6 @@ type ImportList struct {
 	Years                     types.String `tfsdk:"years"`
 	APIKey                    types.String `tfsdk:"api_key"`
 	TraktAdditionalParameters types.String `tfsdk:"trakt_additional_parameters"`
-	LanguageProfileID         types.Int64  `tfsdk:"language_profile_id"`
 	QualityProfileID          types.Int64  `tfsdk:"quality_profile_id"`
 	ID                        types.Int64  `tfsdk:"id"`
 	Limit                     types.Int64  `tfsdk:"limit"`
@@ -89,11 +88,6 @@ func (r *ImportListResource) Schema(ctx context.Context, req resource.SchemaRequ
 			},
 			"season_folder": schema.BoolAttribute{
 				MarkdownDescription: "Season folder flag.",
-				Optional:            true,
-				Computed:            true,
-			},
-			"language_profile_id": schema.Int64Attribute{
-				MarkdownDescription: "Language profile ID.",
 				Optional:            true,
 				Computed:            true,
 			},
@@ -247,7 +241,7 @@ func (r *ImportListResource) Configure(ctx context.Context, req resource.Configu
 	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
-			tools.UnexpectedResourceConfigureType,
+			helpers.UnexpectedResourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -272,7 +266,7 @@ func (r *ImportListResource) Create(ctx context.Context, req resource.CreateRequ
 
 	response, _, err := r.client.ImportListApi.CreateImportList(ctx).ImportListResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", importListResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, importListResourceName, err))
 
 		return
 	}
@@ -299,7 +293,7 @@ func (r *ImportListResource) Read(ctx context.Context, req resource.ReadRequest,
 	// Get ImportList current value
 	response, _, err := r.client.ImportListApi.GetImportListById(ctx, int32(importList.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", importListResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, importListResourceName, err))
 
 		return
 	}
@@ -328,7 +322,7 @@ func (r *ImportListResource) Update(ctx context.Context, req resource.UpdateRequ
 
 	response, _, err := r.client.ImportListApi.UpdateImportList(ctx, strconv.Itoa(int(request.GetId()))).ImportListResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", importListResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, importListResourceName, err))
 
 		return
 	}
@@ -354,7 +348,7 @@ func (r *ImportListResource) Delete(ctx context.Context, req resource.DeleteRequ
 	// Delete ImportList current value
 	_, err := r.client.ImportListApi.DeleteImportList(ctx, int32(importList.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", importListResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, importListResourceName, err))
 
 		return
 	}
@@ -368,7 +362,7 @@ func (r *ImportListResource) ImportState(ctx context.Context, req resource.Impor
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			tools.UnexpectedImportIdentifier,
+			helpers.UnexpectedImportIdentifier,
 			fmt.Sprintf("Expected import identifier with format: ID. Got: %q", req.ID),
 		)
 
@@ -383,7 +377,6 @@ func (i *ImportList) write(ctx context.Context, importList *sonarr.ImportListRes
 	i.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, importList.Tags)
 	i.EnableAutomaticAdd = types.BoolValue(importList.GetEnableAutomaticAdd())
 	i.SeasonFolder = types.BoolValue(importList.GetSeasonFolder())
-	i.LanguageProfileID = types.Int64Value(int64(importList.GetLanguageProfileId()))
 	i.QualityProfileID = types.Int64Value(int64(importList.GetQualityProfileId()))
 	i.ID = types.Int64Value(int64(importList.GetId()))
 	i.ConfigContract = types.StringValue(importList.GetConfigContract())
@@ -405,19 +398,19 @@ func (i *ImportList) writeFields(ctx context.Context, fields []*sonarr.Field) {
 		}
 
 		if slices.Contains(importListStringFields, f.GetName()) {
-			tools.WriteStringField(f, i)
+			helpers.WriteStringField(f, i)
 
 			continue
 		}
 
 		if slices.Contains(importListIntFields, f.GetName()) {
-			tools.WriteIntField(f, i)
+			helpers.WriteIntField(f, i)
 
 			continue
 		}
 
 		if slices.Contains(importListIntSliceFields, f.GetName()) {
-			tools.WriteIntSliceField(ctx, f, i)
+			helpers.WriteIntSliceField(ctx, f, i)
 
 			continue
 		}
@@ -432,7 +425,6 @@ func (i *ImportList) read(ctx context.Context) *sonarr.ImportListResource {
 	list := sonarr.NewImportListResource()
 	list.SetEnableAutomaticAdd(i.EnableAutomaticAdd.ValueBool())
 	list.SetSeasonFolder(i.SeasonFolder.ValueBool())
-	list.SetLanguageProfileId(int32(i.LanguageProfileID.ValueInt64()))
 	list.SetQualityProfileId(int32(i.QualityProfileID.ValueInt64()))
 	list.SetId(int32(i.ID.ValueInt64()))
 	list.SetShouldMonitor(sonarr.MonitorTypes(i.ShouldMonitor.ValueString()))
@@ -451,19 +443,19 @@ func (i *ImportList) readFields(ctx context.Context) []*sonarr.Field {
 	var output []*sonarr.Field
 
 	for _, j := range importListIntFields {
-		if field := tools.ReadIntField(j, i); field != nil {
+		if field := helpers.ReadIntField(j, i); field != nil {
 			output = append(output, field)
 		}
 	}
 
 	for _, s := range importListStringFields {
-		if field := tools.ReadStringField(s, i); field != nil {
+		if field := helpers.ReadStringField(s, i); field != nil {
 			output = append(output, field)
 		}
 	}
 
 	for _, s := range importListIntSliceFields {
-		if field := tools.ReadIntSliceField(ctx, s, i); field != nil {
+		if field := helpers.ReadIntSliceField(ctx, s, i); field != nil {
 			output = append(output, field)
 		}
 	}

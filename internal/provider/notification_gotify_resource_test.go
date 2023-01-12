@@ -31,9 +31,10 @@ func TestAccNotificationGotifyResource(t *testing.T) {
 			},
 			// ImportState testing
 			{
-				ResourceName:      "sonarr_notification_gotify.test",
-				ImportState:       true,
-				ImportStateVerify: true,
+				ResourceName:            "sonarr_notification_gotify.test",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"app_token"},
 			},
 			// Delete testing automatically occurs in TestCase
 		},

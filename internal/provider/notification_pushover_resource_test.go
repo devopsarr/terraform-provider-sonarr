@@ -31,9 +31,10 @@ func TestAccNotificationPushoverResource(t *testing.T) {
 			},
 			// ImportState testing
 			{
-				ResourceName:      "sonarr_notification_pushover.test",
-				ImportState:       true,
-				ImportStateVerify: true,
+				ResourceName:            "sonarr_notification_pushover.test",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"api_key"},
 			},
 			// Delete testing automatically occurs in TestCase
 		},
@@ -56,6 +57,7 @@ func testAccNotificationPushoverResourceConfig(name string, priority int) string
 		name                    = "%s"
 	  
 		api_key = "Key"
+		user_key = "userKey"
 		priority = %d
 	}`, name, priority)
 }

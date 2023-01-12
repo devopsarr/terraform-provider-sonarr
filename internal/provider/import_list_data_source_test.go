@@ -31,9 +31,8 @@ resource "sonarr_import_list" "test" {
 	season_folder = true
 	should_monitor = "all"
 	series_type = "standard"
-	root_folder_path = "/defaults"
+	root_folder_path = "/config"
 	quality_profile_id = 1
-	language_profile_id = 1
 	name = "importListDataTest"
 	implementation = "SonarrImport"
 	config_contract = "SonarrSettings"

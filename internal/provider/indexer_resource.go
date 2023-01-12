@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/devopsarr/sonarr-go/sonarr"
-	"github.com/devopsarr/terraform-provider-sonarr/tools"
+	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -29,11 +29,12 @@ var (
 )
 
 var (
-	indexerIntSliceFields = []string{"categories", "animeCategories"}
-	indexerBoolFields     = []string{"allowZeroSize", "animeStandardFormatSearch", "rankedOnly"}
-	indexerIntFields      = []string{"delay", "minimumSeeders", "seasonPackSeedTime", "seedTime"}
-	indexerStringFields   = []string{"additionalParameters", "apiKey", "apiPath", "baseUrl", "captchaToken", "cookie", "passkey", "username"}
-	indexerFloatFields    = []string{"seedRatio"}
+	indexerIntSliceFields  = []string{"categories", "animeCategories"}
+	indexerBoolFields      = []string{"allowZeroSize", "animeStandardFormatSearch", "rankedOnly"}
+	indexerIntFields       = []string{"delay", "minimumSeeders", "seasonPackSeedTime", "seedTime"}
+	indexerStringFields    = []string{"additionalParameters", "apiKey", "apiPath", "baseUrl", "captchaToken", "cookie", "passkey", "username"}
+	indexerFloatFields     = []string{"seedRatio"}
+	indexerSensitiveFields = []string{"apiKey", "passkey"}
 )
 
 func NewIndexerResource() resource.Resource {
@@ -251,7 +252,7 @@ func (r *IndexerResource) Configure(ctx context.Context, req resource.ConfigureR
 	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
-			tools.UnexpectedResourceConfigureType,
+			helpers.UnexpectedResourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -276,7 +277,7 @@ func (r *IndexerResource) Create(ctx context.Context, req resource.CreateRequest
 
 	response, _, err := r.client.IndexerApi.CreateIndexer(ctx).IndexerResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", indexerResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, indexerResourceName, err))
 
 		return
 	}
@@ -285,8 +286,8 @@ func (r *IndexerResource) Create(ctx context.Context, req resource.CreateRequest
 	// Generate resource state struct.
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state Indexer
-	state.Tags = indexer.Tags
 
+	state.writeSensitive(indexer)
 	state.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
@@ -304,7 +305,7 @@ func (r *IndexerResource) Read(ctx context.Context, req resource.ReadRequest, re
 	// Get Indexer current value
 	response, _, err := r.client.IndexerApi.GetIndexerById(ctx, int32(indexer.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerResourceName, err))
 
 		return
 	}
@@ -313,8 +314,8 @@ func (r *IndexerResource) Read(ctx context.Context, req resource.ReadRequest, re
 	// Generate resource state struct.
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state Indexer
-	state.Tags = indexer.Tags
 
+	state.writeSensitive(indexer)
 	state.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
@@ -334,7 +335,7 @@ func (r *IndexerResource) Update(ctx context.Context, req resource.UpdateRequest
 
 	response, _, err := r.client.IndexerApi.UpdateIndexer(ctx, strconv.Itoa(int(request.GetId()))).IndexerResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", indexerResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, indexerResourceName, err))
 
 		return
 	}
@@ -343,8 +344,8 @@ func (r *IndexerResource) Update(ctx context.Context, req resource.UpdateRequest
 	// Generate resource state struct.
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state Indexer
-	state.Tags = indexer.Tags
 
+	state.writeSensitive(indexer)
 	state.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
@@ -361,7 +362,7 @@ func (r *IndexerResource) Delete(ctx context.Context, req resource.DeleteRequest
 	// Delete Indexer current value
 	_, err := r.client.IndexerApi.DeleteIndexer(ctx, int32(indexer.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", indexerResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerResourceName, err))
 
 		return
 	}
@@ -375,7 +376,7 @@ func (r *IndexerResource) ImportState(ctx context.Context, req resource.ImportSt
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			tools.UnexpectedImportIdentifier,
+			helpers.UnexpectedImportIdentifier,
 			fmt.Sprintf("Expected import identifier with format: ID. Got: %q", req.ID),
 		)
 
@@ -409,32 +410,32 @@ func (i *Indexer) writeFields(ctx context.Context, fields []*sonarr.Field) {
 			continue
 		}
 
-		if slices.Contains(indexerStringFields, f.GetName()) {
-			tools.WriteStringField(f, i)
+		if slices.Contains(indexerStringFields, f.GetName()) && !slices.Contains(indexerSensitiveFields, f.GetName()) {
+			helpers.WriteStringField(f, i)
 
 			continue
 		}
 
 		if slices.Contains(indexerBoolFields, f.GetName()) {
-			tools.WriteBoolField(f, i)
+			helpers.WriteBoolField(f, i)
 
 			continue
 		}
 
 		if slices.Contains(indexerIntFields, f.GetName()) || f.GetName() == "seedCriteria.seedTime" || f.GetName() == "seedCriteria.seasonPackSeedTime" {
-			tools.WriteIntField(f, i)
+			helpers.WriteIntField(f, i)
 
 			continue
 		}
 
 		if slices.Contains(indexerFloatFields, f.GetName()) || f.GetName() == "seedCriteria.seedRatio" {
-			tools.WriteFloatField(f, i)
+			helpers.WriteFloatField(f, i)
 
 			continue
 		}
 
 		if slices.Contains(indexerIntSliceFields, f.GetName()) {
-			tools.WriteIntSliceField(ctx, f, i)
+			helpers.WriteIntSliceField(ctx, f, i)
 		}
 	}
 }
@@ -465,34 +466,45 @@ func (i *Indexer) readFields(ctx context.Context) []*sonarr.Field {
 	var output []*sonarr.Field
 
 	for _, b := range indexerBoolFields {
-		if field := tools.ReadBoolField(b, i); field != nil {
+		if field := helpers.ReadBoolField(b, i); field != nil {
 			output = append(output, field)
 		}
 	}
 
 	for _, n := range indexerIntFields {
-		if field := tools.ReadIntField(n, i); field != nil {
+		if field := helpers.ReadIntField(n, i); field != nil {
 			output = append(output, field)
 		}
 	}
 
 	for _, f := range indexerFloatFields {
-		if field := tools.ReadFloatField(f, i); field != nil {
+		if field := helpers.ReadFloatField(f, i); field != nil {
 			output = append(output, field)
 		}
 	}
 
 	for _, s := range indexerStringFields {
-		if field := tools.ReadStringField(s, i); field != nil {
+		if field := helpers.ReadStringField(s, i); field != nil {
 			output = append(output, field)
 		}
 	}
 
 	for _, s := range indexerIntSliceFields {
-		if field := tools.ReadIntSliceField(ctx, s, i); field != nil {
+		if field := helpers.ReadIntSliceField(ctx, s, i); field != nil {
 			output = append(output, field)
 		}
 	}
 
 	return output
+}
+
+// writeSensitive copy sensitive data from another resource.
+func (i *Indexer) writeSensitive(indexer *Indexer) {
+	if !indexer.Passkey.IsUnknown() {
+		i.Passkey = indexer.Passkey
+	}
+
+	if !indexer.APIKey.IsUnknown() {
+		i.APIKey = indexer.APIKey
+	}
 }

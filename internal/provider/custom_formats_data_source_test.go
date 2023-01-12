@@ -6,7 +6,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-func TestAccLanguageProfilesDataSource(t *testing.T) {
+func TestAccCustomFormatsDataSource(t *testing.T) {
 	t.Parallel()
 
 	resource.Test(t, resource.TestCase{
@@ -15,20 +15,20 @@ func TestAccLanguageProfilesDataSource(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Create a delay profile to have a value to check
 			{
-				Config: testAccLanguageProfileResourceConfig("arabic", "Arabic"),
+				Config: testAccCustomFormatResourceConfig("datasourceTest", "true"),
 			},
 			// Read testing
 			{
-				Config: testAccLanguageProfilesDataSourceConfig,
+				Config: testAccCustomFormatsDataSourceConfig,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckTypeSetElemNestedAttrs("data.sonarr_language_profiles.test", "language_profiles.*", map[string]string{"name": "arabic"}),
+					resource.TestCheckTypeSetElemNestedAttrs("data.sonarr_custom_formats.test", "custom_formats.*", map[string]string{"include_custom_format_when_renaming": "true"}),
 				),
 			},
 		},
 	})
 }
 
-const testAccLanguageProfilesDataSourceConfig = `
-data "sonarr_language_profiles" "test" {
+const testAccCustomFormatsDataSourceConfig = `
+data "sonarr_custom_formats" "test" {
 }
 `

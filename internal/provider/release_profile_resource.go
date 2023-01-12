@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/devopsarr/sonarr-go/sonarr"
-	"github.com/devopsarr/terraform-provider-sonarr/tools"
+	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -106,7 +106,7 @@ func (r *ReleaseProfileResource) Configure(ctx context.Context, req resource.Con
 	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
-			tools.UnexpectedResourceConfigureType,
+			helpers.UnexpectedResourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -132,7 +132,7 @@ func (r *ReleaseProfileResource) Create(ctx context.Context, req resource.Create
 	// Create new ReleaseProfile
 	response, _, err := r.client.ReleaseProfileApi.CreateReleaseProfile(ctx).ReleaseProfileResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", releaseProfileResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, releaseProfileResourceName, err))
 
 		return
 	}
@@ -156,7 +156,7 @@ func (r *ReleaseProfileResource) Read(ctx context.Context, req resource.ReadRequ
 	// Get releaseprofile current value
 	response, _, err := r.client.ReleaseProfileApi.GetReleaseProfileById(ctx, int32(profile.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", releaseProfileResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, releaseProfileResourceName, err))
 
 		return
 	}
@@ -183,7 +183,7 @@ func (r *ReleaseProfileResource) Update(ctx context.Context, req resource.Update
 	// Update ReleaseProfile
 	response, _, err := r.client.ReleaseProfileApi.UpdateReleaseProfile(ctx, strconv.Itoa(int(request.GetId()))).ReleaseProfileResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", releaseProfileResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, releaseProfileResourceName, err))
 
 		return
 	}
@@ -206,7 +206,7 @@ func (r *ReleaseProfileResource) Delete(ctx context.Context, req resource.Delete
 	// Delete releaseprofile current value
 	_, err := r.client.ReleaseProfileApi.DeleteReleaseProfile(ctx, int32(profile.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", releaseProfileResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, releaseProfileResourceName, err))
 
 		return
 	}
@@ -220,7 +220,7 @@ func (r *ReleaseProfileResource) ImportState(ctx context.Context, req resource.I
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			tools.UnexpectedImportIdentifier,
+			helpers.UnexpectedImportIdentifier,
 			fmt.Sprintf("Expected import identifier with format: ID. Got: %q", req.ID),
 		)
 

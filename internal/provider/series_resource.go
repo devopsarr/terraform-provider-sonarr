@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/devopsarr/sonarr-go/sonarr"
-	"github.com/devopsarr/terraform-provider-sonarr/tools"
+	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -42,7 +42,6 @@ type Series struct {
 	TitleSlug         types.String `tfsdk:"title_slug"`
 	RootFolderPath    types.String `tfsdk:"root_folder_path"`
 	ID                types.Int64  `tfsdk:"id"`
-	LanguageProfileID types.Int64  `tfsdk:"language_profile_id"`
 	QualityProfileID  types.Int64  `tfsdk:"quality_profile_id"`
 	TvdbID            types.Int64  `tfsdk:"tvdb_id"`
 	Monitored         types.Bool   `tfsdk:"monitored"`
@@ -101,10 +100,6 @@ func (r *SeriesResource) Schema(ctx context.Context, req resource.SchemaRequest,
 				MarkdownDescription: "Scene numbering flag.",
 				Required:            true,
 			},
-			"language_profile_id": schema.Int64Attribute{
-				MarkdownDescription: "Language Profile ID .",
-				Required:            true,
-			},
 			"quality_profile_id": schema.Int64Attribute{
 				MarkdownDescription: "Quality Profile ID.",
 				Required:            true,
@@ -147,7 +142,7 @@ func (r *SeriesResource) Configure(ctx context.Context, req resource.ConfigureRe
 	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
-			tools.UnexpectedResourceConfigureType,
+			helpers.UnexpectedResourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -180,7 +175,7 @@ func (r *SeriesResource) Create(ctx context.Context, req resource.CreateRequest,
 
 	response, _, err := r.client.SeriesApi.CreateSeries(ctx).SeriesResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", seriesResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, seriesResourceName, err))
 
 		return
 	}
@@ -204,7 +199,7 @@ func (r *SeriesResource) Read(ctx context.Context, req resource.ReadRequest, res
 	// Get series current value
 	response, _, err := r.client.SeriesApi.GetSeriesById(ctx, int32(series.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", seriesResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, seriesResourceName, err))
 
 		return
 	}
@@ -231,7 +226,7 @@ func (r *SeriesResource) Update(ctx context.Context, req resource.UpdateRequest,
 	// TODO: manage movefiles on sdk
 	response, _, err := r.client.SeriesApi.UpdateSeries(ctx, strconv.Itoa(int(request.GetId()))).SeriesResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", seriesResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, seriesResourceName, err))
 
 		return
 	}
@@ -255,7 +250,7 @@ func (r *SeriesResource) Delete(ctx context.Context, req resource.DeleteRequest,
 	// TODO: manage delete parameters on SDK
 	_, err := r.client.SeriesApi.DeleteSeries(ctx, int32(series.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to delete %s, got error: %s", seriesResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, seriesResourceName, err))
 
 		return
 	}
@@ -269,7 +264,7 @@ func (r *SeriesResource) ImportState(ctx context.Context, req resource.ImportSta
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			tools.UnexpectedImportIdentifier,
+			helpers.UnexpectedImportIdentifier,
 			fmt.Sprintf("Expected import identifier with format: ID. Got: %q", req.ID),
 		)
 
@@ -286,7 +281,6 @@ func (s *Series) write(ctx context.Context, series *sonarr.SeriesResource) {
 	s.SeasonFolder = types.BoolValue(series.GetSeasonFolder())
 	s.UseSceneNumbering = types.BoolValue(series.GetUseSceneNumbering())
 	s.ID = types.Int64Value(int64(series.GetId()))
-	s.LanguageProfileID = types.Int64Value(int64(series.GetLanguageProfileId()))
 	s.QualityProfileID = types.Int64Value(int64(series.GetQualityProfileId()))
 	s.TvdbID = types.Int64Value(int64(series.GetTvdbId()))
 	s.Path = types.StringValue(series.GetPath())
@@ -305,7 +299,6 @@ func (s *Series) read(ctx context.Context) *sonarr.SeriesResource {
 	series.SetTitle(s.Title.ValueString())
 	series.SetTitleSlug(s.TitleSlug.ValueString())
 	series.SetQualityProfileId(int32(s.QualityProfileID.ValueInt64()))
-	series.SetLanguageProfileId(int32(s.LanguageProfileID.ValueInt64()))
 	series.SetMonitored(s.Monitored.ValueBool())
 	series.SetSeasonFolder(s.SeasonFolder.ValueBool())
 	series.SetPath(s.Path.ValueString())

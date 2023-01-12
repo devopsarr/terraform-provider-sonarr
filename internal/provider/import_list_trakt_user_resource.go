@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/devopsarr/sonarr-go/sonarr"
-	"github.com/devopsarr/terraform-provider-sonarr/tools"
+	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -57,7 +57,6 @@ type ImportListTraktUser struct {
 	Genres                    types.String `tfsdk:"genres"`
 	Years                     types.String `tfsdk:"years"`
 	TraktAdditionalParameters types.String `tfsdk:"trakt_additional_parameters"`
-	LanguageProfileID         types.Int64  `tfsdk:"language_profile_id"`
 	QualityProfileID          types.Int64  `tfsdk:"quality_profile_id"`
 	ID                        types.Int64  `tfsdk:"id"`
 	Limit                     types.Int64  `tfsdk:"limit"`
@@ -84,7 +83,6 @@ func (i ImportListTraktUser) toImportList() *ImportList {
 		Years:                     i.Years,
 		TraktAdditionalParameters: i.TraktAdditionalParameters,
 		Limit:                     i.Limit,
-		LanguageProfileID:         i.LanguageProfileID,
 		QualityProfileID:          i.QualityProfileID,
 		ID:                        i.ID,
 		EnableAutomaticAdd:        i.EnableAutomaticAdd,
@@ -109,7 +107,6 @@ func (i *ImportListTraktUser) fromImportList(importList *ImportList) {
 	i.Years = importList.Years
 	i.TraktAdditionalParameters = importList.TraktAdditionalParameters
 	i.Limit = importList.Limit
-	i.LanguageProfileID = importList.LanguageProfileID
 	i.QualityProfileID = importList.QualityProfileID
 	i.ID = importList.ID
 	i.EnableAutomaticAdd = importList.EnableAutomaticAdd
@@ -130,10 +127,6 @@ func (r *ImportListTraktUserResource) Schema(ctx context.Context, req resource.S
 			},
 			"season_folder": schema.BoolAttribute{
 				MarkdownDescription: "Season folder flag.",
-				Required:            true,
-			},
-			"language_profile_id": schema.Int64Attribute{
-				MarkdownDescription: "Language profile ID.",
 				Required:            true,
 			},
 			"quality_profile_id": schema.Int64Attribute{
@@ -247,7 +240,7 @@ func (r *ImportListTraktUserResource) Configure(ctx context.Context, req resourc
 	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
-			tools.UnexpectedResourceConfigureType,
+			helpers.UnexpectedResourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -272,7 +265,7 @@ func (r *ImportListTraktUserResource) Create(ctx context.Context, req resource.C
 
 	response, _, err := r.client.ImportListApi.CreateImportList(ctx).ImportListResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", importListTraktUserResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, importListTraktUserResourceName, err))
 
 		return
 	}
@@ -296,7 +289,7 @@ func (r *ImportListTraktUserResource) Read(ctx context.Context, req resource.Rea
 	// Get ImportListTraktUser current value
 	response, _, err := r.client.ImportListApi.GetImportListById(ctx, int32(importList.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", importListTraktUserResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, importListTraktUserResourceName, err))
 
 		return
 	}
@@ -322,7 +315,7 @@ func (r *ImportListTraktUserResource) Update(ctx context.Context, req resource.U
 
 	response, _, err := r.client.ImportListApi.UpdateImportList(ctx, strconv.Itoa(int(request.GetId()))).ImportListResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", importListTraktUserResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, importListTraktUserResourceName, err))
 
 		return
 	}
@@ -345,7 +338,7 @@ func (r *ImportListTraktUserResource) Delete(ctx context.Context, req resource.D
 	// Delete ImportListTraktUser current value
 	_, err := r.client.ImportListApi.DeleteImportList(ctx, int32(importList.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", importListTraktUserResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, importListTraktUserResourceName, err))
 
 		return
 	}
@@ -359,7 +352,7 @@ func (r *ImportListTraktUserResource) ImportState(ctx context.Context, req resou
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			tools.UnexpectedImportIdentifier,
+			helpers.UnexpectedImportIdentifier,
 			fmt.Sprintf("Expected import identifier with format: ID. Got: %q", req.ID),
 		)
 
@@ -376,7 +369,6 @@ func (i *ImportListTraktUser) write(ctx context.Context, importList *sonarr.Impo
 		ShouldMonitor:      types.StringValue(string(importList.GetShouldMonitor())),
 		RootFolderPath:     types.StringValue(importList.GetRootFolderPath()),
 		SeriesType:         types.StringValue(string(importList.GetSeriesType())),
-		LanguageProfileID:  types.Int64Value(int64(importList.GetLanguageProfileId())),
 		QualityProfileID:   types.Int64Value(int64(importList.GetQualityProfileId())),
 		ID:                 types.Int64Value(int64(importList.GetId())),
 		EnableAutomaticAdd: types.BoolValue(importList.GetEnableAutomaticAdd()),
@@ -396,7 +388,6 @@ func (i *ImportListTraktUser) read(ctx context.Context) *sonarr.ImportListResour
 	list.SetShouldMonitor(sonarr.MonitorTypes(i.ShouldMonitor.ValueString()))
 	list.SetRootFolderPath(i.RootFolderPath.ValueString())
 	list.SetSeriesType(sonarr.SeriesTypes(i.SeriesType.ValueString()))
-	list.SetLanguageProfileId(int32(i.LanguageProfileID.ValueInt64()))
 	list.SetQualityProfileId(int32(i.QualityProfileID.ValueInt64()))
 	list.SetEnableAutomaticAdd(i.EnableAutomaticAdd.ValueBool())
 	list.SetSeasonFolder(i.SeasonFolder.ValueBool())

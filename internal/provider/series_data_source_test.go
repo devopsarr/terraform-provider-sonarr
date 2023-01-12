@@ -18,7 +18,7 @@ func TestAccSeriesDataSource(t *testing.T) {
 				Config: testAccSeriesDataSourceConfig,
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrSet("data.sonarr_series.test", "id"),
-					resource.TestCheckResourceAttr("data.sonarr_series.test", "path", "/tmp/the-walking-dead")),
+					resource.TestCheckResourceAttr("data.sonarr_series.test", "path", "/config/the-walking-dead")),
 			},
 		},
 	})
@@ -33,10 +33,9 @@ resource "sonarr_series" "test" {
 	monitored           = false
 	season_folder       = true
 	use_scene_numbering = false
-	path                = "/tmp/the-walking-dead"
-	root_folder_path    = "/tmp"
+	path                = "/config/the-walking-dead"
+	root_folder_path    = "/config"
   
-	language_profile_id = 1
 	quality_profile_id  = 1
 	tags                = []
 }

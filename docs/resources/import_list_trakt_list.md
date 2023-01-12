@@ -22,7 +22,6 @@ resource "sonarr_import_list_popular" "example" {
   series_type          = "standard"
   root_folder_path     = sonarr_root_folder.example.path
   quality_profile_id   = 1
-  language_profile_id  = 1
   name                 = "Example"
   access_token         = "Token"
 }
@@ -34,7 +33,6 @@ resource "sonarr_import_list_popular" "example" {
 ### Required
 
 - `enable_automatic_add` (Boolean) Enable automatic add flag.
-- `language_profile_id` (Number) Language profile ID.
 - `listname` (String) Expires.
 - `name` (String) Import List name.
 - `quality_profile_id` (Number) Quality profile ID.

@@ -31,9 +31,10 @@ func TestAccNotificationTelegramResource(t *testing.T) {
 			},
 			// ImportState testing
 			{
-				ResourceName:      "sonarr_notification_telegram.test",
-				ImportState:       true,
-				ImportStateVerify: true,
+				ResourceName:            "sonarr_notification_telegram.test",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"bot_token"},
 			},
 			// Delete testing automatically occurs in TestCase
 		},

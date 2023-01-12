@@ -31,9 +31,10 @@ func TestAccNotificationPlexResource(t *testing.T) {
 			},
 			// ImportState testing
 			{
-				ResourceName:      "sonarr_notification_plex.test",
-				ImportState:       true,
-				ImportStateVerify: true,
+				ResourceName:            "sonarr_notification_plex.test",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"auth_token"},
 			},
 			// Delete testing automatically occurs in TestCase
 		},

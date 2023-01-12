@@ -28,7 +28,6 @@ data "sonarr_series" "example" {
 ### Read-Only
 
 - `id` (Number) Series ID.
-- `language_profile_id` (Number) Language Profile ID .
 - `monitored` (Boolean) Monitored flag.
 - `path` (String) Series Path.
 - `quality_profile_id` (Number) Quality Profile ID.

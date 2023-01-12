@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/devopsarr/sonarr-go/sonarr"
-	"github.com/devopsarr/terraform-provider-sonarr/tools"
+	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -178,7 +178,7 @@ func (r *NotificationBoxcarResource) Configure(ctx context.Context, req resource
 	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
-			tools.UnexpectedResourceConfigureType,
+			helpers.UnexpectedResourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -203,7 +203,7 @@ func (r *NotificationBoxcarResource) Create(ctx context.Context, req resource.Cr
 
 	response, _, err := r.client.NotificationApi.CreateNotification(ctx).NotificationResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", notificationBoxcarResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, notificationBoxcarResourceName, err))
 
 		return
 	}
@@ -227,7 +227,7 @@ func (r *NotificationBoxcarResource) Read(ctx context.Context, req resource.Read
 	// Get NotificationBoxcar current value
 	response, _, err := r.client.NotificationApi.GetNotificationById(ctx, int32(notification.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", notificationBoxcarResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, notificationBoxcarResourceName, err))
 
 		return
 	}
@@ -253,7 +253,7 @@ func (r *NotificationBoxcarResource) Update(ctx context.Context, req resource.Up
 
 	response, _, err := r.client.NotificationApi.UpdateNotification(ctx, strconv.Itoa(int(request.GetId()))).NotificationResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", notificationBoxcarResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, notificationBoxcarResourceName, err))
 
 		return
 	}
@@ -276,7 +276,7 @@ func (r *NotificationBoxcarResource) Delete(ctx context.Context, req resource.De
 	// Delete NotificationBoxcar current value
 	_, err := r.client.NotificationApi.DeleteNotification(ctx, int32(notification.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", notificationBoxcarResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, notificationBoxcarResourceName, err))
 
 		return
 	}
@@ -290,7 +290,7 @@ func (r *NotificationBoxcarResource) ImportState(ctx context.Context, req resour
 	id, err := strconv.Atoi(req.ID)
 	if err != nil {
 		resp.Diagnostics.AddError(
-			tools.UnexpectedImportIdentifier,
+			helpers.UnexpectedImportIdentifier,
 			fmt.Sprintf("Expected import identifier with format: ID. Got: %q", req.ID),
 		)
 
@@ -314,6 +314,8 @@ func (n *NotificationBoxcar) write(ctx context.Context, notification *sonarr.Not
 		IncludeHealthWarnings:         types.BoolValue(notification.GetIncludeHealthWarnings()),
 		ID:                            types.Int64Value(int64(notification.GetId())),
 		Name:                          types.StringValue(notification.GetName()),
+		// Pass along sensitive values.
+		Token: n.Token,
 	}
 	genericNotification.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, notification.Tags)
 	genericNotification.writeFields(ctx, notification.Fields)

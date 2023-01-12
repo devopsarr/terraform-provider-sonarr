@@ -26,9 +26,8 @@ resource "sonarr_series" "example" {
   path                = "/tmp/breaking_bad"
   root_folder_path    = "/tmp/"
 
-  language_profile_id = 1
-  quality_profile_id  = 1
-  tags                = [1]
+  quality_profile_id = 1
+  tags               = [1]
 }
 ```
 
@@ -37,7 +36,6 @@ resource "sonarr_series" "example" {
 
 ### Required
 
-- `language_profile_id` (Number) Language Profile ID .
 - `monitored` (Boolean) Monitored flag.
 - `path` (String) Series Path.
 - `quality_profile_id` (Number) Quality Profile ID.

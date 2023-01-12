@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/devopsarr/sonarr-go/sonarr"
-	"github.com/devopsarr/terraform-provider-sonarr/tools"
+	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
@@ -76,10 +76,6 @@ func (d *AllSeriessDataSource) Schema(ctx context.Context, req datasource.Schema
 							MarkdownDescription: "Scene numbering flag.",
 							Computed:            true,
 						},
-						"language_profile_id": schema.Int64Attribute{
-							MarkdownDescription: "Language Profile ID .",
-							Computed:            true,
-						},
 						"quality_profile_id": schema.Int64Attribute{
 							MarkdownDescription: "Quality Profile ID.",
 							Computed:            true,
@@ -117,7 +113,7 @@ func (d *AllSeriessDataSource) Configure(ctx context.Context, req datasource.Con
 	client, ok := req.ProviderData.(*sonarr.APIClient)
 	if !ok {
 		resp.Diagnostics.AddError(
-			tools.UnexpectedDataSourceConfigureType,
+			helpers.UnexpectedDataSourceConfigureType,
 			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
@@ -138,7 +134,7 @@ func (d *AllSeriessDataSource) Read(ctx context.Context, req datasource.ReadRequ
 	// Get series current value
 	response, _, err := d.client.SeriesApi.ListSeries(ctx).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(tools.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", allSeriesDataSourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, allSeriesDataSourceName, err))
 
 		return
 	}
