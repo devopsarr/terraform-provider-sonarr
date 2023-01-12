@@ -48,6 +48,7 @@ type CustomFormat struct {
 	IncludeCustomFormatWhenRenaming types.Bool   `tfsdk:"include_custom_format_when_renaming"`
 }
 
+// Specification is part of CustomFormat.
 type Specification struct {
 	Name           types.String `tfsdk:"name"`
 	Implementation types.String `tfsdk:"implementation"`

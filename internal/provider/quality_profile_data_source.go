@@ -50,6 +50,14 @@ func (d *QualityProfileDataSource) Schema(ctx context.Context, req datasource.Sc
 				MarkdownDescription: "Quality ID to which cutoff.",
 				Computed:            true,
 			},
+			"cutoff_format_score": schema.Int64Attribute{
+				MarkdownDescription: "Cutoff format score.",
+				Computed:            true,
+			},
+			"min_format_score": schema.Int64Attribute{
+				MarkdownDescription: "Min format score.",
+				Computed:            true,
+			},
 			"quality_groups": schema.SetNestedAttribute{
 				MarkdownDescription: "Quality groups.",
 				Computed:            true,
@@ -86,6 +94,26 @@ func (d *QualityProfileDataSource) Schema(ctx context.Context, req datasource.Sc
 									},
 								},
 							},
+						},
+					},
+				},
+			},
+			"format_items": schema.SetNestedAttribute{
+				MarkdownDescription: "Quality groups.",
+				Computed:            true,
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: map[string]schema.Attribute{
+						"format": schema.Int64Attribute{
+							MarkdownDescription: "Format.",
+							Computed:            true,
+						},
+						"score": schema.Int64Attribute{
+							MarkdownDescription: "Score.",
+							Computed:            true,
+						},
+						"name": schema.StringAttribute{
+							MarkdownDescription: "Name.",
+							Computed:            true,
 						},
 					},
 				},
