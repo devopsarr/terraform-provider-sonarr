@@ -32,7 +32,7 @@ func (d *CustomFormatDataSource) Metadata(ctx context.Context, req datasource.Me
 func (d *CustomFormatDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the delay server.
-		MarkdownDescription: "<!-- subcategory:Profiles -->Single [Download Client](../resources/custom_format).",
+		MarkdownDescription: "<!-- subcategory:Profiles -->Single [Custom Format](../resources/custom_format).",
 		Attributes: map[string]schema.Attribute{
 			"include_custom_format_when_renaming": schema.BoolAttribute{
 				MarkdownDescription: "Include custom format when renaming flag.",

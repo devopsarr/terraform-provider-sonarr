@@ -22,7 +22,7 @@ data "sonarr_custom_formats" "example" {
 
 ### Read-Only
 
-- `custom_formats` (Attributes Set) Download Client list.. (see [below for nested schema](#nestedatt--custom_formats))
+- `custom_formats` (Attributes Set) Custom Format list. (see [below for nested schema](#nestedatt--custom_formats))
 - `id` (String) The ID of this resource.
 
 <a id="nestedatt--custom_formats"></a>

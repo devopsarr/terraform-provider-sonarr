@@ -169,6 +169,7 @@ func (p *SonarrProvider) Resources(ctx context.Context) []func() resource.Resour
 		NewIndexerTorznabResource,
 
 		// Import Lists
+		NewImportListExclusionResource,
 		NewImportListResource,
 		NewImportListSonarrResource,
 		NewImportListPlexResource,

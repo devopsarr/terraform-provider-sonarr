@@ -3,12 +3,12 @@
 page_title: "sonarr_custom_format Data Source - terraform-provider-sonarr"
 subcategory: "Profiles"
 description: |-
-  Single Download Client ../resources/custom_format.
+  Single Custom Format ../resources/custom_format.
 ---
 
 # sonarr_custom_format (Data Source)
 
-<!-- subcategory:Profiles -->Single [Download Client](../resources/custom_format).
+<!-- subcategory:Profiles -->Single [Custom Format](../resources/custom_format).
 
 ## Example Usage
 

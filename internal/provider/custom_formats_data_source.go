@@ -48,7 +48,7 @@ func (d *CustomFormatsDataSource) Schema(ctx context.Context, req datasource.Sch
 				Computed: true,
 			},
 			"custom_formats": schema.SetNestedAttribute{
-				MarkdownDescription: "Download Client list..",
+				MarkdownDescription: "Custom Format list.",
 				Computed:            true,
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
