@@ -11,7 +11,7 @@ require (
 	github.com/hashicorp/terraform-plugin-log v0.7.0
 	github.com/hashicorp/terraform-plugin-sdk/v2 v2.24.1
 	github.com/stretchr/testify v1.8.1
-	golang.org/x/exp v0.0.0-20230108222341-4b8118a2686a
+	golang.org/x/exp v0.0.0-20230111222715-75897c7a292a
 )
 
 require (
