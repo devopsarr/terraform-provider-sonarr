@@ -14,49 +14,53 @@ import (
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
-const tagsDataSourceName = "tags"
+const languagesDataSourceName = "languages"
 
 // Ensure provider defined types fully satisfy framework interfaces.
-var _ datasource.DataSource = &TagsDataSource{}
+var _ datasource.DataSource = &LanguagesDataSource{}
 
-func NewTagsDataSource() datasource.DataSource {
-	return &TagsDataSource{}
+func NewLanguagesDataSource() datasource.DataSource {
+	return &LanguagesDataSource{}
 }
 
-// TagsDataSource defines the tags implementation.
-type TagsDataSource struct {
+// LanguagesDataSource defines the languages implementation.
+type LanguagesDataSource struct {
 	client *sonarr.APIClient
 }
 
-// Tags describes the tags data model.
-type Tags struct {
-	Tags types.Set    `tfsdk:"tags"`
-	ID   types.String `tfsdk:"id"`
+// Languages describes the languages data model.
+type Languages struct {
+	Languages types.Set    `tfsdk:"languages"`
+	ID        types.String `tfsdk:"id"`
 }
 
-func (d *TagsDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_" + tagsDataSourceName
+func (d *LanguagesDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+	resp.TypeName = req.ProviderTypeName + "_" + languagesDataSourceName
 }
 
-func (d *TagsDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+func (d *LanguagesDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Tags -->List all available [Tags](../resources/tag).",
+		MarkdownDescription: "<!-- subcategory:Languages -->List all available [Languages](../data-sources/language).",
 		Attributes: map[string]schema.Attribute{
 			// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 			"id": schema.StringAttribute{
 				Computed: true,
 			},
-			"tags": schema.SetNestedAttribute{
-				MarkdownDescription: "Tag list.",
+			"languages": schema.SetNestedAttribute{
+				MarkdownDescription: "Language list.",
 				Computed:            true,
 				NestedObject: schema.NestedAttributeObject{
 					Attributes: map[string]schema.Attribute{
 						"id": schema.Int64Attribute{
-							MarkdownDescription: "Tag ID.",
+							MarkdownDescription: "Language ID.",
 							Computed:            true,
 						},
-						"label": schema.StringAttribute{
-							MarkdownDescription: "Tag label.",
+						"name": schema.StringAttribute{
+							MarkdownDescription: "Language.",
+							Computed:            true,
+						},
+						"name_lower": schema.StringAttribute{
+							MarkdownDescription: "Language in lowercase.",
 							Computed:            true,
 						},
 					},
@@ -66,7 +70,7 @@ func (d *TagsDataSource) Schema(ctx context.Context, req datasource.SchemaReques
 	}
 }
 
-func (d *TagsDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
+func (d *LanguagesDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
 	// Prevent panic if the provider has not been configured.
 	if req.ProviderData == nil {
 		return
@@ -85,8 +89,8 @@ func (d *TagsDataSource) Configure(ctx context.Context, req datasource.Configure
 	d.client = client
 }
 
-func (d *TagsDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var data *Tags
+func (d *LanguagesDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+	var data *Languages
 
 	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
 
@@ -94,22 +98,22 @@ func (d *TagsDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 		return
 	}
 
-	// Get tags current value
-	response, _, err := d.client.TagApi.ListTag(ctx).Execute()
+	// Get languages current value
+	response, _, err := d.client.LanguageApi.ListLanguage(ctx).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, tagsDataSourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, languagesDataSourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read "+tagsDataSourceName)
+	tflog.Trace(ctx, "read "+languagesDataSourceName)
 	// Map response body to resource schema attribute
-	tags := make([]Tag, len(response))
+	languages := make([]Language, len(response))
 	for i, t := range response {
-		tags[i].write(t)
+		languages[i].write(t)
 	}
 
-	tfsdk.ValueFrom(ctx, tags, data.Tags.Type(ctx), &data.Tags)
+	tfsdk.ValueFrom(ctx, languages, data.Languages.Type(ctx), &data.Languages)
 	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 	data.ID = types.StringValue(strconv.Itoa(len(response)))
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

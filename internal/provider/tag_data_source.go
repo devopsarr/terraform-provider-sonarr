@@ -31,7 +31,6 @@ func (d *TagDataSource) Metadata(ctx context.Context, req datasource.MetadataReq
 
 func (d *TagDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		// This description is used by the documentation generator and the language server.
 		MarkdownDescription: "<!-- subcategory:Tags -->Single [Tag](../resources/tag).",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
