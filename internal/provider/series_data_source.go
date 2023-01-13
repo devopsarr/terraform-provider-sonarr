@@ -32,7 +32,6 @@ func (d *SeriesDataSource) Metadata(ctx context.Context, req datasource.Metadata
 
 func (d *SeriesDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		// This description is used by the documentation generator and the language server.
 		MarkdownDescription: "<!-- subcategory:Series -->Single [Series](../resources/series).",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{

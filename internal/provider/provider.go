@@ -269,6 +269,7 @@ func (p *SonarrProvider) DataSources(ctx context.Context) []func() datasource.Da
 
 		// System Status
 		NewLanguageDataSource,
+		NewLanguagesDataSource,
 		NewSystemStatusDataSource,
 
 		// Tags
