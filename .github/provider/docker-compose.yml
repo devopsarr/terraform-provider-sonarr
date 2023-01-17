@@ -17,7 +17,7 @@ services:
       - 8989:8989
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", " http://localhost:8989/system/status"]
+      test: ["CMD", "curl", "-f", "http://localhost:8989/system/status"]
   transmission:
     image: linuxserver/transmission:latest
     container_name: transmission

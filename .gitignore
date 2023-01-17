@@ -27,6 +27,7 @@ website/node_modules
 *.test
 *.iml
 terraform-provider-sonarr
+.github/provider/config.xml
 
 website/vendor
 
