@@ -8,5 +8,5 @@ on:
 
 jobs:
   cd:
-    uses: devopsarr/shared-workflows/.github/workflows/terrafrom_provider_cd.yml@main
+    uses: devopsarr/shared-workflows/.github/workflows/terraform_provider_cd.yml@main
     secrets: inherit

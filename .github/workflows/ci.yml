@@ -12,7 +12,7 @@ on:
 
 jobs:
   ci:
-    uses: devopsarr/shared-workflows/.github/workflows/terrafrom_provider_ci.yml@main
+    uses: devopsarr/shared-workflows/.github/workflows/terraform_provider_ci.yml@main
     with:
       app-name: "SONARR"
       url: "http://localhost:8989"
