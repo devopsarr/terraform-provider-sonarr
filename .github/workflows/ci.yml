@@ -1,0 +1,19 @@
+# Terraform Provider testing workflow.
+name: CI
+
+on:
+  pull_request:
+    paths-ignore:
+      - 'README.md'
+      - 'CHANGELOG.md'
+  push:
+    branches:
+      - main
+
+jobs:
+  ci:
+    uses: devopsarr/shared-workflows/.github/workflows/terrafrom_provider_ci.yml@main
+    with:
+      app-name: "SONARR"
+      url: "http://localhost:8989"
+    secrets: inherit

@@ -19,7 +19,7 @@ func TestAccImportListResource(t *testing.T) {
 				PreConfig: rootFolderDSInit,
 				Config:    testAccImportListResourceConfig("importListResourceTest", "false"),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("sonarr_import_list.test", "enable_automatic_add", "false"),
+					resource.TestCheckResourceAttr("sonarr_import_list.test", "season_folder", "false"),
 					resource.TestCheckResourceAttrSet("sonarr_import_list.test", "id"),
 				),
 			},
@@ -27,7 +27,7 @@ func TestAccImportListResource(t *testing.T) {
 			{
 				Config: testAccImportListResourceConfig("importListResourceTest", "true"),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("sonarr_import_list.test", "enable_automatic_add", "true"),
+					resource.TestCheckResourceAttr("sonarr_import_list.test", "season_folder", "true"),
 				),
 			},
 			// ImportState testing
@@ -41,12 +41,12 @@ func TestAccImportListResource(t *testing.T) {
 	})
 }
 
-func testAccImportListResourceConfig(name, enable string) string {
+func testAccImportListResourceConfig(name, folder string) string {
 	return fmt.Sprintf(`
 
 	resource "sonarr_import_list" "test" {
-		enable_automatic_add = %s
-		season_folder = true
+		enable_automatic_add = false
+		season_folder = %s
 		should_monitor = "all"
 		series_type = "standard"
 		root_folder_path = "/config"
@@ -55,7 +55,7 @@ func testAccImportListResourceConfig(name, enable string) string {
 		implementation = "SonarrImport"
     	config_contract = "SonarrSettings"
 		base_url = "http://127.0.0.1:8989"
-		api_key = "b01df9fca2e64e459d64a09888ce7451"
+		api_key = "testAPIKey"
 		tags = []
-	}`, enable, name)
+	}`, folder, name)
 }
