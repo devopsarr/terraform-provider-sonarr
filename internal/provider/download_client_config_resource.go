@@ -177,7 +177,6 @@ func (r *DownloadClientConfigResource) Delete(ctx context.Context, req resource.
 }
 
 func (r *DownloadClientConfigResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	// resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
 	tflog.Trace(ctx, "imported "+downloadClientConfigResourceName+": 1")
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), 1)...)
 }
