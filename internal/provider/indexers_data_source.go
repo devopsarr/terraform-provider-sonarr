@@ -2,7 +2,6 @@ package provider
 
 import (
 	"context"
-	"fmt"
 	"strconv"
 
 	"github.com/devopsarr/sonarr-go/sonarr"
@@ -182,22 +181,9 @@ func (d *IndexersDataSource) Schema(ctx context.Context, req datasource.SchemaRe
 }
 
 func (d *IndexersDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
-	// Prevent panic if the provider has not been configured.
-	if req.ProviderData == nil {
-		return
+	if client := helpers.DataSourceConfigure(ctx, req, resp); client != nil {
+		d.client = client
 	}
-
-	client, ok := req.ProviderData.(*sonarr.APIClient)
-	if !ok {
-		resp.Diagnostics.AddError(
-			helpers.UnexpectedDataSourceConfigureType,
-			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
-		)
-
-		return
-	}
-
-	d.client = client
 }
 
 func (d *IndexersDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
