@@ -11,11 +11,12 @@ import (
 )
 
 type Test struct {
-	Set types.Set
-	Str types.String
-	In  types.Int64
-	Fl  types.Float64
-	Boo types.Bool
+	Set      types.Set
+	Str      types.String
+	In       types.Int64
+	Fl       types.Float64
+	Boo      types.Bool
+	SeedTime types.Int64
 }
 
 func TestWriteStringField(t *testing.T) {
@@ -79,28 +80,35 @@ func TestWriteBoolField(t *testing.T) {
 func TestWriteIntField(t *testing.T) {
 	t.Parallel()
 
-	field := sonarr.NewField()
-	field.SetName("in")
-	// use float to simulate unmarshal response
-	field.SetValue(float64(50))
-
 	tests := map[string]struct {
-		fieldOutput sonarr.Field
-		written     Test
-		expected    Test
+		name     string
+		written  Test
+		expected Test
+		// use float to simulate unmarshal response
+		value float64
 	}{
 		"working": {
-			fieldOutput: *field,
-			written:     Test{},
-			expected:    Test{In: types.Int64Value(50)},
+			name:     "in",
+			value:    float64(50),
+			written:  Test{},
+			expected: Test{In: types.Int64Value(50)},
+		},
+		"seedtime": {
+			name:     "seedCriteria.seedTime",
+			value:    float64(50),
+			written:  Test{},
+			expected: Test{SeedTime: types.Int64Value(50)},
 		},
 	}
 	for name, test := range tests {
 		test := test
 
+		field := sonarr.NewField()
+		field.SetName(test.name)
+		field.SetValue(test.value)
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			WriteIntField(&test.fieldOutput, &test.written)
+			WriteIntField(field, &test.written)
 			assert.Equal(t, test.expected, test.written)
 		})
 	}
@@ -209,7 +217,7 @@ func TestReadStringField(t *testing.T) {
 	field.SetValue("string")
 
 	tests := map[string]struct {
-		expected  sonarr.Field
+		expected  *sonarr.Field
 		name      string
 		fieldCase Test
 	}{
@@ -218,7 +226,12 @@ func TestReadStringField(t *testing.T) {
 				Str: types.StringValue("string"),
 			},
 			name:     "str",
-			expected: *field,
+			expected: field,
+		},
+		"nil": {
+			fieldCase: Test{},
+			name:      "str",
+			expected:  nil,
 		},
 	}
 	for name, test := range tests {
@@ -227,7 +240,7 @@ func TestReadStringField(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			field := ReadStringField(test.name, &test.fieldCase)
-			assert.Equal(t, test.expected, *field)
+			assert.Equal(t, test.expected, field)
 		})
 	}
 }
@@ -235,30 +248,50 @@ func TestReadStringField(t *testing.T) {
 func TestReadIntField(t *testing.T) {
 	t.Parallel()
 
-	field := sonarr.NewField()
-	field.SetName("in")
-	field.SetValue(int64(10))
-
 	tests := map[string]struct {
-		expected  sonarr.Field
 		name      string
+		tfName    string
 		fieldCase Test
+		value     int
 	}{
 		"working": {
 			fieldCase: Test{
 				In: types.Int64Value(10),
 			},
-			name:     "in",
-			expected: *field,
+			name:   "in",
+			tfName: "in",
+			value:  10,
+		},
+		"nil": {
+			fieldCase: Test{},
+			name:      "in",
+			tfName:    "in",
+			value:     0,
+		},
+		"seedtime": {
+			fieldCase: Test{
+				SeedTime: types.Int64Value(10),
+			},
+			name:   "seedCriteria.seedTime",
+			tfName: "seedTime",
+			value:  10,
 		},
 	}
 	for name, test := range tests {
 		test := test
 
+		expected := sonarr.NewField()
+		expected.SetName(test.name)
+		expected.SetValue(int64(test.value))
+
+		if test.value == 0 {
+			expected = nil
+		}
+
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
-			field := ReadIntField(test.name, &test.fieldCase)
-			assert.Equal(t, test.expected, *field)
+			field := ReadIntField(test.tfName, &test.fieldCase)
+			assert.Equal(t, expected, field)
 		})
 	}
 }
@@ -271,7 +304,7 @@ func TestReadBoolField(t *testing.T) {
 	field.SetValue(true)
 
 	tests := map[string]struct {
-		expected  sonarr.Field
+		expected  *sonarr.Field
 		name      string
 		fieldCase Test
 	}{
@@ -280,7 +313,12 @@ func TestReadBoolField(t *testing.T) {
 				Boo: types.BoolValue(true),
 			},
 			name:     "boo",
-			expected: *field,
+			expected: field,
+		},
+		"nil": {
+			fieldCase: Test{},
+			name:      "boo",
+			expected:  nil,
 		},
 	}
 	for name, test := range tests {
@@ -289,7 +327,7 @@ func TestReadBoolField(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			field := ReadBoolField(test.name, &test.fieldCase)
-			assert.Equal(t, test.expected, *field)
+			assert.Equal(t, test.expected, field)
 		})
 	}
 }
@@ -302,7 +340,7 @@ func TestReadFloatField(t *testing.T) {
 	field.SetValue(3.5)
 
 	tests := map[string]struct {
-		expected  sonarr.Field
+		expected  *sonarr.Field
 		name      string
 		fieldCase Test
 	}{
@@ -311,7 +349,12 @@ func TestReadFloatField(t *testing.T) {
 				Fl: types.Float64Value(3.5),
 			},
 			name:     "fl",
-			expected: *field,
+			expected: field,
+		},
+		"nil": {
+			fieldCase: Test{},
+			name:      "fl",
+			expected:  nil,
 		},
 	}
 	for name, test := range tests {
@@ -320,7 +363,7 @@ func TestReadFloatField(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 			field := ReadFloatField(test.name, &test.fieldCase)
-			assert.Equal(t, test.expected, *field)
+			assert.Equal(t, test.expected, field)
 		})
 	}
 }
@@ -333,7 +376,7 @@ func TestReadStringSliceField(t *testing.T) {
 	field.SetValue([]string{"test1", "test2"})
 
 	tests := map[string]struct {
-		expected  sonarr.Field
+		expected  *sonarr.Field
 		name      string
 		set       []string
 		fieldCase Test
@@ -343,8 +386,16 @@ func TestReadStringSliceField(t *testing.T) {
 				Set: types.SetValueMust(types.StringType, nil),
 			},
 			name:     "set",
-			expected: *field,
+			expected: field,
 			set:      []string{"test1", "test2"},
+		},
+		"nil": {
+			fieldCase: Test{
+				Set: types.SetValueMust(types.StringType, nil),
+			},
+			name:     "set",
+			expected: nil,
+			set:      []string{},
 		},
 	}
 	for name, test := range tests {
@@ -354,7 +405,7 @@ func TestReadStringSliceField(t *testing.T) {
 			t.Parallel()
 			tfsdk.ValueFrom(context.Background(), test.set, test.fieldCase.Set.Type(context.Background()), &test.fieldCase.Set)
 			field := ReadStringSliceField(context.Background(), test.name, &test.fieldCase)
-			assert.Equal(t, test.expected, *field)
+			assert.Equal(t, test.expected, field)
 		})
 	}
 }
@@ -367,7 +418,7 @@ func TestReadIntSliceField(t *testing.T) {
 	field.SetValue([]int64{1, 2})
 
 	tests := map[string]struct {
-		expected  sonarr.Field
+		expected  *sonarr.Field
 		name      string
 		set       []int64
 		fieldCase Test
@@ -377,8 +428,16 @@ func TestReadIntSliceField(t *testing.T) {
 				Set: types.SetValueMust(types.Int64Type, nil),
 			},
 			name:     "set",
-			expected: *field,
+			expected: field,
 			set:      []int64{1, 2},
+		},
+		"nil": {
+			fieldCase: Test{
+				Set: types.SetValueMust(types.Int64Type, nil),
+			},
+			name:     "set",
+			expected: nil,
+			set:      []int64{},
 		},
 	}
 	for name, test := range tests {
@@ -388,7 +447,7 @@ func TestReadIntSliceField(t *testing.T) {
 			t.Parallel()
 			tfsdk.ValueFrom(context.Background(), test.set, test.fieldCase.Set.Type(context.Background()), &test.fieldCase.Set)
 			field := ReadIntSliceField(context.Background(), test.name, &test.fieldCase)
-			assert.Equal(t, test.expected, *field)
+			assert.Equal(t, test.expected, field)
 		})
 	}
 }

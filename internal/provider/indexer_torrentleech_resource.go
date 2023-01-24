@@ -2,7 +2,6 @@ package provider
 
 import (
 	"context"
-	"fmt"
 	"strconv"
 
 	"github.com/devopsarr/sonarr-go/sonarr"
@@ -179,22 +178,9 @@ func (r *IndexerTorrentleechResource) Schema(ctx context.Context, req resource.S
 }
 
 func (r *IndexerTorrentleechResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
-	// Prevent panic if the provider has not been configured.
-	if req.ProviderData == nil {
-		return
+	if client := helpers.ResourceConfigure(ctx, req, resp); client != nil {
+		r.client = client
 	}
-
-	client, ok := req.ProviderData.(*sonarr.APIClient)
-	if !ok {
-		resp.Diagnostics.AddError(
-			helpers.UnexpectedResourceConfigureType,
-			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
-		)
-
-		return
-	}
-
-	r.client = client
 }
 
 func (r *IndexerTorrentleechResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
@@ -295,19 +281,8 @@ func (r *IndexerTorrentleechResource) Delete(ctx context.Context, req resource.D
 }
 
 func (r *IndexerTorrentleechResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	// resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
-	id, err := strconv.Atoi(req.ID)
-	if err != nil {
-		resp.Diagnostics.AddError(
-			helpers.UnexpectedImportIdentifier,
-			fmt.Sprintf("Expected import identifier with format: ID. Got: %q", req.ID),
-		)
-
-		return
-	}
-
-	tflog.Trace(ctx, "imported "+indexerTorrentleechResourceName+": "+strconv.Itoa(id))
-	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), id)...)
+	helpers.ImportStatePassthroughIntID(ctx, path.Root("id"), req, resp)
+	tflog.Trace(ctx, "imported "+indexerTorrentleechResourceName+": "+req.ID)
 }
 
 func (i *IndexerTorrentleech) write(ctx context.Context, indexer *sonarr.IndexerResource) {

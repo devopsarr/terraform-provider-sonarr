@@ -2,7 +2,6 @@ package provider
 
 import (
 	"context"
-	"fmt"
 	"strconv"
 
 	"github.com/devopsarr/sonarr-go/sonarr"
@@ -78,22 +77,9 @@ func (r *IndexerConfigResource) Schema(ctx context.Context, req resource.SchemaR
 }
 
 func (r *IndexerConfigResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
-	// Prevent panic if the provider has not been configured.
-	if req.ProviderData == nil {
-		return
+	if client := helpers.ResourceConfigure(ctx, req, resp); client != nil {
+		r.client = client
 	}
-
-	client, ok := req.ProviderData.(*sonarr.APIClient)
-	if !ok {
-		resp.Diagnostics.AddError(
-			helpers.UnexpectedResourceConfigureType,
-			fmt.Sprintf("Expected *sonarr.APIClient, got: %T. Please report this issue to the provider developers.", req.ProviderData),
-		)
-
-		return
-	}
-
-	r.client = client
 }
 
 func (r *IndexerConfigResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
@@ -182,8 +168,7 @@ func (r *IndexerConfigResource) Delete(ctx context.Context, req resource.DeleteR
 }
 
 func (r *IndexerConfigResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	// resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
-	tflog.Trace(ctx, "imported "+indexerConfigResourceName+": "+strconv.Itoa(1))
+	tflog.Trace(ctx, "imported "+indexerConfigResourceName+": 1")
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), 1)...)
 }
 
