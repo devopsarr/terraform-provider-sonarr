@@ -25,7 +25,7 @@ var (
 	_ resource.ResourceWithImportState = &MetadataResource{}
 )
 
-var metadataBoolFields = []string{"seriesMetadata", "seriesMetadataURL", "seriesImages", "seasonImages", "episodeImages", "episodeMetadata"}
+var metadataBoolFields = []string{"seriesMetadata", "seriesMetadataUrl", "seriesImages", "seasonImages", "episodeImages", "episodeMetadata"}
 
 func NewMetadataResource() resource.Resource {
 	return &MetadataResource{}
