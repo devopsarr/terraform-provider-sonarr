@@ -275,6 +275,7 @@ func (p *SonarrProvider) DataSources(ctx context.Context) []func() datasource.Da
 		NewCustomFormatConditionLanguageDataSource,
 		NewCustomFormatConditionReleaseTitleDataSource,
 		NewCustomFormatConditionResolutionDataSource,
+		NewCustomFormatConditionSizeDataSource,
 		NewCustomFormatConditionSourceDataSource,
 
 		// Series
