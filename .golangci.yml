@@ -66,6 +66,8 @@ linters-settings:
     allow-no-explanation:
       - unparam
       - gomnd
+  paralleltest:
+    ignore-missing: true
 
 run:
   timeout: 35m
