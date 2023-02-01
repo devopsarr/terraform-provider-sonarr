@@ -11,6 +11,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -156,21 +157,34 @@ func (r QualityProfileResource) getQualitySchema() schema.Schema {
 				MarkdownDescription: "Quality ID.",
 				Optional:            true,
 				Computed:            true,
+				// plan on uptate is unknown for 1 item array
+				PlanModifiers: []planmodifier.Int64{
+					int64planmodifier.UseStateForUnknown(),
+				},
 			},
 			"resolution": schema.Int64Attribute{
 				MarkdownDescription: "Resolution.",
 				Optional:            true,
 				Computed:            true,
+				PlanModifiers: []planmodifier.Int64{
+					int64planmodifier.UseStateForUnknown(),
+				},
 			},
 			"name": schema.StringAttribute{
 				MarkdownDescription: "Quality name.",
 				Optional:            true,
 				Computed:            true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 			"source": schema.StringAttribute{
 				MarkdownDescription: "Source.",
 				Optional:            true,
 				Computed:            true,
+				PlanModifiers: []planmodifier.String{
+					stringplanmodifier.UseStateForUnknown(),
+				},
 			},
 		},
 	}
@@ -321,12 +335,13 @@ func (p *QualityProfile) write(ctx context.Context, profile *sonarr.QualityProfi
 		qualityGroups[n].write(ctx, g)
 	}
 
-	formatItems := make([]FormatItem, len(profile.FormatItems))
-	for n, f := range profile.FormatItems {
+	formatItems := make([]FormatItem, len(profile.GetFormatItems()))
+	for n, f := range profile.GetFormatItems() {
 		formatItems[n].write(f)
 	}
 
 	tfsdk.ValueFrom(ctx, qualityGroups, p.QualityGroups.Type(ctx), &p.QualityGroups)
+	tfsdk.ValueFrom(ctx, formatItems, p.FormatItems.Type(ctx), &p.FormatItems)
 }
 
 func (q *QualityGroup) write(ctx context.Context, group *sonarr.QualityProfileQualityItemResource) {
@@ -336,9 +351,7 @@ func (q *QualityGroup) write(ctx context.Context, group *sonarr.QualityProfileQu
 		qualities []Quality
 	)
 
-	if len(group.Items) == 0 {
-		name = group.Quality.GetName()
-		id = int64(group.Quality.GetId())
+	if len(group.GetItems()) == 0 {
 		qualities = []Quality{{
 			ID:         types.Int64Value(int64(group.Quality.GetId())),
 			Name:       types.StringValue(group.Quality.GetName()),
@@ -348,8 +361,8 @@ func (q *QualityGroup) write(ctx context.Context, group *sonarr.QualityProfileQu
 	} else {
 		name = group.GetName()
 		id = int64(group.GetId())
-		qualities = make([]Quality, len(group.Items))
-		for m, q := range group.Items {
+		qualities = make([]Quality, len(group.GetItems()))
+		for m, q := range group.GetItems() {
 			qualities[m].write(q)
 		}
 	}
@@ -383,10 +396,12 @@ func (p *QualityProfile) read(ctx context.Context) *sonarr.QualityProfileResourc
 		q := make([]Quality, len(g.Qualities.Elements()))
 		tfsdk.ValueAs(ctx, g.Qualities, &q)
 
-		if len(q) == 0 {
+		if len(q) == 1 {
 			quality := sonarr.NewQuality()
-			quality.SetId(int32(g.ID.ValueInt64()))
-			quality.SetName(g.Name.ValueString())
+			quality.SetId(int32(q[0].ID.ValueInt64()))
+			quality.SetName(q[0].Name.ValueString())
+			quality.SetSource(sonarr.QualitySource(q[0].Source.ValueString()))
+			quality.SetResolution(int32(q[0].Resolution.ValueInt64()))
 
 			item := sonarr.NewQualityProfileQualityItemResource()
 			item.SetAllowed(true)
@@ -433,10 +448,10 @@ func (p *QualityProfile) read(ctx context.Context) *sonarr.QualityProfileResourc
 
 func (q *Quality) read() *sonarr.QualityProfileQualityItemResource {
 	quality := sonarr.NewQuality()
-	quality.SetId(int32(q.ID.ValueInt64()))
 	quality.SetName(q.Name.ValueString())
-	quality.SetResolution(int32(q.Resolution.ValueInt64()))
+	quality.SetId(int32(q.ID.ValueInt64()))
 	quality.SetSource(sonarr.QualitySource(q.Source.ValueString()))
+	quality.SetResolution(int32(q.Resolution.ValueInt64()))
 
 	item := sonarr.NewQualityProfileQualityItemResource()
 	item.SetAllowed(true)
