@@ -6,7 +6,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
-func TestAccQualityProfileDataSource(t *testing.T) {
+func TestAccQualityDataSource(t *testing.T) {
 	t.Parallel()
 
 	resource.Test(t, resource.TestCase{
@@ -15,17 +15,17 @@ func TestAccQualityProfileDataSource(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Read testing
 			{
-				Config: testAccQualityProfileDataSourceConfig,
+				Config: testAccQualityDataSourceConfig,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttrSet("data.sonarr_quality_profile.test", "id"),
-					resource.TestCheckResourceAttr("data.sonarr_quality_profile.test", "cutoff", "1")),
+					resource.TestCheckResourceAttrSet("data.sonarr_quality.test", "id"),
+					resource.TestCheckResourceAttr("data.sonarr_quality.test", "resolution", "2160")),
 			},
 		},
 	})
 }
 
-const testAccQualityProfileDataSourceConfig = `
-data "sonarr_quality_profile" "test" {
-	name = "Any"
+const testAccQualityDataSourceConfig = `
+data "sonarr_quality" "test" {
+	name = "Bluray-2160p"
 }
 `

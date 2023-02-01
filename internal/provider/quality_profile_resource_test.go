@@ -8,8 +8,7 @@ import (
 )
 
 func TestAccQualityProfileResource(t *testing.T) {
-	t.Parallel()
-
+	// no parallel to avoid conflict with custom formats
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
@@ -42,29 +41,62 @@ func TestAccQualityProfileResource(t *testing.T) {
 
 func testAccQualityProfileResourceConfig(name string) string {
 	return fmt.Sprintf(`
+	resource "sonarr_custom_format" "test" {
+		include_custom_format_when_renaming = false
+		name = "QualityFormatTest"
+		
+		specifications = [
+			{
+				name = "Arabic"
+				implementation = "LanguageSpecification"
+				negate = false
+				required = false
+				value = "31"
+			}
+		]	
+	}
+
+	data "sonarr_custom_formats" "test" {
+		depends_on = [sonarr_custom_format.test]
+	}
+
+	data "sonarr_quality" "bluray" {
+		name = "Bluray-2160p"
+	}
+
+	data "sonarr_quality" "webdl" {
+		name = "WEBDL-2160p"
+	}
+
+	data "sonarr_quality" "webrip" {
+		name = "WEBRip-2160p"
+	}
+
 	resource "sonarr_quality_profile" "test" {
 		name            = "%s"
 		upgrade_allowed = true
-		cutoff          = 1100
+		cutoff          = 2000
 
 		quality_groups = [
 			{
-				id   = 1100
-				name = "4k"
+				id   = 2000
+				name = "WEB 2160p"
 				qualities = [
-					{
-						id         = 18
-						name       = "WEBDL-2160p"
-						source     = "web"
-						resolution = 2160
-					},
-					{
-						id         = 19
-						name       = "Bluray-2160p"
-						source     = "bluray"
-						resolution = 2160
-					}
+					data.sonarr_quality.webdl,
+					data.sonarr_quality.webrip,
 				]
+			},
+			{
+				qualities = [data.sonarr_quality.bluray]
+			}
+		]
+
+		format_items = [
+			for format in data.sonarr_custom_formats.test.custom_formats :
+			{
+				name   = format.name
+				format = format.id
+				score  = 0
 			}
 		]
 	}
