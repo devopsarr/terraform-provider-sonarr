@@ -86,7 +86,7 @@ func (d *DelayProfileDataSource) Configure(ctx context.Context, req datasource.C
 func (d *DelayProfileDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 	var delayProfile *DelayProfile
 
-	resp.Diagnostics.Append(resp.State.Get(ctx, &delayProfile)...)
+	resp.Diagnostics.Append(req.Config.Get(ctx, &delayProfile)...)
 
 	if resp.Diagnostics.HasError() {
 		return
