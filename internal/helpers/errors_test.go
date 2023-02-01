@@ -43,9 +43,9 @@ func TestParseClientError(t *testing.T) {
 		},
 		"generic": {
 			action:   "create",
-			name:     "radarr_tag",
+			name:     "sonarr_tag",
 			err:      errors.New("other error"),
-			expected: "Unable to create radarr_tag, got error: other error",
+			expected: "Unable to create sonarr_tag, got error: other error",
 		},
 	}
 	for name, test := range tests {

@@ -182,6 +182,9 @@ func (p *SonarrProvider) Resources(ctx context.Context) []func() resource.Resour
 		NewNamingResource,
 		NewRootFolderResource,
 
+		// Metadata
+		NewMetadataResource,
+
 		// Notifications
 		NewNotificationResource,
 		NewNotificationBoxcarResource,
