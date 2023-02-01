@@ -249,6 +249,9 @@ func (p *SonarrProvider) DataSources(ctx context.Context) []func() datasource.Da
 		NewRootFolderDataSource,
 		NewRootFoldersDataSource,
 
+		// Metadata
+		NewMetadataConsumersDataSource,
+
 		// Notifications
 		NewNotificationDataSource,
 		NewNotificationsDataSource,
