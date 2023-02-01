@@ -313,7 +313,7 @@ func (d *DownloadClientNzbvortex) write(ctx context.Context, downloadClient *son
 		APIKey: d.APIKey,
 	}
 	genericDownloadClient.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, downloadClient.Tags)
-	genericDownloadClient.writeFields(ctx, downloadClient.Fields)
+	genericDownloadClient.writeFields(ctx, downloadClient.GetFields())
 	d.fromDownloadClient(&genericDownloadClient)
 }
 

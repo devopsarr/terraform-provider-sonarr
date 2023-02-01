@@ -287,7 +287,7 @@ func (i *IndexerIptorrents) write(ctx context.Context, indexer *sonarr.IndexerRe
 		Name:                    types.StringValue(indexer.GetName()),
 	}
 	genericIndexer.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, indexer.Tags)
-	genericIndexer.writeFields(ctx, indexer.Fields)
+	genericIndexer.writeFields(ctx, indexer.GetFields())
 	i.fromIndexer(&genericIndexer)
 }
 

@@ -661,7 +661,7 @@ func (n *Notification) write(ctx context.Context, notification *sonarr.Notificat
 	n.To = types.SetValueMust(types.StringType, nil)
 	n.Cc = types.SetValueMust(types.StringType, nil)
 	n.Bcc = types.SetValueMust(types.StringType, nil)
-	n.writeFields(ctx, notification.Fields)
+	n.writeFields(ctx, notification.GetFields())
 }
 
 func (n *Notification) writeFields(ctx context.Context, fields []*sonarr.Field) {

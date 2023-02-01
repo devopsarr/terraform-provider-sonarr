@@ -273,7 +273,7 @@ func (s *Specification) write(spec *sonarr.CustomFormatSpecificationSchema) {
 	s.Name = types.StringValue(spec.GetName())
 	s.Negate = types.BoolValue(spec.GetNegate())
 	s.Required = types.BoolValue(spec.GetRequired())
-	s.writeFields(spec.Fields)
+	s.writeFields(spec.GetFields())
 }
 
 func (s *Specification) writeFields(fields []*sonarr.Field) {
