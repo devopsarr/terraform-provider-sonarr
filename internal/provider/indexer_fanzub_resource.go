@@ -266,7 +266,7 @@ func (i *IndexerFanzub) write(ctx context.Context, indexer *sonarr.IndexerResour
 		Categories:              types.SetValueMust(types.Int64Type, nil),
 	}
 	genericIndexer.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, indexer.Tags)
-	genericIndexer.writeFields(ctx, indexer.Fields)
+	genericIndexer.writeFields(ctx, indexer.GetFields())
 	i.fromIndexer(&genericIndexer)
 }
 

@@ -338,7 +338,7 @@ func (d *DownloadClientTransmission) write(ctx context.Context, downloadClient *
 	// Write sensitive data only if present
 	genericDownloadClient.writeSensitive(&DownloadClient{Password: d.Password})
 	genericDownloadClient.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, downloadClient.Tags)
-	genericDownloadClient.writeFields(ctx, downloadClient.Fields)
+	genericDownloadClient.writeFields(ctx, downloadClient.GetFields())
 	d.fromDownloadClient(&genericDownloadClient)
 }
 

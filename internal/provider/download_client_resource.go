@@ -472,7 +472,7 @@ func (d *DownloadClient) write(ctx context.Context, downloadClient *sonarr.Downl
 	d.AdditionalTags = types.SetValueMust(types.Int64Type, nil)
 	d.FieldTags = types.SetValueMust(types.StringType, nil)
 	d.PostImportTags = types.SetValueMust(types.StringType, nil)
-	d.writeFields(ctx, downloadClient.Fields)
+	d.writeFields(ctx, downloadClient.GetFields())
 }
 
 func (d *DownloadClient) writeFields(ctx context.Context, fields []*sonarr.Field) {

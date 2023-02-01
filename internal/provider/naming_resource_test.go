@@ -51,6 +51,6 @@ func testAccNamingResourceConfig(specials string) string {
 		series_folder_format       = "{Series Title}"
 		season_folder_format       = "Season {season}"
 		specials_folder_format     = "%s"
-		standard_episode_format    = "{Series Title} - S{season:00}E{episode:00} - {Episode Title} {Quality Full}"	  
+		standard_episode_format    = "{Series Title} - S{season:00}E{episode:00} - {Episode Title} {Quality Full}"
 	}`, specials)
 }

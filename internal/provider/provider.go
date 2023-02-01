@@ -182,6 +182,12 @@ func (p *SonarrProvider) Resources(ctx context.Context) []func() resource.Resour
 		NewNamingResource,
 		NewRootFolderResource,
 
+		// Metadata
+		NewMetadataResource,
+		NewMetadataKodiResource,
+		NewMetadataRoksboxResource,
+		NewMetadataWdtvResource,
+
 		// Notifications
 		NewNotificationResource,
 		NewNotificationBoxcarResource,
@@ -245,6 +251,10 @@ func (p *SonarrProvider) DataSources(ctx context.Context) []func() datasource.Da
 		NewNamingDataSource,
 		NewRootFolderDataSource,
 		NewRootFoldersDataSource,
+
+		// Metadata
+		NewMetadataConsumersDataSource,
+		NewMetadataDataSource,
 
 		// Notifications
 		NewNotificationDataSource,

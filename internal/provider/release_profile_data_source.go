@@ -80,7 +80,7 @@ func (d *ReleaseProfileDataSource) Configure(ctx context.Context, req datasource
 func (d *ReleaseProfileDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 	var releaseProfile *ReleaseProfile
 
-	resp.Diagnostics.Append(resp.State.Get(ctx, &releaseProfile)...)
+	resp.Diagnostics.Append(req.Config.Get(ctx, &releaseProfile)...)
 
 	if resp.Diagnostics.HasError() {
 		return

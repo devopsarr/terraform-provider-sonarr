@@ -80,7 +80,7 @@ func (d *QualityDefinitionDataSource) Configure(ctx context.Context, req datasou
 func (d *QualityDefinitionDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
 	var data *QualityDefinition
 
-	resp.Diagnostics.Append(resp.State.Get(ctx, &data)...)
+	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
 
 	if resp.Diagnostics.HasError() {
 		return

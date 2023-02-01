@@ -363,7 +363,7 @@ func (i *ImportList) write(ctx context.Context, importList *sonarr.ImportListRes
 	i.LanguageProfileIds = types.SetValueMust(types.Int64Type, nil)
 	i.ProfileIds = types.SetValueMust(types.Int64Type, nil)
 	i.TagIds = types.SetValueMust(types.Int64Type, nil)
-	i.writeFields(ctx, importList.Fields)
+	i.writeFields(ctx, importList.GetFields())
 }
 
 func (i *ImportList) writeFields(ctx context.Context, fields []*sonarr.Field) {

@@ -376,7 +376,7 @@ func (i *Indexer) write(ctx context.Context, indexer *sonarr.IndexerResource) {
 	i.Protocol = types.StringValue(string(indexer.GetProtocol()))
 	i.AnimeCategories = types.SetValueMust(types.Int64Type, nil)
 	i.Categories = types.SetValueMust(types.Int64Type, nil)
-	i.writeFields(ctx, indexer.Fields)
+	i.writeFields(ctx, indexer.GetFields())
 }
 
 func (i *Indexer) writeFields(ctx context.Context, fields []*sonarr.Field) {
