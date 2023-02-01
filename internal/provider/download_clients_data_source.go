@@ -270,6 +270,7 @@ func (d *DownloadClientsDataSource) Read(ctx context.Context, req datasource.Rea
 	response, _, err := d.client.DownloadClientApi.ListDownloadClient(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, downloadClientsDataSourceName, err))
+
 		return
 	}
 

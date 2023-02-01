@@ -3,13 +3,13 @@
 page_title: "sonarr_indexer_omgwtfnzbs Resource - terraform-provider-sonarr"
 subcategory: "Indexers"
 description: |-
-  Indexer Omgwtfnzbs resource.
+  DeprecatedIndexer Omgwtfnzbs resource.
   For more information refer to Indexer https://wiki.servarr.com/sonarr/settings#indexers and Omgwtfnzbs https://wiki.servarr.com/sonarr/supported#omgwtfnzbs.
 ---
 
 # sonarr_indexer_omgwtfnzbs (Resource)
 
-<!-- subcategory:Indexers -->Indexer Omgwtfnzbs resource.
+<!-- subcategory:Indexers -->**Deprecated**Indexer Omgwtfnzbs resource.
 For more information refer to [Indexer](https://wiki.servarr.com/sonarr/settings#indexers) and [Omgwtfnzbs](https://wiki.servarr.com/sonarr/supported#omgwtfnzbs).
 
 ## Example Usage

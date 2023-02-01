@@ -138,6 +138,7 @@ func (d *MediaManagementDataSource) Read(ctx context.Context, req datasource.Rea
 	response, _, err := d.client.MediaManagementConfigApi.GetMediaManagementConfig(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, mediaManagementDataSourceName, err))
+
 		return
 	}
 

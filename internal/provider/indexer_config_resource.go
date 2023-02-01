@@ -114,6 +114,7 @@ func (r *IndexerConfigResource) Create(ctx context.Context, req resource.CreateR
 	response, _, err := r.client.IndexerConfigApi.UpdateIndexerConfig(ctx, strconv.Itoa(int(request.GetId()))).IndexerConfigResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, indexerConfigResourceName, err))
+
 		return
 	}
 
@@ -137,6 +138,7 @@ func (r *IndexerConfigResource) Read(ctx context.Context, req resource.ReadReque
 	response, _, err := r.client.IndexerConfigApi.GetIndexerConfig(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerConfigResourceName, err))
+
 		return
 	}
 
@@ -163,6 +165,7 @@ func (r *IndexerConfigResource) Update(ctx context.Context, req resource.UpdateR
 	response, _, err := r.client.IndexerConfigApi.UpdateIndexerConfig(ctx, strconv.Itoa(int(request.GetId()))).IndexerConfigResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, indexerConfigResourceName, err))
+
 		return
 	}
 

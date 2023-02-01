@@ -121,6 +121,7 @@ func (d *ReleaseProfilesDataSource) Read(ctx context.Context, req datasource.Rea
 	response, _, err := d.client.ReleaseProfileApi.ListReleaseProfile(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, releaseProfileResourceName, err))
+
 		return
 	}
 

@@ -51,7 +51,8 @@ func (r *LanguageProfileResource) Metadata(ctx context.Context, req resource.Met
 
 func (r *LanguageProfileResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Profiles -->Language Profile resource.\nFor more information refer to [Language Profile](https://wiki.servarr.com/sonarr/settings#language-profiles) documentation.",
+		DeprecationMessage:  "This resource is deprecated and it will be removed in provider version 3.0.0",
+		MarkdownDescription: "<!-- subcategory:Profiles -->**Deprecated**Language Profile resource.\nFor more information refer to [Language Profile](https://wiki.servarr.com/sonarr/settings#language-profiles) documentation.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
 				MarkdownDescription: "Language Profile ID.",
@@ -121,6 +122,7 @@ func (r *LanguageProfileResource) Create(ctx context.Context, req resource.Creat
 	response, _, err := r.client.LanguageProfileApi.CreateLanguageProfile(ctx).LanguageProfileResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, languageProfileResourceName, err))
+
 		return
 	}
 
@@ -144,6 +146,7 @@ func (r *LanguageProfileResource) Read(ctx context.Context, req resource.ReadReq
 	response, _, err := r.client.LanguageProfileApi.GetLanguageProfileById(ctx, int32(profile.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, languageProfileResourceName, err))
+
 		return
 	}
 
@@ -170,6 +173,7 @@ func (r *LanguageProfileResource) Update(ctx context.Context, req resource.Updat
 	response, _, err := r.client.LanguageProfileApi.UpdateLanguageProfile(ctx, strconv.Itoa(int(request.GetId()))).LanguageProfileResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, languageProfileResourceName, err))
+
 		return
 	}
 
@@ -192,6 +196,7 @@ func (r *LanguageProfileResource) Delete(ctx context.Context, req resource.Delet
 	_, err := r.client.LanguageProfileApi.DeleteLanguageProfile(ctx, int32(profile.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, languageProfileResourceName, err))
+
 		return
 	}
 

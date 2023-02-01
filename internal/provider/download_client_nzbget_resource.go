@@ -246,6 +246,7 @@ func (r *DownloadClientNzbgetResource) Create(ctx context.Context, req resource.
 	response, _, err := r.client.DownloadClientApi.CreateDownloadClient(ctx).DownloadClientResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, downloadClientNzbgetResourceName, err))
+
 		return
 	}
 
@@ -269,6 +270,7 @@ func (r *DownloadClientNzbgetResource) Read(ctx context.Context, req resource.Re
 	response, _, err := r.client.DownloadClientApi.GetDownloadClientById(ctx, int32(client.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, downloadClientNzbgetResourceName, err))
+
 		return
 	}
 
@@ -294,6 +296,7 @@ func (r *DownloadClientNzbgetResource) Update(ctx context.Context, req resource.
 	response, _, err := r.client.DownloadClientApi.UpdateDownloadClient(ctx, strconv.Itoa(int(request.GetId()))).DownloadClientResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, downloadClientNzbgetResourceName, err))
+
 		return
 	}
 
@@ -316,6 +319,7 @@ func (r *DownloadClientNzbgetResource) Delete(ctx context.Context, req resource.
 	_, err := r.client.DownloadClientApi.DeleteDownloadClient(ctx, int32(client.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, downloadClientNzbgetResourceName, err))
+
 		return
 	}
 

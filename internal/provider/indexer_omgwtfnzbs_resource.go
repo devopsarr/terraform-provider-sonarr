@@ -90,7 +90,8 @@ func (r *IndexerOmgwtfnzbsResource) Metadata(ctx context.Context, req resource.M
 
 func (r *IndexerOmgwtfnzbsResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Indexers -->Indexer Omgwtfnzbs resource.\nFor more information refer to [Indexer](https://wiki.servarr.com/sonarr/settings#indexers) and [Omgwtfnzbs](https://wiki.servarr.com/sonarr/supported#omgwtfnzbs).",
+		DeprecationMessage:  "This resource is deprecated and it will be removed in provider version 3.0.0",
+		MarkdownDescription: "<!-- subcategory:Indexers -->**Deprecated**Indexer Omgwtfnzbs resource.\nFor more information refer to [Indexer](https://wiki.servarr.com/sonarr/settings#indexers) and [Omgwtfnzbs](https://wiki.servarr.com/sonarr/supported#omgwtfnzbs).",
 		Attributes: map[string]schema.Attribute{
 			"enable_automatic_search": schema.BoolAttribute{
 				MarkdownDescription: "Enable automatic search flag.",
@@ -188,6 +189,7 @@ func (r *IndexerOmgwtfnzbsResource) Create(ctx context.Context, req resource.Cre
 	response, _, err := r.client.IndexerApi.CreateIndexer(ctx).IndexerResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, indexerOmgwtfnzbsResourceName, err))
+
 		return
 	}
 
@@ -211,6 +213,7 @@ func (r *IndexerOmgwtfnzbsResource) Read(ctx context.Context, req resource.ReadR
 	response, _, err := r.client.IndexerApi.GetIndexerById(ctx, int32(indexer.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerOmgwtfnzbsResourceName, err))
+
 		return
 	}
 
@@ -236,6 +239,7 @@ func (r *IndexerOmgwtfnzbsResource) Update(ctx context.Context, req resource.Upd
 	response, _, err := r.client.IndexerApi.UpdateIndexer(ctx, strconv.Itoa(int(request.GetId()))).IndexerResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, indexerOmgwtfnzbsResourceName, err))
+
 		return
 	}
 
@@ -258,6 +262,7 @@ func (r *IndexerOmgwtfnzbsResource) Delete(ctx context.Context, req resource.Del
 	_, err := r.client.IndexerApi.DeleteIndexer(ctx, int32(indexer.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerOmgwtfnzbsResourceName, err))
+
 		return
 	}
 

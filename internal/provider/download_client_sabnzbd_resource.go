@@ -247,6 +247,7 @@ func (r *DownloadClientSabnzbdResource) Create(ctx context.Context, req resource
 	response, _, err := r.client.DownloadClientApi.CreateDownloadClient(ctx).DownloadClientResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, downloadClientSabnzbdResourceName, err))
+
 		return
 	}
 
@@ -270,6 +271,7 @@ func (r *DownloadClientSabnzbdResource) Read(ctx context.Context, req resource.R
 	response, _, err := r.client.DownloadClientApi.GetDownloadClientById(ctx, int32(client.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, downloadClientSabnzbdResourceName, err))
+
 		return
 	}
 
@@ -295,6 +297,7 @@ func (r *DownloadClientSabnzbdResource) Update(ctx context.Context, req resource
 	response, _, err := r.client.DownloadClientApi.UpdateDownloadClient(ctx, strconv.Itoa(int(request.GetId()))).DownloadClientResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, downloadClientSabnzbdResourceName, err))
+
 		return
 	}
 
@@ -317,6 +320,7 @@ func (r *DownloadClientSabnzbdResource) Delete(ctx context.Context, req resource
 	_, err := r.client.DownloadClientApi.DeleteDownloadClient(ctx, int32(client.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, downloadClientSabnzbdResourceName, err))
+
 		return
 	}
 

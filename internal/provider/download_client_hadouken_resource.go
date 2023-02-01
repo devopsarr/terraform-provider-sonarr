@@ -212,6 +212,7 @@ func (r *DownloadClientHadoukenResource) Create(ctx context.Context, req resourc
 	response, _, err := r.client.DownloadClientApi.CreateDownloadClient(ctx).DownloadClientResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, downloadClientHadoukenResourceName, err))
+
 		return
 	}
 
@@ -235,6 +236,7 @@ func (r *DownloadClientHadoukenResource) Read(ctx context.Context, req resource.
 	response, _, err := r.client.DownloadClientApi.GetDownloadClientById(ctx, int32(client.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, downloadClientHadoukenResourceName, err))
+
 		return
 	}
 
@@ -260,6 +262,7 @@ func (r *DownloadClientHadoukenResource) Update(ctx context.Context, req resourc
 	response, _, err := r.client.DownloadClientApi.UpdateDownloadClient(ctx, strconv.Itoa(int(request.GetId()))).DownloadClientResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, downloadClientHadoukenResourceName, err))
+
 		return
 	}
 
@@ -282,6 +285,7 @@ func (r *DownloadClientHadoukenResource) Delete(ctx context.Context, req resourc
 	_, err := r.client.DownloadClientApi.DeleteDownloadClient(ctx, int32(client.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, downloadClientHadoukenResourceName, err))
+
 		return
 	}
 

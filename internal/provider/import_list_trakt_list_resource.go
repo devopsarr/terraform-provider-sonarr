@@ -269,6 +269,7 @@ func (r *ImportListTraktListResource) Create(ctx context.Context, req resource.C
 	response, _, err := r.client.ImportListApi.CreateImportList(ctx).ImportListResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, importListTraktListResourceName, err))
+
 		return
 	}
 
@@ -292,6 +293,7 @@ func (r *ImportListTraktListResource) Read(ctx context.Context, req resource.Rea
 	response, _, err := r.client.ImportListApi.GetImportListById(ctx, int32(importList.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, importListTraktListResourceName, err))
+
 		return
 	}
 
@@ -317,6 +319,7 @@ func (r *ImportListTraktListResource) Update(ctx context.Context, req resource.U
 	response, _, err := r.client.ImportListApi.UpdateImportList(ctx, strconv.Itoa(int(request.GetId()))).ImportListResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, importListTraktListResourceName, err))
+
 		return
 	}
 
@@ -339,6 +342,7 @@ func (r *ImportListTraktListResource) Delete(ctx context.Context, req resource.D
 	_, err := r.client.ImportListApi.DeleteImportList(ctx, int32(importList.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, importListTraktListResourceName, err))
+
 		return
 	}
 

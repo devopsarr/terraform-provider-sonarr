@@ -118,6 +118,7 @@ func (d *RootFoldersDataSource) Read(ctx context.Context, req datasource.ReadReq
 	response, _, err := d.client.RootFolderApi.ListRootFolder(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, rootFoldersDataSourceName, err))
+
 		return
 	}
 

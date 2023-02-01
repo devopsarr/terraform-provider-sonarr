@@ -33,7 +33,8 @@ func (d *LanguageProfileDataSource) Metadata(ctx context.Context, req datasource
 func (d *LanguageProfileDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the language server.
-		MarkdownDescription: "<!-- subcategory:Profiles -->Single [Language Profile](../resources/language_profile).",
+		DeprecationMessage:  "This resource is deprecated and it will be removed in provider version 3.0.0",
+		MarkdownDescription: "<!-- subcategory:Profiles -->**Deprecated**Single [Language Profile](../resources/language_profile).",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
 				MarkdownDescription: "Language Profile ID.",
@@ -91,6 +92,7 @@ func (d *LanguageProfileDataSource) Read(ctx context.Context, req datasource.Rea
 	response, _, err := d.client.LanguageProfileApi.ListLanguageProfile(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, languageProfileDataSourceName, err))
+
 		return
 	}
 

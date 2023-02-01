@@ -3,13 +3,13 @@
 page_title: "sonarr_language_profile Resource - terraform-provider-sonarr"
 subcategory: "Profiles"
 description: |-
-  Language Profile resource.
+  DeprecatedLanguage Profile resource.
   For more information refer to Language Profile https://wiki.servarr.com/sonarr/settings#language-profiles documentation.
 ---
 
 # sonarr_language_profile (Resource)
 
-<!-- subcategory:Profiles -->Language Profile resource.
+<!-- subcategory:Profiles -->**Deprecated**Language Profile resource.
 For more information refer to [Language Profile](https://wiki.servarr.com/sonarr/settings#language-profiles) documentation.
 
 ## Example Usage

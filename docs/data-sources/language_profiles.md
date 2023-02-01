@@ -3,12 +3,12 @@
 page_title: "sonarr_language_profiles Data Source - terraform-provider-sonarr"
 subcategory: "Profiles"
 description: |-
-  List all available Language Profiles ../resources/language_profile.
+  DeprecatedList all available Language Profiles ../resources/language_profile.
 ---
 
 # sonarr_language_profiles (Data Source)
 
-<!-- subcategory:Profiles -->List all available [Language Profiles](../resources/language_profile).
+<!-- subcategory:Profiles -->**Deprecated**List all available [Language Profiles](../resources/language_profile).
 
 ## Example Usage
 

@@ -223,6 +223,7 @@ func (r *ImportListSonarrResource) Create(ctx context.Context, req resource.Crea
 	response, _, err := r.client.ImportListApi.CreateImportList(ctx).ImportListResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, importListSonarrResourceName, err))
+
 		return
 	}
 
@@ -246,6 +247,7 @@ func (r *ImportListSonarrResource) Read(ctx context.Context, req resource.ReadRe
 	response, _, err := r.client.ImportListApi.GetImportListById(ctx, int32(importList.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, importListSonarrResourceName, err))
+
 		return
 	}
 
@@ -271,6 +273,7 @@ func (r *ImportListSonarrResource) Update(ctx context.Context, req resource.Upda
 	response, _, err := r.client.ImportListApi.UpdateImportList(ctx, strconv.Itoa(int(request.GetId()))).ImportListResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, importListSonarrResourceName, err))
+
 		return
 	}
 
@@ -293,6 +296,7 @@ func (r *ImportListSonarrResource) Delete(ctx context.Context, req resource.Dele
 	_, err := r.client.ImportListApi.DeleteImportList(ctx, int32(importList.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, importListSonarrResourceName, err))
+
 		return
 	}
 

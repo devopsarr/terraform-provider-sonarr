@@ -171,6 +171,7 @@ func (r *DownloadClientPneumaticResource) Create(ctx context.Context, req resour
 	response, _, err := r.client.DownloadClientApi.CreateDownloadClient(ctx).DownloadClientResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, downloadClientPneumaticResourceName, err))
+
 		return
 	}
 
@@ -194,6 +195,7 @@ func (r *DownloadClientPneumaticResource) Read(ctx context.Context, req resource
 	response, _, err := r.client.DownloadClientApi.GetDownloadClientById(ctx, int32(client.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, downloadClientPneumaticResourceName, err))
+
 		return
 	}
 
@@ -219,6 +221,7 @@ func (r *DownloadClientPneumaticResource) Update(ctx context.Context, req resour
 	response, _, err := r.client.DownloadClientApi.UpdateDownloadClient(ctx, strconv.Itoa(int(request.GetId()))).DownloadClientResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, downloadClientPneumaticResourceName, err))
+
 		return
 	}
 
@@ -241,6 +244,7 @@ func (r *DownloadClientPneumaticResource) Delete(ctx context.Context, req resour
 	_, err := r.client.DownloadClientApi.DeleteDownloadClient(ctx, int32(client.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, downloadClientPneumaticResourceName, err))
+
 		return
 	}
 

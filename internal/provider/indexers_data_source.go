@@ -212,6 +212,7 @@ func (d *IndexersDataSource) Read(ctx context.Context, req datasource.ReadReques
 	response, _, err := d.client.IndexerApi.ListIndexer(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexersDataSourceName, err))
+
 		return
 	}
 

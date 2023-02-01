@@ -181,6 +181,7 @@ func (r *IndexerFanzubResource) Create(ctx context.Context, req resource.CreateR
 	response, _, err := r.client.IndexerApi.CreateIndexer(ctx).IndexerResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, indexerFanzubResourceName, err))
+
 		return
 	}
 
@@ -204,6 +205,7 @@ func (r *IndexerFanzubResource) Read(ctx context.Context, req resource.ReadReque
 	response, _, err := r.client.IndexerApi.GetIndexerById(ctx, int32(indexer.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerFanzubResourceName, err))
+
 		return
 	}
 
@@ -229,6 +231,7 @@ func (r *IndexerFanzubResource) Update(ctx context.Context, req resource.UpdateR
 	response, _, err := r.client.IndexerApi.UpdateIndexer(ctx, strconv.Itoa(int(request.GetId()))).IndexerResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, indexerFanzubResourceName, err))
+
 		return
 	}
 
@@ -251,6 +254,7 @@ func (r *IndexerFanzubResource) Delete(ctx context.Context, req resource.DeleteR
 	_, err := r.client.IndexerApi.DeleteIndexer(ctx, int32(indexer.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerFanzubResourceName, err))
+
 		return
 	}
 

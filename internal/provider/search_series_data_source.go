@@ -120,6 +120,7 @@ func (d *SearchSeriesDataSource) Read(ctx context.Context, req datasource.ReadRe
 	response, _, err := d.client.SeriesLookupApi.ListSeriesLookup(ctx).Term(strconv.Itoa(int(data.TvdbID.ValueInt64()))).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, searchSearchSeriesDataSourceName, err))
+
 		return
 	}
 

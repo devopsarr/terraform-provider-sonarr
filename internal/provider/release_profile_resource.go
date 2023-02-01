@@ -133,6 +133,7 @@ func (r *ReleaseProfileResource) Create(ctx context.Context, req resource.Create
 	response, _, err := r.client.ReleaseProfileApi.CreateReleaseProfile(ctx).ReleaseProfileResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, releaseProfileResourceName, err))
+
 		return
 	}
 
@@ -156,6 +157,7 @@ func (r *ReleaseProfileResource) Read(ctx context.Context, req resource.ReadRequ
 	response, _, err := r.client.ReleaseProfileApi.GetReleaseProfileById(ctx, int32(profile.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, releaseProfileResourceName, err))
+
 		return
 	}
 
@@ -182,6 +184,7 @@ func (r *ReleaseProfileResource) Update(ctx context.Context, req resource.Update
 	response, _, err := r.client.ReleaseProfileApi.UpdateReleaseProfile(ctx, strconv.Itoa(int(request.GetId()))).ReleaseProfileResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, releaseProfileResourceName, err))
+
 		return
 	}
 
@@ -204,6 +207,7 @@ func (r *ReleaseProfileResource) Delete(ctx context.Context, req resource.Delete
 	_, err := r.client.ReleaseProfileApi.DeleteReleaseProfile(ctx, int32(profile.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, releaseProfileResourceName, err))
+
 		return
 	}
 

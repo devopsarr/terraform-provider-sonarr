@@ -185,6 +185,7 @@ func (r *QualityProfileResource) Create(ctx context.Context, req resource.Create
 	response, _, err := r.client.QualityProfileApi.CreateQualityProfile(ctx).QualityProfileResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, qualityProfileResourceName, err))
+
 		return
 	}
 
@@ -208,6 +209,7 @@ func (r *QualityProfileResource) Read(ctx context.Context, req resource.ReadRequ
 	response, _, err := r.client.QualityProfileApi.GetQualityProfileById(ctx, int32(profile.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, qualityProfileResourceName, err))
+
 		return
 	}
 
@@ -234,6 +236,7 @@ func (r *QualityProfileResource) Update(ctx context.Context, req resource.Update
 	response, _, err := r.client.QualityProfileApi.UpdateQualityProfile(ctx, strconv.Itoa(int(request.GetId()))).QualityProfileResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, qualityProfileResourceName, err))
+
 		return
 	}
 
@@ -256,6 +259,7 @@ func (r *QualityProfileResource) Delete(ctx context.Context, req resource.Delete
 	_, err := r.client.QualityProfileApi.DeleteQualityProfile(ctx, int32(profile.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, qualityProfileResourceName, err))
+
 		return
 	}
 

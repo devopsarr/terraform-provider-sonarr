@@ -41,7 +41,8 @@ func (d *LanguageProfilesDataSource) Metadata(ctx context.Context, req datasourc
 func (d *LanguageProfilesDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the language server.
-		MarkdownDescription: "<!-- subcategory:Profiles -->List all available [Language Profiles](../resources/language_profile).",
+		DeprecationMessage:  "This resource is deprecated and it will be removed in provider version 3.0.0",
+		MarkdownDescription: "<!-- subcategory:Profiles -->**Deprecated**List all available [Language Profiles](../resources/language_profile).",
 		Attributes: map[string]schema.Attribute{
 			// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 			"id": schema.StringAttribute{
@@ -111,6 +112,7 @@ func (d *LanguageProfilesDataSource) Read(ctx context.Context, req datasource.Re
 	response, _, err := d.client.LanguageProfileApi.ListLanguageProfile(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, languageProfilesDataSourceName, err))
+
 		return
 	}
 

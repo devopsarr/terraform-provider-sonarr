@@ -194,6 +194,7 @@ func (d *ImportListDataSource) Read(ctx context.Context, req datasource.ReadRequ
 	response, _, err := d.client.ImportListApi.ListImportList(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, importListDataSourceName, err))
+
 		return
 	}
 
