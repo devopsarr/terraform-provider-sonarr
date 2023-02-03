@@ -72,6 +72,7 @@ func selectWriteField(fieldOutput *sonarr.Field, fieldCase interface{}) reflect.
 func selectReadField(name string, fieldCase interface{}) reflect.Value {
 	value := reflect.ValueOf(fieldCase)
 	value = value.Elem()
+
 	return value.FieldByNameFunc(func(n string) bool { return strings.EqualFold(n, name) })
 }
 

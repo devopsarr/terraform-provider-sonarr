@@ -32,9 +32,10 @@ func TestAccDownloadClientFloodResource(t *testing.T) {
 			},
 			// ImportState testing
 			{
-				ResourceName:      "sonarr_download_client_flood.test",
-				ImportState:       true,
-				ImportStateVerify: true,
+				ResourceName:            "sonarr_download_client_flood.test",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"password"},
 			},
 			// Delete testing automatically occurs in TestCase
 		},
@@ -53,5 +54,7 @@ func testAccDownloadClientFloodResourceConfig(name, host string) string {
 		start_on_add = true
 		additional_tags = [0,1]
 		field_tags = ["sonarr"]
+		username = "User"
+		password = "Pass"
 	}`, name, host)
 }

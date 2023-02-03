@@ -11,7 +11,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -78,6 +77,9 @@ func (i IndexerFilelist) toIndexer() *Indexer {
 		Tags:                    i.Tags,
 		Categories:              i.Categories,
 		AnimeCategories:         i.AnimeCategories,
+		ConfigContract:          types.StringValue(indexerFilelistConfigContract),
+		Implementation:          types.StringValue(indexerFilelistImplementation),
+		Protocol:                types.StringValue(indexerFilelistProtocol),
 	}
 }
 
@@ -311,40 +313,11 @@ func (r *IndexerFilelistResource) ImportState(ctx context.Context, req resource.
 }
 
 func (i *IndexerFilelist) write(ctx context.Context, indexer *sonarr.IndexerResource) {
-	genericIndexer := Indexer{
-		EnableAutomaticSearch:   types.BoolValue(indexer.GetEnableAutomaticSearch()),
-		EnableInteractiveSearch: types.BoolValue(indexer.GetEnableInteractiveSearch()),
-		EnableRss:               types.BoolValue(indexer.GetEnableRss()),
-		Priority:                types.Int64Value(int64(indexer.GetPriority())),
-		DownloadClientID:        types.Int64Value(int64(indexer.GetDownloadClientId())),
-		ID:                      types.Int64Value(int64(indexer.GetId())),
-		Name:                    types.StringValue(indexer.GetName()),
-		// Pass along sensitive values.
-		Passkey: i.Passkey,
-	}
-	genericIndexer.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, indexer.Tags)
-	genericIndexer.writeFields(ctx, indexer.GetFields())
-	i.fromIndexer(&genericIndexer)
+	genericIndexer := i.toIndexer()
+	genericIndexer.write(ctx, indexer)
+	i.fromIndexer(genericIndexer)
 }
 
 func (i *IndexerFilelist) read(ctx context.Context) *sonarr.IndexerResource {
-	var tags []*int32
-
-	tfsdk.ValueAs(ctx, i.Tags, &tags)
-
-	indexer := sonarr.NewIndexerResource()
-	indexer.SetEnableAutomaticSearch(i.EnableAutomaticSearch.ValueBool())
-	indexer.SetEnableInteractiveSearch(i.EnableInteractiveSearch.ValueBool())
-	indexer.SetEnableRss(i.EnableRss.ValueBool())
-	indexer.SetPriority(int32(i.Priority.ValueInt64()))
-	indexer.SetDownloadClientId(int32(i.DownloadClientID.ValueInt64()))
-	indexer.SetId(int32(i.ID.ValueInt64()))
-	indexer.SetConfigContract(indexerFilelistConfigContract)
-	indexer.SetImplementation(indexerFilelistImplementation)
-	indexer.SetName(i.Name.ValueString())
-	indexer.SetProtocol(indexerFilelistProtocol)
-	indexer.SetTags(tags)
-	indexer.SetFields(i.toIndexer().readFields(ctx))
-
-	return indexer
+	return i.toIndexer().read(ctx)
 }

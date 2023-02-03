@@ -381,11 +381,11 @@ func (i *Indexer) write(ctx context.Context, indexer *sonarr.IndexerResource) {
 
 func (i *Indexer) writeFields(ctx context.Context, fields []*sonarr.Field) {
 	for _, f := range fields {
-		if f.Value == nil {
-			continue
-		}
+		if slices.Contains(indexerStringFields, f.GetName()) {
+			if slices.Contains(indexerSensitiveFields, f.GetName()) && f.GetValue() != nil {
+				continue
+			}
 
-		if slices.Contains(indexerStringFields, f.GetName()) && !slices.Contains(indexerSensitiveFields, f.GetName()) {
 			helpers.WriteStringField(f, i)
 
 			continue

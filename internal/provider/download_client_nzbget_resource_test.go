@@ -32,9 +32,10 @@ func TestAccDownloadClientNzbgetResource(t *testing.T) {
 			},
 			// ImportState testing
 			{
-				ResourceName:      "sonarr_download_client_nzbget.test",
-				ImportState:       true,
-				ImportStateVerify: true,
+				ResourceName:            "sonarr_download_client_nzbget.test",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"password"},
 			},
 			// Delete testing automatically occurs in TestCase
 		},
@@ -50,5 +51,7 @@ func testAccDownloadClientNzbgetResourceConfig(name, host string) string {
 		host = "%s"
 		url_base = "/nzbget/"
 		port = 9091
+		username = "User"
+		password = "Pass"
 	}`, name, host)
 }

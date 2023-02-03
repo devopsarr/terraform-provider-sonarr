@@ -368,10 +368,6 @@ func (i *ImportList) write(ctx context.Context, importList *sonarr.ImportListRes
 
 func (i *ImportList) writeFields(ctx context.Context, fields []*sonarr.Field) {
 	for _, f := range fields {
-		if f.Value == nil {
-			continue
-		}
-
 		if slices.Contains(importListStringFields, f.GetName()) {
 			helpers.WriteStringField(f, i)
 

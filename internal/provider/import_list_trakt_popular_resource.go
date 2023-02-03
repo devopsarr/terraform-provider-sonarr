@@ -14,7 +14,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -84,6 +83,8 @@ func (i ImportListTraktPopular) toImportList() *ImportList {
 		ID:                        i.ID,
 		EnableAutomaticAdd:        i.EnableAutomaticAdd,
 		SeasonFolder:              i.SeasonFolder,
+		ConfigContract:            types.StringValue(importListTraktPopularConfigContract),
+		Implementation:            types.StringValue(importListTraktPopularImplementation),
 	}
 }
 
@@ -332,39 +333,11 @@ func (r *ImportListTraktPopularResource) ImportState(ctx context.Context, req re
 }
 
 func (i *ImportListTraktPopular) write(ctx context.Context, importList *sonarr.ImportListResource) {
-	genericImportList := ImportList{
-		Name:               types.StringValue(importList.GetName()),
-		ShouldMonitor:      types.StringValue(string(importList.GetShouldMonitor())),
-		RootFolderPath:     types.StringValue(importList.GetRootFolderPath()),
-		SeriesType:         types.StringValue(string(importList.GetSeriesType())),
-		QualityProfileID:   types.Int64Value(int64(importList.GetQualityProfileId())),
-		ID:                 types.Int64Value(int64(importList.GetId())),
-		EnableAutomaticAdd: types.BoolValue(importList.GetEnableAutomaticAdd()),
-		SeasonFolder:       types.BoolValue(importList.GetSeasonFolder()),
-	}
-	genericImportList.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, importList.Tags)
-	genericImportList.writeFields(ctx, importList.GetFields())
-	i.fromImportList(&genericImportList)
+	genericImportList := i.toImportList()
+	genericImportList.write(ctx, importList)
+	i.fromImportList(genericImportList)
 }
 
 func (i *ImportListTraktPopular) read(ctx context.Context) *sonarr.ImportListResource {
-	var tags []*int32
-
-	tfsdk.ValueAs(ctx, i.Tags, &tags)
-
-	list := sonarr.NewImportListResource()
-	list.SetShouldMonitor(sonarr.MonitorTypes(i.ShouldMonitor.ValueString()))
-	list.SetRootFolderPath(i.RootFolderPath.ValueString())
-	list.SetSeriesType(sonarr.SeriesTypes(i.SeriesType.ValueString()))
-	list.SetQualityProfileId(int32(i.QualityProfileID.ValueInt64()))
-	list.SetEnableAutomaticAdd(i.EnableAutomaticAdd.ValueBool())
-	list.SetSeasonFolder(i.SeasonFolder.ValueBool())
-	list.SetConfigContract(importListTraktPopularConfigContract)
-	list.SetImplementation(importListTraktPopularImplementation)
-	list.SetId(int32(i.ID.ValueInt64()))
-	list.SetName(i.Name.ValueString())
-	list.SetTags(tags)
-	list.SetFields(i.toImportList().readFields(ctx))
-
-	return list
+	return i.toImportList().read(ctx)
 }
