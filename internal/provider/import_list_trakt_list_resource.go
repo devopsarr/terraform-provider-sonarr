@@ -13,7 +13,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -51,10 +50,7 @@ type ImportListTraktList struct {
 	Expires                   types.String `tfsdk:"expires"`
 	AuthUser                  types.String `tfsdk:"auth_user"`
 	Username                  types.String `tfsdk:"username"`
-	Rating                    types.String `tfsdk:"rating"`
 	Listname                  types.String `tfsdk:"listname"`
-	Genres                    types.String `tfsdk:"genres"`
-	Years                     types.String `tfsdk:"years"`
 	TraktAdditionalParameters types.String `tfsdk:"trakt_additional_parameters"`
 	QualityProfileID          types.Int64  `tfsdk:"quality_profile_id"`
 	ID                        types.Int64  `tfsdk:"id"`
@@ -75,16 +71,15 @@ func (i ImportListTraktList) toImportList() *ImportList {
 		Expires:                   i.Expires,
 		AuthUser:                  i.AuthUser,
 		Username:                  i.Username,
-		Rating:                    i.Rating,
 		Listname:                  i.Listname,
-		Genres:                    i.Genres,
-		Years:                     i.Years,
 		TraktAdditionalParameters: i.TraktAdditionalParameters,
 		Limit:                     i.Limit,
 		QualityProfileID:          i.QualityProfileID,
 		ID:                        i.ID,
 		EnableAutomaticAdd:        i.EnableAutomaticAdd,
 		SeasonFolder:              i.SeasonFolder,
+		ConfigContract:            types.StringValue(importListTraktListConfigContract),
+		Implementation:            types.StringValue(importListTraktListImplementation),
 	}
 }
 
@@ -99,10 +94,7 @@ func (i *ImportListTraktList) fromImportList(importList *ImportList) {
 	i.Expires = importList.Expires
 	i.AuthUser = importList.AuthUser
 	i.Username = importList.Username
-	i.Rating = importList.Rating
 	i.Listname = importList.Listname
-	i.Genres = importList.Genres
-	i.Years = importList.Years
 	i.TraktAdditionalParameters = importList.TraktAdditionalParameters
 	i.Limit = importList.Limit
 	i.QualityProfileID = importList.QualityProfileID
@@ -193,11 +185,6 @@ func (r *ImportListTraktListResource) Schema(ctx context.Context, req resource.S
 				MarkdownDescription: "Username.",
 				Required:            true,
 			},
-			"rating": schema.StringAttribute{
-				MarkdownDescription: "Rating.",
-				Optional:            true,
-				Computed:            true,
-			},
 			"expires": schema.StringAttribute{
 				MarkdownDescription: "Expires.",
 				Optional:            true,
@@ -206,16 +193,6 @@ func (r *ImportListTraktListResource) Schema(ctx context.Context, req resource.S
 			"listname": schema.StringAttribute{
 				MarkdownDescription: "Expires.",
 				Required:            true,
-			},
-			"genres": schema.StringAttribute{
-				MarkdownDescription: "Expires.",
-				Optional:            true,
-				Computed:            true,
-			},
-			"years": schema.StringAttribute{
-				MarkdownDescription: "Expires.",
-				Optional:            true,
-				Computed:            true,
 			},
 			"trakt_additional_parameters": schema.StringAttribute{
 				MarkdownDescription: "Trakt additional parameters.",
@@ -335,39 +312,11 @@ func (r *ImportListTraktListResource) ImportState(ctx context.Context, req resou
 }
 
 func (i *ImportListTraktList) write(ctx context.Context, importList *sonarr.ImportListResource) {
-	genericImportList := ImportList{
-		Name:               types.StringValue(importList.GetName()),
-		ShouldMonitor:      types.StringValue(string(importList.GetShouldMonitor())),
-		RootFolderPath:     types.StringValue(importList.GetRootFolderPath()),
-		SeriesType:         types.StringValue(string(importList.GetSeriesType())),
-		QualityProfileID:   types.Int64Value(int64(importList.GetQualityProfileId())),
-		ID:                 types.Int64Value(int64(importList.GetId())),
-		EnableAutomaticAdd: types.BoolValue(importList.GetEnableAutomaticAdd()),
-		SeasonFolder:       types.BoolValue(importList.GetSeasonFolder()),
-	}
-	genericImportList.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, importList.Tags)
-	genericImportList.writeFields(ctx, importList.GetFields())
-	i.fromImportList(&genericImportList)
+	genericImportList := i.toImportList()
+	genericImportList.write(ctx, importList)
+	i.fromImportList(genericImportList)
 }
 
 func (i *ImportListTraktList) read(ctx context.Context) *sonarr.ImportListResource {
-	var tags []*int32
-
-	tfsdk.ValueAs(ctx, i.Tags, &tags)
-
-	list := sonarr.NewImportListResource()
-	list.SetShouldMonitor(sonarr.MonitorTypes(i.ShouldMonitor.ValueString()))
-	list.SetRootFolderPath(i.RootFolderPath.ValueString())
-	list.SetSeriesType(sonarr.SeriesTypes(i.SeriesType.ValueString()))
-	list.SetQualityProfileId(int32(i.QualityProfileID.ValueInt64()))
-	list.SetEnableAutomaticAdd(i.EnableAutomaticAdd.ValueBool())
-	list.SetSeasonFolder(i.SeasonFolder.ValueBool())
-	list.SetConfigContract(importListTraktListConfigContract)
-	list.SetImplementation(importListTraktListImplementation)
-	list.SetId(int32(i.ID.ValueInt64()))
-	list.SetName(i.Name.ValueString())
-	list.SetTags(tags)
-	list.SetFields(i.toImportList().readFields(ctx))
-
-	return list
+	return i.toImportList().read(ctx)
 }

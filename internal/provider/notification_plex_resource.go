@@ -11,7 +11,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -73,6 +72,8 @@ func (n NotificationPlex) toNotification() *Notification {
 		OnRename:                      n.OnRename,
 		OnUpgrade:                     n.OnUpgrade,
 		OnDownload:                    n.OnDownload,
+		ConfigContract:                types.StringValue(notificationPlexConfigContract),
+		Implementation:                types.StringValue(notificationPlexImplementation),
 	}
 }
 
@@ -292,43 +293,11 @@ func (r *NotificationPlexResource) ImportState(ctx context.Context, req resource
 }
 
 func (n *NotificationPlex) write(ctx context.Context, notification *sonarr.NotificationResource) {
-	genericNotification := Notification{
-		OnDownload:                    types.BoolValue(notification.GetOnDownload()),
-		OnUpgrade:                     types.BoolValue(notification.GetOnUpgrade()),
-		OnRename:                      types.BoolValue(notification.GetOnRename()),
-		OnSeriesDelete:                types.BoolValue(notification.GetOnSeriesDelete()),
-		OnEpisodeFileDelete:           types.BoolValue(notification.GetOnEpisodeFileDelete()),
-		OnEpisodeFileDeleteForUpgrade: types.BoolValue(notification.GetOnEpisodeFileDeleteForUpgrade()),
-		IncludeHealthWarnings:         types.BoolValue(notification.GetIncludeHealthWarnings()),
-		ID:                            types.Int64Value(int64(notification.GetId())),
-		Name:                          types.StringValue(notification.GetName()),
-		// Pass along sensitive values.
-		AuthToken: n.AuthToken,
-	}
-	genericNotification.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, notification.Tags)
-	genericNotification.writeFields(ctx, notification.GetFields())
-	n.fromNotification(&genericNotification)
+	genericNotification := n.toNotification()
+	genericNotification.write(ctx, notification)
+	n.fromNotification(genericNotification)
 }
 
 func (n *NotificationPlex) read(ctx context.Context) *sonarr.NotificationResource {
-	var tags []*int32
-
-	tfsdk.ValueAs(ctx, n.Tags, &tags)
-
-	notification := sonarr.NewNotificationResource()
-	notification.SetOnDownload(n.OnDownload.ValueBool())
-	notification.SetOnUpgrade(n.OnUpgrade.ValueBool())
-	notification.SetOnRename(n.OnRename.ValueBool())
-	notification.SetOnSeriesDelete(n.OnSeriesDelete.ValueBool())
-	notification.SetOnEpisodeFileDelete(n.OnEpisodeFileDelete.ValueBool())
-	notification.SetOnEpisodeFileDeleteForUpgrade(n.OnEpisodeFileDeleteForUpgrade.ValueBool())
-	notification.SetIncludeHealthWarnings(n.IncludeHealthWarnings.ValueBool())
-	notification.SetConfigContract(notificationPlexConfigContract)
-	notification.SetImplementation(notificationPlexImplementation)
-	notification.SetId(int32(n.ID.ValueInt64()))
-	notification.SetName(n.Name.ValueString())
-	notification.SetTags(tags)
-	notification.SetFields(n.toNotification().readFields(ctx))
-
-	return notification
+	return n.toNotification().read(ctx)
 }

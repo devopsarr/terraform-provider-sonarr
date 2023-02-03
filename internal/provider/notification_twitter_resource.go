@@ -11,7 +11,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -79,6 +78,8 @@ func (n NotificationTwitter) toNotification() *Notification {
 		OnSeriesDelete:                n.OnSeriesDelete,
 		OnUpgrade:                     n.OnUpgrade,
 		OnDownload:                    n.OnDownload,
+		ConfigContract:                types.StringValue(notificationTwitterConfigContract),
+		Implementation:                types.StringValue(notificationTwitterImplementation),
 	}
 }
 
@@ -316,50 +317,11 @@ func (r *NotificationTwitterResource) ImportState(ctx context.Context, req resou
 }
 
 func (n *NotificationTwitter) write(ctx context.Context, notification *sonarr.NotificationResource) {
-	genericNotification := Notification{
-		OnGrab:                        types.BoolValue(notification.GetOnGrab()),
-		OnDownload:                    types.BoolValue(notification.GetOnDownload()),
-		OnUpgrade:                     types.BoolValue(notification.GetOnUpgrade()),
-		OnSeriesDelete:                types.BoolValue(notification.GetOnSeriesDelete()),
-		OnEpisodeFileDelete:           types.BoolValue(notification.GetOnEpisodeFileDelete()),
-		OnEpisodeFileDeleteForUpgrade: types.BoolValue(notification.GetOnEpisodeFileDeleteForUpgrade()),
-		OnHealthIssue:                 types.BoolValue(notification.GetOnHealthIssue()),
-		OnApplicationUpdate:           types.BoolValue(notification.GetOnApplicationUpdate()),
-		IncludeHealthWarnings:         types.BoolValue(notification.GetIncludeHealthWarnings()),
-		ID:                            types.Int64Value(int64(notification.GetId())),
-		Name:                          types.StringValue(notification.GetName()),
-		// Pass along sensitive values.
-		ConsumerKey:       n.ConsumerKey,
-		ConsumerSecret:    n.ConsumerSecret,
-		AccessToken:       n.AccessToken,
-		AccessTokenSecret: n.AccessTokenSecret,
-	}
-	genericNotification.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, notification.Tags)
-	genericNotification.writeFields(ctx, notification.GetFields())
-	n.fromNotification(&genericNotification)
+	genericNotification := n.toNotification()
+	genericNotification.write(ctx, notification)
+	n.fromNotification(genericNotification)
 }
 
 func (n *NotificationTwitter) read(ctx context.Context) *sonarr.NotificationResource {
-	var tags []*int32
-
-	tfsdk.ValueAs(ctx, n.Tags, &tags)
-
-	notification := sonarr.NewNotificationResource()
-	notification.SetOnGrab(n.OnGrab.ValueBool())
-	notification.SetOnDownload(n.OnDownload.ValueBool())
-	notification.SetOnUpgrade(n.OnUpgrade.ValueBool())
-	notification.SetOnSeriesDelete(n.OnSeriesDelete.ValueBool())
-	notification.SetOnEpisodeFileDelete(n.OnEpisodeFileDelete.ValueBool())
-	notification.SetOnEpisodeFileDeleteForUpgrade(n.OnEpisodeFileDeleteForUpgrade.ValueBool())
-	notification.SetOnHealthIssue(n.OnHealthIssue.ValueBool())
-	notification.SetOnApplicationUpdate(n.OnApplicationUpdate.ValueBool())
-	notification.SetIncludeHealthWarnings(n.IncludeHealthWarnings.ValueBool())
-	notification.SetConfigContract(notificationTwitterConfigContract)
-	notification.SetImplementation(notificationTwitterImplementation)
-	notification.SetId(int32(n.ID.ValueInt64()))
-	notification.SetName(n.Name.ValueString())
-	notification.SetTags(tags)
-	notification.SetFields(n.toNotification().readFields(ctx))
-
-	return notification
+	return n.toNotification().read(ctx)
 }

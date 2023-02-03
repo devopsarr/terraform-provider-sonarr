@@ -13,7 +13,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -53,7 +52,6 @@ type DownloadClientNzbvortex struct {
 	Priority                 types.Int64  `tfsdk:"priority"`
 	Port                     types.Int64  `tfsdk:"port"`
 	ID                       types.Int64  `tfsdk:"id"`
-	UseSsl                   types.Bool   `tfsdk:"use_ssl"`
 	Enable                   types.Bool   `tfsdk:"enable"`
 	RemoveFailedDownloads    types.Bool   `tfsdk:"remove_failed_downloads"`
 	RemoveCompletedDownloads types.Bool   `tfsdk:"remove_completed_downloads"`
@@ -72,10 +70,12 @@ func (d DownloadClientNzbvortex) toDownloadClient() *DownloadClient {
 		Priority:                 d.Priority,
 		Port:                     d.Port,
 		ID:                       d.ID,
-		UseSsl:                   d.UseSsl,
 		Enable:                   d.Enable,
 		RemoveFailedDownloads:    d.RemoveFailedDownloads,
 		RemoveCompletedDownloads: d.RemoveCompletedDownloads,
+		Implementation:           types.StringValue(downloadClientNzbvortexImplementation),
+		ConfigContract:           types.StringValue(downloadClientNzbvortexConfigContract),
+		Protocol:                 types.StringValue(downloadClientNzbvortexProtocol),
 	}
 }
 
@@ -91,7 +91,6 @@ func (d *DownloadClientNzbvortex) fromDownloadClient(client *DownloadClient) {
 	d.Priority = client.Priority
 	d.Port = client.Port
 	d.ID = client.ID
-	d.UseSsl = client.UseSsl
 	d.Enable = client.Enable
 	d.RemoveFailedDownloads = client.RemoveFailedDownloads
 	d.RemoveCompletedDownloads = client.RemoveCompletedDownloads
@@ -143,11 +142,6 @@ func (r *DownloadClientNzbvortexResource) Schema(ctx context.Context, req resour
 				},
 			},
 			// Field values
-			"use_ssl": schema.BoolAttribute{
-				MarkdownDescription: "Use SSL flag.",
-				Optional:            true,
-				Computed:            true,
-			},
 			"port": schema.Int64Attribute{
 				MarkdownDescription: "Port.",
 				Optional:            true,
@@ -302,38 +296,11 @@ func (r *DownloadClientNzbvortexResource) ImportState(ctx context.Context, req r
 }
 
 func (d *DownloadClientNzbvortex) write(ctx context.Context, downloadClient *sonarr.DownloadClientResource) {
-	genericDownloadClient := DownloadClient{
-		Enable:                   types.BoolValue(downloadClient.GetEnable()),
-		RemoveCompletedDownloads: types.BoolValue(downloadClient.GetRemoveCompletedDownloads()),
-		RemoveFailedDownloads:    types.BoolValue(downloadClient.GetRemoveFailedDownloads()),
-		Priority:                 types.Int64Value(int64(downloadClient.GetPriority())),
-		ID:                       types.Int64Value(int64(downloadClient.GetId())),
-		Name:                     types.StringValue(downloadClient.GetName()),
-		// Pass along sensitive values.
-		APIKey: d.APIKey,
-	}
-	genericDownloadClient.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, downloadClient.Tags)
-	genericDownloadClient.writeFields(ctx, downloadClient.GetFields())
-	d.fromDownloadClient(&genericDownloadClient)
+	genericDownloadClient := d.toDownloadClient()
+	genericDownloadClient.write(ctx, downloadClient)
+	d.fromDownloadClient(genericDownloadClient)
 }
 
 func (d *DownloadClientNzbvortex) read(ctx context.Context) *sonarr.DownloadClientResource {
-	var tags []*int32
-
-	tfsdk.ValueAs(ctx, d.Tags, &tags)
-
-	client := sonarr.NewDownloadClientResource()
-	client.SetEnable(d.Enable.ValueBool())
-	client.SetRemoveCompletedDownloads(d.RemoveCompletedDownloads.ValueBool())
-	client.SetRemoveFailedDownloads(d.RemoveFailedDownloads.ValueBool())
-	client.SetPriority(int32(d.Priority.ValueInt64()))
-	client.SetId(int32(d.ID.ValueInt64()))
-	client.SetConfigContract(downloadClientNzbvortexConfigContract)
-	client.SetImplementation(downloadClientNzbvortexImplementation)
-	client.SetName(d.Name.ValueString())
-	client.SetProtocol(downloadClientNzbvortexProtocol)
-	client.SetTags(tags)
-	client.SetFields(d.toDownloadClient().readFields(ctx))
-
-	return client
+	return d.toDownloadClient().read(ctx)
 }

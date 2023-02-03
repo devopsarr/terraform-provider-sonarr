@@ -28,7 +28,7 @@ var (
 )
 
 var (
-	notificationBoolFields        = []string{"alwaysUpdate", "cleanLibrary", "directMessage", "notify", "requireEncryption", "sendSilently", "updateLibrary", "useEuEndpoint", "useSSL"}
+	notificationBoolFields        = []string{"alwaysUpdate", "cleanLibrary", "directMessage", "notify", "requireEncryption", "sendSilently", "updateLibrary", "useEuEndpoint", "useSsl"}
 	notificationStringFields      = []string{"accessToken", "accessTokenSecret", "apiKey", "appToken", "arguments", "author", "authToken", "authUser", "avatar", "botToken", "channel", "chatId", "consumerKey", "consumerSecret", "deviceNames", "expires", "from", "host", "icon", "mention", "password", "path", "refreshToken", "senderDomain", "senderId", "server", "signIn", "sound", "token", "url", "userKey", "username", "webHookUrl"}
 	notificationIntFields         = []string{"method", "port", "priority", "retry", "expire", "displayTime"}
 	notificationStringSliceFields = []string{"channelTags", "deviceIds", "devices", "recipients", "to", "cc", "bcc"}
@@ -666,11 +666,11 @@ func (n *Notification) write(ctx context.Context, notification *sonarr.Notificat
 
 func (n *Notification) writeFields(ctx context.Context, fields []*sonarr.Field) {
 	for _, f := range fields {
-		if f.Value == nil {
-			continue
-		}
+		if slices.Contains(notificationStringFields, f.GetName()) {
+			if slices.Contains(notificationSensitiveFields, f.GetName()) && f.GetValue() != nil {
+				continue
+			}
 
-		if slices.Contains(notificationStringFields, f.GetName()) && !slices.Contains(notificationSensitiveFields, f.GetName()) {
 			helpers.WriteStringField(f, n)
 
 			continue

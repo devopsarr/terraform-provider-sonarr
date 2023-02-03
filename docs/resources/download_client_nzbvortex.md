@@ -46,7 +46,6 @@ resource "sonarr_download_client_nzbvortex" "example" {
 - `tags` (Set of Number) List of associated tags.
 - `tv_category` (String) TV category.
 - `url_base` (String) Base URL.
-- `use_ssl` (Boolean) Use SSL flag.
 
 ### Read-Only
 

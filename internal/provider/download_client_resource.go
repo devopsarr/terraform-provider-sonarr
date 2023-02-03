@@ -477,11 +477,11 @@ func (d *DownloadClient) write(ctx context.Context, downloadClient *sonarr.Downl
 
 func (d *DownloadClient) writeFields(ctx context.Context, fields []*sonarr.Field) {
 	for _, f := range fields {
-		if f.Value == nil {
-			continue
-		}
+		if slices.Contains(downloadClientStringFields, f.GetName()) {
+			if slices.Contains(downloadClientSensitiveFields, f.GetName()) && f.GetValue() != nil {
+				continue
+			}
 
-		if slices.Contains(downloadClientStringFields, f.GetName()) && !slices.Contains(downloadClientSensitiveFields, f.GetName()) {
 			helpers.WriteStringField(f, d)
 
 			continue

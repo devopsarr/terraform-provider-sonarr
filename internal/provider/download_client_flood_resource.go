@@ -6,14 +6,11 @@ import (
 
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
-	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -52,10 +49,6 @@ type DownloadClientFlood struct {
 	Username                 types.String `tfsdk:"username"`
 	Password                 types.String `tfsdk:"password"`
 	Destination              types.String `tfsdk:"destination"`
-	TvCategory               types.String `tfsdk:"tv_category"`
-	TvDirectory              types.String `tfsdk:"tv_directory"`
-	RecentTvPriority         types.Int64  `tfsdk:"recent_tv_priority"`
-	OlderTvPriority          types.Int64  `tfsdk:"older_tv_priority"`
 	Priority                 types.Int64  `tfsdk:"priority"`
 	Port                     types.Int64  `tfsdk:"port"`
 	ID                       types.Int64  `tfsdk:"id"`
@@ -78,10 +71,6 @@ func (d DownloadClientFlood) toDownloadClient() *DownloadClient {
 		Username:                 d.Username,
 		Password:                 d.Password,
 		Destination:              d.Destination,
-		TvCategory:               d.TvCategory,
-		TvDirectory:              d.TvDirectory,
-		RecentTvPriority:         d.RecentTvPriority,
-		OlderTvPriority:          d.OlderTvPriority,
 		Priority:                 d.Priority,
 		Port:                     d.Port,
 		ID:                       d.ID,
@@ -90,6 +79,9 @@ func (d DownloadClientFlood) toDownloadClient() *DownloadClient {
 		Enable:                   d.Enable,
 		RemoveFailedDownloads:    d.RemoveFailedDownloads,
 		RemoveCompletedDownloads: d.RemoveCompletedDownloads,
+		Implementation:           types.StringValue(downloadClientFloodImplementation),
+		ConfigContract:           types.StringValue(downloadClientFloodConfigContract),
+		Protocol:                 types.StringValue(downloadClientFloodProtocol),
 	}
 }
 
@@ -104,10 +96,6 @@ func (d *DownloadClientFlood) fromDownloadClient(client *DownloadClient) {
 	d.Username = client.Username
 	d.Password = client.Password
 	d.Destination = client.Destination
-	d.TvCategory = client.TvCategory
-	d.TvDirectory = client.TvDirectory
-	d.RecentTvPriority = client.RecentTvPriority
-	d.OlderTvPriority = client.OlderTvPriority
 	d.Priority = client.Priority
 	d.Port = client.Port
 	d.ID = client.ID
@@ -179,22 +167,6 @@ func (r *DownloadClientFloodResource) Schema(ctx context.Context, req resource.S
 				Optional:            true,
 				Computed:            true,
 			},
-			"recent_tv_priority": schema.Int64Attribute{
-				MarkdownDescription: "Recent TV priority. `0` Last, `1` First.",
-				Optional:            true,
-				Computed:            true,
-				Validators: []validator.Int64{
-					int64validator.OneOf(0, 1),
-				},
-			},
-			"older_tv_priority": schema.Int64Attribute{
-				MarkdownDescription: "Older TV priority. `0` Last, `1` First.",
-				Optional:            true,
-				Computed:            true,
-				Validators: []validator.Int64{
-					int64validator.OneOf(0, 1),
-				},
-			},
 			"host": schema.StringAttribute{
 				MarkdownDescription: "host.",
 				Optional:            true,
@@ -218,16 +190,6 @@ func (r *DownloadClientFloodResource) Schema(ctx context.Context, req resource.S
 			},
 			"destination": schema.StringAttribute{
 				MarkdownDescription: "Destination.",
-				Optional:            true,
-				Computed:            true,
-			},
-			"tv_category": schema.StringAttribute{
-				MarkdownDescription: "TV category.",
-				Optional:            true,
-				Computed:            true,
-			},
-			"tv_directory": schema.StringAttribute{
-				MarkdownDescription: "TV directory.",
 				Optional:            true,
 				Computed:            true,
 			},
@@ -362,41 +324,11 @@ func (r *DownloadClientFloodResource) ImportState(ctx context.Context, req resou
 }
 
 func (d *DownloadClientFlood) write(ctx context.Context, downloadClient *sonarr.DownloadClientResource) {
-	genericDownloadClient := DownloadClient{
-		Enable:                   types.BoolValue(downloadClient.GetEnable()),
-		RemoveCompletedDownloads: types.BoolValue(downloadClient.GetRemoveCompletedDownloads()),
-		RemoveFailedDownloads:    types.BoolValue(downloadClient.GetRemoveFailedDownloads()),
-		Priority:                 types.Int64Value(int64(downloadClient.GetPriority())),
-		ID:                       types.Int64Value(int64(downloadClient.GetId())),
-		Name:                     types.StringValue(downloadClient.GetName()),
-		AdditionalTags:           types.SetValueMust(types.Int64Type, nil),
-		FieldTags:                types.SetValueMust(types.StringType, nil),
-		PostImportTags:           types.SetValueMust(types.StringType, nil),
-	}
-	// Write sensitive data only if present
-	genericDownloadClient.writeSensitive(&DownloadClient{Password: d.Password})
-	genericDownloadClient.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, downloadClient.Tags)
-	genericDownloadClient.writeFields(ctx, downloadClient.GetFields())
-	d.fromDownloadClient(&genericDownloadClient)
+	genericDownloadClient := d.toDownloadClient()
+	genericDownloadClient.write(ctx, downloadClient)
+	d.fromDownloadClient(genericDownloadClient)
 }
 
 func (d *DownloadClientFlood) read(ctx context.Context) *sonarr.DownloadClientResource {
-	var tags []*int32
-
-	tfsdk.ValueAs(ctx, d.Tags, &tags)
-
-	client := sonarr.NewDownloadClientResource()
-	client.SetEnable(d.Enable.ValueBool())
-	client.SetRemoveCompletedDownloads(d.RemoveCompletedDownloads.ValueBool())
-	client.SetRemoveFailedDownloads(d.RemoveFailedDownloads.ValueBool())
-	client.SetPriority(int32(d.Priority.ValueInt64()))
-	client.SetId(int32(d.ID.ValueInt64()))
-	client.SetConfigContract(downloadClientFloodConfigContract)
-	client.SetImplementation(downloadClientFloodImplementation)
-	client.SetName(d.Name.ValueString())
-	client.SetProtocol(downloadClientFloodProtocol)
-	client.SetTags(tags)
-	client.SetFields(d.toDownloadClient().readFields(ctx))
-
-	return client
+	return d.toDownloadClient().read(ctx)
 }

@@ -50,7 +50,6 @@ resource "sonarr_download_client_qbittorrent" "example" {
 - `sequential_order` (Boolean) Sequential order flag.
 - `tags` (Set of Number) List of associated tags.
 - `tv_category` (String) TV category.
-- `tv_directory` (String) TV directory.
 - `tv_imported_category` (String) TV imported category.
 - `url_base` (String) Base URL.
 - `use_ssl` (Boolean) Use SSL flag.

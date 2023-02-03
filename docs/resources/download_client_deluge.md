@@ -31,6 +31,7 @@ resource "sonarr_download_client_deluge" "example" {
 ### Required
 
 - `name` (String) Download Client name.
+- `password` (String) Password.
 
 ### Optional
 
@@ -38,7 +39,6 @@ resource "sonarr_download_client_deluge" "example" {
 - `enable` (Boolean) Enable flag.
 - `host` (String) host.
 - `older_tv_priority` (Number) Older TV priority. `0` Last, `1` First.
-- `password` (String, Sensitive) Password.
 - `port` (Number) Port.
 - `priority` (Number) Priority.
 - `recent_tv_priority` (Number) Recent TV priority. `0` Last, `1` First.
@@ -46,11 +46,9 @@ resource "sonarr_download_client_deluge" "example" {
 - `remove_failed_downloads` (Boolean) Remove failed downloads flag.
 - `tags` (Set of Number) List of associated tags.
 - `tv_category` (String) TV category.
-- `tv_directory` (String) TV directory.
 - `tv_imported_category` (String) TV imported category.
 - `url_base` (String) Base URL.
 - `use_ssl` (Boolean) Use SSL flag.
-- `username` (String) Username.
 
 ### Read-Only
 

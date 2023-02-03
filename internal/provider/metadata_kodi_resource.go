@@ -12,7 +12,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -64,6 +63,8 @@ func (m MetadataKodi) toMetadata() *Metadata {
 		SeriesImages:      m.SeriesImages,
 		SeasonImages:      m.SeasonImages,
 		EpisodeMetadata:   m.EpisodeMetadata,
+		ConfigContract:    types.StringValue(metadataKodiConfigContract),
+		Implementation:    types.StringValue(metadataKodiImplementation),
 	}
 }
 
@@ -248,28 +249,11 @@ func (r *MetadataKodiResource) ImportState(ctx context.Context, req resource.Imp
 }
 
 func (m *MetadataKodi) write(ctx context.Context, metadata *sonarr.MetadataResource) {
-	genericMetadata := Metadata{
-		Name:   types.StringValue(metadata.GetName()),
-		ID:     types.Int64Value(int64(metadata.GetId())),
-		Enable: types.BoolValue(metadata.GetEnable()),
-	}
-	genericMetadata.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, metadata.Tags)
-	genericMetadata.writeFields(metadata.GetFields())
-	m.fromMetadata(&genericMetadata)
+	genericMetadata := m.toMetadata()
+	genericMetadata.write(ctx, metadata)
+	m.fromMetadata(genericMetadata)
 }
 
 func (m *MetadataKodi) read(ctx context.Context) *sonarr.MetadataResource {
-	tags := make([]*int32, len(m.Tags.Elements()))
-	tfsdk.ValueAs(ctx, m.Tags, &tags)
-
-	metadata := sonarr.NewMetadataResource()
-	metadata.SetEnable(m.Enable.ValueBool())
-	metadata.SetId(int32(m.ID.ValueInt64()))
-	metadata.SetConfigContract(metadataKodiConfigContract)
-	metadata.SetImplementation(metadataKodiImplementation)
-	metadata.SetName(m.Name.ValueString())
-	metadata.SetTags(tags)
-	metadata.SetFields(m.toMetadata().readFields())
-
-	return metadata
+	return m.toMetadata().read(ctx)
 }
