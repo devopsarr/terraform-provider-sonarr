@@ -45,10 +45,8 @@ type DownloadClientDeluge struct {
 	Name                     types.String `tfsdk:"name"`
 	Host                     types.String `tfsdk:"host"`
 	URLBase                  types.String `tfsdk:"url_base"`
-	Username                 types.String `tfsdk:"username"`
 	Password                 types.String `tfsdk:"password"`
 	TvCategory               types.String `tfsdk:"tv_category"`
-	TvDirectory              types.String `tfsdk:"tv_directory"`
 	TvImportedCategory       types.String `tfsdk:"tv_imported_category"`
 	RecentTvPriority         types.Int64  `tfsdk:"recent_tv_priority"`
 	OlderTvPriority          types.Int64  `tfsdk:"older_tv_priority"`
@@ -68,10 +66,8 @@ func (d DownloadClientDeluge) toDownloadClient() *DownloadClient {
 		Name:                     d.Name,
 		Host:                     d.Host,
 		URLBase:                  d.URLBase,
-		Username:                 d.Username,
 		Password:                 d.Password,
 		TvCategory:               d.TvCategory,
-		TvDirectory:              d.TvDirectory,
 		TvImportedCategory:       d.TvImportedCategory,
 		RecentTvPriority:         d.RecentTvPriority,
 		OlderTvPriority:          d.OlderTvPriority,
@@ -94,10 +90,8 @@ func (d *DownloadClientDeluge) fromDownloadClient(client *DownloadClient) {
 	d.Name = client.Name
 	d.Host = client.Host
 	d.URLBase = client.URLBase
-	d.Username = client.Username
 	d.Password = client.Password
 	d.TvCategory = client.TvCategory
-	d.TvDirectory = client.TvDirectory
 	d.TvImportedCategory = client.TvImportedCategory
 	d.RecentTvPriority = client.RecentTvPriority
 	d.OlderTvPriority = client.OlderTvPriority
@@ -198,24 +192,12 @@ func (r *DownloadClientDelugeResource) Schema(ctx context.Context, req resource.
 				Optional:            true,
 				Computed:            true,
 			},
-			"username": schema.StringAttribute{
-				MarkdownDescription: "Username.",
-				Optional:            true,
-				Computed:            true,
-			},
 			"password": schema.StringAttribute{
 				MarkdownDescription: "Password.",
-				Optional:            true,
-				Computed:            true,
-				Sensitive:           true,
+				Required:            true,
 			},
 			"tv_category": schema.StringAttribute{
 				MarkdownDescription: "TV category.",
-				Optional:            true,
-				Computed:            true,
-			},
-			"tv_directory": schema.StringAttribute{
-				MarkdownDescription: "TV directory.",
 				Optional:            true,
 				Computed:            true,
 			},

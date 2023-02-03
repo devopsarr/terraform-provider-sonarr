@@ -51,7 +51,5 @@ func testAccDownloadClientNzbgetResourceConfig(name, host string) string {
 		host = "%s"
 		url_base = "/nzbget/"
 		port = 9091
-		username = "User"
-		password = "Pass"
 	}`, name, host)
 }

@@ -32,9 +32,10 @@ func TestAccDownloadClientDelugeResource(t *testing.T) {
 			},
 			// ImportState testing
 			{
-				ResourceName:      "sonarr_download_client_deluge.test",
-				ImportState:       true,
-				ImportStateVerify: true,
+				ResourceName:            "sonarr_download_client_deluge.test",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"password"},
 			},
 			// Delete testing automatically occurs in TestCase
 		},
@@ -50,5 +51,6 @@ func testAccDownloadClientDelugeResourceConfig(name, host string) string {
 		host = "%s"
 		url_base = "/deluge/"
 		port = 9091
+		password = ""
 	}`, name, host)
 }

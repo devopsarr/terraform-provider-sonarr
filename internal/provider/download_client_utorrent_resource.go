@@ -49,7 +49,6 @@ type DownloadClientUtorrent struct {
 	Username                 types.String `tfsdk:"username"`
 	Password                 types.String `tfsdk:"password"`
 	TvCategory               types.String `tfsdk:"tv_category"`
-	TvDirectory              types.String `tfsdk:"tv_directory"`
 	RecentTvPriority         types.Int64  `tfsdk:"recent_tv_priority"`
 	Priority                 types.Int64  `tfsdk:"priority"`
 	Port                     types.Int64  `tfsdk:"port"`
@@ -71,7 +70,6 @@ func (d DownloadClientUtorrent) toDownloadClient() *DownloadClient {
 		Username:                 d.Username,
 		Password:                 d.Password,
 		TvCategory:               d.TvCategory,
-		TvDirectory:              d.TvDirectory,
 		RecentTvPriority:         d.RecentTvPriority,
 		OlderTvPriority:          d.OlderTvPriority,
 		Priority:                 d.Priority,
@@ -97,7 +95,6 @@ func (d *DownloadClientUtorrent) fromDownloadClient(client *DownloadClient) {
 	d.Username = client.Username
 	d.Password = client.Password
 	d.TvCategory = client.TvCategory
-	d.TvDirectory = client.TvDirectory
 	d.RecentTvPriority = client.RecentTvPriority
 	d.OlderTvPriority = client.OlderTvPriority
 	d.Priority = client.Priority
@@ -219,11 +216,6 @@ func (r *DownloadClientUtorrentResource) Schema(ctx context.Context, req resourc
 			},
 			"tv_imported_category": schema.StringAttribute{
 				MarkdownDescription: "TV imported category.",
-				Optional:            true,
-				Computed:            true,
-			},
-			"tv_directory": schema.StringAttribute{
-				MarkdownDescription: "TV directory.",
 				Optional:            true,
 				Computed:            true,
 			},
