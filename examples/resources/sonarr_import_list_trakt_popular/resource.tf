@@ -1,4 +1,5 @@
 resource "sonarr_import_list_popular" "example" {
+  name                 = "Example"
   enable_automatic_add = true
   season_folder        = true
   should_monitor       = "all"

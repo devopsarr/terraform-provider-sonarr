@@ -23,7 +23,7 @@ resource "sonarr_import_list" "example" {
   root_folder_path     = sonarr_root_folder.example.path
   quality_profile_id   = sonarr_quality_profile.example.id
   language_profile_id  = sonarr_language_profile.example.id
-  name                 = "Esample"
+  name                 = "Example"
   implementation       = "SonarrImport"
   config_contract      = "SonarrSettings"
   base_url             = "http://127.0.0.1:8989"
