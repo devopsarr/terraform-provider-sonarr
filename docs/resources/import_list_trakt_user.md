@@ -16,6 +16,7 @@ For more information refer to [Import List](https://wiki.servarr.com/sonarr/sett
 
 ```terraform
 resource "sonarr_import_list_user" "example" {
+  name                 = "Example"
   enable_automatic_add = true
   season_folder        = true
   should_monitor       = "all"
