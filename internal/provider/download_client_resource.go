@@ -17,7 +17,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"golang.org/x/exp/slices"
 )
 
 const downloadClientResourceName = "download_client"
@@ -28,14 +27,15 @@ var (
 	_ resource.ResourceWithImportState = &DownloadClientResource{}
 )
 
-var (
-	downloadClientBoolFields        = []string{"addPaused", "useSsl", "startOnAdd", "sequentialOrder", "firstAndLast", "addStopped", "saveMagnetFiles", "readOnly"}
-	downloadClientIntFields         = []string{"port", "recentTvPriority", "olderTvPriority", "initialState", "intialState"}
-	downloadClientStringFields      = []string{"host", "apiKey", "urlBase", "rpcPath", "secretToken", "password", "username", "tvCategory", "tvImportedCategory", "tvDirectory", "destination", "category", "nzbFolder", "strmFolder", "torrentFolder", "magnetFileExtension", "watchFolder"}
-	downloadClientStringSliceFields = []string{"fieldTags", "postImportTags"}
-	downloadClientIntSliceFields    = []string{"additionalTags"}
-	downloadClientSensitiveFields   = []string{"apiKey", "password"}
-)
+var downloadClientFields = helpers.Fields{
+	Bools:                  []string{"addPaused", "useSsl", "startOnAdd", "sequentialOrder", "firstAndLast", "addStopped", "saveMagnetFiles", "readOnly"},
+	Ints:                   []string{"port", "recentTvPriority", "olderTvPriority", "initialState", "intialState"},
+	Strings:                []string{"host", "apiKey", "urlBase", "rpcPath", "secretToken", "password", "username", "tvCategory", "tvImportedCategory", "tvDirectory", "destination", "category", "nzbFolder", "strmFolder", "torrentFolder", "magnetFileExtension", "watchFolder"},
+	StringSlices:           []string{"fieldTags", "postImportTags"},
+	StringSlicesExceptions: []string{"tags"},
+	IntSlices:              []string{"additionalTags"},
+	Sensitive:              []string{"apiKey", "password"},
+}
 
 func NewDownloadClientResource() resource.Resource {
 	return &DownloadClientResource{}
@@ -472,44 +472,7 @@ func (d *DownloadClient) write(ctx context.Context, downloadClient *sonarr.Downl
 	d.AdditionalTags = types.SetValueMust(types.Int64Type, nil)
 	d.FieldTags = types.SetValueMust(types.StringType, nil)
 	d.PostImportTags = types.SetValueMust(types.StringType, nil)
-	d.writeFields(ctx, downloadClient.GetFields())
-}
-
-func (d *DownloadClient) writeFields(ctx context.Context, fields []*sonarr.Field) {
-	for _, f := range fields {
-		if slices.Contains(downloadClientStringFields, f.GetName()) {
-			if slices.Contains(downloadClientSensitiveFields, f.GetName()) && f.GetValue() != nil {
-				continue
-			}
-
-			helpers.WriteStringField(f, d)
-
-			continue
-		}
-
-		if slices.Contains(downloadClientBoolFields, f.GetName()) {
-			helpers.WriteBoolField(f, d)
-
-			continue
-		}
-
-		if slices.Contains(downloadClientIntFields, f.GetName()) {
-			helpers.WriteIntField(f, d)
-
-			continue
-		}
-
-		if slices.Contains(downloadClientIntSliceFields, f.GetName()) {
-			helpers.WriteIntSliceField(ctx, f, d)
-
-			continue
-		}
-
-		// add specific check for tags to map field_tags
-		if slices.Contains(downloadClientStringSliceFields, f.GetName()) || f.GetName() == "tags" {
-			helpers.WriteStringSliceField(ctx, f, d)
-		}
-	}
+	helpers.WriteFields(ctx, d, downloadClient.GetFields(), downloadClientFields)
 }
 
 func (d *DownloadClient) read(ctx context.Context) *sonarr.DownloadClientResource {
@@ -528,45 +491,9 @@ func (d *DownloadClient) read(ctx context.Context) *sonarr.DownloadClientResourc
 	client.SetName(d.Name.ValueString())
 	client.SetProtocol(sonarr.DownloadProtocol(d.Protocol.ValueString()))
 	client.SetTags(tags)
-	client.SetFields(d.readFields(ctx))
+	client.SetFields(helpers.ReadFields(ctx, d, downloadClientFields))
 
 	return client
-}
-
-func (d *DownloadClient) readFields(ctx context.Context) []*sonarr.Field {
-	var output []*sonarr.Field
-
-	for _, b := range downloadClientBoolFields {
-		if field := helpers.ReadBoolField(b, d); field != nil {
-			output = append(output, field)
-		}
-	}
-
-	for _, i := range downloadClientIntFields {
-		if field := helpers.ReadIntField(i, d); field != nil {
-			output = append(output, field)
-		}
-	}
-
-	for _, s := range downloadClientStringFields {
-		if field := helpers.ReadStringField(s, d); field != nil {
-			output = append(output, field)
-		}
-	}
-
-	for _, s := range downloadClientStringSliceFields {
-		if field := helpers.ReadStringSliceField(ctx, s, d); field != nil {
-			output = append(output, field)
-		}
-	}
-
-	for _, s := range downloadClientIntSliceFields {
-		if field := helpers.ReadIntSliceField(ctx, s, d); field != nil {
-			output = append(output, field)
-		}
-	}
-
-	return output
 }
 
 // writeSensitive copy sensitive data from another resource.

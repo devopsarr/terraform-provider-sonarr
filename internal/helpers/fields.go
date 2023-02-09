@@ -9,6 +9,7 @@ import (
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
+	"golang.org/x/exp/slices"
 )
 
 type fieldException struct {
@@ -85,36 +86,56 @@ func setField(name string, value interface{}) *sonarr.Field {
 	return field
 }
 
-// WriteStringField writes a sonarr string field into struct field.
-func WriteStringField(fieldOutput *sonarr.Field, fieldCase interface{}) {
+// writeStringField writes a sonarr string field into struct field.
+func writeStringField(fieldOutput *sonarr.Field, fieldCase interface{}) {
 	stringValue := fmt.Sprint(fieldOutput.GetValue())
+
 	v := reflect.ValueOf(types.StringValue(stringValue))
+	if fieldOutput.GetValue() == nil {
+		v = reflect.ValueOf(types.StringNull())
+	}
+
 	selectWriteField(fieldOutput, fieldCase).Set(v)
 }
 
-// WriteBoolField writes a sonarr bool field into struct field.
-func WriteBoolField(fieldOutput *sonarr.Field, fieldCase interface{}) {
+// writeBoolField writes a sonarr bool field into struct field.
+func writeBoolField(fieldOutput *sonarr.Field, fieldCase interface{}) {
 	boolValue, _ := fieldOutput.GetValue().(bool)
+
 	v := reflect.ValueOf(types.BoolValue(boolValue))
+	if fieldOutput.GetValue() == nil {
+		v = reflect.ValueOf(types.BoolNull())
+	}
+
 	selectWriteField(fieldOutput, fieldCase).Set(v)
 }
 
-// WriteIntField writes a sonarr int field into struct field.
-func WriteIntField(fieldOutput *sonarr.Field, fieldCase interface{}) {
+// writeIntField writes a sonarr int field into struct field.
+func writeIntField(fieldOutput *sonarr.Field, fieldCase interface{}) {
 	intValue, _ := fieldOutput.GetValue().(float64)
+
 	v := reflect.ValueOf(types.Int64Value(int64(intValue)))
+	if fieldOutput.GetValue() == nil {
+		v = reflect.ValueOf(types.Int64Null())
+	}
+
 	selectWriteField(fieldOutput, fieldCase).Set(v)
 }
 
-// WriteFloatField writes a sonarr float field into struct field.
-func WriteFloatField(fieldOutput *sonarr.Field, fieldCase interface{}) {
+// writeFloatField writes a sonarr float field into struct field.
+func writeFloatField(fieldOutput *sonarr.Field, fieldCase interface{}) {
 	floatValue, _ := fieldOutput.GetValue().(float64)
+
 	v := reflect.ValueOf(types.Float64Value(floatValue))
+	if fieldOutput.GetValue() == nil {
+		v = reflect.ValueOf(types.Float64Null())
+	}
+
 	selectWriteField(fieldOutput, fieldCase).Set(v)
 }
 
-// WriteStringSliceField writes a sonarr string slice field into struct field.
-func WriteStringSliceField(ctx context.Context, fieldOutput *sonarr.Field, fieldCase interface{}) {
+// writeStringSliceField writes a sonarr string slice field into struct field.
+func writeStringSliceField(ctx context.Context, fieldOutput *sonarr.Field, fieldCase interface{}) {
 	sliceValue, _ := fieldOutput.GetValue().([]interface{})
 	setValue := types.SetValueMust(types.StringType, nil)
 	tfsdk.ValueFrom(ctx, sliceValue, setValue.Type(ctx), &setValue)
@@ -122,8 +143,8 @@ func WriteStringSliceField(ctx context.Context, fieldOutput *sonarr.Field, field
 	selectWriteField(fieldOutput, fieldCase).Set(v)
 }
 
-// WriteIntSliceField writes a sonarr int slice field into struct field.
-func WriteIntSliceField(ctx context.Context, fieldOutput *sonarr.Field, fieldCase interface{}) {
+// writeIntSliceField writes a sonarr int slice field into struct field.
+func writeIntSliceField(ctx context.Context, fieldOutput *sonarr.Field, fieldCase interface{}) {
 	sliceValue, _ := fieldOutput.GetValue().([]interface{})
 	setValue := types.SetValueMust(types.Int64Type, nil)
 	tfsdk.ValueFrom(ctx, sliceValue, setValue.Type(ctx), &setValue)
@@ -131,8 +152,8 @@ func WriteIntSliceField(ctx context.Context, fieldOutput *sonarr.Field, fieldCas
 	selectWriteField(fieldOutput, fieldCase).Set(v)
 }
 
-// ReadStringField reads from a string struct field and return a sonarr field.
-func ReadStringField(name string, fieldCase interface{}) *sonarr.Field {
+// readStringField reads from a string struct field and return a sonarr field.
+func readStringField(name string, fieldCase interface{}) *sonarr.Field {
 	fieldName := selectAPIName(name)
 	stringField := (*types.String)(selectReadField(name, fieldCase).Addr().UnsafePointer())
 
@@ -143,8 +164,8 @@ func ReadStringField(name string, fieldCase interface{}) *sonarr.Field {
 	return nil
 }
 
-// ReadBoolField reads from a bool struct field and return a sonarr field.
-func ReadBoolField(name string, fieldCase interface{}) *sonarr.Field {
+// readBoolField reads from a bool struct field and return a sonarr field.
+func readBoolField(name string, fieldCase interface{}) *sonarr.Field {
 	fieldName := selectAPIName(name)
 	boolField := (*types.Bool)(selectReadField(name, fieldCase).Addr().UnsafePointer())
 
@@ -155,8 +176,8 @@ func ReadBoolField(name string, fieldCase interface{}) *sonarr.Field {
 	return nil
 }
 
-// ReadIntField reads from a int struct field and return a sonarr field.
-func ReadIntField(name string, fieldCase interface{}) *sonarr.Field {
+// readIntField reads from a int struct field and return a sonarr field.
+func readIntField(name string, fieldCase interface{}) *sonarr.Field {
 	fieldName := selectAPIName(name)
 	intField := (*types.Int64)(selectReadField(name, fieldCase).Addr().UnsafePointer())
 
@@ -167,8 +188,8 @@ func ReadIntField(name string, fieldCase interface{}) *sonarr.Field {
 	return nil
 }
 
-// ReadFloatField reads from a float struct field and return a sonarr field.
-func ReadFloatField(name string, fieldCase interface{}) *sonarr.Field {
+// readFloatField reads from a float struct field and return a sonarr field.
+func readFloatField(name string, fieldCase interface{}) *sonarr.Field {
 	fieldName := selectAPIName(name)
 	floatField := (*types.Float64)(selectReadField(name, fieldCase).Addr().UnsafePointer())
 
@@ -179,8 +200,8 @@ func ReadFloatField(name string, fieldCase interface{}) *sonarr.Field {
 	return nil
 }
 
-// ReadStringSliceField reads from a string slice struct field and return a sonarr field.
-func ReadStringSliceField(ctx context.Context, name string, fieldCase interface{}) *sonarr.Field {
+// readStringSliceField reads from a string slice struct field and return a sonarr field.
+func readStringSliceField(ctx context.Context, name string, fieldCase interface{}) *sonarr.Field {
 	fieldName := selectAPIName(name)
 	sliceField := (*types.Set)(selectReadField(name, fieldCase).Addr().UnsafePointer())
 
@@ -194,8 +215,8 @@ func ReadStringSliceField(ctx context.Context, name string, fieldCase interface{
 	return nil
 }
 
-// ReadIntSliceField reads from a int slice struct field and return a sonarr field.
-func ReadIntSliceField(ctx context.Context, name string, fieldCase interface{}) *sonarr.Field {
+// readIntSliceField reads from a int slice struct field and return a sonarr field.
+func readIntSliceField(ctx context.Context, name string, fieldCase interface{}) *sonarr.Field {
 	fieldName := selectAPIName(name)
 	sliceField := (*types.Set)(selectReadField(name, fieldCase).Addr().UnsafePointer())
 
@@ -207,4 +228,102 @@ func ReadIntSliceField(ctx context.Context, name string, fieldCase interface{}) 
 	}
 
 	return nil
+}
+
+// Fields contains all the field lists of a specific resource per type.
+type Fields struct {
+	Bools                  []string
+	BoolsExceptions        []string
+	Ints                   []string
+	IntsExceptions         []string
+	Strings                []string
+	StringsExceptions      []string
+	Floats                 []string
+	FloatsExceptions       []string
+	IntSlices              []string
+	IntSlicesExceptions    []string
+	StringSlices           []string
+	StringSlicesExceptions []string
+	Sensitive              []string
+}
+
+// getList return a specific list of fields.
+func (f Fields) getList(list string) []string {
+	r := reflect.ValueOf(f)
+	output, _ := reflect.Indirect(r).FieldByName(list).Interface().([]string)
+
+	return output
+}
+
+// ReadFields takes in input a field container and populates a sonarr.Field slice.
+func ReadFields(ctx context.Context, fieldContainer interface{}, fieldLists Fields) []*sonarr.Field {
+	var output []*sonarr.Field
+
+	// Map each list to its read function.
+	readFuncs := map[string]func(string, interface{}) *sonarr.Field{
+		"Bools":   readBoolField,
+		"Ints":    readIntField,
+		"Floats":  readFloatField,
+		"Strings": readStringField,
+		"StringSlices": func(name string, fieldContainer interface{}) *sonarr.Field {
+			return readStringSliceField(ctx, name, fieldContainer)
+		},
+		"IntSlices": func(name string, fieldContainer interface{}) *sonarr.Field {
+			return readIntSliceField(ctx, name, fieldContainer)
+		},
+	}
+
+	// Loop over the map to populate the sonarr.Field slice.
+	for fieldType, readFunc := range readFuncs {
+		for _, f := range fieldLists.getList(fieldType) {
+			if field := readFunc(f, fieldContainer); field != nil {
+				output = append(output, field)
+			}
+		}
+	}
+
+	return output
+}
+
+// WriteFields takes in input a sonarr.Field slice and populate the relevant container fields.
+func WriteFields(ctx context.Context, fieldContainer interface{}, fields []*sonarr.Field, fieldLists Fields) {
+	// Map each list to its write function.
+	writeFuncs := map[string]func(*sonarr.Field, interface{}){
+		"Bools":             writeBoolField,
+		"BoolsExceptions":   writeBoolField,
+		"Ints":              writeIntField,
+		"IntsExceptions":    writeIntField,
+		"Strings":           writeStringField,
+		"StringsExceptions": writeStringField,
+		"Floats":            writeFloatField,
+		"FloatsExceptions":  writeFloatField,
+		"IntSlices": func(fieldOutput *sonarr.Field, fieldContainer interface{}) {
+			writeIntSliceField(ctx, fieldOutput, fieldContainer)
+		},
+		"IntSlicesExceptions": func(fieldOutput *sonarr.Field, fieldContainer interface{}) {
+			writeIntSliceField(ctx, fieldOutput, fieldContainer)
+		},
+		"StringSlices": func(fieldOutput *sonarr.Field, fieldContainer interface{}) {
+			writeStringSliceField(ctx, fieldOutput, fieldContainer)
+		},
+		"StringSlicesExceptions": func(fieldOutput *sonarr.Field, fieldContainer interface{}) {
+			writeStringSliceField(ctx, fieldOutput, fieldContainer)
+		},
+	}
+
+	// Loop over each field and populate the related container field with the corresponding write function.
+	for _, f := range fields {
+		fieldName := f.GetName()
+		if slices.Contains(fieldLists.Sensitive, fieldName) && f.GetValue() != nil {
+			continue
+		}
+
+		for listName, writeFunc := range writeFuncs {
+			if slices.Contains(fieldLists.getList(listName), fieldName) {
+				writeFunc(f, fieldContainer)
+
+				break
+			}
+		}
+	}
 }

@@ -16,7 +16,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"golang.org/x/exp/slices"
 )
 
 const notificationResourceName = "notification"
@@ -27,14 +26,14 @@ var (
 	_ resource.ResourceWithImportState = &NotificationResource{}
 )
 
-var (
-	notificationBoolFields        = []string{"alwaysUpdate", "cleanLibrary", "directMessage", "notify", "requireEncryption", "sendSilently", "updateLibrary", "useEuEndpoint", "useSsl"}
-	notificationStringFields      = []string{"accessToken", "accessTokenSecret", "apiKey", "appToken", "arguments", "author", "authToken", "authUser", "avatar", "botToken", "channel", "chatId", "consumerKey", "consumerSecret", "deviceNames", "expires", "from", "host", "icon", "mention", "password", "path", "refreshToken", "senderDomain", "senderId", "server", "signIn", "sound", "token", "url", "userKey", "username", "webHookUrl"}
-	notificationIntFields         = []string{"method", "port", "priority", "retry", "expire", "displayTime"}
-	notificationStringSliceFields = []string{"channelTags", "deviceIds", "devices", "recipients", "to", "cc", "bcc"}
-	notificationIntSliceFields    = []string{"grabFields", "importFields"}
-	notificationSensitiveFields   = []string{"apiKey", "token", "password", "appToken", "authToken", "botToken", "accessToken", "accessTokenSecret", "consumerKey", "consumerSecret"}
-)
+var notificationFields = helpers.Fields{
+	Bools:        []string{"alwaysUpdate", "cleanLibrary", "directMessage", "notify", "requireEncryption", "sendSilently", "updateLibrary", "useEuEndpoint", "useSsl"},
+	Strings:      []string{"accessToken", "accessTokenSecret", "apiKey", "appToken", "arguments", "author", "authToken", "authUser", "avatar", "botToken", "channel", "chatId", "consumerKey", "consumerSecret", "deviceNames", "expires", "from", "host", "icon", "mention", "password", "path", "refreshToken", "senderDomain", "senderId", "server", "signIn", "sound", "token", "url", "userKey", "username", "webHookUrl"},
+	Ints:         []string{"method", "port", "priority", "retry", "expire", "displayTime"},
+	StringSlices: []string{"channelTags", "deviceIds", "devices", "recipients", "to", "cc", "bcc"},
+	IntSlices:    []string{"grabFields", "importFields"},
+	Sensitive:    []string{"apiKey", "token", "password", "appToken", "authToken", "botToken", "accessToken", "accessTokenSecret", "consumerKey", "consumerSecret"},
+}
 
 func NewNotificationResource() resource.Resource {
 	return &NotificationResource{}
@@ -661,45 +660,7 @@ func (n *Notification) write(ctx context.Context, notification *sonarr.Notificat
 	n.To = types.SetValueMust(types.StringType, nil)
 	n.Cc = types.SetValueMust(types.StringType, nil)
 	n.Bcc = types.SetValueMust(types.StringType, nil)
-	n.writeFields(ctx, notification.GetFields())
-}
-
-func (n *Notification) writeFields(ctx context.Context, fields []*sonarr.Field) {
-	for _, f := range fields {
-		if slices.Contains(notificationStringFields, f.GetName()) {
-			if slices.Contains(notificationSensitiveFields, f.GetName()) && f.GetValue() != nil {
-				continue
-			}
-
-			helpers.WriteStringField(f, n)
-
-			continue
-		}
-
-		if slices.Contains(notificationBoolFields, f.GetName()) {
-			helpers.WriteBoolField(f, n)
-
-			continue
-		}
-
-		if slices.Contains(notificationIntFields, f.GetName()) {
-			helpers.WriteIntField(f, n)
-
-			continue
-		}
-
-		if slices.Contains(notificationStringSliceFields, f.GetName()) {
-			helpers.WriteStringSliceField(ctx, f, n)
-
-			continue
-		}
-
-		if slices.Contains(notificationIntSliceFields, f.GetName()) {
-			helpers.WriteIntSliceField(ctx, f, n)
-
-			continue
-		}
-	}
+	helpers.WriteFields(ctx, n, notification.GetFields(), notificationFields)
 }
 
 func (n *Notification) read(ctx context.Context) *sonarr.NotificationResource {
@@ -723,45 +684,9 @@ func (n *Notification) read(ctx context.Context) *sonarr.NotificationResource {
 	notification.SetImplementation(n.Implementation.ValueString())
 	notification.SetConfigContract(n.ConfigContract.ValueString())
 	notification.SetTags(tags)
-	notification.SetFields(n.readFields(ctx))
+	notification.SetFields(helpers.ReadFields(ctx, n, notificationFields))
 
 	return notification
-}
-
-func (n *Notification) readFields(ctx context.Context) []*sonarr.Field {
-	var output []*sonarr.Field
-
-	for _, b := range notificationBoolFields {
-		if field := helpers.ReadBoolField(b, n); field != nil {
-			output = append(output, field)
-		}
-	}
-
-	for _, i := range notificationIntFields {
-		if field := helpers.ReadIntField(i, n); field != nil {
-			output = append(output, field)
-		}
-	}
-
-	for _, s := range notificationStringFields {
-		if field := helpers.ReadStringField(s, n); field != nil {
-			output = append(output, field)
-		}
-	}
-
-	for _, s := range notificationStringSliceFields {
-		if field := helpers.ReadStringSliceField(ctx, s, n); field != nil {
-			output = append(output, field)
-		}
-	}
-
-	for _, i := range notificationIntSliceFields {
-		if field := helpers.ReadIntSliceField(ctx, i, n); field != nil {
-			output = append(output, field)
-		}
-	}
-
-	return output
 }
 
 // writeSensitive copy sensitive data from another resource.

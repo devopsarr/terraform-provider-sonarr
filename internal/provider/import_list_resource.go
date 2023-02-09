@@ -14,7 +14,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"golang.org/x/exp/slices"
 )
 
 const importListResourceName = "import_list"
@@ -25,11 +24,11 @@ var (
 	_ resource.ResourceWithImportState = &ImportListResource{}
 )
 
-var (
-	importListIntFields      = []string{"limit", "traktListType"}
-	importListStringFields   = []string{"accessToken", "baseUrl", "apiKey", "refreshToken", "expires", "authUser", "username", "rating", "listname", "genres", "years", "traktAdditionalParameters"}
-	importListIntSliceFields = []string{"profileIds", "languageProfileIds", "tagIds"}
-)
+var importListFields = helpers.Fields{
+	Ints:      []string{"limit", "traktListType"},
+	Strings:   []string{"accessToken", "baseUrl", "apiKey", "refreshToken", "expires", "authUser", "username", "rating", "listname", "genres", "years", "traktAdditionalParameters"},
+	IntSlices: []string{"profileIds", "languageProfileIds", "tagIds"},
+}
 
 func NewImportListResource() resource.Resource {
 	return &ImportListResource{}
@@ -363,29 +362,7 @@ func (i *ImportList) write(ctx context.Context, importList *sonarr.ImportListRes
 	i.LanguageProfileIds = types.SetValueMust(types.Int64Type, nil)
 	i.ProfileIds = types.SetValueMust(types.Int64Type, nil)
 	i.TagIds = types.SetValueMust(types.Int64Type, nil)
-	i.writeFields(ctx, importList.GetFields())
-}
-
-func (i *ImportList) writeFields(ctx context.Context, fields []*sonarr.Field) {
-	for _, f := range fields {
-		if slices.Contains(importListStringFields, f.GetName()) {
-			helpers.WriteStringField(f, i)
-
-			continue
-		}
-
-		if slices.Contains(importListIntFields, f.GetName()) {
-			helpers.WriteIntField(f, i)
-
-			continue
-		}
-
-		if slices.Contains(importListIntSliceFields, f.GetName()) {
-			helpers.WriteIntSliceField(ctx, f, i)
-
-			continue
-		}
-	}
+	helpers.WriteFields(ctx, i, importList.GetFields(), importListFields)
 }
 
 func (i *ImportList) read(ctx context.Context) *sonarr.ImportListResource {
@@ -405,31 +382,7 @@ func (i *ImportList) read(ctx context.Context) *sonarr.ImportListResource {
 	list.SetImplementation(i.Implementation.ValueString())
 	list.SetName(i.Name.ValueString())
 	list.SetTags(tags)
-	list.SetFields(i.readFields(ctx))
+	list.SetFields(helpers.ReadFields(ctx, i, importListFields))
 
 	return list
-}
-
-func (i *ImportList) readFields(ctx context.Context) []*sonarr.Field {
-	var output []*sonarr.Field
-
-	for _, j := range importListIntFields {
-		if field := helpers.ReadIntField(j, i); field != nil {
-			output = append(output, field)
-		}
-	}
-
-	for _, s := range importListStringFields {
-		if field := helpers.ReadStringField(s, i); field != nil {
-			output = append(output, field)
-		}
-	}
-
-	for _, s := range importListIntSliceFields {
-		if field := helpers.ReadIntSliceField(ctx, s, i); field != nil {
-			output = append(output, field)
-		}
-	}
-
-	return output
 }
