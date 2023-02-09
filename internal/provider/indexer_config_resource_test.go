@@ -2,6 +2,7 @@ package provider
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -14,6 +15,11 @@ func TestAccIndexerConfigResource(t *testing.T) {
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
+			// Unauthorized Create
+			{
+				Config:      testAccIndexerConfigResourceConfig(20) + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
+			},
 			// Create and Read testing
 			{
 				Config: testAccIndexerConfigResourceConfig(20),
@@ -21,6 +27,11 @@ func TestAccIndexerConfigResource(t *testing.T) {
 					resource.TestCheckResourceAttr("sonarr_indexer_config.test", "rss_sync_interval", "20"),
 					resource.TestCheckResourceAttrSet("sonarr_indexer_config.test", "id"),
 				),
+			},
+			// Unauthorized Read
+			{
+				Config:      testAccIndexerConfigResourceConfig(20) + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
 			},
 			// Update and Read testing
 			{

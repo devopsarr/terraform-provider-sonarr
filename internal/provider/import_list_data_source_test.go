@@ -1,6 +1,8 @@
 package provider
 
 import (
+	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -13,10 +15,20 @@ func TestAccImportListDataSource(t *testing.T) {
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
+			// Unauthorized
+			{
+				Config:      testAccImportListDataSourceConfig("\"Error\"") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
+			},
+			// Not found testing
+			{
+				Config:      testAccImportListDataSourceConfig("\"Error\""),
+				ExpectError: regexp.MustCompile("Unable to find import_list"),
+			},
 			// Read testing
 			{
 				PreConfig: rootFolderDSInit,
-				Config:    testAccImportListDataSourceConfig,
+				Config:    testAccImportListResourceConfig("importListDataTest", "false") + testAccImportListDataSourceConfig("sonarr_import_list.test.name"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrSet("data.sonarr_import_list.test", "id"),
 					resource.TestCheckResourceAttr("data.sonarr_import_list.test", "should_monitor", "all")),
@@ -25,23 +37,10 @@ func TestAccImportListDataSource(t *testing.T) {
 	})
 }
 
-const testAccImportListDataSourceConfig = `
-resource "sonarr_import_list" "test" {
-	enable_automatic_add = false
-	season_folder = true
-	should_monitor = "all"
-	series_type = "standard"
-	root_folder_path = "/config"
-	quality_profile_id = 1
-	name = "importListDataTest"
-	implementation = "SonarrImport"
-	config_contract = "SonarrSettings"
-	base_url = "http://127.0.0.1:8989"
-	api_key = "testAPIKey"
-	tags = []
+func testAccImportListDataSourceConfig(name string) string {
+	return fmt.Sprintf(`
+	data "sonarr_import_list" "test" {
+		name = %s
+	}
+	`, name)
 }
-
-data "sonarr_import_list" "test" {
-	name = sonarr_import_list.test.name
-}
-`

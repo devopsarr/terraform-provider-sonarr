@@ -2,6 +2,7 @@ package provider
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -14,6 +15,11 @@ func TestAccIndexerNyaaResource(t *testing.T) {
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
+			// Unauthorized Create
+			{
+				Config:      testAccIndexerNyaaResourceConfig("nyaaResourceTest", "https://nyaa.org") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
+			},
 			// Create and Read testing
 			{
 				Config: testAccIndexerNyaaResourceConfig("nyaaResourceTest", "https://nyaa.org"),
@@ -21,6 +27,11 @@ func TestAccIndexerNyaaResource(t *testing.T) {
 					resource.TestCheckResourceAttr("sonarr_indexer_nyaa.test", "base_url", "https://nyaa.org"),
 					resource.TestCheckResourceAttrSet("sonarr_indexer_nyaa.test", "id"),
 				),
+			},
+			// Unauthorized Read
+			{
+				Config:      testAccIndexerNyaaResourceConfig("nyaaResourceTest", "https://nyaa.org") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
 			},
 			// Update and Read testing
 			{

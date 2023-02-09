@@ -2,6 +2,7 @@ package provider
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -14,6 +15,11 @@ func TestAccDownloadClientFloodResource(t *testing.T) {
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
+			// Unauthorized Create
+			{
+				Config:      testAccDownloadClientFloodResourceConfig("resourceFloodTest", "flood") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
+			},
 			// Create and Read testing
 			{
 				Config: testAccDownloadClientFloodResourceConfig("resourceFloodTest", "flood"),
@@ -22,6 +28,11 @@ func TestAccDownloadClientFloodResource(t *testing.T) {
 					resource.TestCheckResourceAttr("sonarr_download_client_flood.test", "url_base", "/flood/"),
 					resource.TestCheckResourceAttrSet("sonarr_download_client_flood.test", "id"),
 				),
+			},
+			// Unauthorized Read
+			{
+				Config:      testAccDownloadClientFloodResourceConfig("resourceFloodTest", "flood") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
 			},
 			// Update and Read testing
 			{

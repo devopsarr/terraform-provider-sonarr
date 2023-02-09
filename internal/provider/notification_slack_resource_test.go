@@ -2,6 +2,7 @@ package provider
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -14,6 +15,11 @@ func TestAccNotificationSlackResource(t *testing.T) {
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
+			// Unauthorized Create
+			{
+				Config:      testAccNotificationSlackResourceConfig("resourceSlackTest", "test") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
+			},
 			// Create and Read testing
 			{
 				Config: testAccNotificationSlackResourceConfig("resourceSlackTest", "test"),
@@ -21,6 +27,11 @@ func TestAccNotificationSlackResource(t *testing.T) {
 					resource.TestCheckResourceAttr("sonarr_notification_slack.test", "channel", "test"),
 					resource.TestCheckResourceAttrSet("sonarr_notification_slack.test", "id"),
 				),
+			},
+			// Unauthorized Read
+			{
+				Config:      testAccNotificationSlackResourceConfig("resourceSlackTest", "test") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
 			},
 			// Update and Read testing
 			{

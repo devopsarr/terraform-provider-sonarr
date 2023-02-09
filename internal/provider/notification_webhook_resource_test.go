@@ -2,6 +2,7 @@ package provider
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -14,6 +15,11 @@ func TestAccNotificationWebhookResource(t *testing.T) {
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
+			// Unauthorized Create
+			{
+				Config:      testAccNotificationWebhookResourceConfig("resourceWebhookTest", "false") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
+			},
 			// Create and Read testing
 			{
 				Config: testAccNotificationWebhookResourceConfig("resourceWebhookTest", "false"),
@@ -21,6 +27,11 @@ func TestAccNotificationWebhookResource(t *testing.T) {
 					resource.TestCheckResourceAttr("sonarr_notification_webhook.test", "on_upgrade", "false"),
 					resource.TestCheckResourceAttrSet("sonarr_notification_webhook.test", "id"),
 				),
+			},
+			// Unauthorized Read
+			{
+				Config:      testAccNotificationWebhookResourceConfig("resourceWebhookTest", "false") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
 			},
 			// Update and Read testing
 			{

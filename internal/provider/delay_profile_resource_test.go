@@ -2,6 +2,7 @@ package provider
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -14,17 +15,27 @@ func TestAccDelayProfileResource(t *testing.T) {
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
+			// Unauthorized Create
+			{
+				Config:      testAccDelayProfileResourceConfig("usenet", "0") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
+			},
 			// Create and Read testing
 			{
-				Config: testAccDelayProfileResourceConfig("usenet"),
+				Config: testAccTagResourceConfig("test", "delay_profile_resource") + testAccDelayProfileResourceConfig("usenet", "sonarr_tag.test.id"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("sonarr_delay_profile.test", "preferred_protocol", "usenet"),
 					resource.TestCheckResourceAttrSet("sonarr_delay_profile.test", "id"),
 				),
 			},
+			// Unauthorized Read
+			{
+				Config:      testAccDelayProfileResourceConfig("usenet", "0") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
+			},
 			// Update and Read testing
 			{
-				Config: testAccDelayProfileResourceConfig("torrent"),
+				Config: testAccTagResourceConfig("test", "delay_profile_resource") + testAccDelayProfileResourceConfig("torrent", "sonarr_tag.test.id"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("sonarr_delay_profile.test", "preferred_protocol", "torrent"),
 				),
@@ -40,12 +51,8 @@ func TestAccDelayProfileResource(t *testing.T) {
 	})
 }
 
-func testAccDelayProfileResourceConfig(protocol string) string {
+func testAccDelayProfileResourceConfig(protocol, tag string) string {
 	return fmt.Sprintf(`
-	resource "sonarr_tag" "test" {
-		label = "delay_profile_resource"
-	}
-
 	resource "sonarr_delay_profile" "test" {
 		enable_usenet = true
 		enable_torrent = true
@@ -54,6 +61,6 @@ func testAccDelayProfileResourceConfig(protocol string) string {
 		usenet_delay = 0
 		torrent_delay = 0
 		preferred_protocol= "%s"
-		tags = [sonarr_tag.test.id]
-	}`, protocol)
+		tags = [%s]
+	}`, protocol, tag)
 }

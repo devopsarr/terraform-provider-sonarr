@@ -2,6 +2,7 @@ package provider
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -14,6 +15,11 @@ func TestAccDownloadClientAria2Resource(t *testing.T) {
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
+			// Unauthorized Create
+			{
+				Config:      testAccDownloadClientAria2ResourceConfig("resourceAria2Test", "aria2") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
+			},
 			// Create and Read testing
 			{
 				Config: testAccDownloadClientAria2ResourceConfig("resourceAria2Test", "aria2"),
@@ -22,6 +28,11 @@ func TestAccDownloadClientAria2Resource(t *testing.T) {
 					resource.TestCheckResourceAttr("sonarr_download_client_aria2.test", "rpc_path", "/aria2/"),
 					resource.TestCheckResourceAttrSet("sonarr_download_client_aria2.test", "id"),
 				),
+			},
+			// Unauthorized Read
+			{
+				Config:      testAccDownloadClientAria2ResourceConfig("resourceAria2Test", "aria2") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
 			},
 			// Update and Read testing
 			{

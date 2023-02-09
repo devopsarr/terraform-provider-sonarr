@@ -2,6 +2,7 @@ package provider
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -14,6 +15,11 @@ func TestAccReleaseProfileResource(t *testing.T) {
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
+			// Unauthorized Create
+			{
+				Config:      testAccReleaseProfileResourceConfig("resourceTest", "test1") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
+			},
 			// Create and Read testing
 			{
 				Config: testAccReleaseProfileResourceConfig("resourceTest", "test1"),
@@ -21,6 +27,11 @@ func TestAccReleaseProfileResource(t *testing.T) {
 					resource.TestCheckResourceAttr("sonarr_release_profile.test", "required.0", "test1"),
 					resource.TestCheckResourceAttrSet("sonarr_release_profile.test", "id"),
 				),
+			},
+			// Unauthorized Read
+			{
+				Config:      testAccReleaseProfileResourceConfig("resourceTest", "test1") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
 			},
 			// Update and Read testing
 			{

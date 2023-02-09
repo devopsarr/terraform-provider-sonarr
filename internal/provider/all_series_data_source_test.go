@@ -1,6 +1,7 @@
 package provider
 
 import (
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -13,6 +14,15 @@ func TestAccAllSeriesDataSource(t *testing.T) {
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
+			// Unauthorized
+			{
+				Config:      testAccAllSeriesDataSourceConfig + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
+			},
+			// Create a resource to test
+			{
+				Config: testAccSeriesResourceConfig(332606, "Friends", "friends", "false"),
+			},
 			// Read testing
 			{
 				Config: testAccAllSeriesDataSourceConfig,
@@ -25,26 +35,6 @@ func TestAccAllSeriesDataSource(t *testing.T) {
 }
 
 const testAccAllSeriesDataSourceConfig = `
-resource "sonarr_tag" "test" {
-	label = "all_series_datasource"
-}
-
-resource "sonarr_series" "test" {
-	title      = "Friends"
-	title_slug = "friends"
-	tvdb_id    = 332606
-  
-	monitored           = false
-	season_folder       = true
-	use_scene_numbering = false
-	path                = "/config/friends"
-	root_folder_path    = "/config"
-  
-	quality_profile_id  = 1
-	tags                = [sonarr_tag.test.id]
-}
-
 data "sonarr_all_series" "test" {
-	depends_on = [sonarr_series.test]
 }
 `

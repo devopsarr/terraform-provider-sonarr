@@ -2,6 +2,7 @@ package provider
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -14,6 +15,11 @@ func TestAccIndexerTorrentleechResource(t *testing.T) {
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
+			// Unauthorized Create
+			{
+				Config:      testAccIndexerTorrentleechResourceConfig("torrentleechResourceTest", 1) + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
+			},
 			// Create and Read testing
 			{
 				Config: testAccIndexerTorrentleechResourceConfig("torrentleechResourceTest", 1),
@@ -21,6 +27,11 @@ func TestAccIndexerTorrentleechResource(t *testing.T) {
 					resource.TestCheckResourceAttr("sonarr_indexer_torrentleech.test", "minimum_seeders", "1"),
 					resource.TestCheckResourceAttrSet("sonarr_indexer_torrentleech.test", "id"),
 				),
+			},
+			// Unauthorized Read
+			{
+				Config:      testAccIndexerTorrentleechResourceConfig("torrentleechResourceTest", 1) + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
 			},
 			// Update and Read testing
 			{

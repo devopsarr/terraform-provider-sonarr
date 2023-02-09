@@ -2,6 +2,7 @@ package provider
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -14,6 +15,11 @@ func TestAccIndexerRarbgResource(t *testing.T) {
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
+			// Unauthorized Create
+			{
+				Config:      testAccIndexerRarbgResourceConfig("rarbgResourceTest", "false") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
+			},
 			// Create and Read testing
 			{
 				Config: testAccIndexerRarbgResourceConfig("rarbgResourceTest", "false"),
@@ -22,6 +28,11 @@ func TestAccIndexerRarbgResource(t *testing.T) {
 					resource.TestCheckResourceAttr("sonarr_indexer_rarbg.test", "base_url", "https://torrentapi.org"),
 					resource.TestCheckResourceAttrSet("sonarr_indexer_rarbg.test", "id"),
 				),
+			},
+			// Unauthorized Read
+			{
+				Config:      testAccIndexerRarbgResourceConfig("rarbgResourceTest", "false") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
 			},
 			// Update and Read testing
 			{

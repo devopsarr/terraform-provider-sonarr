@@ -1,6 +1,8 @@
 package provider
 
 import (
+	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -13,9 +15,19 @@ func TestAccMetadataDataSource(t *testing.T) {
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
+			// Unauthorized
+			{
+				Config:      testAccMetadataDataSourceConfig("\"Error\"") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
+			},
+			// Not found testing
+			{
+				Config:      testAccMetadataDataSourceConfig("\"Error\""),
+				ExpectError: regexp.MustCompile("Unable to find metadata"),
+			},
 			// Read testing
 			{
-				Config: testAccMetadataDataSourceConfig,
+				Config: testAccMetadataResourceConfig("metadataData", "false") + testAccMetadataDataSourceConfig("sonarr_metadata.test.name"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrSet("data.sonarr_metadata.test", "id"),
 					resource.TestCheckResourceAttr("data.sonarr_metadata.test", "episode_metadata", "false")),
@@ -24,19 +36,10 @@ func TestAccMetadataDataSource(t *testing.T) {
 	})
 }
 
-const testAccMetadataDataSourceConfig = `
-resource "sonarr_metadata" "test" {
-	enable = true
-	name = "metadataData"
-	implementation = "WdtvMetadata"
-	config_contract = "WdtvMetadataSettings"
-	episode_metadata = false
-	series_images = false
-	season_images = true
-	episode_images = false
+func testAccMetadataDataSourceConfig(name string) string {
+	return fmt.Sprintf(`
+	data "sonarr_metadata" "test" {
+		name = %s
+	}
+	`, name)
 }
-
-data "sonarr_metadata" "test" {
-	name = sonarr_metadata.test.name
-}
-`

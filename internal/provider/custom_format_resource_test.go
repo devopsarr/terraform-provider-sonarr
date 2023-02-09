@@ -2,6 +2,7 @@ package provider
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -14,6 +15,11 @@ func TestAccCustomFormatResource(t *testing.T) {
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
+			// Unauthorized Create
+			{
+				Config:      testAccCustomFormatResourceConfig("resourceTest", "false") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
+			},
 			// Create and Read testing
 			{
 				Config: testAccCustomFormatResourceConfig("resourceTest", "false"),
@@ -21,6 +27,11 @@ func TestAccCustomFormatResource(t *testing.T) {
 					resource.TestCheckResourceAttr("sonarr_custom_format.test", "include_custom_format_when_renaming", "false"),
 					resource.TestCheckResourceAttrSet("sonarr_custom_format.test", "id"),
 				),
+			},
+			// Unauthorized Read
+			{
+				Config:      testAccCustomFormatResourceConfig("resourceTest", "false") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
 			},
 			// Update and Read testing
 			{

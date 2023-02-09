@@ -2,6 +2,7 @@ package provider
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -14,6 +15,11 @@ func TestAccDownloadClientQbittorrentResource(t *testing.T) {
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
+			// Unauthorized Create
+			{
+				Config:      testAccDownloadClientQbittorrentResourceConfig("resourceQbittorrentTest", "qbittorrent") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
+			},
 			// Create and Read testing
 			{
 				Config: testAccDownloadClientQbittorrentResourceConfig("resourceQbittorrentTest", "qbittorrent"),
@@ -22,6 +28,11 @@ func TestAccDownloadClientQbittorrentResource(t *testing.T) {
 					resource.TestCheckResourceAttr("sonarr_download_client_qbittorrent.test", "url_base", "/qbittorrent/"),
 					resource.TestCheckResourceAttrSet("sonarr_download_client_qbittorrent.test", "id"),
 				),
+			},
+			// Unauthorized Read
+			{
+				Config:      testAccDownloadClientQbittorrentResourceConfig("resourceQbittorrentTest", "qbittorrent") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
 			},
 			// Update and Read testing
 			{
