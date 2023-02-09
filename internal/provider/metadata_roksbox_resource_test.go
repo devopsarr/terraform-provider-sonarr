@@ -2,6 +2,7 @@ package provider
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -14,6 +15,11 @@ func TestAccMetadataRoksboxResource(t *testing.T) {
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
+			// Unauthorized Create
+			{
+				Config:      testAccMetadataRoksboxResourceConfig("roksboxResourceTest", "false") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
+			},
 			// Create and Read testing
 			{
 				Config: testAccMetadataRoksboxResourceConfig("roksboxResourceTest", "false"),
@@ -21,6 +27,11 @@ func TestAccMetadataRoksboxResource(t *testing.T) {
 					resource.TestCheckResourceAttr("sonarr_metadata_roksbox.test", "episode_metadata", "false"),
 					resource.TestCheckResourceAttrSet("sonarr_metadata_roksbox.test", "id"),
 				),
+			},
+			// Unauthorized Read
+			{
+				Config:      testAccMetadataRoksboxResourceConfig("roksboxResourceTest", "false") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
 			},
 			// Update and Read testing
 			{

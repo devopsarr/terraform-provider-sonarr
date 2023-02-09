@@ -2,6 +2,7 @@ package provider
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -14,6 +15,11 @@ func TestAccNotificationDiscordResource(t *testing.T) {
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
+			// Unauthorized Create
+			{
+				Config:      testAccNotificationDiscordResourceConfig("resourceDiscordTest", "dog-picture") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
+			},
 			// Create and Read testing
 			{
 				Config: testAccNotificationDiscordResourceConfig("resourceDiscordTest", "dog-picture"),
@@ -21,6 +27,11 @@ func TestAccNotificationDiscordResource(t *testing.T) {
 					resource.TestCheckResourceAttr("sonarr_notification_discord.test", "avatar", "dog-picture"),
 					resource.TestCheckResourceAttrSet("sonarr_notification_discord.test", "id"),
 				),
+			},
+			// Unauthorized Read
+			{
+				Config:      testAccNotificationDiscordResourceConfig("resourceDiscordTest", "dog-picture") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
 			},
 			// Update and Read testing
 			{

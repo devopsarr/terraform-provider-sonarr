@@ -2,6 +2,7 @@ package provider
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -14,6 +15,11 @@ func TestAccSeriesResource(t *testing.T) {
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
+			// Unauthorized Create
+			{
+				Config:      testAccSeriesResourceConfig(81189, "Breaking Bad", "breaking-bad", "false") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
+			},
 			// Create and Read testing
 			{
 				Config: testAccSeriesResourceConfig(81189, "Breaking Bad", "breaking-bad", "false"),
@@ -21,6 +27,11 @@ func TestAccSeriesResource(t *testing.T) {
 					resource.TestCheckResourceAttr("sonarr_series.test", "monitored", "false"),
 					resource.TestCheckResourceAttrSet("sonarr_series.test", "id"),
 				),
+			},
+			// Unauthorized Read
+			{
+				Config:      testAccSeriesResourceConfig(81189, "Breaking Bad", "breaking-bad", "false") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
 			},
 			// Update and Read testing
 			{
@@ -42,10 +53,6 @@ func TestAccSeriesResource(t *testing.T) {
 
 func testAccSeriesResourceConfig(id int, title, slug, monitored string) string {
 	return fmt.Sprintf(`
-	resource "sonarr_tag" "test" {
-		label = "series_resource"
-	}
-
 	resource "sonarr_series" "test" {
 		title      = "%s"
 		title_slug = "%s"
@@ -58,7 +65,6 @@ func testAccSeriesResourceConfig(id int, title, slug, monitored string) string {
 		root_folder_path    = "/config"
 	  
 		quality_profile_id  = 1
-		tags                = [sonarr_tag.test.id]
 	}
 	`, title, slug, id, monitored, slug)
 }

@@ -2,6 +2,7 @@ package provider
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -14,6 +15,11 @@ func TestAccImportListResource(t *testing.T) {
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
+			// Unauthorized Create
+			{
+				Config:      testAccImportListResourceConfig("importListResourceTest", "false") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
+			},
 			// Create and Read testing
 			{
 				PreConfig: rootFolderDSInit,
@@ -22,6 +28,11 @@ func TestAccImportListResource(t *testing.T) {
 					resource.TestCheckResourceAttr("sonarr_import_list.test", "season_folder", "false"),
 					resource.TestCheckResourceAttrSet("sonarr_import_list.test", "id"),
 				),
+			},
+			// Unauthorized Read
+			{
+				Config:      testAccImportListResourceConfig("importListResourceTest", "false") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
 			},
 			// Update and Read testing
 			{
@@ -43,7 +54,6 @@ func TestAccImportListResource(t *testing.T) {
 
 func testAccImportListResourceConfig(name, folder string) string {
 	return fmt.Sprintf(`
-
 	resource "sonarr_import_list" "test" {
 		enable_automatic_add = false
 		season_folder = %s

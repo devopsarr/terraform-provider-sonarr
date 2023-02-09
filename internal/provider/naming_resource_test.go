@@ -2,6 +2,7 @@ package provider
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -14,6 +15,11 @@ func TestAccNamingResource(t *testing.T) {
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
+			// Unauthorized Create
+			{
+				Config:      testAccNamingResourceConfig("Specials") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
+			},
 			// Create and Read testing
 			{
 				Config: testAccNamingResourceConfig("Specials"),
@@ -21,6 +27,11 @@ func TestAccNamingResource(t *testing.T) {
 					resource.TestCheckResourceAttr("sonarr_naming.test", "specials_folder_format", "Specials"),
 					resource.TestCheckResourceAttrSet("sonarr_naming.test", "id"),
 				),
+			},
+			// Unauthorized Read
+			{
+				Config:      testAccNamingResourceConfig("Specials") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
 			},
 			// Update and Read testing
 			{

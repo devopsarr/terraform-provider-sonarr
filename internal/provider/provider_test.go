@@ -36,3 +36,10 @@ func testAccAPIClient() *sonarr.APIClient {
 
 	return sonarr.NewAPIClient(config)
 }
+
+const testUnauthorizedProvider = `
+provider "sonarr" {
+	url = "http://localhost:7878"
+	api_key = "ErrorAPIKey"
+  }
+`

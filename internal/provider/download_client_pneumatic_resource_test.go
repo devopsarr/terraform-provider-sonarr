@@ -2,6 +2,7 @@ package provider
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -14,6 +15,11 @@ func TestAccDownloadClientPneumaticResource(t *testing.T) {
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
+			// Unauthorized Create
+			{
+				Config:      testAccDownloadClientPneumaticResourceConfig("resourcePneumaticTest", "/config/") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
+			},
 			// Create and Read testing
 			{
 				Config: testAccDownloadClientPneumaticResourceConfig("resourcePneumaticTest", "/config/"),
@@ -21,6 +27,11 @@ func TestAccDownloadClientPneumaticResource(t *testing.T) {
 					resource.TestCheckResourceAttr("sonarr_download_client_pneumatic.test", "nzb_folder", "/config/"),
 					resource.TestCheckResourceAttrSet("sonarr_download_client_pneumatic.test", "id"),
 				),
+			},
+			// Unauthorized Read
+			{
+				Config:      testAccDownloadClientPneumaticResourceConfig("resourcePneumaticTest", "/config/") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
 			},
 			// Update and Read testing
 			{

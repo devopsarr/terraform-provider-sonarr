@@ -2,6 +2,7 @@ package provider
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -14,6 +15,11 @@ func TestAccIndexerNewznabResource(t *testing.T) {
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
+			// Unauthorized Create
+			{
+				Config:      testAccIndexerNewznabResourceConfig("newzabResourceTest", "false") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
+			},
 			// Create and Read testing
 			{
 				Config: testAccIndexerNewznabResourceConfig("newzabResourceTest", "false"),
@@ -22,6 +28,11 @@ func TestAccIndexerNewznabResource(t *testing.T) {
 					resource.TestCheckResourceAttr("sonarr_indexer_newznab.test", "base_url", "https://lolo.sickbeard.com"),
 					resource.TestCheckResourceAttrSet("sonarr_indexer_newznab.test", "id"),
 				),
+			},
+			// Unauthorized Read
+			{
+				Config:      testAccIndexerNewznabResourceConfig("newzabResourceTest", "false") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
 			},
 			// Update and Read testing
 			{

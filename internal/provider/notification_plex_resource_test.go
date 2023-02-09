@@ -2,6 +2,7 @@ package provider
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -14,6 +15,11 @@ func TestAccNotificationPlexResource(t *testing.T) {
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
+			// Unauthorized Create
+			{
+				Config:      testAccNotificationPlexResourceConfig("resourcePlexTest", "token123") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
+			},
 			// Create and Read testing
 			{
 				Config: testAccNotificationPlexResourceConfig("resourcePlexTest", "token123"),
@@ -21,6 +27,11 @@ func TestAccNotificationPlexResource(t *testing.T) {
 					resource.TestCheckResourceAttr("sonarr_notification_plex.test", "auth_token", "token123"),
 					resource.TestCheckResourceAttrSet("sonarr_notification_plex.test", "id"),
 				),
+			},
+			// Unauthorized Read
+			{
+				Config:      testAccNotificationPlexResourceConfig("resourcePlexTest", "token123") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
 			},
 			// Update and Read testing
 			{

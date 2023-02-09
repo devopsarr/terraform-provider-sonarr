@@ -2,6 +2,7 @@ package provider
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -13,6 +14,11 @@ func TestAccQualityProfileResource(t *testing.T) {
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
+			// Unauthorized Create
+			{
+				Config:      testAccQualityProfileResourceError + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
+			},
 			// Create and Read testing
 			{
 				Config: testAccQualityProfileResourceConfig("example-4k"),
@@ -20,6 +26,11 @@ func TestAccQualityProfileResource(t *testing.T) {
 					resource.TestCheckResourceAttr("sonarr_quality_profile.test", "name", "example-4k"),
 					resource.TestCheckResourceAttrSet("sonarr_quality_profile.test", "id"),
 				),
+			},
+			// Unauthorized Read
+			{
+				Config:      testAccQualityProfileResourceError + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
 			},
 			// Update and Read testing
 			{
@@ -38,6 +49,15 @@ func TestAccQualityProfileResource(t *testing.T) {
 		},
 	})
 }
+
+const testAccQualityProfileResourceError = `
+resource "sonarr_quality_profile" "test" {
+	name            = "Error"
+	upgrade_allowed = true
+	cutoff          = 2000
+	quality_groups = []
+}
+`
 
 func testAccQualityProfileResourceConfig(name string) string {
 	return fmt.Sprintf(`

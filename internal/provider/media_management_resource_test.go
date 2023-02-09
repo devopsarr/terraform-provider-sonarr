@@ -2,6 +2,7 @@ package provider
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -14,6 +15,11 @@ func TestAccMediaManagementResource(t *testing.T) {
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
+			// Unauthorized Create
+			{
+				Config:      testAccMediaManagementResourceConfig("none") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
+			},
 			// Create and Read testing
 			{
 				Config: testAccMediaManagementResourceConfig("none"),
@@ -21,6 +27,11 @@ func TestAccMediaManagementResource(t *testing.T) {
 					resource.TestCheckResourceAttr("sonarr_media_management.test", "file_date", "none"),
 					resource.TestCheckResourceAttrSet("sonarr_media_management.test", "id"),
 				),
+			},
+			// Unauthorized Read
+			{
+				Config:      testAccMediaManagementResourceConfig("none") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
 			},
 			// Update and Read testing
 			{

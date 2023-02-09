@@ -2,6 +2,7 @@ package provider
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -14,6 +15,11 @@ func TestAccNotificationMailgunResource(t *testing.T) {
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
+			// Unauthorized Create
+			{
+				Config:      testAccNotificationMailgunResourceConfig("resourceMailgunTest", "test@mailgun.com") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
+			},
 			// Create and Read testing
 			{
 				Config: testAccNotificationMailgunResourceConfig("resourceMailgunTest", "test@mailgun.com"),
@@ -21,6 +27,11 @@ func TestAccNotificationMailgunResource(t *testing.T) {
 					resource.TestCheckResourceAttr("sonarr_notification_mailgun.test", "from", "test@mailgun.com"),
 					resource.TestCheckResourceAttrSet("sonarr_notification_mailgun.test", "id"),
 				),
+			},
+			// Unauthorized Read
+			{
+				Config:      testAccNotificationMailgunResourceConfig("resourceMailgunTest", "test@mailgun.com") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
 			},
 			// Update and Read testing
 			{

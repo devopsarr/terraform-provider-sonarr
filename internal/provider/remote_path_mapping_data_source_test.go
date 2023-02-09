@@ -1,6 +1,8 @@
 package provider
 
 import (
+	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -13,25 +15,31 @@ func TestAccRemotePathMappingDataSource(t *testing.T) {
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
+			// Unauthorized
+			{
+				Config:      testAccRemotePathMappingDataSourceConfig("999") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
+			},
+			// Not found testing
+			{
+				Config:      testAccRemotePathMappingDataSourceConfig("999"),
+				ExpectError: regexp.MustCompile("Unable to find remote_path_mapping"),
+			},
 			// Read testing
 			{
-				Config: testAccRemotePathMappingDataSourceConfig,
+				Config: testAccRemotePathMappingResourceConfig("dataTest", "/test2/") + testAccRemotePathMappingDataSourceConfig("sonarr_remote_path_mapping.test.id"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrSet("data.sonarr_remote_path_mapping.test", "id"),
-					resource.TestCheckResourceAttr("data.sonarr_remote_path_mapping.test", "host", "transmission")),
+					resource.TestCheckResourceAttr("data.sonarr_remote_path_mapping.test", "host", "dataTest")),
 			},
 		},
 	})
 }
 
-const testAccRemotePathMappingDataSourceConfig = `
-resource "sonarr_remote_path_mapping" "test" {
-	host = "transmission"
-	remote_path = "/datatest/"
-	local_path = "/config/"
+func testAccRemotePathMappingDataSourceConfig(id string) string {
+	return fmt.Sprintf(`
+	data "sonarr_remote_path_mapping" "test" {
+		id = %s
+	}
+	`, id)
 }
-
-data "sonarr_remote_path_mapping" "test" {
-	id = sonarr_remote_path_mapping.test.id
-}
-`

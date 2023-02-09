@@ -1,6 +1,8 @@
 package provider
 
 import (
+	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -13,9 +15,19 @@ func TestAccNotificationDataSource(t *testing.T) {
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
+			// Unauthorized
+			{
+				Config:      testAccNotificationDataSourceConfig("\"Error\"") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
+			},
+			// Not found testing
+			{
+				Config:      testAccNotificationDataSourceConfig("\"Error\""),
+				ExpectError: regexp.MustCompile("Unable to find notification"),
+			},
 			// Read testing
 			{
-				Config: testAccNotificationDataSourceConfig,
+				Config: testAccNotificationResourceConfig("dataTest", "true") + testAccNotificationDataSourceConfig("sonarr_notification.test.name"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrSet("data.sonarr_notification.test", "id"),
 					resource.TestCheckResourceAttr("data.sonarr_notification.test", "path", "/scripts/test.sh")),
@@ -24,28 +36,10 @@ func TestAccNotificationDataSource(t *testing.T) {
 	})
 }
 
-const testAccNotificationDataSourceConfig = `
-resource "sonarr_notification" "test" {
-	on_grab                            = false
-	on_download                        = true
-	on_upgrade                         = true
-	on_rename                          = false
-	on_series_delete                   = false
-	on_episode_file_delete             = false
-	on_episode_file_delete_for_upgrade = true
-	on_health_issue                    = false
-	on_application_update              = false
-  
-	include_health_warnings = false
-	name                    = "notificationData"
-  
-	implementation  = "CustomScript"
-	config_contract = "CustomScriptSettings"
-  
-	path = "/scripts/test.sh"
+func testAccNotificationDataSourceConfig(name string) string {
+	return fmt.Sprintf(`
+	data "sonarr_notification" "test" {
+		name = %s
+	}
+	`, name)
 }
-
-data "sonarr_notification" "test" {
-	name = sonarr_notification.test.name
-}
-`

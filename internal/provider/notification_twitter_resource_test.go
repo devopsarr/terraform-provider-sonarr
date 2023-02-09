@@ -2,6 +2,7 @@ package provider
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -14,6 +15,11 @@ func TestAccNotificationTwitterResource(t *testing.T) {
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
+			// Unauthorized Create
+			{
+				Config:      testAccNotificationTwitterResourceConfig("resourceTwitterTest", "me") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
+			},
 			// Create and Read testing
 			{
 				Config: testAccNotificationTwitterResourceConfig("resourceTwitterTest", "me"),
@@ -21,6 +27,11 @@ func TestAccNotificationTwitterResource(t *testing.T) {
 					resource.TestCheckResourceAttr("sonarr_notification_twitter.test", "mention", "me"),
 					resource.TestCheckResourceAttrSet("sonarr_notification_twitter.test", "id"),
 				),
+			},
+			// Unauthorized Read
+			{
+				Config:      testAccNotificationTwitterResourceConfig("resourceTwitterTest", "me") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
 			},
 			// Update and Read testing
 			{

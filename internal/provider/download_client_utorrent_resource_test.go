@@ -2,6 +2,7 @@ package provider
 
 import (
 	"fmt"
+	"regexp"
 	"testing"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
@@ -14,6 +15,11 @@ func TestAccDownloadClientUtorrentResource(t *testing.T) {
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
 		Steps: []resource.TestStep{
+			// Unauthorized Create
+			{
+				Config:      testAccDownloadClientUtorrentResourceConfig("resourceUtorrentTest", "utorrent") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
+			},
 			// Create and Read testing
 			{
 				Config: testAccDownloadClientUtorrentResourceConfig("resourceUtorrentTest", "utorrent"),
@@ -22,6 +28,11 @@ func TestAccDownloadClientUtorrentResource(t *testing.T) {
 					resource.TestCheckResourceAttr("sonarr_download_client_utorrent.test", "url_base", "/utorrent/"),
 					resource.TestCheckResourceAttrSet("sonarr_download_client_utorrent.test", "id"),
 				),
+			},
+			// Unauthorized Read
+			{
+				Config:      testAccDownloadClientUtorrentResourceConfig("resourceUtorrentTest", "utorrent") + testUnauthorizedProvider,
+				ExpectError: regexp.MustCompile("Client Error"),
 			},
 			// Update and Read testing
 			{
