@@ -14,7 +14,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"golang.org/x/exp/slices"
 )
 
 const metadataResourceName = "metadata"
@@ -25,7 +24,9 @@ var (
 	_ resource.ResourceWithImportState = &MetadataResource{}
 )
 
-var metadataBoolFields = []string{"seriesMetadata", "seriesMetadataUrl", "seriesImages", "seasonImages", "episodeImages", "episodeMetadata"}
+var metadataFields = helpers.Fields{
+	Bools: []string{"seriesMetadata", "seriesMetadataUrl", "seriesImages", "seasonImages", "episodeImages", "episodeMetadata"},
+}
 
 func NewMetadataResource() resource.Resource {
 	return &MetadataResource{}
@@ -242,51 +243,29 @@ func (r *MetadataResource) ImportState(ctx context.Context, req resource.ImportS
 	tflog.Trace(ctx, "imported "+metadataResourceName+": "+req.ID)
 }
 
-func (i *Metadata) write(ctx context.Context, metadata *sonarr.MetadataResource) {
-	i.Enable = types.BoolValue(metadata.GetEnable())
-	i.ID = types.Int64Value(int64(metadata.GetId()))
-	i.ConfigContract = types.StringValue(metadata.GetConfigContract())
-	i.Implementation = types.StringValue(metadata.GetImplementation())
-	i.Name = types.StringValue(metadata.GetName())
-	i.Tags = types.SetValueMust(types.Int64Type, nil)
-	tfsdk.ValueFrom(ctx, metadata.Tags, i.Tags.Type(ctx), &i.Tags)
-	i.writeFields(metadata.GetFields())
+func (m *Metadata) write(ctx context.Context, metadata *sonarr.MetadataResource) {
+	m.Enable = types.BoolValue(metadata.GetEnable())
+	m.ID = types.Int64Value(int64(metadata.GetId()))
+	m.ConfigContract = types.StringValue(metadata.GetConfigContract())
+	m.Implementation = types.StringValue(metadata.GetImplementation())
+	m.Name = types.StringValue(metadata.GetName())
+	m.Tags = types.SetValueMust(types.Int64Type, nil)
+	tfsdk.ValueFrom(ctx, metadata.Tags, m.Tags.Type(ctx), &m.Tags)
+	helpers.WriteFields(ctx, m, metadata.GetFields(), metadataFields)
 }
 
-func (i *Metadata) writeFields(fields []*sonarr.Field) {
-	for _, f := range fields {
-		if slices.Contains(metadataBoolFields, f.GetName()) {
-			helpers.WriteBoolField(f, i)
-
-			continue
-		}
-	}
-}
-
-func (i *Metadata) read(ctx context.Context) *sonarr.MetadataResource {
-	tags := make([]*int32, len(i.Tags.Elements()))
-	tfsdk.ValueAs(ctx, i.Tags, &tags)
+func (m *Metadata) read(ctx context.Context) *sonarr.MetadataResource {
+	tags := make([]*int32, len(m.Tags.Elements()))
+	tfsdk.ValueAs(ctx, m.Tags, &tags)
 
 	metadata := sonarr.NewMetadataResource()
-	metadata.SetEnable(i.Enable.ValueBool())
-	metadata.SetId(int32(i.ID.ValueInt64()))
-	metadata.SetConfigContract(i.ConfigContract.ValueString())
-	metadata.SetImplementation(i.Implementation.ValueString())
-	metadata.SetName(i.Name.ValueString())
+	metadata.SetEnable(m.Enable.ValueBool())
+	metadata.SetId(int32(m.ID.ValueInt64()))
+	metadata.SetConfigContract(m.ConfigContract.ValueString())
+	metadata.SetImplementation(m.Implementation.ValueString())
+	metadata.SetName(m.Name.ValueString())
 	metadata.SetTags(tags)
-	metadata.SetFields(i.readFields())
+	metadata.SetFields(helpers.ReadFields(ctx, m, metadataFields))
 
 	return metadata
-}
-
-func (i *Metadata) readFields() []*sonarr.Field {
-	var output []*sonarr.Field
-
-	for _, b := range metadataBoolFields {
-		if field := helpers.ReadBoolField(b, i); field != nil {
-			output = append(output, field)
-		}
-	}
-
-	return output
 }

@@ -245,7 +245,7 @@ func (c *CustomFormat) write(ctx context.Context, customFormat *sonarr.CustomFor
 
 	specs := make([]CustomFormatCondition, len(customFormat.Specifications))
 	for n, c := range customFormat.Specifications {
-		specs[n].write(c)
+		specs[n].write(ctx, c)
 	}
 
 	tfsdk.ValueFrom(ctx, specs, c.Specifications.Type(ctx), &c.Specifications)
@@ -257,7 +257,7 @@ func (c *CustomFormat) read(ctx context.Context) *sonarr.CustomFormatResource {
 	specs := make([]*sonarr.CustomFormatSpecificationSchema, len(specifications))
 
 	for n, d := range specifications {
-		specs[n] = d.read()
+		specs[n] = d.read(ctx)
 	}
 
 	format := sonarr.NewCustomFormatResource()

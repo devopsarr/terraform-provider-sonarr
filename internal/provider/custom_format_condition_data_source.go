@@ -11,15 +11,14 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 	"github.com/mitchellh/hashstructure/v2"
-	"golang.org/x/exp/slices"
 )
 
 const customFormatConditionDataSourceName = "custom_format_condition"
 
-var (
-	customFormatStringFields = []string{"value"}
-	customFormatIntFields    = []string{"min", "max"}
-)
+var customFormatFields = helpers.Fields{
+	Strings: []string{"value"},
+	Ints:    []string{"min", "max"},
+}
 
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ datasource.DataSource = &CustomFormatConditionDataSource{}
@@ -132,60 +131,22 @@ func (d *CustomFormatConditionDataSource) Read(ctx context.Context, req datasour
 	resp.Diagnostics.Append(resp.State.SetAttribute(ctx, path.Root("id"), int64(hash))...)
 }
 
-func (s *CustomFormatCondition) write(spec *sonarr.CustomFormatSpecificationSchema) {
-	s.Implementation = types.StringValue(spec.GetImplementation())
-	s.Name = types.StringValue(spec.GetName())
-	s.Negate = types.BoolValue(spec.GetNegate())
-	s.Required = types.BoolValue(spec.GetRequired())
-	s.writeFields(spec.GetFields())
+func (c *CustomFormatCondition) write(ctx context.Context, spec *sonarr.CustomFormatSpecificationSchema) {
+	c.Implementation = types.StringValue(spec.GetImplementation())
+	c.Name = types.StringValue(spec.GetName())
+	c.Negate = types.BoolValue(spec.GetNegate())
+	c.Required = types.BoolValue(spec.GetRequired())
+	helpers.WriteFields(ctx, c, spec.GetFields(), customFormatFields)
 }
 
-func (s *CustomFormatCondition) writeFields(fields []*sonarr.Field) {
-	for _, f := range fields {
-		if f.Value == nil {
-			continue
-		}
-
-		if slices.Contains(customFormatStringFields, f.GetName()) {
-			helpers.WriteStringField(f, s)
-
-			continue
-		}
-
-		if slices.Contains(customFormatIntFields, f.GetName()) {
-			helpers.WriteIntField(f, s)
-
-			continue
-		}
-	}
-}
-
-func (s *CustomFormatCondition) read() *sonarr.CustomFormatSpecificationSchema {
+func (c *CustomFormatCondition) read(ctx context.Context) *sonarr.CustomFormatSpecificationSchema {
 	spec := sonarr.NewCustomFormatSpecificationSchema()
-	spec.SetName(s.Name.ValueString())
+	spec.SetName(c.Name.ValueString())
 
-	spec.SetImplementation(s.Implementation.ValueString())
-	spec.SetNegate(s.Negate.ValueBool())
-	spec.SetRequired(s.Required.ValueBool())
-	spec.SetFields(s.readFields())
+	spec.SetImplementation(c.Implementation.ValueString())
+	spec.SetNegate(c.Negate.ValueBool())
+	spec.SetRequired(c.Required.ValueBool())
+	spec.SetFields(helpers.ReadFields(ctx, c, customFormatFields))
 
 	return spec
-}
-
-func (s *CustomFormatCondition) readFields() []*sonarr.Field {
-	var output []*sonarr.Field
-
-	for _, i := range customFormatIntFields {
-		if field := helpers.ReadIntField(i, s); field != nil {
-			output = append(output, field)
-		}
-	}
-
-	for _, str := range customFormatStringFields {
-		if field := helpers.ReadStringField(str, s); field != nil {
-			output = append(output, field)
-		}
-	}
-
-	return output
 }

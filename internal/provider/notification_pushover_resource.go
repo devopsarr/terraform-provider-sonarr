@@ -210,7 +210,7 @@ func (r *NotificationPushoverResource) Schema(ctx context.Context, req resource.
 			},
 			"user_key": schema.StringAttribute{
 				MarkdownDescription: "User key.",
-				Optional:            true,
+				Required:            true,
 				Sensitive:           true,
 			},
 			"devices": schema.SetAttribute{
