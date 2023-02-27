@@ -37,15 +37,17 @@ type DelayProfileResource struct {
 
 // DelayProfile describes the delay profile data model.
 type DelayProfile struct {
-	Tags                   types.Set    `tfsdk:"tags"`
-	PreferredProtocol      types.String `tfsdk:"preferred_protocol"`
-	UsenetDelay            types.Int64  `tfsdk:"usenet_delay"`
-	TorrentDelay           types.Int64  `tfsdk:"torrent_delay"`
-	ID                     types.Int64  `tfsdk:"id"`
-	Order                  types.Int64  `tfsdk:"order"`
-	EnableUsenet           types.Bool   `tfsdk:"enable_usenet"`
-	EnableTorrent          types.Bool   `tfsdk:"enable_torrent"`
-	BypassIfHighestQuality types.Bool   `tfsdk:"bypass_if_highest_quality"`
+	Tags                           types.Set    `tfsdk:"tags"`
+	PreferredProtocol              types.String `tfsdk:"preferred_protocol"`
+	UsenetDelay                    types.Int64  `tfsdk:"usenet_delay"`
+	TorrentDelay                   types.Int64  `tfsdk:"torrent_delay"`
+	ID                             types.Int64  `tfsdk:"id"`
+	Order                          types.Int64  `tfsdk:"order"`
+	MinimumCustomFormatScore       types.Int64  `tfsdk:"minimum_custom_format_score"`
+	EnableUsenet                   types.Bool   `tfsdk:"enable_usenet"`
+	EnableTorrent                  types.Bool   `tfsdk:"enable_torrent"`
+	BypassIfHighestQuality         types.Bool   `tfsdk:"bypass_if_highest_quality"`
+	BypassIfAboveCustomFormatScore types.Bool   `tfsdk:"bypass_if_above_custom_format_score"`
 }
 
 func (r *DelayProfileResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -78,6 +80,11 @@ func (r *DelayProfileResource) Schema(ctx context.Context, req resource.SchemaRe
 				Optional:            true,
 				Computed:            true,
 			},
+			"bypass_if_above_custom_format_score": schema.BoolAttribute{
+				MarkdownDescription: "Bypass for higher custom format score flag.",
+				Optional:            true,
+				Computed:            true,
+			},
 			"usenet_delay": schema.Int64Attribute{
 				MarkdownDescription: "Usenet delay.",
 				Optional:            true,
@@ -90,6 +97,11 @@ func (r *DelayProfileResource) Schema(ctx context.Context, req resource.SchemaRe
 			},
 			"order": schema.Int64Attribute{
 				MarkdownDescription: "Order.",
+				Optional:            true,
+				Computed:            true,
+			},
+			"minimum_custom_format_score": schema.Int64Attribute{
+				MarkdownDescription: "Minimum custom format score.",
 				Optional:            true,
 				Computed:            true,
 			},
@@ -238,10 +250,12 @@ func (p *DelayProfile) write(ctx context.Context, profile *sonarr.DelayProfileRe
 	p.EnableUsenet = types.BoolValue(profile.GetEnableUsenet())
 	p.EnableTorrent = types.BoolValue(profile.GetEnableTorrent())
 	p.BypassIfHighestQuality = types.BoolValue(profile.GetBypassIfHighestQuality())
+	p.BypassIfAboveCustomFormatScore = types.BoolValue(profile.GetBypassIfAboveCustomFormatScore())
 	p.UsenetDelay = types.Int64Value(int64(profile.GetUsenetDelay()))
 	p.TorrentDelay = types.Int64Value(int64(profile.GetTorrentDelay()))
 	p.Order = types.Int64Value(int64(profile.GetOrder()))
-	p.PreferredProtocol = types.StringValue(string(*profile.PreferredProtocol))
+	p.MinimumCustomFormatScore = types.Int64Value(int64(profile.GetMinimumCustomFormatScore()))
+	p.PreferredProtocol = types.StringValue(string(profile.GetPreferredProtocol()))
 	p.Tags = types.SetValueMust(types.Int64Type, nil)
 	tfsdk.ValueFrom(ctx, profile.Tags, p.Tags.Type(ctx), &p.Tags)
 }
@@ -253,9 +267,11 @@ func (p *DelayProfile) read(ctx context.Context) *sonarr.DelayProfileResource {
 	profile := sonarr.NewDelayProfileResource()
 	profile.SetId(int32(p.ID.ValueInt64()))
 	profile.SetBypassIfHighestQuality(p.BypassIfHighestQuality.ValueBool())
+	profile.SetBypassIfAboveCustomFormatScore(p.BypassIfAboveCustomFormatScore.ValueBool())
 	profile.SetEnableTorrent(p.EnableTorrent.ValueBool())
 	profile.SetEnableUsenet(p.EnableUsenet.ValueBool())
 	profile.SetOrder(int32(p.Order.ValueInt64()))
+	profile.SetMinimumCustomFormatScore(int32(p.MinimumCustomFormatScore.ValueInt64()))
 	profile.SetPreferredProtocol(sonarr.DownloadProtocol(p.PreferredProtocol.ValueString()))
 	profile.SetTags(tags)
 	profile.SetTorrentDelay(int32(p.TorrentDelay.ValueInt64()))

@@ -52,6 +52,10 @@ func (d *DelayProfileDataSource) Schema(ctx context.Context, req datasource.Sche
 				MarkdownDescription: "Bypass for highest quality Flag.",
 				Computed:            true,
 			},
+			"bypass_if_above_custom_format_score": schema.BoolAttribute{
+				MarkdownDescription: "Bypass for higher custom format score flag.",
+				Computed:            true,
+			},
 			"usenet_delay": schema.Int64Attribute{
 				MarkdownDescription: "Usenet delay.",
 				Computed:            true,
@@ -62,6 +66,10 @@ func (d *DelayProfileDataSource) Schema(ctx context.Context, req datasource.Sche
 			},
 			"order": schema.Int64Attribute{
 				MarkdownDescription: "Order.",
+				Computed:            true,
+			},
+			"minimum_custom_format_score": schema.Int64Attribute{
+				MarkdownDescription: "Minimum custom format score.",
 				Computed:            true,
 			},
 			"tags": schema.SetAttribute{
