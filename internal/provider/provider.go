@@ -171,6 +171,7 @@ func (p *SonarrProvider) Resources(ctx context.Context) []func() resource.Resour
 		// Import Lists
 		NewImportListExclusionResource,
 		NewImportListResource,
+		NewImportListSimklUserResource,
 		NewImportListSonarrResource,
 		NewImportListPlexResource,
 		NewImportListTraktListResource,

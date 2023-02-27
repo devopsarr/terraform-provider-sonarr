@@ -105,6 +105,10 @@ func (d *ImportListsDataSource) Schema(ctx context.Context, req datasource.Schem
 							MarkdownDescription: "Trakt list type.",
 							Computed:            true,
 						},
+						"list_type": schema.Int64Attribute{
+							MarkdownDescription: "Simkl list type.",
+							Computed:            true,
+						},
 						"access_token": schema.StringAttribute{
 							MarkdownDescription: "Access token.",
 							Computed:            true,

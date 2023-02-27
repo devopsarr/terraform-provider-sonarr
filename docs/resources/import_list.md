@@ -53,6 +53,7 @@ resource "sonarr_import_list" "example" {
 - `implementation` (String) ImportList implementation name.
 - `language_profile_ids` (Set of Number) Language profile IDs.
 - `limit` (Number) Limit.
+- `list_type` (Number) Simkl list type.
 - `listname` (String) Expires.
 - `quality_profile_id` (Number) Quality profile ID.
 - `quality_profile_ids` (Set of Number) Quality profile IDs.

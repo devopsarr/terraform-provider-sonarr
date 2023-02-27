@@ -42,6 +42,7 @@ Read-Only:
 - `implementation` (String) ImportList implementation name.
 - `language_profile_ids` (Set of Number) Language profile IDs.
 - `limit` (Number) Limit.
+- `list_type` (Number) Simkl list type.
 - `listname` (String) Expires.
 - `name` (String) Import List name.
 - `quality_profile_id` (Number) Quality profile ID.
