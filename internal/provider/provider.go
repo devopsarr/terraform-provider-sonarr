@@ -294,6 +294,7 @@ func (p *SonarrProvider) DataSources(ctx context.Context) []func() datasource.Da
 		// Tags
 		NewTagDataSource,
 		NewTagsDataSource,
+		NewAutoTagDataSource,
 		NewAutoTagsDataSource,
 	}
 }
