@@ -98,7 +98,7 @@ func (r *TagResource) Create(ctx context.Context, req resource.CreateRequest, re
 		return
 	}
 
-	tflog.Trace(ctx, "created tag: "+strconv.Itoa(int(response.GetId())))
+	tflog.Trace(ctx, "created "+tagResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
 	tag.write(response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &tag)...)

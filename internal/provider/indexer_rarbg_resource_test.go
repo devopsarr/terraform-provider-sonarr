@@ -24,7 +24,7 @@ func TestAccIndexerRarbgResource(t *testing.T) {
 			{
 				Config: testAccIndexerRarbgResourceConfig("rarbgResourceTest", "false"),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("sonarr_indexer_rarbg.test", "enable_automatic_search", "false"),
+					resource.TestCheckResourceAttr("sonarr_indexer_rarbg.test", "ranked_only", "false"),
 					resource.TestCheckResourceAttr("sonarr_indexer_rarbg.test", "base_url", "https://torrentapi.org"),
 					resource.TestCheckResourceAttrSet("sonarr_indexer_rarbg.test", "id"),
 				),
@@ -38,7 +38,7 @@ func TestAccIndexerRarbgResource(t *testing.T) {
 			{
 				Config: testAccIndexerRarbgResourceConfig("rarbgResourceTest", "true"),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("sonarr_indexer_rarbg.test", "enable_automatic_search", "true"),
+					resource.TestCheckResourceAttr("sonarr_indexer_rarbg.test", "ranked_only", "true"),
 				),
 			},
 			// ImportState testing
@@ -52,13 +52,13 @@ func TestAccIndexerRarbgResource(t *testing.T) {
 	})
 }
 
-func testAccIndexerRarbgResourceConfig(name, aSearch string) string {
+func testAccIndexerRarbgResourceConfig(name, ranked string) string {
 	return fmt.Sprintf(`
 	resource "sonarr_indexer_rarbg" "test" {
-		enable_automatic_search = %s
+		enable_automatic_search = false
 		name = "%s"
 		base_url = "https://torrentapi.org"
-		ranked_only = "false"
+		ranked_only = %s
 		minimum_seeders = 1
-	}`, aSearch, name)
+	}`, name, ranked)
 }
