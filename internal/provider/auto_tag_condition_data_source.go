@@ -48,7 +48,7 @@ func (d *AutoTagConditionDataSource) Metadata(ctx context.Context, req datasourc
 func (d *AutoTagConditionDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the delay server.
-		MarkdownDescription: "<!-- subcategory:Profiles --> Generic Auto Tag Condition data source. When possible use a specific data source instead.\nFor more information refer to [ Format Conditions](https://wiki.servarr.com/sonarr/settings#conditions).\n To be used in conjunction with [ Format](../resources/auto_tag).",
+		MarkdownDescription: "<!-- subcategory:Tags --> Generic Auto Tag Condition data source. When possible use a specific data source instead.\nFor more information refer to [ Format Conditions](https://wiki.servarr.com/sonarr/settings#conditions).\n To be used in conjunction with [ Format](../resources/auto_tag).",
 		Attributes: map[string]schema.Attribute{
 			"negate": schema.BoolAttribute{
 				MarkdownDescription: "Negate flag.",
