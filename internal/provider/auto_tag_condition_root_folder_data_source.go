@@ -36,7 +36,7 @@ func (d *AutoTagConditionRootFolderDataSource) Metadata(ctx context.Context, req
 func (d *AutoTagConditionRootFolderDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the delay server.
-		MarkdownDescription: "<!-- subcategory:Profiles --> Auto Tag Condition Root Folder data source.\nFor more intagion refer to [Auto Tag Conditions](https://wiki.servarr.com/sonarr/settings#conditions).",
+		MarkdownDescription: "<!-- subcategory:Tags --> Auto Tag Condition Root Folder data source.\nFor more intagion refer to [Auto Tag Conditions](https://wiki.servarr.com/sonarr/settings#conditions).",
 		Attributes: map[string]schema.Attribute{
 			"negate": schema.BoolAttribute{
 				MarkdownDescription: "Negate flag.",
