@@ -171,6 +171,7 @@ func (p *SonarrProvider) Resources(ctx context.Context) []func() resource.Resour
 		// Import Lists
 		NewImportListExclusionResource,
 		NewImportListResource,
+		NewImportListSimklUserResource,
 		NewImportListSonarrResource,
 		NewImportListPlexResource,
 		NewImportListTraktListResource,
@@ -223,6 +224,7 @@ func (p *SonarrProvider) Resources(ctx context.Context) []func() resource.Resour
 
 		// Tags
 		NewTagResource,
+		NewAutoTagResource,
 	}
 }
 
@@ -293,6 +295,12 @@ func (p *SonarrProvider) DataSources(ctx context.Context) []func() datasource.Da
 		// Tags
 		NewTagDataSource,
 		NewTagsDataSource,
+		NewAutoTagDataSource,
+		NewAutoTagsDataSource,
+		NewAutoTagConditionDataSource,
+		NewAutoTagConditionGenresDataSource,
+		NewAutoTagConditionRootFolderDataSource,
+		NewAutoTagConditionSeriesTypeDataSource,
 	}
 }
 

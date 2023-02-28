@@ -35,9 +35,11 @@ resource "sonarr_delay_profile" "example" {
 
 ### Optional
 
+- `bypass_if_above_custom_format_score` (Boolean) Bypass for higher custom format score flag.
 - `bypass_if_highest_quality` (Boolean) Bypass for highest quality flag.
 - `enable_torrent` (Boolean) Torrent allowed flag at least one of `enable_usenet` and `enable_torrent` must be defined.
 - `enable_usenet` (Boolean) Usenet allowed flag at least one of `enable_usenet` and `enable_torrent` must be defined.
+- `minimum_custom_format_score` (Number) Minimum custom format score.
 - `order` (Number) Order.
 - `preferred_protocol` (String) Preferred protocol.
 - `torrent_delay` (Number) Torrent Delay.

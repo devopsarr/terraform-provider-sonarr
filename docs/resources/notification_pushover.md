@@ -40,6 +40,7 @@ resource "sonarr_notification_join" "example" {
 
 - `api_key` (String, Sensitive) API key.
 - `name` (String) NotificationPushover name.
+- `user_key` (String, Sensitive) User key.
 
 ### Optional
 
@@ -58,7 +59,6 @@ resource "sonarr_notification_join" "example" {
 - `retry` (Number) Retry.
 - `sound` (String) Sound.
 - `tags` (Set of Number) List of associated tags.
-- `user_key` (String, Sensitive) User key.
 
 ### Read-Only
 

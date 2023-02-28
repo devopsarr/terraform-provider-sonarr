@@ -30,10 +30,12 @@ data "sonarr_delay_profiles" "example" {
 
 Read-Only:
 
+- `bypass_if_above_custom_format_score` (Boolean) Bypass for higher custom format score flag.
 - `bypass_if_highest_quality` (Boolean) Bypass for highest quality Flag.
 - `enable_torrent` (Boolean) Torrent allowed Flag.
 - `enable_usenet` (Boolean) Usenet allowed Flag.
 - `id` (Number) Delay Profile ID.
+- `minimum_custom_format_score` (Number) Minimum custom format score.
 - `order` (Number) Order.
 - `preferred_protocol` (String) Preferred protocol.
 - `tags` (Set of Number) List of associated tags.

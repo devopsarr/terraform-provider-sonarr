@@ -170,7 +170,7 @@ func (d *SystemStatusDataSource) Configure(ctx context.Context, req datasource.C
 }
 
 func (d *SystemStatusDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	// Get naming current value
+	// Get system status current value
 	response, _, err := d.client.SystemApi.GetSystemStatus(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, systemStatusDataSourceName, err))

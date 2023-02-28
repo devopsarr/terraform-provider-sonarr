@@ -25,7 +25,7 @@ var (
 )
 
 var importListFields = helpers.Fields{
-	Ints:      []string{"limit", "traktListType"},
+	Ints:      []string{"limit", "traktListType", "listType"},
 	Strings:   []string{"accessToken", "baseUrl", "apiKey", "refreshToken", "expires", "authUser", "username", "rating", "listname", "genres", "years", "traktAdditionalParameters"},
 	IntSlices: []string{"profileIds", "languageProfileIds", "tagIds"},
 }
@@ -67,6 +67,7 @@ type ImportList struct {
 	ID                        types.Int64  `tfsdk:"id"`
 	Limit                     types.Int64  `tfsdk:"limit"`
 	TraktListType             types.Int64  `tfsdk:"trakt_list_type"`
+	ListType                  types.Int64  `tfsdk:"list_type"`
 	EnableAutomaticAdd        types.Bool   `tfsdk:"enable_automatic_add"`
 	SeasonFolder              types.Bool   `tfsdk:"season_folder"`
 }
@@ -142,6 +143,11 @@ func (r *ImportListResource) Schema(ctx context.Context, req resource.SchemaRequ
 			},
 			"trakt_list_type": schema.Int64Attribute{
 				MarkdownDescription: "Trakt list type.",
+				Optional:            true,
+				Computed:            true,
+			},
+			"list_type": schema.Int64Attribute{
+				MarkdownDescription: "Simkl list type.",
 				Optional:            true,
 				Computed:            true,
 			},
