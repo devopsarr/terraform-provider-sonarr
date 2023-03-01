@@ -19,7 +19,7 @@ func TestAccMetadataConsumersDataSource(t *testing.T) {
 				Config:      testAccMetadataConsumersDataSourceConfig + testUnauthorizedProvider,
 				ExpectError: regexp.MustCompile("Client Error"),
 			},
-			// Create a delay profile to have a value to check
+			// Create a resource to have a value to check
 			{
 				Config: testAccMetadataResourceConfig("datasourceTest", "false"),
 			},

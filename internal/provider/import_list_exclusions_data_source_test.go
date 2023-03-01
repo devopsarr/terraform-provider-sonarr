@@ -19,7 +19,7 @@ func TestAccImportListExclusionsDataSource(t *testing.T) {
 				Config:      testAccImportListExclusionsDataSourceConfig + testUnauthorizedProvider,
 				ExpectError: regexp.MustCompile("Client Error"),
 			},
-			// Create a import_list_exclusion to have a value to check
+			// Create a resource to have a value to check
 			{
 				Config: testAccImportListExclusionResourceConfig("testList", 321),
 			},
