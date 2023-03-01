@@ -27,7 +27,7 @@ func TestAccAutoTagConditionGenresDataSource(t *testing.T) {
 
 const testAccAutoTagConditionGenresDataSourceConfig = `
 resource "sonarr_tag" "test" {
-	label = "atconditiontype"
+	label = "atconditiongenre"
 }
 
 data  "sonarr_auto_tag_condition_genres" "test" {

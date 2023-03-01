@@ -19,7 +19,7 @@ func TestAccRemotePathMappingsDataSource(t *testing.T) {
 				Config:      testAccRemotePathMappingsDataSourceConfig + testUnauthorizedProvider,
 				ExpectError: regexp.MustCompile("Client Error"),
 			},
-			// Create a tag to have a value to check
+			// Create a resource to have a value to check
 			{
 				Config: testAccRemotePathMappingResourceConfig("remotemapDataSourceTest", "/test3/"),
 			},

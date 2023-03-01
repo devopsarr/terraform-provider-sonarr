@@ -19,7 +19,7 @@ func TestAccAutoTagsDataSource(t *testing.T) {
 				Config:      testAccAutoTagsDataSourceConfig + testUnauthorizedProvider,
 				ExpectError: regexp.MustCompile("Client Error"),
 			},
-			// Create a delay profile to have a value to check
+			// Create a resource to have a value to check
 			{
 				Config: testAccTagResourceConfig("test", "dataautotag") + testAccAutoTagResourceConfig("datasourceTest", "true"),
 			},

@@ -19,7 +19,7 @@ func TestAccRootFoldersDataSource(t *testing.T) {
 				Config:      testAccRootFoldersDataSourceConfig + testUnauthorizedProvider,
 				ExpectError: regexp.MustCompile("Client Error"),
 			},
-			// Create a root folder to have a value to check
+			// Create a resource to have a value to check
 			{
 				Config: testAccRootFolderResourceConfig("/tmp"),
 			},

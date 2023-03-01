@@ -19,7 +19,7 @@ func TestAccReleaseProfilesDataSource(t *testing.T) {
 				Config:      testAccReleaseProfilesDataSourceConfig + testUnauthorizedProvider,
 				ExpectError: regexp.MustCompile("Client Error"),
 			},
-			// Create a profile to have a value to check
+			// Create a resource to have a value to check
 			{
 				Config: testAccReleaseProfileResourceConfig("testDataSources", "sd"),
 			},

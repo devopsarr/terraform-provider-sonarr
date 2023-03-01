@@ -19,7 +19,7 @@ func TestAccTagsDataSource(t *testing.T) {
 				Config:      testAccTagsDataSourceConfig + testUnauthorizedProvider,
 				ExpectError: regexp.MustCompile("Client Error"),
 			},
-			// Create a tag to have a value to check
+			// Create a resource to have a value to check
 			{
 				Config: testAccTagResourceConfig("test-1", "sd") + testAccTagResourceConfig("test-2", "hd"),
 			},

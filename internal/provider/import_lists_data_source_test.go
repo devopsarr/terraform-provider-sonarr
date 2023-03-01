@@ -19,7 +19,7 @@ func TestAccImportListsDataSource(t *testing.T) {
 				Config:      testAccImportListsDataSourceConfig + testUnauthorizedProvider,
 				ExpectError: regexp.MustCompile("Client Error"),
 			},
-			// Create a import list to have a value to check
+			// Create a resource to have a value to check
 			{
 				PreConfig: rootFolderDSInit,
 				Config:    testAccImportListResourceConfig("importListsDataTest", "false"),
