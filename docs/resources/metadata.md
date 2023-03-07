@@ -44,7 +44,7 @@ resource "sonarr_metadata" "example" {
 - `episode_metadata` (Boolean) Episode metadata flag.
 - `season_images` (Boolean) Season images flag.
 - `series_images` (Boolean) Series images flag.
-- `series_metadata` (Boolean) Series metafata flag.
+- `series_metadata` (Boolean) Series metadata flag.
 - `series_metadata_url` (Boolean) Series metadata URL flag.
 - `tags` (Set of Number) List of associated tags.
 

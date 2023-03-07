@@ -129,7 +129,7 @@ func (r *MetadataKodiResource) Schema(ctx context.Context, req resource.SchemaRe
 				Required:            true,
 			},
 			"series_metadata": schema.BoolAttribute{
-				MarkdownDescription: "Series metafata flag.",
+				MarkdownDescription: "Series metadata flag.",
 				Required:            true,
 			},
 			"series_metadata_url": schema.BoolAttribute{

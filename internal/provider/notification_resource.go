@@ -664,8 +664,7 @@ func (n *Notification) write(ctx context.Context, notification *sonarr.Notificat
 }
 
 func (n *Notification) read(ctx context.Context) *sonarr.NotificationResource {
-	var tags []*int32
-
+	tags := make([]*int32, len(n.Tags.Elements()))
 	tfsdk.ValueAs(ctx, n.Tags, &tags)
 
 	notification := sonarr.NewNotificationResource()

@@ -113,7 +113,7 @@ func (r *MetadataResource) Schema(ctx context.Context, req resource.SchemaReques
 				Computed:            true,
 			},
 			"series_metadata": schema.BoolAttribute{
-				MarkdownDescription: "Series metafata flag.",
+				MarkdownDescription: "Series metadata flag.",
 				Optional:            true,
 				Computed:            true,
 			},
@@ -249,8 +249,7 @@ func (m *Metadata) write(ctx context.Context, metadata *sonarr.MetadataResource)
 	m.ConfigContract = types.StringValue(metadata.GetConfigContract())
 	m.Implementation = types.StringValue(metadata.GetImplementation())
 	m.Name = types.StringValue(metadata.GetName())
-	m.Tags = types.SetValueMust(types.Int64Type, nil)
-	tfsdk.ValueFrom(ctx, metadata.Tags, m.Tags.Type(ctx), &m.Tags)
+	m.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, metadata.Tags)
 	helpers.WriteFields(ctx, m, metadata.GetFields(), metadataFields)
 }
 

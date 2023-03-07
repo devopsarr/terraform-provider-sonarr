@@ -381,8 +381,7 @@ func (i *Indexer) write(ctx context.Context, indexer *sonarr.IndexerResource) {
 }
 
 func (i *Indexer) read(ctx context.Context) *sonarr.IndexerResource {
-	var tags []*int32
-
+	tags := make([]*int32, len(i.Tags.Elements()))
 	tfsdk.ValueAs(ctx, i.Tags, &tags)
 
 	indexer := sonarr.NewIndexerResource()
