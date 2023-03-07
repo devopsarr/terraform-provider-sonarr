@@ -40,7 +40,7 @@ require (
 	github.com/hashicorp/hc-install v0.5.0 // indirect
 	github.com/hashicorp/hcl/v2 v2.16.1 // indirect
 	github.com/hashicorp/logutils v1.0.0 // indirect
-	github.com/hashicorp/terraform-exec v0.17.3 // indirect
+	github.com/hashicorp/terraform-exec v0.18.1 // indirect
 	github.com/hashicorp/terraform-json v0.15.0 // indirect
 	github.com/hashicorp/terraform-registry-address v0.1.0 // indirect
 	github.com/hashicorp/terraform-svchost v0.0.0-20200729002733-f050f53b9734 // indirect
@@ -64,7 +64,7 @@ require (
 	github.com/vmihailenco/msgpack v4.0.4+incompatible // indirect
 	github.com/vmihailenco/msgpack/v4 v4.3.12 // indirect
 	github.com/vmihailenco/tagparser v0.1.2 // indirect
-	github.com/zclconf/go-cty v1.12.1 // indirect
+	github.com/zclconf/go-cty v1.13.0 // indirect
 	golang.org/x/crypto v0.6.0 // indirect
 	golang.org/x/mod v0.7.0 // indirect
 	golang.org/x/net v0.7.0 // indirect
@@ -79,4 +79,4 @@ require (
 )
 
 // To be removed once terraform docs allows subcategories
-replace github.com/hashicorp/terraform-plugin-docs => github.com/fuochi/terraform-plugin-docs v0.0.0-20221102115635-d0b02bd5fc0f
+replace github.com/hashicorp/terraform-plugin-docs => github.com/fuochi/terraform-plugin-docs v0.0.0-20230303070141-d2c1202cfe89

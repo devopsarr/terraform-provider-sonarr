@@ -241,8 +241,7 @@ func (t *AutoTag) write(ctx context.Context, autoTag *sonarr.AutoTaggingResource
 }
 
 func (t *AutoTag) read(ctx context.Context) *sonarr.AutoTaggingResource {
-	var tags []*int32
-
+	tags := make([]*int32, len(t.Tags.Elements()))
 	tfsdk.ValueAs(ctx, t.Tags, &tags)
 
 	specifications := make([]AutoTagCondition, len(t.Specifications.Elements()))

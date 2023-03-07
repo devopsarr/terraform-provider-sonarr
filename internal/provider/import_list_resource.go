@@ -372,8 +372,7 @@ func (i *ImportList) write(ctx context.Context, importList *sonarr.ImportListRes
 }
 
 func (i *ImportList) read(ctx context.Context) *sonarr.ImportListResource {
-	var tags []*int32
-
+	tags := make([]*int32, len(i.Tags.Elements()))
 	tfsdk.ValueAs(ctx, i.Tags, &tags)
 
 	list := sonarr.NewImportListResource()
