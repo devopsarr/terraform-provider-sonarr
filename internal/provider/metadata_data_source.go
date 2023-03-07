@@ -78,7 +78,7 @@ func (d *MetadataDataSource) Schema(ctx context.Context, req datasource.SchemaRe
 				Computed:            true,
 			},
 			"series_metadata": schema.BoolAttribute{
-				MarkdownDescription: "Series metafata flag.",
+				MarkdownDescription: "Series metadata flag.",
 				Computed:            true,
 			},
 			"series_metadata_url": schema.BoolAttribute{

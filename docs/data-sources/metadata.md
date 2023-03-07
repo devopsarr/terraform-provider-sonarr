@@ -38,7 +38,7 @@ data "sonarr_metadata" "example" {
 - `implementation` (String) Metadata implementation name.
 - `season_images` (Boolean) Season images flag.
 - `series_images` (Boolean) Series images flag.
-- `series_metadata` (Boolean) Series metafata flag.
+- `series_metadata` (Boolean) Series metadata flag.
 - `series_metadata_url` (Boolean) Series metadata URL flag.
 - `tags` (Set of Number) List of associated tags.
 

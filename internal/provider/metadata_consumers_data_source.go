@@ -94,7 +94,7 @@ func (d *MetadataConsumersDataSource) Schema(ctx context.Context, req datasource
 							Computed:            true,
 						},
 						"series_metadata": schema.BoolAttribute{
-							MarkdownDescription: "Series metafata flag.",
+							MarkdownDescription: "Series metadata flag.",
 							Computed:            true,
 						},
 						"series_metadata_url": schema.BoolAttribute{
