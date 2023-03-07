@@ -19,7 +19,7 @@ func TestAccAutoTagConditionRootFolderDataSource(t *testing.T) {
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrSet("data.sonarr_auto_tag_condition_root_folder.test", "id"),
 					resource.TestCheckResourceAttr("data.sonarr_auto_tag_condition_root_folder.test", "name", "Test"),
-					resource.TestCheckResourceAttr("sonarr_auto_tag.test", "specifications.0.value", "/config")),
+					resource.TestCheckResourceAttr("sonarr_auto_tag.test", "specifications.0.value", "/test")),
 			},
 		},
 	})
@@ -34,7 +34,7 @@ data  "sonarr_auto_tag_condition_root_folder" "test" {
 	name = "Test"
 	negate = false
 	required = false
-	value = "/config"
+	value = "/test"
 }
 
 resource "sonarr_auto_tag" "test" {
