@@ -207,16 +207,13 @@ func (r *ReleaseProfileResource) ImportState(ctx context.Context, req resource.I
 }
 
 func (p *ReleaseProfile) write(ctx context.Context, profile *sonarr.ReleaseProfileResource) {
+	p.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, profile.GetTags())
+	p.Required, _ = types.SetValueFrom(ctx, types.StringType, profile.GetRequired())
+	p.Ignored, _ = types.SetValueFrom(ctx, types.StringType, profile.GetIgnored())
 	p.ID = types.Int64Value(int64(profile.GetId()))
 	p.Name = types.StringValue(profile.GetName())
 	p.Enabled = types.BoolValue(profile.GetEnabled())
 	p.IndexerID = types.Int64Value(int64(profile.GetIndexerId()))
-	p.Required = types.SetValueMust(types.StringType, nil)
-	tfsdk.ValueFrom(ctx, profile.Required, p.Required.Type(ctx), &p.Required)
-	p.Ignored = types.SetValueMust(types.StringType, nil)
-	tfsdk.ValueFrom(ctx, profile.Ignored, p.Ignored.Type(ctx), &p.Ignored)
-	p.Tags = types.SetValueMust(types.Int64Type, nil)
-	tfsdk.ValueFrom(ctx, profile.Tags, p.Tags.Type(ctx), &p.Tags)
 }
 
 func (p *ReleaseProfile) read(ctx context.Context) *sonarr.ReleaseProfileResource {
