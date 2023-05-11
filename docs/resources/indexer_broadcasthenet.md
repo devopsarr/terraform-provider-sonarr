@@ -15,7 +15,7 @@ For more information refer to [Indexer](https://wiki.servarr.com/sonarr/settings
 ## Example Usage
 
 ```terraform
-resource "sonarr_indexer_rargb" "example" {
+resource "sonarr_indexer_broadcasthenet" "example" {
   enable_automatic_search = true
   name                    = "Example"
   base_url                = "https://api.broadcasthe.net/"

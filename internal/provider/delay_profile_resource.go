@@ -246,6 +246,7 @@ func (r *DelayProfileResource) ImportState(ctx context.Context, req resource.Imp
 }
 
 func (p *DelayProfile) write(ctx context.Context, profile *sonarr.DelayProfileResource) {
+	p.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, profile.GetTags())
 	p.ID = types.Int64Value(int64(profile.GetId()))
 	p.EnableUsenet = types.BoolValue(profile.GetEnableUsenet())
 	p.EnableTorrent = types.BoolValue(profile.GetEnableTorrent())
@@ -256,8 +257,6 @@ func (p *DelayProfile) write(ctx context.Context, profile *sonarr.DelayProfileRe
 	p.Order = types.Int64Value(int64(profile.GetOrder()))
 	p.MinimumCustomFormatScore = types.Int64Value(int64(profile.GetMinimumCustomFormatScore()))
 	p.PreferredProtocol = types.StringValue(string(profile.GetPreferredProtocol()))
-	p.Tags = types.SetValueMust(types.Int64Type, nil)
-	tfsdk.ValueFrom(ctx, profile.Tags, p.Tags.Type(ctx), &p.Tags)
 }
 
 func (p *DelayProfile) read(ctx context.Context) *sonarr.DelayProfileResource {

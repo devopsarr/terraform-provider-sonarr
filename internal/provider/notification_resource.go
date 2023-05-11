@@ -636,7 +636,7 @@ func (r *NotificationResource) ImportState(ctx context.Context, req resource.Imp
 }
 
 func (n *Notification) write(ctx context.Context, notification *sonarr.NotificationResource) {
-	n.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, notification.Tags)
+	n.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, notification.GetTags())
 	n.OnGrab = types.BoolValue(notification.GetOnGrab())
 	n.OnDownload = types.BoolValue(notification.GetOnDownload())
 	n.OnUpgrade = types.BoolValue(notification.GetOnUpgrade())

@@ -459,7 +459,7 @@ func (r *DownloadClientResource) ImportState(ctx context.Context, req resource.I
 }
 
 func (d *DownloadClient) write(ctx context.Context, downloadClient *sonarr.DownloadClientResource) {
-	d.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, downloadClient.Tags)
+	d.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, downloadClient.GetTags())
 	d.Enable = types.BoolValue(downloadClient.GetEnable())
 	d.RemoveCompletedDownloads = types.BoolValue(downloadClient.GetRemoveCompletedDownloads())
 	d.RemoveFailedDownloads = types.BoolValue(downloadClient.GetRemoveFailedDownloads())

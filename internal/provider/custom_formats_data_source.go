@@ -137,7 +137,7 @@ func (d *CustomFormatsDataSource) Read(ctx context.Context, req datasource.ReadR
 		profiles[i].write(ctx, p)
 	}
 
-	tfsdk.ValueFrom(ctx, profiles, data.CustomFormats.Type(context.Background()), &data.CustomFormats)
+	tfsdk.ValueFrom(ctx, profiles, data.CustomFormats.Type(ctx), &data.CustomFormats)
 	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 	data.ID = types.StringValue(strconv.Itoa(len(response)))
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

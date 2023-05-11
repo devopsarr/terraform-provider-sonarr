@@ -226,7 +226,7 @@ func (r *AutoTagResource) ImportState(ctx context.Context, req resource.ImportSt
 }
 
 func (t *AutoTag) write(ctx context.Context, autoTag *sonarr.AutoTaggingResource) {
-	t.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, autoTag.Tags)
+	t.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, autoTag.GetTags())
 	t.ID = types.Int64Value(int64(autoTag.GetId()))
 	t.Name = types.StringValue(autoTag.GetName())
 	t.RemoveTagsAutomatically = types.BoolValue(autoTag.GetRemoveTagsAutomatically())

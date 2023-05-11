@@ -207,6 +207,7 @@ func (r *ReleaseProfileResource) ImportState(ctx context.Context, req resource.I
 }
 
 func (p *ReleaseProfile) write(ctx context.Context, profile *sonarr.ReleaseProfileResource) {
+	p.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, profile.GetTags())
 	p.ID = types.Int64Value(int64(profile.GetId()))
 	p.Name = types.StringValue(profile.GetName())
 	p.Enabled = types.BoolValue(profile.GetEnabled())

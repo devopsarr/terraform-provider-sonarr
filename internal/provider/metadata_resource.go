@@ -249,7 +249,7 @@ func (m *Metadata) write(ctx context.Context, metadata *sonarr.MetadataResource)
 	m.ConfigContract = types.StringValue(metadata.GetConfigContract())
 	m.Implementation = types.StringValue(metadata.GetImplementation())
 	m.Name = types.StringValue(metadata.GetName())
-	m.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, metadata.Tags)
+	m.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, metadata.GetTags())
 	helpers.WriteFields(ctx, m, metadata.GetFields(), metadataFields)
 }
 

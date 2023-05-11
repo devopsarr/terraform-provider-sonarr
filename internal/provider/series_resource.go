@@ -251,7 +251,7 @@ func (r *SeriesResource) ImportState(ctx context.Context, req resource.ImportSta
 }
 
 func (s *Series) write(ctx context.Context, series *sonarr.SeriesResource) {
-	s.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, series.Tags)
+	s.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, series.GetTags())
 	s.Monitored = types.BoolValue(series.GetMonitored())
 	s.SeasonFolder = types.BoolValue(series.GetSeasonFolder())
 	s.UseSceneNumbering = types.BoolValue(series.GetUseSceneNumbering())
