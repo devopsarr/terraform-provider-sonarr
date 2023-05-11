@@ -364,7 +364,7 @@ func (r *IndexerResource) ImportState(ctx context.Context, req resource.ImportSt
 }
 
 func (i *Indexer) write(ctx context.Context, indexer *sonarr.IndexerResource) {
-	i.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, indexer.Tags)
+	i.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, indexer.GetTags())
 	i.EnableAutomaticSearch = types.BoolValue(indexer.GetEnableAutomaticSearch())
 	i.EnableInteractiveSearch = types.BoolValue(indexer.GetEnableInteractiveSearch())
 	i.EnableRss = types.BoolValue(indexer.GetEnableRss())

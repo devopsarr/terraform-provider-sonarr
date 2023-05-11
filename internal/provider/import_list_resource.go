@@ -354,7 +354,7 @@ func (r *ImportListResource) ImportState(ctx context.Context, req resource.Impor
 }
 
 func (i *ImportList) write(ctx context.Context, importList *sonarr.ImportListResource) {
-	i.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, importList.Tags)
+	i.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, importList.GetTags())
 	i.EnableAutomaticAdd = types.BoolValue(importList.GetEnableAutomaticAdd())
 	i.SeasonFolder = types.BoolValue(importList.GetSeasonFolder())
 	i.QualityProfileID = types.Int64Value(int64(importList.GetQualityProfileId()))
