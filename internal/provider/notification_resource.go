@@ -28,12 +28,12 @@ var (
 
 var notificationFields = helpers.Fields{
 	Bools:                  []string{"alwaysUpdate", "cleanLibrary", "directMessage", "notify", "requireEncryption", "sendSilently", "updateLibrary", "useEuEndpoint", "useSsl"},
-	Strings:                []string{"accessToken", "accessTokenSecret", "apiKey", "appToken", "arguments", "author", "authToken", "authUser", "avatar", "botToken", "channel", "chatId", "consumerKey", "consumerSecret", "deviceNames", "expires", "from", "host", "icon", "mention", "password", "path", "refreshToken", "senderDomain", "senderId", "server", "signIn", "sound", "token", "url", "userKey", "username", "userName", "webHookUrl", "clickUrl", "serverUrl"},
-	Ints:                   []string{"method", "port", "priority", "retry", "expire", "displayTime"},
+	Strings:                []string{"accessToken", "accessTokenSecret", "apiKey", "appToken", "arguments", "author", "authToken", "authUser", "avatar", "botToken", "channel", "chatId", "consumerKey", "consumerSecret", "deviceNames", "expires", "from", "host", "icon", "mention", "password", "path", "refreshToken", "senderDomain", "senderId", "server", "signIn", "sound", "token", "url", "userKey", "username", "userName", "webHookUrl", "clickUrl", "serverUrl", "authUsername", "authPassword", "statelessUrls", "configurationKey"},
+	Ints:                   []string{"method", "port", "priority", "retry", "expire", "displayTime", "notificationType"},
 	StringSlices:           []string{"channelTags", "deviceIds", "devices", "recipients", "to", "cc", "bcc", "topics", "fieldTags"},
 	StringSlicesExceptions: []string{"tags"},
 	IntSlices:              []string{"grabFields", "importFields"},
-	Sensitive:              []string{"apiKey", "token", "password", "appToken", "authToken", "botToken", "accessToken", "accessTokenSecret", "consumerKey", "consumerSecret"},
+	Sensitive:              []string{"apiKey", "token", "password", "appToken", "authToken", "botToken", "accessToken", "accessTokenSecret", "consumerKey", "consumerSecret", "configurationKey", "authPassword"},
 }
 
 func NewNotificationResource() resource.Resource {
@@ -67,6 +67,7 @@ type Notification struct {
 	Mention                       types.String `tfsdk:"mention"`
 	ClickURL                      types.String `tfsdk:"click_url"`
 	ServerURL                     types.String `tfsdk:"server_url"`
+	StatelessURLs                 types.String `tfsdk:"stateless_urls"`
 	Name                          types.String `tfsdk:"name"`
 	Avatar                        types.String `tfsdk:"avatar"`
 	ConfigContract                types.String `tfsdk:"config_contract"`
@@ -97,6 +98,10 @@ type Notification struct {
 	ConsumerKey                   types.String `tfsdk:"consumer_key"`
 	ConsumerSecret                types.String `tfsdk:"consumer_secret"`
 	DeviceNames                   types.String `tfsdk:"device_names"`
+	AuthUsername                  types.String `tfsdk:"auth_username"`
+	AuthPassword                  types.String `tfsdk:"auth_password"`
+	ConfigurationKey              types.String `tfsdk:"configuration_key"`
+	NotificationType              types.Int64  `tfsdk:"notification_type"`
 	Expire                        types.Int64  `tfsdk:"expire"`
 	DisplayTime                   types.Int64  `tfsdk:"display_time"`
 	Priority                      types.Int64  `tfsdk:"priority"`
@@ -284,6 +289,36 @@ func (r *NotificationResource) Schema(ctx context.Context, req resource.SchemaRe
 				MarkdownDescription: "Retry.",
 				Optional:            true,
 				Computed:            true,
+			},
+			"notification_type": schema.Int64Attribute{
+				MarkdownDescription: "Notification type. `0` Info, `1` Success, `2` Warning, `3` Failure.",
+				Optional:            true,
+				Computed:            true,
+				Validators: []validator.Int64{
+					int64validator.OneOf(0, 1, 2, 3),
+				},
+			},
+			"stateless_urls": schema.StringAttribute{
+				MarkdownDescription: "Stateless URLs.",
+				Optional:            true,
+				Computed:            true,
+			},
+			"configuration_key": schema.StringAttribute{
+				MarkdownDescription: "Configuration key.",
+				Optional:            true,
+				Computed:            true,
+				Sensitive:           true,
+			},
+			"auth_username": schema.StringAttribute{
+				MarkdownDescription: "Username.",
+				Optional:            true,
+				Computed:            true,
+			},
+			"auth_password": schema.StringAttribute{
+				MarkdownDescription: "Password.",
+				Optional:            true,
+				Computed:            true,
+				Sensitive:           true,
 			},
 			"access_token": schema.StringAttribute{
 				MarkdownDescription: "Access token.",
@@ -687,6 +722,8 @@ func (n *Notification) write(ctx context.Context, notification *sonarr.Notificat
 	n.To = types.SetValueMust(types.StringType, nil)
 	n.Cc = types.SetValueMust(types.StringType, nil)
 	n.Bcc = types.SetValueMust(types.StringType, nil)
+	n.Topics = types.SetValueMust(types.StringType, nil)
+	n.FieldTags = types.SetValueMust(types.StringType, nil)
 	helpers.WriteFields(ctx, n, notification.GetFields(), notificationFields)
 }
 
