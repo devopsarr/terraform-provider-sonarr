@@ -27,12 +27,13 @@ var (
 )
 
 var notificationFields = helpers.Fields{
-	Bools:        []string{"alwaysUpdate", "cleanLibrary", "directMessage", "notify", "requireEncryption", "sendSilently", "updateLibrary", "useEuEndpoint", "useSsl"},
-	Strings:      []string{"accessToken", "accessTokenSecret", "apiKey", "appToken", "arguments", "author", "authToken", "authUser", "avatar", "botToken", "channel", "chatId", "consumerKey", "consumerSecret", "deviceNames", "expires", "from", "host", "icon", "mention", "password", "path", "refreshToken", "senderDomain", "senderId", "server", "signIn", "sound", "token", "url", "userKey", "username", "webHookUrl"},
-	Ints:         []string{"method", "port", "priority", "retry", "expire", "displayTime"},
-	StringSlices: []string{"channelTags", "deviceIds", "devices", "recipients", "to", "cc", "bcc"},
-	IntSlices:    []string{"grabFields", "importFields"},
-	Sensitive:    []string{"apiKey", "token", "password", "appToken", "authToken", "botToken", "accessToken", "accessTokenSecret", "consumerKey", "consumerSecret"},
+	Bools:                  []string{"alwaysUpdate", "cleanLibrary", "directMessage", "notify", "requireEncryption", "sendSilently", "updateLibrary", "useEuEndpoint", "useSsl"},
+	Strings:                []string{"accessToken", "accessTokenSecret", "apiKey", "appToken", "arguments", "author", "authToken", "authUser", "avatar", "botToken", "channel", "chatId", "consumerKey", "consumerSecret", "deviceNames", "expires", "from", "host", "icon", "mention", "password", "path", "refreshToken", "senderDomain", "senderId", "server", "signIn", "sound", "token", "url", "userKey", "username", "userName", "webHookUrl", "clickUrl", "serverUrl"},
+	Ints:                   []string{"method", "port", "priority", "retry", "expire", "displayTime"},
+	StringSlices:           []string{"channelTags", "deviceIds", "devices", "recipients", "to", "cc", "bcc", "topics", "fieldTags"},
+	StringSlicesExceptions: []string{"tags"},
+	IntSlices:              []string{"grabFields", "importFields"},
+	Sensitive:              []string{"apiKey", "token", "password", "appToken", "authToken", "botToken", "accessToken", "accessTokenSecret", "consumerKey", "consumerSecret"},
 }
 
 func NewNotificationResource() resource.Resource {
@@ -47,6 +48,8 @@ type NotificationResource struct {
 // Notification describes the notification data model.
 type Notification struct {
 	Tags                          types.Set    `tfsdk:"tags"`
+	FieldTags                     types.Set    `tfsdk:"field_tags"`
+	Topics                        types.Set    `tfsdk:"topics"`
 	Recipients                    types.Set    `tfsdk:"recipients"`
 	Devices                       types.Set    `tfsdk:"devices"`
 	DeviceIds                     types.Set    `tfsdk:"device_ids"`
@@ -62,6 +65,8 @@ type Notification struct {
 	Username                      types.String `tfsdk:"username"`
 	UserKey                       types.String `tfsdk:"user_key"`
 	Mention                       types.String `tfsdk:"mention"`
+	ClickURL                      types.String `tfsdk:"click_url"`
+	ServerURL                     types.String `tfsdk:"server_url"`
 	Name                          types.String `tfsdk:"name"`
 	Avatar                        types.String `tfsdk:"avatar"`
 	ConfigContract                types.String `tfsdk:"config_contract"`
@@ -313,6 +318,16 @@ func (r *NotificationResource) Schema(ctx context.Context, req resource.SchemaRe
 				Optional:            true,
 				Computed:            true,
 			},
+			"server_url": schema.StringAttribute{
+				MarkdownDescription: "Server URL.",
+				Optional:            true,
+				Computed:            true,
+			},
+			"click_url": schema.StringAttribute{
+				MarkdownDescription: "Click URL.",
+				Optional:            true,
+				Computed:            true,
+			},
 			"auth_token": schema.StringAttribute{
 				MarkdownDescription: "Auth token.",
 				Optional:            true,
@@ -507,6 +522,18 @@ func (r *NotificationResource) Schema(ctx context.Context, req resource.SchemaRe
 			},
 			"bcc": schema.SetAttribute{
 				MarkdownDescription: "Bcc.",
+				Optional:            true,
+				Computed:            true,
+				ElementType:         types.StringType,
+			},
+			"topics": schema.SetAttribute{
+				MarkdownDescription: "Topics.",
+				Computed:            true,
+				Optional:            true,
+				ElementType:         types.StringType,
+			},
+			"field_tags": schema.SetAttribute{
+				MarkdownDescription: "Tags and emojis.",
 				Optional:            true,
 				Computed:            true,
 				ElementType:         types.StringType,

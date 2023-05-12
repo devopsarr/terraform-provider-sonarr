@@ -64,6 +64,7 @@ resource "sonarr_notification" "example" {
 - `channel_tags` (Set of String) Channel tags.
 - `chat_id` (String) Chat ID.
 - `clean_library` (Boolean) Clean library flag.
+- `click_url` (String) Click URL.
 - `consumer_key` (String) Consumer key.
 - `consumer_secret` (String, Sensitive) Consumer secret.
 - `device_ids` (Set of String) Device IDs.
@@ -73,6 +74,7 @@ resource "sonarr_notification" "example" {
 - `display_time` (Number) Display time.
 - `expire` (Number) Expire.
 - `expires` (String) Expires.
+- `field_tags` (Set of String) Tags and emojis.
 - `from` (String) From.
 - `grab_fields` (Set of Number) Grab fields. `0` Overview, `1` Rating, `2` Genres, `3` Quality, `4` Group, `5` Size, `6` Links, `7` Release, `8` Poster, `9` Fanart.
 - `host` (String) Host.
@@ -103,11 +105,13 @@ resource "sonarr_notification" "example" {
 - `sender_domain` (String) Sender domain.
 - `sender_id` (String) Sender ID.
 - `server` (String) server.
+- `server_url` (String) Server URL.
 - `sign_in` (String) Sign in.
 - `sound` (String) Sound.
 - `tags` (Set of Number) List of associated tags.
 - `to` (Set of String) To.
 - `token` (String, Sensitive) Token.
+- `topics` (Set of String) Topics.
 - `update_library` (Boolean) Update library flag.
 - `url` (String) URL.
 - `use_eu_endpoint` (Boolean) Use EU endpoint flag.
