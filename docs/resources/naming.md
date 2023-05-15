@@ -19,6 +19,7 @@ resource "sonarr_media_management" "example" {
   rename_episodes            = true
   replace_illegal_characters = true
   multi_episode_style        = 0
+  colon_replacement_format   = 4
   daily_episode_format       = "{Series Title} - {Air-Date} - {Episode Title} {Quality Full}"
   anime_episode_format       = "{Series Title} - S{season:00}E{episode:00} - {Episode Title} {Quality Full}"
   series_folder_format       = "{Series Title}"
@@ -34,6 +35,7 @@ resource "sonarr_media_management" "example" {
 ### Required
 
 - `anime_episode_format` (String) Anime episode format.
+- `colon_replacement_format` (Number) Colon replacement format. 0 - 'Delete' 1 - 'Replace with Dash' 2 - 'Replace with Space Dash' 3 - 'Replace with Space Dash Space' 4 - 'Smart Replace'.
 - `daily_episode_format` (String) Daily episode format.
 - `multi_episode_style` (Number) Multi episode style. 0 - 'Extend' 1 - 'Duplicate' 2 - 'Repeat' 3 - 'Scene' 4 - 'Range' 5 - 'Prefixed Range'.
 - `rename_episodes` (Boolean) Sonarr will use the existing file name if false.

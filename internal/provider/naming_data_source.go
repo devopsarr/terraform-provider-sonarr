@@ -49,6 +49,10 @@ func (d *NamingDataSource) Schema(ctx context.Context, req datasource.SchemaRequ
 				MarkdownDescription: "Multi episode style. 0 - 'Extend' 1 - 'Duplicate' 2 - 'Repeat' 3 - 'Scene' 4 - 'Range' 5 - 'Prefixed Range'.",
 				Computed:            true,
 			},
+			"colon_replacement_format": schema.Int64Attribute{
+				MarkdownDescription: "Colon replacement format. 0 - 'Delete' 1 - 'Replace with Dash' 2 - 'Replace with Space Dash' 3 - 'Replace with Space Dash Space' 4 - 'Smart Replace'.",
+				Computed:            true,
+			},
 			"daily_episode_format": schema.StringAttribute{
 				MarkdownDescription: "Daily episode format.",
 				Computed:            true,
