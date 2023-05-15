@@ -6,11 +6,13 @@ import (
 
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
+	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -42,6 +44,7 @@ type Naming struct {
 	StandardEpisodeFormat    types.String `tfsdk:"standard_episode_format"`
 	ID                       types.Int64  `tfsdk:"id"`
 	MultiEpisodeStyle        types.Int64  `tfsdk:"multi_episode_style"`
+	ColonReplacementFormat   types.Int64  `tfsdk:"colon_replacement_format"`
 	RenameEpisodes           types.Bool   `tfsdk:"rename_episodes"`
 	ReplaceIllegalCharacters types.Bool   `tfsdk:"replace_illegal_characters"`
 }
@@ -72,6 +75,16 @@ func (r *NamingResource) Schema(ctx context.Context, req resource.SchemaRequest,
 			"multi_episode_style": schema.Int64Attribute{
 				MarkdownDescription: "Multi episode style. 0 - 'Extend' 1 - 'Duplicate' 2 - 'Repeat' 3 - 'Scene' 4 - 'Range' 5 - 'Prefixed Range'.",
 				Required:            true,
+				Validators: []validator.Int64{
+					int64validator.OneOf(0, 1, 2, 3, 4, 5),
+				},
+			},
+			"colon_replacement_format": schema.Int64Attribute{
+				MarkdownDescription: "Colon replacement format. 0 - 'Delete' 1 - 'Replace with Dash' 2 - 'Replace with Space Dash' 3 - 'Replace with Space Dash Space' 4 - 'Smart Replace'.",
+				Required:            true,
+				Validators: []validator.Int64{
+					int64validator.OneOf(0, 1, 2, 3, 4),
+				},
 			},
 			"daily_episode_format": schema.StringAttribute{
 				MarkdownDescription: "Daily episode format.",
@@ -209,6 +222,7 @@ func (n *Naming) write(naming *sonarr.NamingConfigResource) {
 	n.ReplaceIllegalCharacters = types.BoolValue(naming.GetReplaceIllegalCharacters())
 	n.ID = types.Int64Value(int64(naming.GetId()))
 	n.MultiEpisodeStyle = types.Int64Value(int64(naming.GetMultiEpisodeStyle()))
+	n.ColonReplacementFormat = types.Int64Value(int64(naming.GetColonReplacementFormat()))
 	n.DailyEpisodeFormat = types.StringValue(naming.GetDailyEpisodeFormat())
 	n.AnimeEpisodeFormat = types.StringValue(naming.GetAnimeEpisodeFormat())
 	n.SeriesFolderFormat = types.StringValue(naming.GetSeriesFolderFormat())
@@ -225,6 +239,7 @@ func (n *Naming) read() *sonarr.NamingConfigResource {
 	naming.SetRenameEpisodes(n.RenameEpisodes.ValueBool())
 	naming.SetReplaceIllegalCharacters(n.ReplaceIllegalCharacters.ValueBool())
 	naming.SetMultiEpisodeStyle(int32(n.MultiEpisodeStyle.ValueInt64()))
+	naming.SetColonReplacementFormat(int32(n.ColonReplacementFormat.ValueInt64()))
 	naming.SetSeriesFolderFormat(n.SeriesFolderFormat.ValueString())
 	naming.SetSeasonFolderFormat(n.SeasonFolderFormat.ValueString())
 	naming.SetSpecialsFolderFormat(n.SpecialsFolderFormat.ValueString())

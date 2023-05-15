@@ -56,6 +56,9 @@ type NotificationEmail struct {
 	IncludeHealthWarnings         types.Bool   `tfsdk:"include_health_warnings"`
 	OnApplicationUpdate           types.Bool   `tfsdk:"on_application_update"`
 	OnHealthIssue                 types.Bool   `tfsdk:"on_health_issue"`
+	OnHealthRestored              types.Bool   `tfsdk:"on_health_restored"`
+	OnManualInteractionRequired   types.Bool   `tfsdk:"on_manual_interaction_required"`
+	OnSeriesAdd                   types.Bool   `tfsdk:"on_series_add"`
 	OnSeriesDelete                types.Bool   `tfsdk:"on_series_delete"`
 	OnUpgrade                     types.Bool   `tfsdk:"on_upgrade"`
 	OnDownload                    types.Bool   `tfsdk:"on_download"`
@@ -81,6 +84,9 @@ func (n NotificationEmail) toNotification() *Notification {
 		IncludeHealthWarnings:         n.IncludeHealthWarnings,
 		OnApplicationUpdate:           n.OnApplicationUpdate,
 		OnHealthIssue:                 n.OnHealthIssue,
+		OnHealthRestored:              n.OnHealthRestored,
+		OnManualInteractionRequired:   n.OnManualInteractionRequired,
+		OnSeriesAdd:                   n.OnSeriesAdd,
 		OnSeriesDelete:                n.OnSeriesDelete,
 		OnUpgrade:                     n.OnUpgrade,
 		OnDownload:                    n.OnDownload,
@@ -108,6 +114,9 @@ func (n *NotificationEmail) fromNotification(notification *Notification) {
 	n.IncludeHealthWarnings = notification.IncludeHealthWarnings
 	n.OnApplicationUpdate = notification.OnApplicationUpdate
 	n.OnHealthIssue = notification.OnHealthIssue
+	n.OnHealthRestored = notification.OnHealthRestored
+	n.OnManualInteractionRequired = notification.OnManualInteractionRequired
+	n.OnSeriesAdd = notification.OnSeriesAdd
 	n.OnSeriesDelete = notification.OnSeriesDelete
 	n.OnUpgrade = notification.OnUpgrade
 	n.OnDownload = notification.OnDownload
@@ -136,6 +145,11 @@ func (r *NotificationEmailResource) Schema(ctx context.Context, req resource.Sch
 				Optional:            true,
 				Computed:            true,
 			},
+			"on_series_add": schema.BoolAttribute{
+				MarkdownDescription: "On series add flag.",
+				Optional:            true,
+				Computed:            true,
+			},
 			"on_series_delete": schema.BoolAttribute{
 				MarkdownDescription: "On series delete flag.",
 				Optional:            true,
@@ -153,6 +167,16 @@ func (r *NotificationEmailResource) Schema(ctx context.Context, req resource.Sch
 			},
 			"on_health_issue": schema.BoolAttribute{
 				MarkdownDescription: "On health issue flag.",
+				Optional:            true,
+				Computed:            true,
+			},
+			"on_health_restored": schema.BoolAttribute{
+				MarkdownDescription: "On health restored flag.",
+				Optional:            true,
+				Computed:            true,
+			},
+			"on_manual_interaction_required": schema.BoolAttribute{
+				MarkdownDescription: "On manual interaction required flag.",
 				Optional:            true,
 				Computed:            true,
 			},

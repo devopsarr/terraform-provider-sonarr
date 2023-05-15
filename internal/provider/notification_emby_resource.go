@@ -53,6 +53,8 @@ type NotificationEmby struct {
 	IncludeHealthWarnings         types.Bool   `tfsdk:"include_health_warnings"`
 	OnApplicationUpdate           types.Bool   `tfsdk:"on_application_update"`
 	OnHealthIssue                 types.Bool   `tfsdk:"on_health_issue"`
+	OnHealthRestored              types.Bool   `tfsdk:"on_health_restored"`
+	OnSeriesAdd                   types.Bool   `tfsdk:"on_series_add"`
 	OnSeriesDelete                types.Bool   `tfsdk:"on_series_delete"`
 	OnRename                      types.Bool   `tfsdk:"on_rename"`
 	OnUpgrade                     types.Bool   `tfsdk:"on_upgrade"`
@@ -76,6 +78,8 @@ func (n NotificationEmby) toNotification() *Notification {
 		IncludeHealthWarnings:         n.IncludeHealthWarnings,
 		OnApplicationUpdate:           n.OnApplicationUpdate,
 		OnHealthIssue:                 n.OnHealthIssue,
+		OnHealthRestored:              n.OnHealthRestored,
+		OnSeriesAdd:                   n.OnSeriesAdd,
 		OnSeriesDelete:                n.OnSeriesDelete,
 		OnRename:                      n.OnRename,
 		OnUpgrade:                     n.OnUpgrade,
@@ -101,6 +105,8 @@ func (n *NotificationEmby) fromNotification(notification *Notification) {
 	n.IncludeHealthWarnings = notification.IncludeHealthWarnings
 	n.OnApplicationUpdate = notification.OnApplicationUpdate
 	n.OnHealthIssue = notification.OnHealthIssue
+	n.OnHealthRestored = notification.OnHealthRestored
+	n.OnSeriesAdd = notification.OnSeriesAdd
 	n.OnSeriesDelete = notification.OnSeriesDelete
 	n.OnRename = notification.OnRename
 	n.OnUpgrade = notification.OnUpgrade
@@ -135,6 +141,11 @@ func (r *NotificationEmbyResource) Schema(ctx context.Context, req resource.Sche
 				Optional:            true,
 				Computed:            true,
 			},
+			"on_series_add": schema.BoolAttribute{
+				MarkdownDescription: "On series add flag.",
+				Optional:            true,
+				Computed:            true,
+			},
 			"on_series_delete": schema.BoolAttribute{
 				MarkdownDescription: "On series delete flag.",
 				Optional:            true,
@@ -152,6 +163,11 @@ func (r *NotificationEmbyResource) Schema(ctx context.Context, req resource.Sche
 			},
 			"on_health_issue": schema.BoolAttribute{
 				MarkdownDescription: "On health issue flag.",
+				Optional:            true,
+				Computed:            true,
+			},
+			"on_health_restored": schema.BoolAttribute{
+				MarkdownDescription: "On health restored flag.",
 				Optional:            true,
 				Computed:            true,
 			},

@@ -45,6 +45,7 @@ resource "sonarr_notification_trakt" "example" {
 - `on_download` (Boolean) On download flag.
 - `on_episode_file_delete` (Boolean) On episode file delete flag.
 - `on_episode_file_delete_for_upgrade` (Boolean) On episode file delete for upgrade flag.
+- `on_series_add` (Boolean) On series add flag.
 - `on_series_delete` (Boolean) On series delete flag.
 - `on_upgrade` (Boolean) On upgrade flag.
 - `refresh_token` (String, Sensitive) Access Token.
