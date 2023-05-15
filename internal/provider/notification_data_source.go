@@ -153,6 +153,28 @@ func (d *NotificationDataSource) Schema(ctx context.Context, req datasource.Sche
 				MarkdownDescription: "Retry.",
 				Computed:            true,
 			},
+			"notification_type": schema.Int64Attribute{
+				MarkdownDescription: "Notification type. `0` Info, `1` Success, `2` Warning, `3` Failure.",
+				Computed:            true,
+			},
+			"stateless_urls": schema.StringAttribute{
+				MarkdownDescription: "Stateless URLs.",
+				Computed:            true,
+			},
+			"configuration_key": schema.StringAttribute{
+				MarkdownDescription: "Configuration key.",
+				Computed:            true,
+				Sensitive:           true,
+			},
+			"auth_username": schema.StringAttribute{
+				MarkdownDescription: "Username.",
+				Computed:            true,
+			},
+			"auth_password": schema.StringAttribute{
+				MarkdownDescription: "Password.",
+				Computed:            true,
+				Sensitive:           true,
+			},
 			"access_token": schema.StringAttribute{
 				MarkdownDescription: "Access token.",
 				Computed:            true,
@@ -170,6 +192,7 @@ func (d *NotificationDataSource) Schema(ctx context.Context, req datasource.Sche
 			"app_token": schema.StringAttribute{
 				MarkdownDescription: "App token.",
 				Computed:            true,
+				Sensitive:           true,
 			},
 			"arguments": schema.StringAttribute{
 				MarkdownDescription: "Arguments.",
@@ -177,6 +200,14 @@ func (d *NotificationDataSource) Schema(ctx context.Context, req datasource.Sche
 			},
 			"author": schema.StringAttribute{
 				MarkdownDescription: "Author.",
+				Computed:            true,
+			},
+			"server_url": schema.StringAttribute{
+				MarkdownDescription: "Server URL.",
+				Computed:            true,
+			},
+			"click_url": schema.StringAttribute{
+				MarkdownDescription: "Click URL.",
 				Computed:            true,
 			},
 			"auth_token": schema.StringAttribute{
@@ -337,6 +368,16 @@ func (d *NotificationDataSource) Schema(ctx context.Context, req datasource.Sche
 			},
 			"bcc": schema.SetAttribute{
 				MarkdownDescription: "Bcc.",
+				Computed:            true,
+				ElementType:         types.StringType,
+			},
+			"topics": schema.SetAttribute{
+				MarkdownDescription: "Topics.",
+				Computed:            true,
+				ElementType:         types.StringType,
+			},
+			"field_tags": schema.SetAttribute{
+				MarkdownDescription: "Tags and emojis.",
 				Computed:            true,
 				ElementType:         types.StringType,
 			},

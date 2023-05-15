@@ -191,6 +191,7 @@ func (p *SonarrProvider) Resources(ctx context.Context) []func() resource.Resour
 
 		// Notifications
 		NewNotificationResource,
+		NewNotificationAppriseResource,
 		NewNotificationBoxcarResource,
 		NewNotificationCustomScriptResource,
 		NewNotificationWebhookResource,
@@ -201,6 +202,7 @@ func (p *SonarrProvider) Resources(ctx context.Context) []func() resource.Resour
 		NewNotificationJoinResource,
 		NewNotificationKodiResource,
 		NewNotificationMailgunResource,
+		NewNotificationNtfyResource,
 		NewNotificationPlexResource,
 		NewNotificationProwlResource,
 		NewNotificationPushbulletResource,
