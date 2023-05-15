@@ -124,6 +124,9 @@ type Notification struct {
 	IncludeHealthWarnings         types.Bool   `tfsdk:"include_health_warnings"`
 	OnApplicationUpdate           types.Bool   `tfsdk:"on_application_update"`
 	OnHealthIssue                 types.Bool   `tfsdk:"on_health_issue"`
+	OnHealthRestored              types.Bool   `tfsdk:"on_health_restored"`
+	OnManualInteractionRequired   types.Bool   `tfsdk:"on_manual_interaction_required"`
+	OnSeriesAdd                   types.Bool   `tfsdk:"on_series_add"`
 	OnSeriesDelete                types.Bool   `tfsdk:"on_series_delete"`
 	OnRename                      types.Bool   `tfsdk:"on_rename"`
 	OnUpgrade                     types.Bool   `tfsdk:"on_upgrade"`
@@ -158,6 +161,11 @@ func (r *NotificationResource) Schema(ctx context.Context, req resource.SchemaRe
 				Optional:            true,
 				Computed:            true,
 			},
+			"on_series_add": schema.BoolAttribute{
+				MarkdownDescription: "On series add flag.",
+				Optional:            true,
+				Computed:            true,
+			},
 			"on_series_delete": schema.BoolAttribute{
 				MarkdownDescription: "On series delete flag.",
 				Optional:            true,
@@ -178,8 +186,18 @@ func (r *NotificationResource) Schema(ctx context.Context, req resource.SchemaRe
 				Optional:            true,
 				Computed:            true,
 			},
+			"on_health_restored": schema.BoolAttribute{
+				MarkdownDescription: "On health restored flag.",
+				Optional:            true,
+				Computed:            true,
+			},
 			"on_application_update": schema.BoolAttribute{
 				MarkdownDescription: "On application update flag.",
+				Optional:            true,
+				Computed:            true,
+			},
+			"on_manual_interaction_required": schema.BoolAttribute{
+				MarkdownDescription: "On manual interaction required flag.",
 				Optional:            true,
 				Computed:            true,
 			},
@@ -703,11 +721,14 @@ func (n *Notification) write(ctx context.Context, notification *sonarr.Notificat
 	n.OnDownload = types.BoolValue(notification.GetOnDownload())
 	n.OnUpgrade = types.BoolValue(notification.GetOnUpgrade())
 	n.OnRename = types.BoolValue(notification.GetOnRename())
+	n.OnSeriesAdd = types.BoolValue(notification.GetOnSeriesAdd())
 	n.OnSeriesDelete = types.BoolValue(notification.GetOnSeriesDelete())
 	n.OnEpisodeFileDelete = types.BoolValue(notification.GetOnEpisodeFileDelete())
 	n.OnEpisodeFileDeleteForUpgrade = types.BoolValue(notification.GetOnEpisodeFileDeleteForUpgrade())
 	n.OnHealthIssue = types.BoolValue(notification.GetOnHealthIssue())
+	n.OnHealthRestored = types.BoolValue(notification.GetOnHealthRestored())
 	n.OnApplicationUpdate = types.BoolValue(notification.GetOnApplicationUpdate())
+	n.OnManualInteractionRequired = types.BoolValue(notification.GetOnManualInteractionRequired())
 	n.IncludeHealthWarnings = types.BoolValue(notification.GetIncludeHealthWarnings())
 	n.ID = types.Int64Value(int64(notification.GetId()))
 	n.Name = types.StringValue(notification.GetName())
@@ -736,11 +757,14 @@ func (n *Notification) read(ctx context.Context) *sonarr.NotificationResource {
 	notification.SetOnDownload(n.OnDownload.ValueBool())
 	notification.SetOnUpgrade(n.OnUpgrade.ValueBool())
 	notification.SetOnRename(n.OnRename.ValueBool())
+	notification.SetOnSeriesAdd(n.OnSeriesAdd.ValueBool())
 	notification.SetOnSeriesDelete(n.OnSeriesDelete.ValueBool())
 	notification.SetOnEpisodeFileDelete(n.OnEpisodeFileDelete.ValueBool())
 	notification.SetOnEpisodeFileDeleteForUpgrade(n.OnEpisodeFileDeleteForUpgrade.ValueBool())
 	notification.SetOnHealthIssue(n.OnHealthIssue.ValueBool())
+	notification.SetOnHealthRestored(n.OnHealthRestored.ValueBool())
 	notification.SetOnApplicationUpdate(n.OnApplicationUpdate.ValueBool())
+	notification.SetOnManualInteractionRequired(n.OnManualInteractionRequired.ValueBool())
 	notification.SetIncludeHealthWarnings(n.IncludeHealthWarnings.ValueBool())
 	notification.SetId(int32(n.ID.ValueInt64()))
 	notification.SetName(n.Name.ValueString())

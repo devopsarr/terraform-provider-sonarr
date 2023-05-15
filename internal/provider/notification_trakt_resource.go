@@ -48,6 +48,7 @@ type NotificationTrakt struct {
 	OnEpisodeFileDeleteForUpgrade types.Bool   `tfsdk:"on_episode_file_delete_for_upgrade"`
 	OnEpisodeFileDelete           types.Bool   `tfsdk:"on_episode_file_delete"`
 	IncludeHealthWarnings         types.Bool   `tfsdk:"include_health_warnings"`
+	OnSeriesAdd                   types.Bool   `tfsdk:"on_series_add"`
 	OnSeriesDelete                types.Bool   `tfsdk:"on_series_delete"`
 	OnUpgrade                     types.Bool   `tfsdk:"on_upgrade"`
 	OnDownload                    types.Bool   `tfsdk:"on_download"`
@@ -65,6 +66,7 @@ func (n NotificationTrakt) toNotification() *Notification {
 		OnEpisodeFileDeleteForUpgrade: n.OnEpisodeFileDeleteForUpgrade,
 		OnEpisodeFileDelete:           n.OnEpisodeFileDelete,
 		IncludeHealthWarnings:         n.IncludeHealthWarnings,
+		OnSeriesAdd:                   n.OnSeriesAdd,
 		OnSeriesDelete:                n.OnSeriesDelete,
 		OnUpgrade:                     n.OnUpgrade,
 		OnDownload:                    n.OnDownload,
@@ -84,6 +86,7 @@ func (n *NotificationTrakt) fromNotification(notification *Notification) {
 	n.OnEpisodeFileDeleteForUpgrade = notification.OnEpisodeFileDeleteForUpgrade
 	n.OnEpisodeFileDelete = notification.OnEpisodeFileDelete
 	n.IncludeHealthWarnings = notification.IncludeHealthWarnings
+	n.OnSeriesAdd = notification.OnSeriesAdd
 	n.OnSeriesDelete = notification.OnSeriesDelete
 	n.OnUpgrade = notification.OnUpgrade
 	n.OnDownload = notification.OnDownload
@@ -104,6 +107,11 @@ func (r *NotificationTraktResource) Schema(ctx context.Context, req resource.Sch
 			},
 			"on_upgrade": schema.BoolAttribute{
 				MarkdownDescription: "On upgrade flag.",
+				Optional:            true,
+				Computed:            true,
+			},
+			"on_series_add": schema.BoolAttribute{
+				MarkdownDescription: "On series add flag.",
 				Optional:            true,
 				Computed:            true,
 			},

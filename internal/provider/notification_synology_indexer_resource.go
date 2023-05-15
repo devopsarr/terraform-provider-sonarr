@@ -45,6 +45,7 @@ type NotificationSynology struct {
 	OnEpisodeFileDeleteForUpgrade types.Bool   `tfsdk:"on_episode_file_delete_for_upgrade"`
 	OnEpisodeFileDelete           types.Bool   `tfsdk:"on_episode_file_delete"`
 	IncludeHealthWarnings         types.Bool   `tfsdk:"include_health_warnings"`
+	OnSeriesAdd                   types.Bool   `tfsdk:"on_series_add"`
 	OnSeriesDelete                types.Bool   `tfsdk:"on_series_delete"`
 	OnRename                      types.Bool   `tfsdk:"on_rename"`
 	OnUpgrade                     types.Bool   `tfsdk:"on_upgrade"`
@@ -60,6 +61,7 @@ func (n NotificationSynology) toNotification() *Notification {
 		OnEpisodeFileDeleteForUpgrade: n.OnEpisodeFileDeleteForUpgrade,
 		OnEpisodeFileDelete:           n.OnEpisodeFileDelete,
 		IncludeHealthWarnings:         n.IncludeHealthWarnings,
+		OnSeriesAdd:                   n.OnSeriesAdd,
 		OnSeriesDelete:                n.OnSeriesDelete,
 		OnRename:                      n.OnRename,
 		OnUpgrade:                     n.OnUpgrade,
@@ -77,6 +79,7 @@ func (n *NotificationSynology) fromNotification(notification *Notification) {
 	n.OnEpisodeFileDeleteForUpgrade = notification.OnEpisodeFileDeleteForUpgrade
 	n.OnEpisodeFileDelete = notification.OnEpisodeFileDelete
 	n.IncludeHealthWarnings = notification.IncludeHealthWarnings
+	n.OnSeriesAdd = notification.OnSeriesAdd
 	n.OnSeriesDelete = notification.OnSeriesDelete
 	n.OnRename = notification.OnRename
 	n.OnUpgrade = notification.OnUpgrade
@@ -103,6 +106,11 @@ func (r *NotificationSynologyResource) Schema(ctx context.Context, req resource.
 			},
 			"on_rename": schema.BoolAttribute{
 				MarkdownDescription: "On rename flag.",
+				Optional:            true,
+				Computed:            true,
+			},
+			"on_series_add": schema.BoolAttribute{
+				MarkdownDescription: "On series add flag.",
 				Optional:            true,
 				Computed:            true,
 			},
