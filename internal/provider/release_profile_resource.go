@@ -216,8 +216,6 @@ func (p *ReleaseProfile) write(ctx context.Context, profile *sonarr.ReleaseProfi
 	tfsdk.ValueFrom(ctx, profile.Required, p.Required.Type(ctx), &p.Required)
 	p.Ignored = types.SetValueMust(types.StringType, nil)
 	tfsdk.ValueFrom(ctx, profile.Ignored, p.Ignored.Type(ctx), &p.Ignored)
-	p.Tags = types.SetValueMust(types.Int64Type, nil)
-	tfsdk.ValueFrom(ctx, profile.Tags, p.Tags.Type(ctx), &p.Tags)
 }
 
 func (p *ReleaseProfile) read(ctx context.Context) *sonarr.ReleaseProfileResource {
