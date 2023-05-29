@@ -206,6 +206,15 @@ func (d *NotificationDataSource) Schema(ctx context.Context, req datasource.Sche
 				Computed:            true,
 				Sensitive:           true,
 			},
+			"key": schema.StringAttribute{
+				MarkdownDescription: "Key.",
+				Computed:            true,
+				Sensitive:           true,
+			},
+			"event": schema.StringAttribute{
+				MarkdownDescription: "Event.",
+				Computed:            true,
+			},
 			"arguments": schema.StringAttribute{
 				MarkdownDescription: "Arguments.",
 				Computed:            true,

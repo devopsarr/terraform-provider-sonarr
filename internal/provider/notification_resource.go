@@ -28,12 +28,12 @@ var (
 
 var notificationFields = helpers.Fields{
 	Bools:                  []string{"alwaysUpdate", "cleanLibrary", "directMessage", "notify", "requireEncryption", "sendSilently", "updateLibrary", "useEuEndpoint", "useSsl"},
-	Strings:                []string{"accessToken", "accessTokenSecret", "apiKey", "appToken", "arguments", "author", "authToken", "authUser", "avatar", "botToken", "channel", "chatId", "consumerKey", "consumerSecret", "deviceNames", "expires", "from", "host", "icon", "mention", "password", "path", "refreshToken", "senderDomain", "senderId", "server", "signIn", "sound", "token", "url", "userKey", "username", "userName", "webHookUrl", "clickUrl", "serverUrl", "authUsername", "authPassword", "statelessUrls", "configurationKey", "senderNumber", "receiverId"},
+	Strings:                []string{"accessToken", "accessTokenSecret", "apiKey", "appToken", "arguments", "author", "authToken", "authUser", "avatar", "botToken", "channel", "chatId", "consumerKey", "consumerSecret", "deviceNames", "expires", "from", "host", "icon", "mention", "password", "path", "refreshToken", "senderDomain", "senderId", "server", "signIn", "sound", "token", "url", "userKey", "username", "userName", "webHookUrl", "clickUrl", "serverUrl", "authUsername", "authPassword", "statelessUrls", "configurationKey", "senderNumber", "receiverId", "key", "event"},
 	Ints:                   []string{"method", "port", "priority", "retry", "expire", "displayTime", "notificationType"},
 	StringSlices:           []string{"channelTags", "deviceIds", "devices", "recipients", "to", "cc", "bcc", "topics", "fieldTags"},
 	StringSlicesExceptions: []string{"tags"},
 	IntSlices:              []string{"grabFields", "importFields"},
-	Sensitive:              []string{"apiKey", "token", "password", "appToken", "authToken", "botToken", "accessToken", "accessTokenSecret", "consumerKey", "consumerSecret", "configurationKey", "authPassword", "senderNumber"},
+	Sensitive:              []string{"apiKey", "token", "password", "appToken", "authToken", "botToken", "accessToken", "accessTokenSecret", "consumerKey", "consumerSecret", "configurationKey", "authPassword", "senderNumber", "key"},
 }
 
 func NewNotificationResource() resource.Resource {
@@ -103,6 +103,8 @@ type Notification struct {
 	AuthUsername                  types.String `tfsdk:"auth_username"`
 	AuthPassword                  types.String `tfsdk:"auth_password"`
 	ConfigurationKey              types.String `tfsdk:"configuration_key"`
+	Key                           types.String `tfsdk:"key"`
+	Event                         types.String `tfsdk:"event"`
 	NotificationType              types.Int64  `tfsdk:"notification_type"`
 	Expire                        types.Int64  `tfsdk:"expire"`
 	DisplayTime                   types.Int64  `tfsdk:"display_time"`
@@ -362,6 +364,17 @@ func (r *NotificationResource) Schema(ctx context.Context, req resource.SchemaRe
 				Optional:            true,
 				Computed:            true,
 				Sensitive:           true,
+			},
+			"key": schema.StringAttribute{
+				MarkdownDescription: "Key.",
+				Optional:            true,
+				Computed:            true,
+				Sensitive:           true,
+			},
+			"event": schema.StringAttribute{
+				MarkdownDescription: "Event.",
+				Optional:            true,
+				Computed:            true,
 			},
 			"arguments": schema.StringAttribute{
 				MarkdownDescription: "Arguments.",
