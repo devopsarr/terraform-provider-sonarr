@@ -104,6 +104,7 @@ resource "sonarr_notification" "example" {
 - `path` (String) Path.
 - `port` (Number) Port.
 - `priority` (Number) Priority.
+- `receiver_id` (String) Receiver ID.
 - `recipients` (Set of String) Recipients.
 - `refresh_token` (String) Refresh token.
 - `require_encryption` (Boolean) Require encryption flag.
@@ -111,6 +112,7 @@ resource "sonarr_notification" "example" {
 - `send_silently` (Boolean) Add silently flag.
 - `sender_domain` (String) Sender domain.
 - `sender_id` (String) Sender ID.
+- `sender_number` (String) Sender Number.
 - `server` (String) server.
 - `server_url` (String) Server URL.
 - `sign_in` (String) Sign in.
