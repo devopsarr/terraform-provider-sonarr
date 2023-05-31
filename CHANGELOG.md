@@ -1,5 +1,71 @@
 # Changelog
 
+## [3.0.0](https://github.com/devopsarr/terraform-provider-sonarr/compare/v3.0.0...v2.7.0) (2023-05-21)
+
+
+### ⚠ BREAKING CHANGES
+
+* remove unsupported indexer omgwtfnzbs
+* remove deprecated language profile
+
+### Features
+
+* add auto tag condition data source ([acd22cb](https://github.com/devopsarr/terraform-provider-sonarr/commit/acd22cbf13a80260baa7bfe31fbaf5698dd1b446))
+* add auto tag condition genres data source ([279cedf](https://github.com/devopsarr/terraform-provider-sonarr/commit/279cedf4cc0eaa8c803808dbbb70d95c8d5eff1b))
+* add auto tag condition root folder data source ([f818eb1](https://github.com/devopsarr/terraform-provider-sonarr/commit/f818eb1c75df16a6e69ad6e433b6f50875397020))
+* add auto tag condition series type data source ([6b295dc](https://github.com/devopsarr/terraform-provider-sonarr/commit/6b295dcd3043bc68884335d77d1941928d9ca5c1))
+* add auto tag data source ([c49f93a](https://github.com/devopsarr/terraform-provider-sonarr/commit/c49f93aa1ca39ed2805aba2287e44f952d2b563e))
+* add auto tag resource ([d9b3932](https://github.com/devopsarr/terraform-provider-sonarr/commit/d9b3932ddacf8344e972f54966ec655a69fd5ca6))
+* add auto tags data source ([7d685bc](https://github.com/devopsarr/terraform-provider-sonarr/commit/7d685bce962d024896de5b5e2e3eaa9260febdbd))
+* add custom format condition data source ([b747056](https://github.com/devopsarr/terraform-provider-sonarr/commit/b747056e9ab8aabdfdc8b99bd53290ca4f809ce9))
+* add custom format condition language data source ([45c5fd0](https://github.com/devopsarr/terraform-provider-sonarr/commit/45c5fd0cb43a46ca99019c662dfa7d1ff58c6aeb))
+* add custom format condition release group data source ([e7a44af](https://github.com/devopsarr/terraform-provider-sonarr/commit/e7a44afdc9ddf73a73f0bc745f19c95c49d0de02))
+* add custom format condition release title data source ([c080e87](https://github.com/devopsarr/terraform-provider-sonarr/commit/c080e87371856eddcc1065a5384cdbcf49c96a3e))
+* add custom format condition resolution data source ([afac201](https://github.com/devopsarr/terraform-provider-sonarr/commit/afac201caf7e2299547dd0e04d508f1b98c4b692))
+* add custom format condition size data source ([1a96419](https://github.com/devopsarr/terraform-provider-sonarr/commit/1a964196fe6339849158988823da1fc54830a7cd))
+* add custom format condition source data source ([b583eb1](https://github.com/devopsarr/terraform-provider-sonarr/commit/b583eb15adcc29880fa5a6a937720cc31928810d))
+* add custom format datasource ([62d01ab](https://github.com/devopsarr/terraform-provider-sonarr/commit/62d01ab3e7edc844e5c98f5e6fde0dd76c0c80ca))
+* add custom format resource ([ec9cb73](https://github.com/devopsarr/terraform-provider-sonarr/commit/ec9cb73e3b868a4dca64b58193638be67a5c8762))
+* add custom formats datasource ([a015810](https://github.com/devopsarr/terraform-provider-sonarr/commit/a015810749c47bee3d2160b51020e30eceae67ac))
+* add import list custom resource ([a34ab91](https://github.com/devopsarr/terraform-provider-sonarr/commit/a34ab91fa534c8dc271fa12a6b24c2a39ef7c7d6))
+* add import list exclusion datasource ([dd56755](https://github.com/devopsarr/terraform-provider-sonarr/commit/dd56755d5488b28d745cfc120ea278742e1ed8d6))
+* add import list exclusion resource ([cae99bb](https://github.com/devopsarr/terraform-provider-sonarr/commit/cae99bbe8e26373ab6601cefa86400411bcd2278))
+* add import list exclusions datasource ([1195ef0](https://github.com/devopsarr/terraform-provider-sonarr/commit/1195ef0aca007705280974dede1ae59297802dbd))
+* add import list imdb resource ([d918ed8](https://github.com/devopsarr/terraform-provider-sonarr/commit/d918ed8dc445305aac82356565533730cde6b3cb))
+* add import list plex rss resource ([ac270fd](https://github.com/devopsarr/terraform-provider-sonarr/commit/ac270fd0a28598351b38dd9ae64f68b6a19736d2))
+* add language data source ([da546a2](https://github.com/devopsarr/terraform-provider-sonarr/commit/da546a2b53b7e4f9a48fe24cd6b93041099cc383))
+* add languages data source ([68609a1](https://github.com/devopsarr/terraform-provider-sonarr/commit/68609a1ad600eaaf43086efe6a560d92f9116cb0))
+* add metadata consumers data source ([6a738b8](https://github.com/devopsarr/terraform-provider-sonarr/commit/6a738b893dbd76a8ab6a4085aafe9622caf78ca1))
+* add metadata data source ([7ac7994](https://github.com/devopsarr/terraform-provider-sonarr/commit/7ac79946e6e893bc5d213bf7c675c8f66a7f87ba))
+* add metadata kodi resource ([96c1bb0](https://github.com/devopsarr/terraform-provider-sonarr/commit/96c1bb038387f8242cf5b730d49a763f848880a4))
+* add metadata resource ([32c046e](https://github.com/devopsarr/terraform-provider-sonarr/commit/32c046eaf29c4fee71be14513d933a38d2495780))
+* add metadata roksbox resource ([96c2749](https://github.com/devopsarr/terraform-provider-sonarr/commit/96c27498fb25732164275e143a2bf662515af944))
+* add metadata wdtv resource ([ef59c0d](https://github.com/devopsarr/terraform-provider-sonarr/commit/ef59c0d70398e48b31133588418161d27ffe1ed0))
+* add naming colon replacement format ([237f21a](https://github.com/devopsarr/terraform-provider-sonarr/commit/237f21ae0e772ab63709209f0c7ff9b6a6e6123b))
+* add new notification flags ([ca7e03c](https://github.com/devopsarr/terraform-provider-sonarr/commit/ca7e03c927d26fc406b6d3b847e07f25927ca3c5))
+* add notificaiton apprise resource ([3523b11](https://github.com/devopsarr/terraform-provider-sonarr/commit/3523b115ea211e25645054f9f2df102c2d55f9e4))
+* add notification ntfy resource ([43446ef](https://github.com/devopsarr/terraform-provider-sonarr/commit/43446ef536f79719d4f6ee8b2af96d5dbd71e417))
+* add notification signal resource ([ead9e09](https://github.com/devopsarr/terraform-provider-sonarr/commit/ead9e090e77dbc76e44c7b0112b6f15d0a174548))
+* add notification simplepush resource ([10b38fe](https://github.com/devopsarr/terraform-provider-sonarr/commit/10b38fe37a4e442757a7279f73b62ba18e0bfc29))
+* add quality data source ([628ff46](https://github.com/devopsarr/terraform-provider-sonarr/commit/628ff468f49226f323825b6928a4a1f6f5769e2e))
+* remove deprecated language profile ([5a76731](https://github.com/devopsarr/terraform-provider-sonarr/commit/5a76731b65a6057f61b53fbf6c1128d58fb694d0))
+* remove obsolete languages helper ([a9cf584](https://github.com/devopsarr/terraform-provider-sonarr/commit/a9cf584df20e2d2ad866cd83c7ae88937b623f66))
+* remove unsupported indexer omgwtfnzbs ([8d515ce](https://github.com/devopsarr/terraform-provider-sonarr/commit/8d515ce0ea2175810920964c76f3b8909295134f))
+* set indexer flags to optional ([7a291e4](https://github.com/devopsarr/terraform-provider-sonarr/commit/7a291e426dd7b9c04aed00b3dd4eef287db8232a))
+* update delay profile for custom format ([d262ace](https://github.com/devopsarr/terraform-provider-sonarr/commit/d262acec46142b53462c2a85adeba14433bd4b8e))
+* update quality profile with custom formats ([f656ea3](https://github.com/devopsarr/terraform-provider-sonarr/commit/f656ea39b5dfe62067e3030d17999c7cf95830c0))
+
+
+### Bug Fixes
+
+* add back import list language profile ids ([74714ed](https://github.com/devopsarr/terraform-provider-sonarr/commit/74714edcf023482077feeae723943d28ea5372a3))
+* quality profile failing with one item group ([81b59fd](https://github.com/devopsarr/terraform-provider-sonarr/commit/81b59fd517526f4ebf76d5927022301c1eb3e991))
+* read data source from request ([f8e65ab](https://github.com/devopsarr/terraform-provider-sonarr/commit/f8e65abcea47be0dc569120601720a3bff848094))
+* some download clients has wrong parameters ([61d5451](https://github.com/devopsarr/terraform-provider-sonarr/commit/61d5451b9670e022d05cc757f08bc22959c51c3a))
+* update sdk method naming ([0414d62](https://github.com/devopsarr/terraform-provider-sonarr/commit/0414d621c5893fa140cf9aa67131c460b099f4f1))
+* update sensitive data management ([642ffb7](https://github.com/devopsarr/terraform-provider-sonarr/commit/642ffb72bc2b44d41892718590df7bf8edc75d7c))
+* use get function for sdk fields ([c07b9e6](https://github.com/devopsarr/terraform-provider-sonarr/commit/c07b9e6950b010f545dc75de2300efddc7a665df))
+
 ## [2.7.0](https://github.com/devopsarr/terraform-provider-sonarr/compare/v2.6.0...v2.7.0) (2022-12-13)
 
 
