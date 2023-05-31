@@ -26,7 +26,7 @@ var (
 
 var importListFields = helpers.Fields{
 	Ints:      []string{"limit", "traktListType", "listType"},
-	Strings:   []string{"accessToken", "baseUrl", "apiKey", "refreshToken", "expires", "authUser", "username", "rating", "listname", "genres", "years", "traktAdditionalParameters", "listId"},
+	Strings:   []string{"accessToken", "baseUrl", "apiKey", "refreshToken", "expires", "authUser", "username", "rating", "listname", "genres", "years", "traktAdditionalParameters", "listId", "url"},
 	IntSlices: []string{"profileIds", "languageProfileIds", "tagIds"},
 }
 
@@ -55,6 +55,7 @@ type ImportList struct {
 	RefreshToken              types.String `tfsdk:"refresh_token"`
 	Expires                   types.String `tfsdk:"expires"`
 	BaseURL                   types.String `tfsdk:"base_url"`
+	URL                       types.String `tfsdk:"url"`
 	AuthUser                  types.String `tfsdk:"auth_user"`
 	Username                  types.String `tfsdk:"username"`
 	Rating                    types.String `tfsdk:"rating"`
@@ -187,6 +188,11 @@ func (r *ImportListResource) Schema(ctx context.Context, req resource.SchemaRequ
 			},
 			"base_url": schema.StringAttribute{
 				MarkdownDescription: "Base URL.",
+				Optional:            true,
+				Computed:            true,
+			},
+			"url": schema.StringAttribute{
+				MarkdownDescription: "URL.",
 				Optional:            true,
 				Computed:            true,
 			},

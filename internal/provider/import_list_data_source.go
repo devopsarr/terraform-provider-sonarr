@@ -124,6 +124,10 @@ func (d *ImportListDataSource) Schema(ctx context.Context, req datasource.Schema
 				MarkdownDescription: "Base URL.",
 				Computed:            true,
 			},
+			"url": schema.StringAttribute{
+				MarkdownDescription: "URL.",
+				Computed:            true,
+			},
 			"expires": schema.StringAttribute{
 				MarkdownDescription: "Expires.",
 				Computed:            true,

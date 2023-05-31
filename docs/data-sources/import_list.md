@@ -54,6 +54,7 @@ data "sonarr_import_list" "example" {
 - `tags` (Set of Number) List of associated tags.
 - `trakt_additional_parameters` (String) Trakt additional parameters.
 - `trakt_list_type` (Number) Trakt list type.
+- `url` (String) URL.
 - `username` (String) Username.
 - `years` (String) Years.
 

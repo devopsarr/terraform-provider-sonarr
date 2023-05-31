@@ -18,77 +18,77 @@ import (
 )
 
 const (
-	importListPlexResourceName   = "import_list_plex"
-	importListPlexImplementation = "PlexImport"
-	importListPlexConfigContract = "PlexListSettings"
+	importListPlexRSSResourceName   = "import_list_plex_rss"
+	importListPlexRSSImplementation = "PlexRssImport"
+	importListPlexRSSConfigContract = "PlexRssImportSettings"
 )
 
 // Ensure provider defined types fully satisfy framework interfaces.
 var (
-	_ resource.Resource                = &ImportListPlexResource{}
-	_ resource.ResourceWithImportState = &ImportListPlexResource{}
+	_ resource.Resource                = &ImportListPlexRSSResource{}
+	_ resource.ResourceWithImportState = &ImportListPlexRSSResource{}
 )
 
-func NewImportListPlexResource() resource.Resource {
-	return &ImportListPlexResource{}
+func NewImportListPlexRSSResource() resource.Resource {
+	return &ImportListPlexRSSResource{}
 }
 
-// ImportListPlexResource defines the import list implementation.
-type ImportListPlexResource struct {
+// ImportListPlexRSSResource defines the import list implementation.
+type ImportListPlexRSSResource struct {
 	client *sonarr.APIClient
 }
 
-// ImportListPlex describes the import list data model.
-type ImportListPlex struct {
+// ImportListPlexRSS describes the import list data model.
+type ImportListPlexRSS struct {
 	Tags               types.Set    `tfsdk:"tags"`
 	Name               types.String `tfsdk:"name"`
 	ShouldMonitor      types.String `tfsdk:"should_monitor"`
 	RootFolderPath     types.String `tfsdk:"root_folder_path"`
 	SeriesType         types.String `tfsdk:"series_type"`
-	AccessToken        types.String `tfsdk:"access_token"`
+	URL                types.String `tfsdk:"url"`
 	QualityProfileID   types.Int64  `tfsdk:"quality_profile_id"`
 	ID                 types.Int64  `tfsdk:"id"`
 	EnableAutomaticAdd types.Bool   `tfsdk:"enable_automatic_add"`
 	SeasonFolder       types.Bool   `tfsdk:"season_folder"`
 }
 
-func (i ImportListPlex) toImportList() *ImportList {
+func (i ImportListPlexRSS) toImportList() *ImportList {
 	return &ImportList{
 		Tags:               i.Tags,
 		Name:               i.Name,
 		ShouldMonitor:      i.ShouldMonitor,
 		RootFolderPath:     i.RootFolderPath,
 		SeriesType:         i.SeriesType,
-		AccessToken:        i.AccessToken,
+		URL:                i.URL,
 		QualityProfileID:   i.QualityProfileID,
 		ID:                 i.ID,
 		EnableAutomaticAdd: i.EnableAutomaticAdd,
 		SeasonFolder:       i.SeasonFolder,
-		ConfigContract:     types.StringValue(importListPlexConfigContract),
-		Implementation:     types.StringValue(importListPlexImplementation),
+		ConfigContract:     types.StringValue(importListPlexRSSConfigContract),
+		Implementation:     types.StringValue(importListPlexRSSImplementation),
 	}
 }
 
-func (i *ImportListPlex) fromImportList(importList *ImportList) {
+func (i *ImportListPlexRSS) fromImportList(importList *ImportList) {
 	i.Tags = importList.Tags
 	i.Name = importList.Name
 	i.ShouldMonitor = importList.ShouldMonitor
 	i.RootFolderPath = importList.RootFolderPath
 	i.SeriesType = importList.SeriesType
-	i.AccessToken = importList.AccessToken
+	i.URL = importList.URL
 	i.QualityProfileID = importList.QualityProfileID
 	i.ID = importList.ID
 	i.EnableAutomaticAdd = importList.EnableAutomaticAdd
 	i.SeasonFolder = importList.SeasonFolder
 }
 
-func (r *ImportListPlexResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
-	resp.TypeName = req.ProviderTypeName + "_" + importListPlexResourceName
+func (r *ImportListPlexRSSResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+	resp.TypeName = req.ProviderTypeName + "_" + importListPlexRSSResourceName
 }
 
-func (r *ImportListPlexResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+func (r *ImportListPlexRSSResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Import Lists -->ImportList Plex resource.\nFor more information refer to [Import List](https://wiki.servarr.com/sonarr/settings#import-lists) and [Plex](https://wiki.servarr.com/sonarr/supported#pleximport).",
+		MarkdownDescription: "<!-- subcategory:Import Lists -->ImportList Plex RSS resource.\nFor more information refer to [Import List](https://wiki.servarr.com/sonarr/settings#import-lists) and [Plex RSS](https://wiki.servarr.com/sonarr/supported#plexrssimport).",
 		Attributes: map[string]schema.Attribute{
 			"enable_automatic_add": schema.BoolAttribute{
 				MarkdownDescription: "Enable automatic add flag.",
@@ -138,24 +138,23 @@ func (r *ImportListPlexResource) Schema(ctx context.Context, req resource.Schema
 				},
 			},
 			// Field values
-			"access_token": schema.StringAttribute{
-				MarkdownDescription: "Access token.",
+			"url": schema.StringAttribute{
+				MarkdownDescription: "URL.",
 				Required:            true,
-				Sensitive:           true,
 			},
 		},
 	}
 }
 
-func (r *ImportListPlexResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
+func (r *ImportListPlexRSSResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
 	if client := helpers.ResourceConfigure(ctx, req, resp); client != nil {
 		r.client = client
 	}
 }
 
-func (r *ImportListPlexResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
+func (r *ImportListPlexRSSResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	// Retrieve values from plan
-	var importList *ImportListPlex
+	var importList *ImportListPlexRSS
 
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &importList)...)
 
@@ -163,25 +162,25 @@ func (r *ImportListPlexResource) Create(ctx context.Context, req resource.Create
 		return
 	}
 
-	// Create new ImportListPlex
+	// Create new ImportListPlexRSS
 	request := importList.read(ctx)
 
 	response, _, err := r.client.ImportListApi.CreateImportList(ctx).ImportListResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, importListPlexResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, importListPlexRSSResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "created "+importListPlexResourceName+": "+strconv.Itoa(int(response.GetId())))
+	tflog.Trace(ctx, "created "+importListPlexRSSResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
 	importList.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &importList)...)
 }
 
-func (r *ImportListPlexResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
+func (r *ImportListPlexRSSResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
 	// Get current state
-	var importList *ImportListPlex
+	var importList *ImportListPlexRSS
 
 	resp.Diagnostics.Append(req.State.Get(ctx, &importList)...)
 
@@ -189,23 +188,23 @@ func (r *ImportListPlexResource) Read(ctx context.Context, req resource.ReadRequ
 		return
 	}
 
-	// Get ImportListPlex current value
+	// Get ImportListPlexRSS current value
 	response, _, err := r.client.ImportListApi.GetImportListById(ctx, int32(importList.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, importListPlexResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, importListPlexRSSResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "read "+importListPlexResourceName+": "+strconv.Itoa(int(response.GetId())))
+	tflog.Trace(ctx, "read "+importListPlexRSSResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
 	importList.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &importList)...)
 }
 
-func (r *ImportListPlexResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+func (r *ImportListPlexRSSResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
 	// Get plan values
-	var importList *ImportListPlex
+	var importList *ImportListPlexRSS
 
 	resp.Diagnostics.Append(req.Plan.Get(ctx, &importList)...)
 
@@ -213,24 +212,24 @@ func (r *ImportListPlexResource) Update(ctx context.Context, req resource.Update
 		return
 	}
 
-	// Update ImportListPlex
+	// Update ImportListPlexRSS
 	request := importList.read(ctx)
 
 	response, _, err := r.client.ImportListApi.UpdateImportList(ctx, strconv.Itoa(int(request.GetId()))).ImportListResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, importListPlexResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, importListPlexRSSResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "updated "+importListPlexResourceName+": "+strconv.Itoa(int(response.GetId())))
+	tflog.Trace(ctx, "updated "+importListPlexRSSResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
 	importList.write(ctx, response)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &importList)...)
 }
 
-func (r *ImportListPlexResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var importList *ImportListPlex
+func (r *ImportListPlexRSSResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
+	var importList *ImportListPlexRSS
 
 	resp.Diagnostics.Append(req.State.Get(ctx, &importList)...)
 
@@ -238,29 +237,29 @@ func (r *ImportListPlexResource) Delete(ctx context.Context, req resource.Delete
 		return
 	}
 
-	// Delete ImportListPlex current value
+	// Delete ImportListPlexRSS current value
 	_, err := r.client.ImportListApi.DeleteImportList(ctx, int32(importList.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, importListPlexResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, importListPlexRSSResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted "+importListPlexResourceName+": "+strconv.Itoa(int(importList.ID.ValueInt64())))
+	tflog.Trace(ctx, "deleted "+importListPlexRSSResourceName+": "+strconv.Itoa(int(importList.ID.ValueInt64())))
 	resp.State.RemoveResource(ctx)
 }
 
-func (r *ImportListPlexResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+func (r *ImportListPlexRSSResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	helpers.ImportStatePassthroughIntID(ctx, path.Root("id"), req, resp)
-	tflog.Trace(ctx, "imported "+importListPlexResourceName+": "+req.ID)
+	tflog.Trace(ctx, "imported "+importListPlexRSSResourceName+": "+req.ID)
 }
 
-func (i *ImportListPlex) write(ctx context.Context, importList *sonarr.ImportListResource) {
+func (i *ImportListPlexRSS) write(ctx context.Context, importList *sonarr.ImportListResource) {
 	genericImportList := i.toImportList()
 	genericImportList.write(ctx, importList)
 	i.fromImportList(genericImportList)
 }
 
-func (i *ImportListPlex) read(ctx context.Context) *sonarr.ImportListResource {
+func (i *ImportListPlexRSS) read(ctx context.Context) *sonarr.ImportListResource {
 	return i.toImportList().read(ctx)
 }
