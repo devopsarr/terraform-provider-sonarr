@@ -145,15 +145,15 @@ func (d *ImportListsDataSource) Schema(ctx context.Context, req datasource.Schem
 							Computed:            true,
 						},
 						"listname": schema.StringAttribute{
-							MarkdownDescription: "Expires.",
+							MarkdownDescription: "List name.",
 							Computed:            true,
 						},
 						"genres": schema.StringAttribute{
-							MarkdownDescription: "Expires.",
+							MarkdownDescription: "Genres.",
 							Computed:            true,
 						},
 						"years": schema.StringAttribute{
-							MarkdownDescription: "Expires.",
+							MarkdownDescription: "Years.",
 							Computed:            true,
 						},
 						"trakt_additional_parameters": schema.StringAttribute{

@@ -47,13 +47,13 @@ resource "sonarr_import_list_popular" "example" {
 - `access_token` (String, Sensitive) Access token.
 - `auth_user` (String) Auth User.
 - `expires` (String) Expires.
-- `genres` (String) Expires.
+- `genres` (String) Genres.
 - `limit` (Number) Limit.
 - `rating` (String) Rating.
 - `refresh_token` (String, Sensitive) Refresh token.
 - `tags` (Set of Number) List of associated tags.
 - `trakt_additional_parameters` (String) Trakt additional parameters.
-- `years` (String) Expires.
+- `years` (String) Years.
 
 ### Read-Only
 

@@ -191,7 +191,7 @@ func (r *ImportListTraktListResource) Schema(ctx context.Context, req resource.S
 				Computed:            true,
 			},
 			"listname": schema.StringAttribute{
-				MarkdownDescription: "Expires.",
+				MarkdownDescription: "List name.",
 				Required:            true,
 			},
 			"trakt_additional_parameters": schema.StringAttribute{

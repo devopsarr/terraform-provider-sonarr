@@ -33,7 +33,7 @@ resource "sonarr_import_list_popular" "example" {
 ### Required
 
 - `enable_automatic_add` (Boolean) Enable automatic add flag.
-- `listname` (String) Expires.
+- `listname` (String) List name.
 - `name` (String) Import List name.
 - `quality_profile_id` (Number) Quality profile ID.
 - `root_folder_path` (String) Root folder path.

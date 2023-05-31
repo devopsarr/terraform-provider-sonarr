@@ -37,13 +37,13 @@ Read-Only:
 - `config_contract` (String) ImportList configuration template.
 - `enable_automatic_add` (Boolean) Enable automatic add flag.
 - `expires` (String) Expires.
-- `genres` (String) Expires.
+- `genres` (String) Genres.
 - `id` (Number) Import List ID.
 - `implementation` (String) ImportList implementation name.
 - `language_profile_ids` (Set of Number) Language profile IDs.
 - `limit` (Number) Limit.
 - `list_type` (Number) Simkl list type.
-- `listname` (String) Expires.
+- `listname` (String) List name.
 - `name` (String) Import List name.
 - `quality_profile_id` (Number) Quality profile ID.
 - `quality_profile_ids` (Set of Number) Quality profile IDs.
@@ -58,6 +58,6 @@ Read-Only:
 - `trakt_additional_parameters` (String) Trakt additional parameters.
 - `trakt_list_type` (Number) Trakt list type.
 - `username` (String) Username.
-- `years` (String) Expires.
+- `years` (String) Years.
 
 

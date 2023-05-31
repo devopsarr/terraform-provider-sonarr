@@ -195,17 +195,17 @@ func (r *ImportListResource) Schema(ctx context.Context, req resource.SchemaRequ
 				Computed:            true,
 			},
 			"listname": schema.StringAttribute{
-				MarkdownDescription: "Expires.",
+				MarkdownDescription: "List name.",
 				Optional:            true,
 				Computed:            true,
 			},
 			"genres": schema.StringAttribute{
-				MarkdownDescription: "Expires.",
+				MarkdownDescription: "Genres.",
 				Optional:            true,
 				Computed:            true,
 			},
 			"years": schema.StringAttribute{
-				MarkdownDescription: "Expires.",
+				MarkdownDescription: "Years.",
 				Optional:            true,
 				Computed:            true,
 			},

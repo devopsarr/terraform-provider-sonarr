@@ -206,12 +206,12 @@ func (r *ImportListTraktPopularResource) Schema(ctx context.Context, req resourc
 				Computed:            true,
 			},
 			"genres": schema.StringAttribute{
-				MarkdownDescription: "Expires.",
+				MarkdownDescription: "Genres.",
 				Optional:            true,
 				Computed:            true,
 			},
 			"years": schema.StringAttribute{
-				MarkdownDescription: "Expires.",
+				MarkdownDescription: "Years.",
 				Optional:            true,
 				Computed:            true,
 			},

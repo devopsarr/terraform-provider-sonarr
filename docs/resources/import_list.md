@@ -49,12 +49,12 @@ resource "sonarr_import_list" "example" {
 - `base_url` (String) Base URL.
 - `enable_automatic_add` (Boolean) Enable automatic add flag.
 - `expires` (String) Expires.
-- `genres` (String) Expires.
+- `genres` (String) Genres.
 - `implementation` (String) ImportList implementation name.
 - `language_profile_ids` (Set of Number) Language profile IDs.
 - `limit` (Number) Limit.
 - `list_type` (Number) Simkl list type.
-- `listname` (String) Expires.
+- `listname` (String) List name.
 - `quality_profile_id` (Number) Quality profile ID.
 - `quality_profile_ids` (Set of Number) Quality profile IDs.
 - `rating` (String) Rating.
@@ -67,7 +67,7 @@ resource "sonarr_import_list" "example" {
 - `trakt_additional_parameters` (String) Trakt additional parameters.
 - `trakt_list_type` (Number) Trakt list type.
 - `username` (String) Username.
-- `years` (String) Expires.
+- `years` (String) Years.
 
 ### Read-Only
 
