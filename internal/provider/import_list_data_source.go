@@ -132,6 +132,10 @@ func (d *ImportListDataSource) Schema(ctx context.Context, req datasource.Schema
 				MarkdownDescription: "List name.",
 				Computed:            true,
 			},
+			"list_id": schema.StringAttribute{
+				MarkdownDescription: "List ID.",
+				Computed:            true,
+			},
 			"genres": schema.StringAttribute{
 				MarkdownDescription: "Genres.",
 				Computed:            true,
