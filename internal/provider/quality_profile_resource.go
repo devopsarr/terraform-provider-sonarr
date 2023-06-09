@@ -345,11 +345,9 @@ func (p *QualityProfile) write(ctx context.Context, profile *sonarr.QualityProfi
 }
 
 func (q *QualityGroup) write(ctx context.Context, group *sonarr.QualityProfileQualityItemResource) {
-	var (
-		name      string
-		id        int64
-		qualities []Quality
-	)
+	qualities := make([]Quality, len(group.GetItems()))
+	name := types.StringNull()
+	id := types.Int64Null()
 
 	if len(group.GetItems()) == 0 {
 		qualities = []Quality{{
@@ -359,19 +357,16 @@ func (q *QualityGroup) write(ctx context.Context, group *sonarr.QualityProfileQu
 			Resolution: types.Int64Value(int64(group.Quality.GetResolution())),
 		}}
 	} else {
-		name = group.GetName()
-		id = int64(group.GetId())
-		qualities = make([]Quality, len(group.GetItems()))
+		name = types.StringValue(group.GetName())
+		id = types.Int64Value(int64(group.GetId()))
 		for m, q := range group.GetItems() {
 			qualities[m].write(q)
 		}
 	}
 
-	q.Name = types.StringValue(name)
-	q.ID = types.Int64Value(id)
-	q.Qualities = types.SetValueMust(QualityProfileResource{}.getQualitySchema().Type(), nil)
-
-	tfsdk.ValueFrom(ctx, qualities, q.Qualities.Type(ctx), &q.Qualities)
+	q.Name = name
+	q.ID = id
+	q.Qualities, _ = types.SetValueFrom(ctx, QualityProfileResource{}.getQualitySchema().Type(), &qualities)
 }
 
 func (q *Quality) write(quality *sonarr.QualityProfileQualityItemResource) {
