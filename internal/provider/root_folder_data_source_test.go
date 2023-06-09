@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/devopsarr/sonarr-go/sonarr"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
 func TestAccRootFolderDataSource(t *testing.T) {
