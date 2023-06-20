@@ -318,7 +318,7 @@ func (r *ImportListTraktPopularResource) Delete(ctx context.Context, req resourc
 	// Delete ImportListTraktPopular current value
 	_, err := r.client.ImportListApi.DeleteImportList(ctx, int32(importList.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, importListTraktPopularResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, importListTraktPopularResourceName, err))
 
 		return
 	}

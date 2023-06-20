@@ -231,7 +231,7 @@ func (r *DownloadClientUsenetBlackholeResource) Delete(ctx context.Context, req 
 	// Delete DownloadClientUsenetBlackhole current value
 	_, err := r.client.DownloadClientApi.DeleteDownloadClient(ctx, int32(client.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, downloadClientUsenetBlackholeResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, downloadClientUsenetBlackholeResourceName, err))
 
 		return
 	}

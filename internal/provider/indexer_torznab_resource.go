@@ -315,7 +315,7 @@ func (r *IndexerTorznabResource) Delete(ctx context.Context, req resource.Delete
 	// Delete IndexerTorznab current value
 	_, err := r.client.IndexerApi.DeleteIndexer(ctx, int32(indexer.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerTorznabResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, indexerTorznabResourceName, err))
 
 		return
 	}

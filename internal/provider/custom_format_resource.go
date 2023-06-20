@@ -241,14 +241,13 @@ func (c *CustomFormat) write(ctx context.Context, customFormat *sonarr.CustomFor
 	c.ID = types.Int64Value(int64(customFormat.GetId()))
 	c.Name = types.StringValue(customFormat.GetName())
 	c.IncludeCustomFormatWhenRenaming = types.BoolValue(customFormat.GetIncludeCustomFormatWhenRenaming())
-	c.Specifications = types.SetValueMust(CustomFormatResource{}.getSpecificationSchema().Type(), nil)
 
 	specs := make([]CustomFormatCondition, len(customFormat.Specifications))
 	for n, c := range customFormat.Specifications {
 		specs[n].write(ctx, c)
 	}
 
-	tfsdk.ValueFrom(ctx, specs, c.Specifications.Type(ctx), &c.Specifications)
+	c.Specifications, _ = types.SetValueFrom(ctx, CustomFormatResource{}.getSpecificationSchema().Type(), specs)
 }
 
 func (c *CustomFormat) read(ctx context.Context) *sonarr.CustomFormatResource {

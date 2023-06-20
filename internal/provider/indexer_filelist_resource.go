@@ -298,7 +298,7 @@ func (r *IndexerFilelistResource) Delete(ctx context.Context, req resource.Delet
 	// Delete IndexerFilelist current value
 	_, err := r.client.IndexerApi.DeleteIndexer(ctx, int32(indexer.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerFilelistResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, indexerFilelistResourceName, err))
 
 		return
 	}

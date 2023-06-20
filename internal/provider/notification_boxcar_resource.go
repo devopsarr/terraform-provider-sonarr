@@ -287,7 +287,7 @@ func (r *NotificationBoxcarResource) Delete(ctx context.Context, req resource.De
 	// Delete NotificationBoxcar current value
 	_, err := r.client.NotificationApi.DeleteNotification(ctx, int32(notification.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, notificationBoxcarResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, notificationBoxcarResourceName, err))
 
 		return
 	}

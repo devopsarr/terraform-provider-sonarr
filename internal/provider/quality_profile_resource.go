@@ -256,7 +256,7 @@ func (r *QualityProfileResource) Read(ctx context.Context, req resource.ReadRequ
 	// Get qualityprofile current value
 	response, _, err := r.client.QualityProfileApi.GetQualityProfileById(ctx, int32(profile.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, qualityProfileResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, qualityProfileResourceName, err))
 
 		return
 	}

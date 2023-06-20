@@ -52,7 +52,7 @@ linters-settings:
     ignore-words:
     - "intial"
   errcheck:
-    ignore: github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema:ForceNew|Set,fmt:.*,io:Close
+    ignore: github.com/hashicorp/terraform-plugin-testing/helper/schema:ForceNew|Set,fmt:.*,io:Close
   gomnd:
     settings:
       mnd:

@@ -280,7 +280,7 @@ func (r *IndexerNyaaResource) Delete(ctx context.Context, req resource.DeleteReq
 	// Delete IndexerNyaa current value
 	_, err := r.client.IndexerApi.DeleteIndexer(ctx, int32(indexer.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerNyaaResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, indexerNyaaResourceName, err))
 
 		return
 	}

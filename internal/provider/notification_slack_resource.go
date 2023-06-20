@@ -317,7 +317,7 @@ func (r *NotificationSlackResource) Delete(ctx context.Context, req resource.Del
 	// Delete NotificationSlack current value
 	_, err := r.client.NotificationApi.DeleteNotification(ctx, int32(notification.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, notificationSlackResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, notificationSlackResourceName, err))
 
 		return
 	}
