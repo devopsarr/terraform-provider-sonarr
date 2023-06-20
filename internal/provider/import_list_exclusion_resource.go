@@ -149,23 +149,23 @@ func (r *ImportListExclusionResource) Update(ctx context.Context, req resource.U
 }
 
 func (r *ImportListExclusionResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var importListExclusion *ImportListExclusion
+	var ID int64
 
-	resp.Diagnostics.Append(req.State.Get(ctx, &importListExclusion)...)
+	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("id"), &ID)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Delete importListExclusion current value
-	_, err := r.client.ImportListExclusionApi.DeleteImportListExclusion(ctx, int32(importListExclusion.ID.ValueInt64())).Execute()
+	_, err := r.client.ImportListExclusionApi.DeleteImportListExclusion(ctx, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, importListExclusionResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted "+importListExclusionResourceName+": "+strconv.Itoa(int(importListExclusion.ID.ValueInt64())))
+	tflog.Trace(ctx, "deleted "+importListExclusionResourceName+": "+strconv.Itoa(int(ID)))
 	resp.State.RemoveResource(ctx)
 }
 

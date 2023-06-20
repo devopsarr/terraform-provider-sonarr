@@ -224,9 +224,9 @@ func (r *SeriesResource) Update(ctx context.Context, req resource.UpdateRequest,
 }
 
 func (r *SeriesResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var series *Series
+	var ID int64
 
-	resp.Diagnostics.Append(req.State.Get(ctx, &series)...)
+	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("id"), &ID)...)
 
 	if resp.Diagnostics.HasError() {
 		return
@@ -234,14 +234,14 @@ func (r *SeriesResource) Delete(ctx context.Context, req resource.DeleteRequest,
 
 	// Delete series current value
 	// TODO: manage delete parameters on SDK
-	_, err := r.client.SeriesApi.DeleteSeries(ctx, int32(series.ID.ValueInt64())).Execute()
+	_, err := r.client.SeriesApi.DeleteSeries(ctx, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, seriesResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted "+seriesResourceName+": "+strconv.Itoa(int(series.ID.ValueInt64())))
+	tflog.Trace(ctx, "deleted "+seriesResourceName+": "+strconv.Itoa(int(ID)))
 	resp.State.RemoveResource(ctx)
 }
 

@@ -218,23 +218,23 @@ func (r *MetadataResource) Update(ctx context.Context, req resource.UpdateReques
 }
 
 func (r *MetadataResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var metadata Metadata
+	var ID int64
 
-	resp.Diagnostics.Append(req.State.Get(ctx, &metadata)...)
+	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("id"), &ID)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Delete Metadata current value
-	_, err := r.client.MetadataApi.DeleteMetadata(ctx, int32(metadata.ID.ValueInt64())).Execute()
+	_, err := r.client.MetadataApi.DeleteMetadata(ctx, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, metadataResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted "+metadataResourceName+": "+strconv.Itoa(int(metadata.ID.ValueInt64())))
+	tflog.Trace(ctx, "deleted "+metadataResourceName+": "+strconv.Itoa(int(ID)))
 	resp.State.RemoveResource(ctx)
 }
 

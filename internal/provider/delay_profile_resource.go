@@ -220,23 +220,23 @@ func (r *DelayProfileResource) Update(ctx context.Context, req resource.UpdateRe
 }
 
 func (r *DelayProfileResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var profile *DelayProfile
+	var ID int64
 
-	resp.Diagnostics.Append(req.State.Get(ctx, &profile)...)
+	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("id"), &ID)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Delete delayprofile current value
-	_, err := r.client.DelayProfileApi.DeleteDelayProfile(ctx, int32(profile.ID.ValueInt64())).Execute()
+	_, err := r.client.DelayProfileApi.DeleteDelayProfile(ctx, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, delayProfileResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted "+delayProfileResourceName+": "+strconv.Itoa(int(profile.ID.ValueInt64())))
+	tflog.Trace(ctx, "deleted "+delayProfileResourceName+": "+strconv.Itoa(int(ID)))
 	resp.State.RemoveResource(ctx)
 }
 
