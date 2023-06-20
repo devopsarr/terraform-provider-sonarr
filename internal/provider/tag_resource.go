@@ -168,7 +168,7 @@ func (r *TagResource) Delete(ctx context.Context, req resource.DeleteRequest, re
 	// Delete tag current value
 	_, err := r.client.TagApi.DeleteTag(ctx, int32(tag.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, tagResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, tagResourceName, err))
 
 		return
 	}

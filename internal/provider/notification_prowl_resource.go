@@ -300,7 +300,7 @@ func (r *NotificationProwlResource) Delete(ctx context.Context, req resource.Del
 	// Delete NotificationProwl current value
 	_, err := r.client.NotificationApi.DeleteNotification(ctx, int32(notification.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, notificationProwlResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, notificationProwlResourceName, err))
 
 		return
 	}

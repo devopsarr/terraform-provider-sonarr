@@ -160,7 +160,7 @@ func (r *ImportListExclusionResource) Delete(ctx context.Context, req resource.D
 	// Delete importListExclusion current value
 	_, err := r.client.ImportListExclusionApi.DeleteImportListExclusion(ctx, int32(importListExclusion.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, importListExclusionResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, importListExclusionResourceName, err))
 
 		return
 	}

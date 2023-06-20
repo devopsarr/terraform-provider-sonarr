@@ -211,7 +211,7 @@ func (r *AutoTagResource) Delete(ctx context.Context, req resource.DeleteRequest
 	// Delete auto tag current value
 	_, err := r.client.AutoTaggingApi.DeleteAutoTagging(ctx, int32(autoTag.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, autoTagResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, autoTagResourceName, err))
 
 		return
 	}

@@ -274,7 +274,7 @@ func (r *DownloadClientUsenetDownloadStationResource) Delete(ctx context.Context
 	// Delete DownloadClientUsenetDownloadStation current value
 	_, err := r.client.DownloadClientApi.DeleteDownloadClient(ctx, int32(client.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, downloadClientUsenetDownloadStationResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, downloadClientUsenetDownloadStationResourceName, err))
 
 		return
 	}

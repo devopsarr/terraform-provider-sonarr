@@ -12,7 +12,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -174,7 +173,7 @@ func (r *RootFolderResource) Delete(ctx context.Context, req resource.DeleteRequ
 	// Delete rootFolder current value
 	_, err := r.client.RootFolderApi.DeleteRootFolder(ctx, int32(folder.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, rootFolderResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, rootFolderResourceName, err))
 
 		return
 	}
@@ -192,14 +191,13 @@ func (r *RootFolder) write(ctx context.Context, rootFolder *sonarr.RootFolderRes
 	r.Accessible = types.BoolValue(rootFolder.GetAccessible())
 	r.ID = types.Int64Value(int64(rootFolder.GetId()))
 	r.Path = types.StringValue(rootFolder.GetPath())
-	r.UnmappedFolders = types.SetValueMust(RootFolderResource{}.getUnmappedFolderSchema().Type(), nil)
 
 	unmapped := make([]Path, len(rootFolder.GetUnmappedFolders()))
 	for i, f := range rootFolder.UnmappedFolders {
 		unmapped[i].write(f)
 	}
 
-	tfsdk.ValueFrom(ctx, unmapped, r.UnmappedFolders.Type(ctx), r.UnmappedFolders)
+	r.UnmappedFolders, _ = types.SetValueFrom(ctx, RootFolderResource{}.getUnmappedFolderSchema().Type(), unmapped)
 }
 
 func (p *Path) write(folder *sonarr.UnmappedFolder) {

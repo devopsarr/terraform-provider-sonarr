@@ -726,7 +726,7 @@ func (r *NotificationResource) Delete(ctx context.Context, req resource.DeleteRe
 	// Delete Notification current value
 	_, err := r.client.NotificationApi.DeleteNotification(ctx, int32(notification.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, notificationResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, notificationResourceName, err))
 
 		return
 	}

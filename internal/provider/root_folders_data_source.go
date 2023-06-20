@@ -8,7 +8,6 @@ import (
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -110,8 +109,8 @@ func (d *RootFoldersDataSource) Read(ctx context.Context, req datasource.ReadReq
 
 	tflog.Trace(ctx, "read "+rootFoldersDataSourceName)
 	// Map response body to resource schema attribute
-	rootFolders := *writes(ctx, response)
-	tfsdk.ValueFrom(ctx, rootFolders, data.RootFolders.Type(ctx), &data.RootFolders)
+	rootFolders := writes(ctx, response)
+	data.RootFolders, _ = types.SetValueFrom(ctx, data.RootFolders.ElementType(ctx), &rootFolders)
 	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 	data.ID = types.StringValue(strconv.Itoa(len(response)))
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)

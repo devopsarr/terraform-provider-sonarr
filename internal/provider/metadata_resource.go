@@ -229,7 +229,7 @@ func (r *MetadataResource) Delete(ctx context.Context, req resource.DeleteReques
 	// Delete Metadata current value
 	_, err := r.client.MetadataApi.DeleteMetadata(ctx, int32(metadata.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, metadataResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, metadataResourceName, err))
 
 		return
 	}

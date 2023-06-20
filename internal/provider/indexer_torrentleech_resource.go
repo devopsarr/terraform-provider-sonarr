@@ -273,7 +273,7 @@ func (r *IndexerTorrentleechResource) Delete(ctx context.Context, req resource.D
 	// Delete IndexerTorrentleech current value
 	_, err := r.client.IndexerApi.DeleteIndexer(ctx, int32(indexer.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerTorrentleechResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, indexerTorrentleechResourceName, err))
 
 		return
 	}

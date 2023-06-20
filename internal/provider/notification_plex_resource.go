@@ -286,7 +286,7 @@ func (r *NotificationPlexResource) Delete(ctx context.Context, req resource.Dele
 	// Delete NotificationPlex current value
 	_, err := r.client.NotificationApi.DeleteNotification(ctx, int32(notification.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, notificationPlexResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, notificationPlexResourceName, err))
 
 		return
 	}

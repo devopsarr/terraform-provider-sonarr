@@ -166,7 +166,7 @@ func (r *RemotePathMappingResource) Delete(ctx context.Context, req resource.Del
 	// Delete remotePathMapping current value
 	_, err := r.client.RemotePathMappingApi.DeleteRemotePathMapping(ctx, int32(mapping.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, remotePathMappingResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, remotePathMappingResourceName, err))
 
 		return
 	}
