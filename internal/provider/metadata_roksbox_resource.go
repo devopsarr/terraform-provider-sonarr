@@ -7,6 +7,7 @@ import (
 
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -143,7 +144,7 @@ func (r *MetadataRoksboxResource) Create(ctx context.Context, req resource.Creat
 	}
 
 	// Create new MetadataRoksbox
-	request := metadata.read(ctx)
+	request := metadata.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.MetadataApi.CreateMetadata(ctx).MetadataResource(*request).Execute()
 	if err != nil {
@@ -154,7 +155,7 @@ func (r *MetadataRoksboxResource) Create(ctx context.Context, req resource.Creat
 
 	tflog.Trace(ctx, "created "+metadataRoksboxResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	metadata.write(ctx, response)
+	metadata.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &metadata)...)
 }
 
@@ -178,7 +179,7 @@ func (r *MetadataRoksboxResource) Read(ctx context.Context, req resource.ReadReq
 
 	tflog.Trace(ctx, "read "+metadataRoksboxResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
-	metadata.write(ctx, response)
+	metadata.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &metadata)...)
 }
 
@@ -193,7 +194,7 @@ func (r *MetadataRoksboxResource) Update(ctx context.Context, req resource.Updat
 	}
 
 	// Update MetadataRoksbox
-	request := metadata.read(ctx)
+	request := metadata.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.MetadataApi.UpdateMetadata(ctx, strconv.Itoa(int(request.GetId()))).MetadataResource(*request).Execute()
 	if err != nil {
@@ -204,7 +205,7 @@ func (r *MetadataRoksboxResource) Update(ctx context.Context, req resource.Updat
 
 	tflog.Trace(ctx, "updated "+metadataRoksboxResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	metadata.write(ctx, response)
+	metadata.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &metadata)...)
 }
 
@@ -234,12 +235,12 @@ func (r *MetadataRoksboxResource) ImportState(ctx context.Context, req resource.
 	tflog.Trace(ctx, "imported "+metadataRoksboxResourceName+": "+req.ID)
 }
 
-func (m *MetadataRoksbox) write(ctx context.Context, metadata *sonarr.MetadataResource) {
+func (m *MetadataRoksbox) write(ctx context.Context, metadata *sonarr.MetadataResource, diags *diag.Diagnostics) {
 	genericMetadata := m.toMetadata()
-	genericMetadata.write(ctx, metadata)
+	genericMetadata.write(ctx, metadata, diags)
 	m.fromMetadata(genericMetadata)
 }
 
-func (m *MetadataRoksbox) read(ctx context.Context) *sonarr.MetadataResource {
-	return m.toMetadata().read(ctx)
+func (m *MetadataRoksbox) read(ctx context.Context, diags *diag.Diagnostics) *sonarr.MetadataResource {
+	return m.toMetadata().read(ctx, diags)
 }

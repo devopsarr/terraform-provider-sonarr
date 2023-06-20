@@ -117,7 +117,7 @@ func (d *CustomFormatDataSource) Read(ctx context.Context, req datasource.ReadRe
 	}
 
 	tflog.Trace(ctx, "read "+customFormatDataSourceName)
-	data.write(ctx, customFormat)
+	data.write(ctx, customFormat, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 

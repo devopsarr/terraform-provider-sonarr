@@ -6,6 +6,7 @@ import (
 
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -240,7 +241,7 @@ func (r *NotificationSlackResource) Create(ctx context.Context, req resource.Cre
 	}
 
 	// Create new NotificationSlack
-	request := notification.read(ctx)
+	request := notification.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.NotificationApi.CreateNotification(ctx).NotificationResource(*request).Execute()
 	if err != nil {
@@ -251,7 +252,7 @@ func (r *NotificationSlackResource) Create(ctx context.Context, req resource.Cre
 
 	tflog.Trace(ctx, "created "+notificationSlackResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	notification.write(ctx, response)
+	notification.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &notification)...)
 }
 
@@ -275,7 +276,7 @@ func (r *NotificationSlackResource) Read(ctx context.Context, req resource.ReadR
 
 	tflog.Trace(ctx, "read "+notificationSlackResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
-	notification.write(ctx, response)
+	notification.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &notification)...)
 }
 
@@ -290,7 +291,7 @@ func (r *NotificationSlackResource) Update(ctx context.Context, req resource.Upd
 	}
 
 	// Update NotificationSlack
-	request := notification.read(ctx)
+	request := notification.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.NotificationApi.UpdateNotification(ctx, strconv.Itoa(int(request.GetId()))).NotificationResource(*request).Execute()
 	if err != nil {
@@ -301,7 +302,7 @@ func (r *NotificationSlackResource) Update(ctx context.Context, req resource.Upd
 
 	tflog.Trace(ctx, "updated "+notificationSlackResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	notification.write(ctx, response)
+	notification.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &notification)...)
 }
 
@@ -331,12 +332,12 @@ func (r *NotificationSlackResource) ImportState(ctx context.Context, req resourc
 	tflog.Trace(ctx, "imported "+notificationSlackResourceName+": "+req.ID)
 }
 
-func (n *NotificationSlack) write(ctx context.Context, notification *sonarr.NotificationResource) {
+func (n *NotificationSlack) write(ctx context.Context, notification *sonarr.NotificationResource, diags *diag.Diagnostics) {
 	genericNotification := n.toNotification()
-	genericNotification.write(ctx, notification)
+	genericNotification.write(ctx, notification, diags)
 	n.fromNotification(genericNotification)
 }
 
-func (n *NotificationSlack) read(ctx context.Context) *sonarr.NotificationResource {
-	return n.toNotification().read(ctx)
+func (n *NotificationSlack) read(ctx context.Context, diags *diag.Diagnostics) *sonarr.NotificationResource {
+	return n.toNotification().read(ctx, diags)
 }

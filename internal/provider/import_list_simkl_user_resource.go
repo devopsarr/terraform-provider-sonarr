@@ -8,6 +8,7 @@ import (
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -201,7 +202,7 @@ func (r *ImportListSimklUserResource) Create(ctx context.Context, req resource.C
 	}
 
 	// Create new ImportListSimklUser
-	request := importList.read(ctx)
+	request := importList.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.ImportListApi.CreateImportList(ctx).ImportListResource(*request).Execute()
 	if err != nil {
@@ -212,7 +213,7 @@ func (r *ImportListSimklUserResource) Create(ctx context.Context, req resource.C
 
 	tflog.Trace(ctx, "created "+importListSimklUserResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	importList.write(ctx, response)
+	importList.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &importList)...)
 }
 
@@ -236,7 +237,7 @@ func (r *ImportListSimklUserResource) Read(ctx context.Context, req resource.Rea
 
 	tflog.Trace(ctx, "read "+importListSimklUserResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
-	importList.write(ctx, response)
+	importList.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &importList)...)
 }
 
@@ -251,7 +252,7 @@ func (r *ImportListSimklUserResource) Update(ctx context.Context, req resource.U
 	}
 
 	// Update ImportListSimklUser
-	request := importList.read(ctx)
+	request := importList.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.ImportListApi.UpdateImportList(ctx, strconv.Itoa(int(request.GetId()))).ImportListResource(*request).Execute()
 	if err != nil {
@@ -262,7 +263,7 @@ func (r *ImportListSimklUserResource) Update(ctx context.Context, req resource.U
 
 	tflog.Trace(ctx, "updated "+importListSimklUserResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	importList.write(ctx, response)
+	importList.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &importList)...)
 }
 
@@ -292,12 +293,12 @@ func (r *ImportListSimklUserResource) ImportState(ctx context.Context, req resou
 	tflog.Trace(ctx, "imported "+importListSimklUserResourceName+": "+req.ID)
 }
 
-func (i *ImportListSimklUser) write(ctx context.Context, importList *sonarr.ImportListResource) {
+func (i *ImportListSimklUser) write(ctx context.Context, importList *sonarr.ImportListResource, diags *diag.Diagnostics) {
 	genericImportList := i.toImportList()
-	genericImportList.write(ctx, importList)
+	genericImportList.write(ctx, importList, diags)
 	i.fromImportList(genericImportList)
 }
 
-func (i *ImportListSimklUser) read(ctx context.Context) *sonarr.ImportListResource {
-	return i.toImportList().read(ctx)
+func (i *ImportListSimklUser) read(ctx context.Context, diags *diag.Diagnostics) *sonarr.ImportListResource {
+	return i.toImportList().read(ctx, diags)
 }

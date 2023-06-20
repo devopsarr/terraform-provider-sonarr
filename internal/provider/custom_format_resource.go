@@ -7,12 +7,12 @@ import (
 
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -137,7 +137,7 @@ func (r *CustomFormatResource) Create(ctx context.Context, req resource.CreateRe
 	}
 
 	// Create new CustomFormat
-	request := client.read(ctx)
+	request := client.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.CustomFormatApi.CreateCustomFormat(ctx).CustomFormatResource(*request).Execute()
 	if err != nil {
@@ -151,7 +151,7 @@ func (r *CustomFormatResource) Create(ctx context.Context, req resource.CreateRe
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state CustomFormat
 
-	state.write(ctx, response)
+	state.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
 
@@ -178,7 +178,7 @@ func (r *CustomFormatResource) Read(ctx context.Context, req resource.ReadReques
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state CustomFormat
 
-	state.write(ctx, response)
+	state.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
 
@@ -193,7 +193,7 @@ func (r *CustomFormatResource) Update(ctx context.Context, req resource.UpdateRe
 	}
 
 	// Update CustomFormat
-	request := client.read(ctx)
+	request := client.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.CustomFormatApi.UpdateCustomFormat(ctx, strconv.Itoa(int(request.GetId()))).CustomFormatResource(*request).Execute()
 	if err != nil {
@@ -207,7 +207,7 @@ func (r *CustomFormatResource) Update(ctx context.Context, req resource.UpdateRe
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state CustomFormat
 
-	state.write(ctx, response)
+	state.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
 
@@ -237,7 +237,9 @@ func (r *CustomFormatResource) ImportState(ctx context.Context, req resource.Imp
 	tflog.Trace(ctx, "imported "+customFormatResourceName+": "+req.ID)
 }
 
-func (c *CustomFormat) write(ctx context.Context, customFormat *sonarr.CustomFormatResource) {
+func (c *CustomFormat) write(ctx context.Context, customFormat *sonarr.CustomFormatResource, diags *diag.Diagnostics) {
+	var tempDiag diag.Diagnostics
+
 	c.ID = types.Int64Value(int64(customFormat.GetId()))
 	c.Name = types.StringValue(customFormat.GetName())
 	c.IncludeCustomFormatWhenRenaming = types.BoolValue(customFormat.GetIncludeCustomFormatWhenRenaming())
@@ -247,12 +249,13 @@ func (c *CustomFormat) write(ctx context.Context, customFormat *sonarr.CustomFor
 		specs[n].write(ctx, c)
 	}
 
-	c.Specifications, _ = types.SetValueFrom(ctx, CustomFormatResource{}.getSpecificationSchema().Type(), specs)
+	c.Specifications, tempDiag = types.SetValueFrom(ctx, CustomFormatResource{}.getSpecificationSchema().Type(), specs)
+	diags.Append(tempDiag...)
 }
 
-func (c *CustomFormat) read(ctx context.Context) *sonarr.CustomFormatResource {
+func (c *CustomFormat) read(ctx context.Context, diags *diag.Diagnostics) *sonarr.CustomFormatResource {
 	specifications := make([]CustomFormatCondition, len(c.Specifications.Elements()))
-	tfsdk.ValueAs(ctx, c.Specifications, &specifications)
+	diags.Append(c.Specifications.ElementsAs(ctx, &specifications, false)...)
 	specs := make([]*sonarr.CustomFormatSpecificationSchema, len(specifications))
 
 	for n, d := range specifications {

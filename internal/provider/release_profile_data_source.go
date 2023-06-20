@@ -101,7 +101,7 @@ func (d *ReleaseProfileDataSource) Read(ctx context.Context, req datasource.Read
 	}
 
 	tflog.Trace(ctx, "read "+releaseProfileDataSourceName)
-	releaseProfile.write(ctx, profile)
+	releaseProfile.write(ctx, profile, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &releaseProfile)...)
 }
 

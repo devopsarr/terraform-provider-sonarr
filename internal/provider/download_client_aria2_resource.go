@@ -6,6 +6,7 @@ import (
 
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -180,7 +181,7 @@ func (r *DownloadClientAria2Resource) Create(ctx context.Context, req resource.C
 	}
 
 	// Create new DownloadClientAria2
-	request := client.read(ctx)
+	request := client.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.DownloadClientApi.CreateDownloadClient(ctx).DownloadClientResource(*request).Execute()
 	if err != nil {
@@ -191,7 +192,7 @@ func (r *DownloadClientAria2Resource) Create(ctx context.Context, req resource.C
 
 	tflog.Trace(ctx, "created "+downloadClientAria2ResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	client.write(ctx, response)
+	client.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &client)...)
 }
 
@@ -215,7 +216,7 @@ func (r *DownloadClientAria2Resource) Read(ctx context.Context, req resource.Rea
 
 	tflog.Trace(ctx, "read "+downloadClientAria2ResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
-	client.write(ctx, response)
+	client.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &client)...)
 }
 
@@ -230,7 +231,7 @@ func (r *DownloadClientAria2Resource) Update(ctx context.Context, req resource.U
 	}
 
 	// Update DownloadClientAria2
-	request := client.read(ctx)
+	request := client.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.DownloadClientApi.UpdateDownloadClient(ctx, strconv.Itoa(int(request.GetId()))).DownloadClientResource(*request).Execute()
 	if err != nil {
@@ -241,7 +242,7 @@ func (r *DownloadClientAria2Resource) Update(ctx context.Context, req resource.U
 
 	tflog.Trace(ctx, "updated "+downloadClientAria2ResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	client.write(ctx, response)
+	client.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &client)...)
 }
 
@@ -271,12 +272,12 @@ func (r *DownloadClientAria2Resource) ImportState(ctx context.Context, req resou
 	tflog.Trace(ctx, "imported "+downloadClientAria2ResourceName+": "+req.ID)
 }
 
-func (d *DownloadClientAria2) write(ctx context.Context, downloadClient *sonarr.DownloadClientResource) {
+func (d *DownloadClientAria2) write(ctx context.Context, downloadClient *sonarr.DownloadClientResource, diags *diag.Diagnostics) {
 	genericDownloadClient := d.toDownloadClient()
-	genericDownloadClient.write(ctx, downloadClient)
+	genericDownloadClient.write(ctx, downloadClient, diags)
 	d.fromDownloadClient(genericDownloadClient)
 }
 
-func (d *DownloadClientAria2) read(ctx context.Context) *sonarr.DownloadClientResource {
-	return d.toDownloadClient().read(ctx)
+func (d *DownloadClientAria2) read(ctx context.Context, diags *diag.Diagnostics) *sonarr.DownloadClientResource {
+	return d.toDownloadClient().read(ctx, diags)
 }

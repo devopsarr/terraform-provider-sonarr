@@ -6,6 +6,7 @@ import (
 
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -236,7 +237,7 @@ func (r *NotificationPushbulletResource) Create(ctx context.Context, req resourc
 	}
 
 	// Create new NotificationPushbullet
-	request := notification.read(ctx)
+	request := notification.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.NotificationApi.CreateNotification(ctx).NotificationResource(*request).Execute()
 	if err != nil {
@@ -247,7 +248,7 @@ func (r *NotificationPushbulletResource) Create(ctx context.Context, req resourc
 
 	tflog.Trace(ctx, "created "+notificationPushbulletResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	notification.write(ctx, response)
+	notification.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &notification)...)
 }
 
@@ -271,7 +272,7 @@ func (r *NotificationPushbulletResource) Read(ctx context.Context, req resource.
 
 	tflog.Trace(ctx, "read "+notificationPushbulletResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
-	notification.write(ctx, response)
+	notification.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &notification)...)
 }
 
@@ -286,7 +287,7 @@ func (r *NotificationPushbulletResource) Update(ctx context.Context, req resourc
 	}
 
 	// Update NotificationPushbullet
-	request := notification.read(ctx)
+	request := notification.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.NotificationApi.UpdateNotification(ctx, strconv.Itoa(int(request.GetId()))).NotificationResource(*request).Execute()
 	if err != nil {
@@ -297,7 +298,7 @@ func (r *NotificationPushbulletResource) Update(ctx context.Context, req resourc
 
 	tflog.Trace(ctx, "updated "+notificationPushbulletResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	notification.write(ctx, response)
+	notification.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &notification)...)
 }
 
@@ -327,12 +328,12 @@ func (r *NotificationPushbulletResource) ImportState(ctx context.Context, req re
 	tflog.Trace(ctx, "imported "+notificationPushbulletResourceName+": "+req.ID)
 }
 
-func (n *NotificationPushbullet) write(ctx context.Context, notification *sonarr.NotificationResource) {
+func (n *NotificationPushbullet) write(ctx context.Context, notification *sonarr.NotificationResource, diags *diag.Diagnostics) {
 	genericNotification := n.toNotification()
-	genericNotification.write(ctx, notification)
+	genericNotification.write(ctx, notification, diags)
 	n.fromNotification(genericNotification)
 }
 
-func (n *NotificationPushbullet) read(ctx context.Context) *sonarr.NotificationResource {
-	return n.toNotification().read(ctx)
+func (n *NotificationPushbullet) read(ctx context.Context, diags *diag.Diagnostics) *sonarr.NotificationResource {
+	return n.toNotification().read(ctx, diags)
 }

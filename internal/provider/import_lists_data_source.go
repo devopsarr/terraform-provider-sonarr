@@ -216,8 +216,7 @@ func (d *ImportListsDataSource) Read(ctx context.Context, req datasource.ReadReq
 	// Map response body to resource schema attribute
 	importLists := make([]ImportList, len(response))
 	for i, d := range response {
-		importLists[i].Tags = types.SetNull(types.Int64Type)
-		importLists[i].write(ctx, d)
+		importLists[i].write(ctx, d, &resp.Diagnostics)
 	}
 
 	tfsdk.ValueFrom(ctx, importLists, data.ImportLists.Type(ctx), &data.ImportLists)

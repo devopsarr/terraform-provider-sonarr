@@ -8,6 +8,7 @@ import (
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
@@ -177,7 +178,7 @@ func (d *QualityProfilesDataSource) Read(ctx context.Context, req datasource.Rea
 func writeQualitiyprofiles(ctx context.Context, qualities []*sonarr.QualityProfileResource) *[]QualityProfile {
 	output := make([]QualityProfile, len(qualities))
 	for i, p := range qualities {
-		output[i].write(ctx, p)
+		output[i].write(ctx, p, &diag.Diagnostics{})
 	}
 
 	return &output

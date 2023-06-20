@@ -6,6 +6,7 @@ import (
 
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -195,7 +196,7 @@ func (r *IndexerBroadcastheNetResource) Create(ctx context.Context, req resource
 	}
 
 	// Create new IndexerBroadcastheNet
-	request := indexer.read(ctx)
+	request := indexer.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.IndexerApi.CreateIndexer(ctx).IndexerResource(*request).Execute()
 	if err != nil {
@@ -206,7 +207,7 @@ func (r *IndexerBroadcastheNetResource) Create(ctx context.Context, req resource
 
 	tflog.Trace(ctx, "created "+indexerBroadcastheNetResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	indexer.write(ctx, response)
+	indexer.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &indexer)...)
 }
 
@@ -230,7 +231,7 @@ func (r *IndexerBroadcastheNetResource) Read(ctx context.Context, req resource.R
 
 	tflog.Trace(ctx, "read "+indexerBroadcastheNetResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
-	indexer.write(ctx, response)
+	indexer.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &indexer)...)
 }
 
@@ -245,7 +246,7 @@ func (r *IndexerBroadcastheNetResource) Update(ctx context.Context, req resource
 	}
 
 	// Update IndexerBroadcastheNet
-	request := indexer.read(ctx)
+	request := indexer.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.IndexerApi.UpdateIndexer(ctx, strconv.Itoa(int(request.GetId()))).IndexerResource(*request).Execute()
 	if err != nil {
@@ -256,7 +257,7 @@ func (r *IndexerBroadcastheNetResource) Update(ctx context.Context, req resource
 
 	tflog.Trace(ctx, "updated "+indexerBroadcastheNetResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	indexer.write(ctx, response)
+	indexer.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &indexer)...)
 }
 
@@ -286,12 +287,12 @@ func (r *IndexerBroadcastheNetResource) ImportState(ctx context.Context, req res
 	tflog.Trace(ctx, "imported "+indexerBroadcastheNetResourceName+": "+req.ID)
 }
 
-func (i *IndexerBroadcastheNet) write(ctx context.Context, indexer *sonarr.IndexerResource) {
+func (i *IndexerBroadcastheNet) write(ctx context.Context, indexer *sonarr.IndexerResource, diags *diag.Diagnostics) {
 	genericIndexer := i.toIndexer()
-	genericIndexer.write(ctx, indexer)
+	genericIndexer.write(ctx, indexer, diags)
 	i.fromIndexer(genericIndexer)
 }
 
-func (i *IndexerBroadcastheNet) read(ctx context.Context) *sonarr.IndexerResource {
-	return i.toIndexer().read(ctx)
+func (i *IndexerBroadcastheNet) read(ctx context.Context, diags *diag.Diagnostics) *sonarr.IndexerResource {
+	return i.toIndexer().read(ctx, diags)
 }

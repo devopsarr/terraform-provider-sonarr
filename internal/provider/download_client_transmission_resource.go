@@ -7,6 +7,7 @@ import (
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -237,7 +238,7 @@ func (r *DownloadClientTransmissionResource) Create(ctx context.Context, req res
 	}
 
 	// Create new DownloadClientTransmission
-	request := client.read(ctx)
+	request := client.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.DownloadClientApi.CreateDownloadClient(ctx).DownloadClientResource(*request).Execute()
 	if err != nil {
@@ -248,7 +249,7 @@ func (r *DownloadClientTransmissionResource) Create(ctx context.Context, req res
 
 	tflog.Trace(ctx, "created "+downloadClientTransmissionResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	client.write(ctx, response)
+	client.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &client)...)
 }
 
@@ -272,7 +273,7 @@ func (r *DownloadClientTransmissionResource) Read(ctx context.Context, req resou
 
 	tflog.Trace(ctx, "read "+downloadClientTransmissionResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
-	client.write(ctx, response)
+	client.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &client)...)
 }
 
@@ -287,7 +288,7 @@ func (r *DownloadClientTransmissionResource) Update(ctx context.Context, req res
 	}
 
 	// Update DownloadClientTransmission
-	request := client.read(ctx)
+	request := client.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.DownloadClientApi.UpdateDownloadClient(ctx, strconv.Itoa(int(request.GetId()))).DownloadClientResource(*request).Execute()
 	if err != nil {
@@ -298,7 +299,7 @@ func (r *DownloadClientTransmissionResource) Update(ctx context.Context, req res
 
 	tflog.Trace(ctx, "updated "+downloadClientTransmissionResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	client.write(ctx, response)
+	client.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &client)...)
 }
 
@@ -328,12 +329,12 @@ func (r *DownloadClientTransmissionResource) ImportState(ctx context.Context, re
 	tflog.Trace(ctx, "imported "+downloadClientTransmissionResourceName+": "+req.ID)
 }
 
-func (d *DownloadClientTransmission) write(ctx context.Context, downloadClient *sonarr.DownloadClientResource) {
+func (d *DownloadClientTransmission) write(ctx context.Context, downloadClient *sonarr.DownloadClientResource, diags *diag.Diagnostics) {
 	genericDownloadClient := d.toDownloadClient()
-	genericDownloadClient.write(ctx, downloadClient)
+	genericDownloadClient.write(ctx, downloadClient, diags)
 	d.fromDownloadClient(genericDownloadClient)
 }
 
-func (d *DownloadClientTransmission) read(ctx context.Context) *sonarr.DownloadClientResource {
-	return d.toDownloadClient().read(ctx)
+func (d *DownloadClientTransmission) read(ctx context.Context, diags *diag.Diagnostics) *sonarr.DownloadClientResource {
+	return d.toDownloadClient().read(ctx, diags)
 }

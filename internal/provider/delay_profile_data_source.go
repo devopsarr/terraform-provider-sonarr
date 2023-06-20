@@ -115,7 +115,7 @@ func (d *DelayProfileDataSource) Read(ctx context.Context, req datasource.ReadRe
 	}
 
 	tflog.Trace(ctx, "read "+delayProfileDataSourceName)
-	delayProfile.write(ctx, profile)
+	delayProfile.write(ctx, profile, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &delayProfile)...)
 }
 

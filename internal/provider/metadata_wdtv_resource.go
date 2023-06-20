@@ -7,6 +7,7 @@ import (
 
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -143,7 +144,7 @@ func (r *MetadataWdtvResource) Create(ctx context.Context, req resource.CreateRe
 	}
 
 	// Create new MetadataWdtv
-	request := metadata.read(ctx)
+	request := metadata.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.MetadataApi.CreateMetadata(ctx).MetadataResource(*request).Execute()
 	if err != nil {
@@ -154,7 +155,7 @@ func (r *MetadataWdtvResource) Create(ctx context.Context, req resource.CreateRe
 
 	tflog.Trace(ctx, "created "+metadataWdtvResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	metadata.write(ctx, response)
+	metadata.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &metadata)...)
 }
 
@@ -178,7 +179,7 @@ func (r *MetadataWdtvResource) Read(ctx context.Context, req resource.ReadReques
 
 	tflog.Trace(ctx, "read "+metadataWdtvResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
-	metadata.write(ctx, response)
+	metadata.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &metadata)...)
 }
 
@@ -193,7 +194,7 @@ func (r *MetadataWdtvResource) Update(ctx context.Context, req resource.UpdateRe
 	}
 
 	// Update MetadataWdtv
-	request := metadata.read(ctx)
+	request := metadata.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.MetadataApi.UpdateMetadata(ctx, strconv.Itoa(int(request.GetId()))).MetadataResource(*request).Execute()
 	if err != nil {
@@ -204,7 +205,7 @@ func (r *MetadataWdtvResource) Update(ctx context.Context, req resource.UpdateRe
 
 	tflog.Trace(ctx, "updated "+metadataWdtvResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	metadata.write(ctx, response)
+	metadata.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &metadata)...)
 }
 
@@ -234,12 +235,12 @@ func (r *MetadataWdtvResource) ImportState(ctx context.Context, req resource.Imp
 	tflog.Trace(ctx, "imported "+metadataWdtvResourceName+": "+req.ID)
 }
 
-func (m *MetadataWdtv) write(ctx context.Context, metadata *sonarr.MetadataResource) {
+func (m *MetadataWdtv) write(ctx context.Context, metadata *sonarr.MetadataResource, diags *diag.Diagnostics) {
 	genericMetadata := m.toMetadata()
-	genericMetadata.write(ctx, metadata)
+	genericMetadata.write(ctx, metadata, diags)
 	m.fromMetadata(genericMetadata)
 }
 
-func (m *MetadataWdtv) read(ctx context.Context) *sonarr.MetadataResource {
-	return m.toMetadata().read(ctx)
+func (m *MetadataWdtv) read(ctx context.Context, diags *diag.Diagnostics) *sonarr.MetadataResource {
+	return m.toMetadata().read(ctx, diags)
 }

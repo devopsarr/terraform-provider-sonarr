@@ -28,6 +28,10 @@ func ErrDataNotFoundError(kind, field, search string) error {
 	return fmt.Errorf("%w: no %s with %s '%s'", ErrDataNotFound, kind, field, search)
 }
 
+func ParseNotFoundError(kind, field, search string) string {
+	return fmt.Sprintf("Unable to find %s, got error: data source not found: no %s with %s '%s'", kind, kind, field, search)
+}
+
 func WrongClient(clientType string, providerData interface{}) string {
 	return fmt.Sprintf("Expected %s, got: %T. Please report this issue to the provider developers.", clientType, providerData)
 }

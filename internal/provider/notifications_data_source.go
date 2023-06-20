@@ -460,8 +460,7 @@ func (d *NotificationsDataSource) Read(ctx context.Context, req datasource.ReadR
 	// Map response body to resource schema attribute
 	notifications := make([]Notification, len(response))
 	for i, n := range response {
-		notifications[i].Tags = types.SetNull(types.Int64Type)
-		notifications[i].write(ctx, n)
+		notifications[i].write(ctx, n, &resp.Diagnostics)
 	}
 
 	tfsdk.ValueFrom(ctx, notifications, data.Notifications.Type(ctx), &data.Notifications)

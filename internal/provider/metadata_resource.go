@@ -6,12 +6,12 @@ import (
 
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -143,7 +143,7 @@ func (r *MetadataResource) Create(ctx context.Context, req resource.CreateReques
 	}
 
 	// Create new Metadata
-	request := metadata.read(ctx)
+	request := metadata.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.MetadataApi.CreateMetadata(ctx).MetadataResource(*request).Execute()
 	if err != nil {
@@ -157,7 +157,7 @@ func (r *MetadataResource) Create(ctx context.Context, req resource.CreateReques
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state Metadata
 
-	state.write(ctx, response)
+	state.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
 
@@ -184,7 +184,7 @@ func (r *MetadataResource) Read(ctx context.Context, req resource.ReadRequest, r
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state Metadata
 
-	state.write(ctx, response)
+	state.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
 
@@ -199,7 +199,7 @@ func (r *MetadataResource) Update(ctx context.Context, req resource.UpdateReques
 	}
 
 	// Update Metadata
-	request := metadata.read(ctx)
+	request := metadata.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.MetadataApi.UpdateMetadata(ctx, strconv.Itoa(int(request.GetId()))).MetadataResource(*request).Execute()
 	if err != nil {
@@ -213,7 +213,7 @@ func (r *MetadataResource) Update(ctx context.Context, req resource.UpdateReques
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state Metadata
 
-	state.write(ctx, response)
+	state.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
 
@@ -243,27 +243,28 @@ func (r *MetadataResource) ImportState(ctx context.Context, req resource.ImportS
 	tflog.Trace(ctx, "imported "+metadataResourceName+": "+req.ID)
 }
 
-func (m *Metadata) write(ctx context.Context, metadata *sonarr.MetadataResource) {
+func (m *Metadata) write(ctx context.Context, metadata *sonarr.MetadataResource, diags *diag.Diagnostics) {
+	var localDiag diag.Diagnostics
+
+	m.Tags, localDiag = types.SetValueFrom(ctx, types.Int64Type, metadata.Tags)
+	diags.Append(localDiag...)
+
 	m.Enable = types.BoolValue(metadata.GetEnable())
 	m.ID = types.Int64Value(int64(metadata.GetId()))
 	m.ConfigContract = types.StringValue(metadata.GetConfigContract())
 	m.Implementation = types.StringValue(metadata.GetImplementation())
 	m.Name = types.StringValue(metadata.GetName())
-	m.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, metadata.GetTags())
 	helpers.WriteFields(ctx, m, metadata.GetFields(), metadataFields)
 }
 
-func (m *Metadata) read(ctx context.Context) *sonarr.MetadataResource {
-	tags := make([]*int32, len(m.Tags.Elements()))
-	tfsdk.ValueAs(ctx, m.Tags, &tags)
-
+func (m *Metadata) read(ctx context.Context, diags *diag.Diagnostics) *sonarr.MetadataResource {
 	metadata := sonarr.NewMetadataResource()
 	metadata.SetEnable(m.Enable.ValueBool())
 	metadata.SetId(int32(m.ID.ValueInt64()))
 	metadata.SetConfigContract(m.ConfigContract.ValueString())
 	metadata.SetImplementation(m.Implementation.ValueString())
 	metadata.SetName(m.Name.ValueString())
-	metadata.SetTags(tags)
+	diags.Append(m.Tags.ElementsAs(ctx, &metadata.Tags, true)...)
 	metadata.SetFields(helpers.ReadFields(ctx, m, metadataFields))
 
 	return metadata

@@ -6,6 +6,7 @@ import (
 
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -38,6 +39,16 @@ type RemotePathMapping struct {
 	RemotePath types.String `tfsdk:"remote_path"`
 	LocalPath  types.String `tfsdk:"local_path"`
 	ID         types.Int64  `tfsdk:"id"`
+}
+
+func (r RemotePathMapping) getType() attr.Type {
+	return types.ObjectType{}.WithAttributeTypes(
+		map[string]attr.Type{
+			"id":          types.Int64Type,
+			"host":        types.StringType,
+			"remote_path": types.StringType,
+			"local_path":  types.StringType,
+		})
 }
 
 func (r *RemotePathMappingResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {

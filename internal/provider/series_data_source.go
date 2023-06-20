@@ -113,7 +113,7 @@ func (d *SeriesDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 	}
 
 	tflog.Trace(ctx, "read "+seriesDataSourceName)
-	data.write(ctx, series)
+	data.write(ctx, series, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 

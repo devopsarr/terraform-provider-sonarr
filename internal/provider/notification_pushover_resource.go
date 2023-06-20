@@ -7,6 +7,7 @@ import (
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -264,7 +265,7 @@ func (r *NotificationPushoverResource) Create(ctx context.Context, req resource.
 	}
 
 	// Create new NotificationPushover
-	request := notification.read(ctx)
+	request := notification.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.NotificationApi.CreateNotification(ctx).NotificationResource(*request).Execute()
 	if err != nil {
@@ -275,7 +276,7 @@ func (r *NotificationPushoverResource) Create(ctx context.Context, req resource.
 
 	tflog.Trace(ctx, "created "+notificationPushoverResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	notification.write(ctx, response)
+	notification.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &notification)...)
 }
 
@@ -299,7 +300,7 @@ func (r *NotificationPushoverResource) Read(ctx context.Context, req resource.Re
 
 	tflog.Trace(ctx, "read "+notificationPushoverResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
-	notification.write(ctx, response)
+	notification.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &notification)...)
 }
 
@@ -314,7 +315,7 @@ func (r *NotificationPushoverResource) Update(ctx context.Context, req resource.
 	}
 
 	// Update NotificationPushover
-	request := notification.read(ctx)
+	request := notification.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.NotificationApi.UpdateNotification(ctx, strconv.Itoa(int(request.GetId()))).NotificationResource(*request).Execute()
 	if err != nil {
@@ -325,7 +326,7 @@ func (r *NotificationPushoverResource) Update(ctx context.Context, req resource.
 
 	tflog.Trace(ctx, "updated "+notificationPushoverResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	notification.write(ctx, response)
+	notification.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &notification)...)
 }
 
@@ -355,12 +356,12 @@ func (r *NotificationPushoverResource) ImportState(ctx context.Context, req reso
 	tflog.Trace(ctx, "imported "+notificationPushoverResourceName+": "+req.ID)
 }
 
-func (n *NotificationPushover) write(ctx context.Context, notification *sonarr.NotificationResource) {
+func (n *NotificationPushover) write(ctx context.Context, notification *sonarr.NotificationResource, diags *diag.Diagnostics) {
 	genericNotification := n.toNotification()
-	genericNotification.write(ctx, notification)
+	genericNotification.write(ctx, notification, diags)
 	n.fromNotification(genericNotification)
 }
 
-func (n *NotificationPushover) read(ctx context.Context) *sonarr.NotificationResource {
-	return n.toNotification().read(ctx)
+func (n *NotificationPushover) read(ctx context.Context, diags *diag.Diagnostics) *sonarr.NotificationResource {
+	return n.toNotification().read(ctx, diags)
 }

@@ -7,13 +7,13 @@ import (
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -139,7 +139,7 @@ func (r *DelayProfileResource) Create(ctx context.Context, req resource.CreateRe
 	}
 
 	// Build Create resource
-	request := profile.read(ctx)
+	request := profile.read(ctx, &resp.Diagnostics)
 
 	// Create new DelayProfile
 	response, _, err := r.client.DelayProfileApi.CreateDelayProfile(ctx).DelayProfileResource(*request).Execute()
@@ -164,7 +164,7 @@ func (r *DelayProfileResource) Create(ctx context.Context, req resource.CreateRe
 	}
 
 	// Generate resource state struct
-	profile.write(ctx, response)
+	profile.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &profile)...)
 }
 
@@ -188,7 +188,7 @@ func (r *DelayProfileResource) Read(ctx context.Context, req resource.ReadReques
 
 	tflog.Trace(ctx, "read "+delayProfileResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
-	profile.write(ctx, response)
+	profile.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &profile)...)
 }
 
@@ -203,7 +203,7 @@ func (r *DelayProfileResource) Update(ctx context.Context, req resource.UpdateRe
 	}
 
 	// Build Update resource
-	request := profile.read(ctx)
+	request := profile.read(ctx, &resp.Diagnostics)
 
 	// Update DelayProfile
 	response, _, err := r.client.DelayProfileApi.UpdateDelayProfile(ctx, strconv.Itoa(int(request.GetId()))).DelayProfileResource(*request).Execute()
@@ -215,7 +215,7 @@ func (r *DelayProfileResource) Update(ctx context.Context, req resource.UpdateRe
 
 	tflog.Trace(ctx, "updated "+delayProfileResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	profile.write(ctx, response)
+	profile.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &profile)...)
 }
 
@@ -245,8 +245,9 @@ func (r *DelayProfileResource) ImportState(ctx context.Context, req resource.Imp
 	tflog.Trace(ctx, "imported "+delayProfileResourceName+": "+req.ID)
 }
 
-func (p *DelayProfile) write(ctx context.Context, profile *sonarr.DelayProfileResource) {
-	p.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, profile.GetTags())
+func (p *DelayProfile) write(ctx context.Context, profile *sonarr.DelayProfileResource, diags *diag.Diagnostics) {
+	var tempDiag diag.Diagnostics
+
 	p.ID = types.Int64Value(int64(profile.GetId()))
 	p.EnableUsenet = types.BoolValue(profile.GetEnableUsenet())
 	p.EnableTorrent = types.BoolValue(profile.GetEnableTorrent())
@@ -257,12 +258,11 @@ func (p *DelayProfile) write(ctx context.Context, profile *sonarr.DelayProfileRe
 	p.Order = types.Int64Value(int64(profile.GetOrder()))
 	p.MinimumCustomFormatScore = types.Int64Value(int64(profile.GetMinimumCustomFormatScore()))
 	p.PreferredProtocol = types.StringValue(string(profile.GetPreferredProtocol()))
+	p.Tags, tempDiag = types.SetValueFrom(ctx, types.Int64Type, profile.GetTags())
+	diags.Append(tempDiag...)
 }
 
-func (p *DelayProfile) read(ctx context.Context) *sonarr.DelayProfileResource {
-	tags := make([]*int32, len(p.Tags.Elements()))
-	tfsdk.ValueAs(ctx, p.Tags, &tags)
-
+func (p *DelayProfile) read(ctx context.Context, diags *diag.Diagnostics) *sonarr.DelayProfileResource {
 	profile := sonarr.NewDelayProfileResource()
 	profile.SetId(int32(p.ID.ValueInt64()))
 	profile.SetBypassIfHighestQuality(p.BypassIfHighestQuality.ValueBool())
@@ -272,9 +272,9 @@ func (p *DelayProfile) read(ctx context.Context) *sonarr.DelayProfileResource {
 	profile.SetOrder(int32(p.Order.ValueInt64()))
 	profile.SetMinimumCustomFormatScore(int32(p.MinimumCustomFormatScore.ValueInt64()))
 	profile.SetPreferredProtocol(sonarr.DownloadProtocol(p.PreferredProtocol.ValueString()))
-	profile.SetTags(tags)
 	profile.SetTorrentDelay(int32(p.TorrentDelay.ValueInt64()))
 	profile.SetUsenetDelay(int32(p.UsenetDelay.ValueInt64()))
+	diags.Append(p.Tags.ElementsAs(ctx, &profile.Tags, true)...)
 
 	return profile
 }

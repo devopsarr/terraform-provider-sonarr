@@ -191,7 +191,7 @@ func (d *IndexerDataSource) Read(ctx context.Context, req datasource.ReadRequest
 	}
 
 	tflog.Trace(ctx, "read "+indexerDataSourceName)
-	data.write(ctx, indexer)
+	data.write(ctx, indexer, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 

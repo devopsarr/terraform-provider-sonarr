@@ -2,13 +2,13 @@ package provider
 
 import (
 	"context"
-	"fmt"
 	"strconv"
 
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
@@ -62,9 +62,9 @@ func (d *RemotePathMappingDataSource) Configure(ctx context.Context, req datasou
 }
 
 func (d *RemotePathMappingDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var remoteMapping *RemotePathMapping
+	var data *RemotePathMapping
 
-	resp.Diagnostics.Append(req.Config.Get(ctx, &remoteMapping)...)
+	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
 
 	if resp.Diagnostics.HasError() {
 		return
@@ -77,26 +77,20 @@ func (d *RemotePathMappingDataSource) Read(ctx context.Context, req datasource.R
 		return
 	}
 
-	// Map response body to resource schema attribute
-	mapping, err := findRemotePathMapping(remoteMapping.ID.ValueInt64(), response)
-	if err != nil {
-		resp.Diagnostics.AddError(helpers.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", remotePathMappingDataSourceName, err))
-
-		return
-	}
-
+	data.find(data.ID.ValueInt64(), response, &resp.Diagnostics)
 	tflog.Trace(ctx, "read "+remotePathMappingDataSourceName)
-
-	remoteMapping.write(mapping)
-	resp.Diagnostics.Append(resp.State.Set(ctx, &remoteMapping)...)
+	// Map response body to resource schema attribute
+	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func findRemotePathMapping(id int64, mappings []*sonarr.RemotePathMappingResource) (*sonarr.RemotePathMappingResource, error) {
+func (r *RemotePathMapping) find(id int64, mappings []*sonarr.RemotePathMappingResource, diags *diag.Diagnostics) {
 	for _, m := range mappings {
 		if int64(m.GetId()) == id {
-			return m, nil
+			r.write(m)
+
+			return
 		}
 	}
 
-	return nil, helpers.ErrDataNotFoundError(remotePathMappingDataSourceName, "id", strconv.Itoa(int(id)))
+	diags.AddError(helpers.DataSourceError, helpers.ParseNotFoundError(remotePathMappingDataSourceName, "id", strconv.Itoa(int(id))))
 }

@@ -6,6 +6,7 @@ import (
 
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -195,7 +196,7 @@ func (r *DownloadClientHadoukenResource) Create(ctx context.Context, req resourc
 	}
 
 	// Create new DownloadClientHadouken
-	request := client.read(ctx)
+	request := client.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.DownloadClientApi.CreateDownloadClient(ctx).DownloadClientResource(*request).Execute()
 	if err != nil {
@@ -206,7 +207,7 @@ func (r *DownloadClientHadoukenResource) Create(ctx context.Context, req resourc
 
 	tflog.Trace(ctx, "created "+downloadClientHadoukenResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	client.write(ctx, response)
+	client.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &client)...)
 }
 
@@ -230,7 +231,7 @@ func (r *DownloadClientHadoukenResource) Read(ctx context.Context, req resource.
 
 	tflog.Trace(ctx, "read "+downloadClientHadoukenResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
-	client.write(ctx, response)
+	client.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &client)...)
 }
 
@@ -245,7 +246,7 @@ func (r *DownloadClientHadoukenResource) Update(ctx context.Context, req resourc
 	}
 
 	// Update DownloadClientHadouken
-	request := client.read(ctx)
+	request := client.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.DownloadClientApi.UpdateDownloadClient(ctx, strconv.Itoa(int(request.GetId()))).DownloadClientResource(*request).Execute()
 	if err != nil {
@@ -256,7 +257,7 @@ func (r *DownloadClientHadoukenResource) Update(ctx context.Context, req resourc
 
 	tflog.Trace(ctx, "updated "+downloadClientHadoukenResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	client.write(ctx, response)
+	client.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &client)...)
 }
 
@@ -286,12 +287,12 @@ func (r *DownloadClientHadoukenResource) ImportState(ctx context.Context, req re
 	tflog.Trace(ctx, "imported "+downloadClientHadoukenResourceName+": "+req.ID)
 }
 
-func (d *DownloadClientHadouken) write(ctx context.Context, downloadClient *sonarr.DownloadClientResource) {
+func (d *DownloadClientHadouken) write(ctx context.Context, downloadClient *sonarr.DownloadClientResource, diags *diag.Diagnostics) {
 	genericDownloadClient := d.toDownloadClient()
-	genericDownloadClient.write(ctx, downloadClient)
+	genericDownloadClient.write(ctx, downloadClient, diags)
 	d.fromDownloadClient(genericDownloadClient)
 }
 
-func (d *DownloadClientHadouken) read(ctx context.Context) *sonarr.DownloadClientResource {
-	return d.toDownloadClient().read(ctx)
+func (d *DownloadClientHadouken) read(ctx context.Context, diags *diag.Diagnostics) *sonarr.DownloadClientResource {
+	return d.toDownloadClient().read(ctx, diags)
 }

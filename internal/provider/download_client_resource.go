@@ -8,13 +8,13 @@ import (
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -355,7 +355,7 @@ func (r *DownloadClientResource) Create(ctx context.Context, req resource.Create
 	}
 
 	// Create new DownloadClient
-	request := client.read(ctx)
+	request := client.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.DownloadClientApi.CreateDownloadClient(ctx).DownloadClientResource(*request).Execute()
 	if err != nil {
@@ -370,7 +370,7 @@ func (r *DownloadClientResource) Create(ctx context.Context, req resource.Create
 	var state DownloadClient
 
 	state.writeSensitive(client)
-	state.write(ctx, response)
+	state.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
 
@@ -398,7 +398,7 @@ func (r *DownloadClientResource) Read(ctx context.Context, req resource.ReadRequ
 	var state DownloadClient
 
 	state.writeSensitive(client)
-	state.write(ctx, response)
+	state.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
 
@@ -413,7 +413,7 @@ func (r *DownloadClientResource) Update(ctx context.Context, req resource.Update
 	}
 
 	// Update DownloadClient
-	request := client.read(ctx)
+	request := client.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.DownloadClientApi.UpdateDownloadClient(ctx, strconv.Itoa(int(request.GetId()))).DownloadClientResource(*request).Execute()
 	if err != nil {
@@ -428,7 +428,7 @@ func (r *DownloadClientResource) Update(ctx context.Context, req resource.Update
 	var state DownloadClient
 
 	state.writeSensitive(client)
-	state.write(ctx, response)
+	state.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
 
@@ -458,8 +458,12 @@ func (r *DownloadClientResource) ImportState(ctx context.Context, req resource.I
 	tflog.Trace(ctx, "imported "+downloadClientResourceName+": "+req.ID)
 }
 
-func (d *DownloadClient) write(ctx context.Context, downloadClient *sonarr.DownloadClientResource) {
-	d.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, downloadClient.GetTags())
+func (d *DownloadClient) write(ctx context.Context, downloadClient *sonarr.DownloadClientResource, diags *diag.Diagnostics) {
+	var localDiag diag.Diagnostics
+
+	d.Tags, localDiag = types.SetValueFrom(ctx, types.Int64Type, downloadClient.Tags)
+	diags.Append(localDiag...)
+
 	d.Enable = types.BoolValue(downloadClient.GetEnable())
 	d.RemoveCompletedDownloads = types.BoolValue(downloadClient.GetRemoveCompletedDownloads())
 	d.RemoveFailedDownloads = types.BoolValue(downloadClient.GetRemoveFailedDownloads())
@@ -475,10 +479,7 @@ func (d *DownloadClient) write(ctx context.Context, downloadClient *sonarr.Downl
 	helpers.WriteFields(ctx, d, downloadClient.GetFields(), downloadClientFields)
 }
 
-func (d *DownloadClient) read(ctx context.Context) *sonarr.DownloadClientResource {
-	tags := make([]*int32, len(d.Tags.Elements()))
-	tfsdk.ValueAs(ctx, d.Tags, &tags)
-
+func (d *DownloadClient) read(ctx context.Context, diags *diag.Diagnostics) *sonarr.DownloadClientResource {
 	client := sonarr.NewDownloadClientResource()
 	client.SetEnable(d.Enable.ValueBool())
 	client.SetRemoveCompletedDownloads(d.RemoveCompletedDownloads.ValueBool())
@@ -489,7 +490,7 @@ func (d *DownloadClient) read(ctx context.Context) *sonarr.DownloadClientResourc
 	client.SetImplementation(d.Implementation.ValueString())
 	client.SetName(d.Name.ValueString())
 	client.SetProtocol(sonarr.DownloadProtocol(d.Protocol.ValueString()))
-	client.SetTags(tags)
+	diags.Append(d.Tags.ElementsAs(ctx, &client.Tags, true)...)
 	client.SetFields(helpers.ReadFields(ctx, d, downloadClientFields))
 
 	return client

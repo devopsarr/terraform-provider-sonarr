@@ -128,7 +128,7 @@ func (d *AllSeriessDataSource) Read(ctx context.Context, req datasource.ReadRequ
 	// Map response body to resource schema attribute
 	series := make([]Series, len(response))
 	for i, t := range response {
-		series[i].write(ctx, t)
+		series[i].write(ctx, t, &resp.Diagnostics)
 	}
 
 	tfsdk.ValueFrom(ctx, series, data.Series.Type(ctx), &data.Series)

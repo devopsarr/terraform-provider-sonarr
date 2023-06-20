@@ -8,7 +8,6 @@ import (
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -81,13 +80,6 @@ func (d *RemotePathMappingsDataSource) Configure(ctx context.Context, req dataso
 }
 
 func (d *RemotePathMappingsDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var data *RemotePathMappings
-
-	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
-
-	if resp.Diagnostics.HasError() {
-		return
-	}
 	// Get remotePathMappings current value
 	response, _, err := d.client.RemotePathMappingApi.ListRemotePathMapping(ctx).Execute()
 	if err != nil {
@@ -103,8 +95,7 @@ func (d *RemotePathMappingsDataSource) Read(ctx context.Context, req datasource.
 		mappings[i].write(p)
 	}
 
-	tfsdk.ValueFrom(ctx, mappings, data.RemotePathMappings.Type(ctx), &data.RemotePathMappings)
-	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
-	data.ID = types.StringValue(strconv.Itoa(len(response)))
-	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
+	pathList, diags := types.SetValueFrom(ctx, RemotePathMapping{}.getType(), mappings)
+	resp.Diagnostics.Append(diags...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, RemotePathMappings{RemotePathMappings: pathList, ID: types.StringValue(strconv.Itoa(len(response)))})...)
 }

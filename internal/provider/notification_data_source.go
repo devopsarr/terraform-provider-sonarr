@@ -445,7 +445,7 @@ func (d *NotificationDataSource) Read(ctx context.Context, req datasource.ReadRe
 	}
 
 	tflog.Trace(ctx, "read "+notificationDataSourceName)
-	data.write(ctx, notification)
+	data.write(ctx, notification, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 

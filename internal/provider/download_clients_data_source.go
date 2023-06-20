@@ -264,8 +264,7 @@ func (d *DownloadClientsDataSource) Read(ctx context.Context, req datasource.Rea
 	// Map response body to resource schema attribute
 	downloadClients := make([]DownloadClient, len(response))
 	for i, d := range response {
-		downloadClients[i].Tags = types.SetNull(types.Int64Type)
-		downloadClients[i].write(ctx, d)
+		downloadClients[i].write(ctx, d, &resp.Diagnostics)
 	}
 
 	tfsdk.ValueFrom(ctx, downloadClients, data.DownloadClients.Type(ctx), &data.DownloadClients)

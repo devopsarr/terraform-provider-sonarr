@@ -97,7 +97,7 @@ func (d *RootFolderDataSource) Read(ctx context.Context, req datasource.ReadRequ
 	}
 
 	tflog.Trace(ctx, "read "+rootFolderDataSourceName)
-	folder.write(ctx, rootFolder)
+	folder.write(ctx, rootFolder, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &folder)...)
 }
 

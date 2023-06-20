@@ -6,12 +6,12 @@ import (
 
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -113,7 +113,7 @@ func (r *ReleaseProfileResource) Create(ctx context.Context, req resource.Create
 	}
 
 	// Build Create resource
-	request := profile.read(ctx)
+	request := profile.read(ctx, &resp.Diagnostics)
 
 	// Create new ReleaseProfile
 	response, _, err := r.client.ReleaseProfileApi.CreateReleaseProfile(ctx).ReleaseProfileResource(*request).Execute()
@@ -125,7 +125,7 @@ func (r *ReleaseProfileResource) Create(ctx context.Context, req resource.Create
 
 	tflog.Trace(ctx, "created"+releaseProfileResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	profile.write(ctx, response)
+	profile.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &profile)...)
 }
 
@@ -149,7 +149,7 @@ func (r *ReleaseProfileResource) Read(ctx context.Context, req resource.ReadRequ
 
 	tflog.Trace(ctx, "read "+releaseProfileResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
-	profile.write(ctx, response)
+	profile.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &profile)...)
 }
 
@@ -164,7 +164,7 @@ func (r *ReleaseProfileResource) Update(ctx context.Context, req resource.Update
 	}
 
 	// Build Update resource
-	request := profile.read(ctx)
+	request := profile.read(ctx, &resp.Diagnostics)
 
 	// Update ReleaseProfile
 	response, _, err := r.client.ReleaseProfileApi.UpdateReleaseProfile(ctx, strconv.Itoa(int(request.GetId()))).ReleaseProfileResource(*request).Execute()
@@ -176,7 +176,7 @@ func (r *ReleaseProfileResource) Update(ctx context.Context, req resource.Update
 
 	tflog.Trace(ctx, "updated "+releaseProfileResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	profile.write(ctx, response)
+	profile.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &profile)...)
 }
 
@@ -206,36 +206,30 @@ func (r *ReleaseProfileResource) ImportState(ctx context.Context, req resource.I
 	tflog.Trace(ctx, "imported "+releaseProfileResourceName+": "+req.ID)
 }
 
-func (p *ReleaseProfile) write(ctx context.Context, profile *sonarr.ReleaseProfileResource) {
-	p.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, profile.GetTags())
+func (p *ReleaseProfile) write(ctx context.Context, profile *sonarr.ReleaseProfileResource, diags *diag.Diagnostics) {
+	var tempDiag diag.Diagnostics
+
 	p.ID = types.Int64Value(int64(profile.GetId()))
 	p.Name = types.StringValue(profile.GetName())
 	p.Enabled = types.BoolValue(profile.GetEnabled())
 	p.IndexerID = types.Int64Value(int64(profile.GetIndexerId()))
-	p.Required = types.SetValueMust(types.StringType, nil)
-	tfsdk.ValueFrom(ctx, profile.Required, p.Required.Type(ctx), &p.Required)
-	p.Ignored = types.SetValueMust(types.StringType, nil)
-	tfsdk.ValueFrom(ctx, profile.Ignored, p.Ignored.Type(ctx), &p.Ignored)
+	p.Required, tempDiag = types.SetValueFrom(ctx, types.StringType, profile.GetRequired())
+	diags.Append(tempDiag...)
+	p.Ignored, tempDiag = types.SetValueFrom(ctx, types.StringType, profile.GetIgnored())
+	diags.Append(tempDiag...)
+	p.Tags, tempDiag = types.SetValueFrom(ctx, types.Int64Type, profile.GetTags())
+	diags.Append(tempDiag...)
 }
 
-func (p *ReleaseProfile) read(ctx context.Context) *sonarr.ReleaseProfileResource {
-	tags := make([]*int32, len(p.Tags.Elements()))
-	tfsdk.ValueAs(ctx, p.Tags, &tags)
-
-	required := make([]*string, len(p.Required.Elements()))
-	tfsdk.ValueAs(ctx, p.Required, &required)
-
-	ignored := make([]*string, len(p.Required.Elements()))
-	tfsdk.ValueAs(ctx, p.Ignored, &ignored)
-
+func (p *ReleaseProfile) read(ctx context.Context, diags *diag.Diagnostics) *sonarr.ReleaseProfileResource {
 	profile := sonarr.NewReleaseProfileResource()
 	profile.SetEnabled(p.Enabled.ValueBool())
 	profile.SetId(int32(p.ID.ValueInt64()))
-	profile.SetIgnored(ignored)
 	profile.SetIndexerId(int32(p.IndexerID.ValueInt64()))
 	profile.SetName(p.Name.ValueString())
-	profile.SetRequired(required)
-	profile.SetTags(tags)
+	diags.Append(p.Ignored.ElementsAs(ctx, &profile.Ignored, true)...)
+	diags.Append(p.Required.ElementsAs(ctx, &profile.Required, true)...)
+	diags.Append(p.Tags.ElementsAs(ctx, &profile.Tags, true)...)
 
 	return profile
 }

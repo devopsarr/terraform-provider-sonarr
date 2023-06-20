@@ -2,12 +2,12 @@ package provider
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
@@ -52,9 +52,9 @@ func (d *TagDataSource) Configure(ctx context.Context, req datasource.ConfigureR
 }
 
 func (d *TagDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var tag *Tag
+	var data *Tag
 
-	resp.Diagnostics.Append(req.Config.Get(ctx, &tag)...)
+	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
 
 	if resp.Diagnostics.HasError() {
 		return
@@ -68,25 +68,20 @@ func (d *TagDataSource) Read(ctx context.Context, req datasource.ReadRequest, re
 		return
 	}
 
-	value, err := findTag(tag.Label.ValueString(), response)
-	if err != nil {
-		resp.Diagnostics.AddError(helpers.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", tagDataSourceName, err))
-
-		return
-	}
-
+	data.find(data.Label.ValueString(), response, &resp.Diagnostics)
 	tflog.Trace(ctx, "read "+tagDataSourceName)
-	tag.write(value)
 	// Map response body to resource schema attribute
-	resp.Diagnostics.Append(resp.State.Set(ctx, &tag)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func findTag(label string, tags []*sonarr.TagResource) (*sonarr.TagResource, error) {
-	for _, t := range tags {
-		if t.GetLabel() == label {
-			return t, nil
+func (t *Tag) find(label string, tags []*sonarr.TagResource, diags *diag.Diagnostics) {
+	for _, tag := range tags {
+		if tag.GetLabel() == label {
+			t.write(tag)
+
+			return
 		}
 	}
 
-	return nil, helpers.ErrDataNotFoundError(tagDataSourceName, "label", label)
+	diags.AddError(helpers.DataSourceError, helpers.ParseNotFoundError(tagDataSourceName, "label", label))
 }

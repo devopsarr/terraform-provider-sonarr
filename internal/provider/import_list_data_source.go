@@ -201,7 +201,7 @@ func (d *ImportListDataSource) Read(ctx context.Context, req datasource.ReadRequ
 	}
 
 	tflog.Trace(ctx, "read "+importListDataSourceName)
-	data.write(ctx, importList)
+	data.write(ctx, importList, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 

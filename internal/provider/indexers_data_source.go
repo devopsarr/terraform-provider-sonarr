@@ -207,7 +207,7 @@ func (d *IndexersDataSource) Read(ctx context.Context, req datasource.ReadReques
 	indexers := make([]Indexer, len(response))
 	for j, i := range response {
 		indexers[j].Tags = types.SetNull(types.Int64Type)
-		indexers[j].write(ctx, i)
+		indexers[j].write(ctx, i, &resp.Diagnostics)
 	}
 
 	tfsdk.ValueFrom(ctx, indexers, data.Indexers.Type(ctx), &data.Indexers)

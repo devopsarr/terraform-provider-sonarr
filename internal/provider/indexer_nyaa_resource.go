@@ -6,6 +6,7 @@ import (
 
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -203,7 +204,7 @@ func (r *IndexerNyaaResource) Create(ctx context.Context, req resource.CreateReq
 	}
 
 	// Create new IndexerNyaa
-	request := indexer.read(ctx)
+	request := indexer.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.IndexerApi.CreateIndexer(ctx).IndexerResource(*request).Execute()
 	if err != nil {
@@ -214,7 +215,7 @@ func (r *IndexerNyaaResource) Create(ctx context.Context, req resource.CreateReq
 
 	tflog.Trace(ctx, "created "+indexerNyaaResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	indexer.write(ctx, response)
+	indexer.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &indexer)...)
 }
 
@@ -238,7 +239,7 @@ func (r *IndexerNyaaResource) Read(ctx context.Context, req resource.ReadRequest
 
 	tflog.Trace(ctx, "read "+indexerNyaaResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
-	indexer.write(ctx, response)
+	indexer.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &indexer)...)
 }
 
@@ -253,7 +254,7 @@ func (r *IndexerNyaaResource) Update(ctx context.Context, req resource.UpdateReq
 	}
 
 	// Update IndexerNyaa
-	request := indexer.read(ctx)
+	request := indexer.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.IndexerApi.UpdateIndexer(ctx, strconv.Itoa(int(request.GetId()))).IndexerResource(*request).Execute()
 	if err != nil {
@@ -264,7 +265,7 @@ func (r *IndexerNyaaResource) Update(ctx context.Context, req resource.UpdateReq
 
 	tflog.Trace(ctx, "updated "+indexerNyaaResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	indexer.write(ctx, response)
+	indexer.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &indexer)...)
 }
 
@@ -294,12 +295,12 @@ func (r *IndexerNyaaResource) ImportState(ctx context.Context, req resource.Impo
 	tflog.Trace(ctx, "imported "+indexerNyaaResourceName+": "+req.ID)
 }
 
-func (i *IndexerNyaa) write(ctx context.Context, indexer *sonarr.IndexerResource) {
+func (i *IndexerNyaa) write(ctx context.Context, indexer *sonarr.IndexerResource, diags *diag.Diagnostics) {
 	genericIndexer := i.toIndexer()
-	genericIndexer.write(ctx, indexer)
+	genericIndexer.write(ctx, indexer, diags)
 	i.fromIndexer(genericIndexer)
 }
 
-func (i *IndexerNyaa) read(ctx context.Context) *sonarr.IndexerResource {
-	return i.toIndexer().read(ctx)
+func (i *IndexerNyaa) read(ctx context.Context, diags *diag.Diagnostics) *sonarr.IndexerResource {
+	return i.toIndexer().read(ctx, diags)
 }
