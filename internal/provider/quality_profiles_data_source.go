@@ -8,8 +8,6 @@ import (
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -150,13 +148,6 @@ func (d *QualityProfilesDataSource) Configure(ctx context.Context, req datasourc
 }
 
 func (d *QualityProfilesDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var data *QualityProfiles
-
-	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
-
-	if resp.Diagnostics.HasError() {
-		return
-	}
 	// Get qualityprofiles current value
 	response, _, err := d.client.QualityProfileApi.ListQualityProfile(ctx).Execute()
 	if err != nil {
@@ -167,19 +158,12 @@ func (d *QualityProfilesDataSource) Read(ctx context.Context, req datasource.Rea
 
 	tflog.Trace(ctx, "read "+qualityProfilesDataSourceName)
 	// Map response body to resource schema attribute
-	profiles := *writeQualitiyprofiles(ctx, response)
-	tfsdk.ValueFrom(ctx, profiles, data.QualityProfiles.Type(ctx), &data.QualityProfiles)
-
-	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
-	data.ID = types.StringValue(strconv.Itoa(len(response)))
-	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
-}
-
-func writeQualitiyprofiles(ctx context.Context, qualities []*sonarr.QualityProfileResource) *[]QualityProfile {
-	output := make([]QualityProfile, len(qualities))
-	for i, p := range qualities {
-		output[i].write(ctx, p, &diag.Diagnostics{})
+	profiles := make([]QualityProfile, len(response))
+	for i, p := range response {
+		profiles[i].write(ctx, p, &resp.Diagnostics)
 	}
 
-	return &output
+	profileList, diags := types.SetValueFrom(ctx, QualityProfile{}.getType(), profiles)
+	resp.Diagnostics.Append(diags...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, QualityProfiles{QualityProfiles: profileList, ID: types.StringValue(strconv.Itoa(len(response)))})...)
 }

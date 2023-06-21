@@ -152,7 +152,7 @@ func (d *QualityProfileDataSource) Read(ctx context.Context, req datasource.Read
 	}
 
 	tflog.Trace(ctx, "read "+qualityProfileDataSourceName)
-	data.write(ctx, profile)
+	data.write(ctx, profile, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
