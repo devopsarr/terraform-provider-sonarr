@@ -7,6 +7,7 @@ import (
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -163,7 +164,7 @@ func (r *ImportListPlexRSSResource) Create(ctx context.Context, req resource.Cre
 	}
 
 	// Create new ImportListPlexRSS
-	request := importList.read(ctx)
+	request := importList.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.ImportListApi.CreateImportList(ctx).ImportListResource(*request).Execute()
 	if err != nil {
@@ -174,7 +175,7 @@ func (r *ImportListPlexRSSResource) Create(ctx context.Context, req resource.Cre
 
 	tflog.Trace(ctx, "created "+importListPlexRSSResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	importList.write(ctx, response)
+	importList.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &importList)...)
 }
 
@@ -198,7 +199,7 @@ func (r *ImportListPlexRSSResource) Read(ctx context.Context, req resource.ReadR
 
 	tflog.Trace(ctx, "read "+importListPlexRSSResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
-	importList.write(ctx, response)
+	importList.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &importList)...)
 }
 
@@ -213,7 +214,7 @@ func (r *ImportListPlexRSSResource) Update(ctx context.Context, req resource.Upd
 	}
 
 	// Update ImportListPlexRSS
-	request := importList.read(ctx)
+	request := importList.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.ImportListApi.UpdateImportList(ctx, strconv.Itoa(int(request.GetId()))).ImportListResource(*request).Execute()
 	if err != nil {
@@ -224,28 +225,28 @@ func (r *ImportListPlexRSSResource) Update(ctx context.Context, req resource.Upd
 
 	tflog.Trace(ctx, "updated "+importListPlexRSSResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	importList.write(ctx, response)
+	importList.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &importList)...)
 }
 
 func (r *ImportListPlexRSSResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var importList *ImportListPlexRSS
+	var ID int64
 
-	resp.Diagnostics.Append(req.State.Get(ctx, &importList)...)
+	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("id"), &ID)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Delete ImportListPlexRSS current value
-	_, err := r.client.ImportListApi.DeleteImportList(ctx, int32(importList.ID.ValueInt64())).Execute()
+	_, err := r.client.ImportListApi.DeleteImportList(ctx, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, importListPlexRSSResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted "+importListPlexRSSResourceName+": "+strconv.Itoa(int(importList.ID.ValueInt64())))
+	tflog.Trace(ctx, "deleted "+importListPlexRSSResourceName+": "+strconv.Itoa(int(ID)))
 	resp.State.RemoveResource(ctx)
 }
 
@@ -254,12 +255,12 @@ func (r *ImportListPlexRSSResource) ImportState(ctx context.Context, req resourc
 	tflog.Trace(ctx, "imported "+importListPlexRSSResourceName+": "+req.ID)
 }
 
-func (i *ImportListPlexRSS) write(ctx context.Context, importList *sonarr.ImportListResource) {
+func (i *ImportListPlexRSS) write(ctx context.Context, importList *sonarr.ImportListResource, diags *diag.Diagnostics) {
 	genericImportList := i.toImportList()
-	genericImportList.write(ctx, importList)
+	genericImportList.write(ctx, importList, diags)
 	i.fromImportList(genericImportList)
 }
 
-func (i *ImportListPlexRSS) read(ctx context.Context) *sonarr.ImportListResource {
-	return i.toImportList().read(ctx)
+func (i *ImportListPlexRSS) read(ctx context.Context, diags *diag.Diagnostics) *sonarr.ImportListResource {
+	return i.toImportList().read(ctx, diags)
 }

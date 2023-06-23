@@ -8,6 +8,7 @@ import (
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
@@ -109,24 +110,19 @@ func (d *CustomFormatDataSource) Read(ctx context.Context, req datasource.ReadRe
 		return
 	}
 
-	customFormat, err := findCustomFormat(data.Name.ValueString(), response)
-	if err != nil {
-		resp.Diagnostics.AddError(helpers.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", customFormatDataSourceName, err))
-
-		return
-	}
-
+	data.find(ctx, data.Name.ValueString(), response, &resp.Diagnostics)
 	tflog.Trace(ctx, "read "+customFormatDataSourceName)
-	data.write(ctx, customFormat)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func findCustomFormat(name string, customFormats []*sonarr.CustomFormatResource) (*sonarr.CustomFormatResource, error) {
+func (c *CustomFormat) find(ctx context.Context, name string, customFormats []*sonarr.CustomFormatResource, diags *diag.Diagnostics) {
 	for _, i := range customFormats {
 		if i.GetName() == name {
-			return i, nil
+			c.write(ctx, i, diags)
+
+			return
 		}
 	}
 
-	return nil, helpers.ErrDataNotFoundError(customFormatDataSourceName, "name", name)
+	diags.AddError(helpers.DataSourceError, helpers.ParseNotFoundError(customFormatDataSourceName, "name", name))
 }

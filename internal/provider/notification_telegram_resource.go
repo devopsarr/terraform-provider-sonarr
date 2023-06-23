@@ -6,6 +6,7 @@ import (
 
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -225,7 +226,7 @@ func (r *NotificationTelegramResource) Create(ctx context.Context, req resource.
 	}
 
 	// Create new NotificationTelegram
-	request := notification.read(ctx)
+	request := notification.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.NotificationApi.CreateNotification(ctx).NotificationResource(*request).Execute()
 	if err != nil {
@@ -236,7 +237,7 @@ func (r *NotificationTelegramResource) Create(ctx context.Context, req resource.
 
 	tflog.Trace(ctx, "created "+notificationTelegramResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	notification.write(ctx, response)
+	notification.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &notification)...)
 }
 
@@ -260,7 +261,7 @@ func (r *NotificationTelegramResource) Read(ctx context.Context, req resource.Re
 
 	tflog.Trace(ctx, "read "+notificationTelegramResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
-	notification.write(ctx, response)
+	notification.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &notification)...)
 }
 
@@ -275,7 +276,7 @@ func (r *NotificationTelegramResource) Update(ctx context.Context, req resource.
 	}
 
 	// Update NotificationTelegram
-	request := notification.read(ctx)
+	request := notification.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.NotificationApi.UpdateNotification(ctx, strconv.Itoa(int(request.GetId()))).NotificationResource(*request).Execute()
 	if err != nil {
@@ -286,28 +287,28 @@ func (r *NotificationTelegramResource) Update(ctx context.Context, req resource.
 
 	tflog.Trace(ctx, "updated "+notificationTelegramResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	notification.write(ctx, response)
+	notification.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &notification)...)
 }
 
 func (r *NotificationTelegramResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var notification *NotificationTelegram
+	var ID int64
 
-	resp.Diagnostics.Append(req.State.Get(ctx, &notification)...)
+	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("id"), &ID)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Delete NotificationTelegram current value
-	_, err := r.client.NotificationApi.DeleteNotification(ctx, int32(notification.ID.ValueInt64())).Execute()
+	_, err := r.client.NotificationApi.DeleteNotification(ctx, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, notificationTelegramResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted "+notificationTelegramResourceName+": "+strconv.Itoa(int(notification.ID.ValueInt64())))
+	tflog.Trace(ctx, "deleted "+notificationTelegramResourceName+": "+strconv.Itoa(int(ID)))
 	resp.State.RemoveResource(ctx)
 }
 
@@ -316,12 +317,12 @@ func (r *NotificationTelegramResource) ImportState(ctx context.Context, req reso
 	tflog.Trace(ctx, "imported "+notificationTelegramResourceName+": "+req.ID)
 }
 
-func (n *NotificationTelegram) write(ctx context.Context, notification *sonarr.NotificationResource) {
+func (n *NotificationTelegram) write(ctx context.Context, notification *sonarr.NotificationResource, diags *diag.Diagnostics) {
 	genericNotification := n.toNotification()
-	genericNotification.write(ctx, notification)
+	genericNotification.write(ctx, notification, diags)
 	n.fromNotification(genericNotification)
 }
 
-func (n *NotificationTelegram) read(ctx context.Context) *sonarr.NotificationResource {
-	return n.toNotification().read(ctx)
+func (n *NotificationTelegram) read(ctx context.Context, diags *diag.Diagnostics) *sonarr.NotificationResource {
+	return n.toNotification().read(ctx, diags)
 }

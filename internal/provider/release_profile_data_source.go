@@ -2,13 +2,13 @@ package provider
 
 import (
 	"context"
-	"fmt"
 	"strconv"
 
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -78,9 +78,9 @@ func (d *ReleaseProfileDataSource) Configure(ctx context.Context, req datasource
 }
 
 func (d *ReleaseProfileDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var releaseProfile *ReleaseProfile
+	var data *ReleaseProfile
 
-	resp.Diagnostics.Append(req.Config.Get(ctx, &releaseProfile)...)
+	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
 
 	if resp.Diagnostics.HasError() {
 		return
@@ -93,24 +93,21 @@ func (d *ReleaseProfileDataSource) Read(ctx context.Context, req datasource.Read
 		return
 	}
 
-	profile, err := findReleaseProfile(releaseProfile.ID.ValueInt64(), response)
-	if err != nil {
-		resp.Diagnostics.AddError(helpers.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", releaseProfileDataSourceName, err))
-
-		return
-	}
+	data.find(ctx, data.ID.ValueInt64(), response, &resp.Diagnostics)
 
 	tflog.Trace(ctx, "read "+releaseProfileDataSourceName)
-	releaseProfile.write(ctx, profile)
-	resp.Diagnostics.Append(resp.State.Set(ctx, &releaseProfile)...)
+	// Map response body to resource schema attribute
+	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func findReleaseProfile(id int64, profiles []*sonarr.ReleaseProfileResource) (*sonarr.ReleaseProfileResource, error) {
-	for _, p := range profiles {
-		if int64(p.GetId()) == id {
-			return p, nil
+func (p *ReleaseProfile) find(ctx context.Context, id int64, profiles []*sonarr.ReleaseProfileResource, diags *diag.Diagnostics) {
+	for _, profile := range profiles {
+		if int64(profile.GetId()) == id {
+			p.write(ctx, profile, diags)
+
+			return
 		}
 	}
 
-	return nil, helpers.ErrDataNotFoundError(releaseProfileDataSourceName, "id", strconv.Itoa(int(id)))
+	diags.AddError(helpers.DataSourceError, helpers.ParseNotFoundError(releaseProfileDataSourceName, "id", strconv.Itoa(int(id))))
 }

@@ -9,6 +9,7 @@ import (
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -40,6 +41,14 @@ type TagResource struct {
 type Tag struct {
 	Label types.String `tfsdk:"label"`
 	ID    types.Int64  `tfsdk:"id"`
+}
+
+func (t Tag) getType() attr.Type {
+	return types.ObjectType{}.WithAttributeTypes(
+		map[string]attr.Type{
+			"id":    types.Int64Type,
+			"label": types.StringType,
+		})
 }
 
 func (r *TagResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -157,23 +166,23 @@ func (r *TagResource) Update(ctx context.Context, req resource.UpdateRequest, re
 }
 
 func (r *TagResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var tag *Tag
+	var ID int64
 
-	resp.Diagnostics.Append(req.State.Get(ctx, &tag)...)
+	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("id"), &ID)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Delete tag current value
-	_, err := r.client.TagApi.DeleteTag(ctx, int32(tag.ID.ValueInt64())).Execute()
+	_, err := r.client.TagApi.DeleteTag(ctx, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, tagResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted "+tagResourceName+": "+strconv.Itoa(int(tag.ID.ValueInt64())))
+	tflog.Trace(ctx, "deleted "+tagResourceName+": "+strconv.Itoa(int(ID)))
 	resp.State.RemoveResource(ctx)
 }
 

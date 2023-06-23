@@ -2,12 +2,12 @@ package provider
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -105,24 +105,20 @@ func (d *SeriesDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 		return
 	}
 
-	series, err := findSeries(data.Title.ValueString(), response)
-	if err != nil {
-		resp.Diagnostics.AddError(helpers.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", seriesDataSourceName, err))
-
-		return
-	}
-
-	tflog.Trace(ctx, "read "+seriesDataSourceName)
-	data.write(ctx, series)
+	data.find(ctx, data.Title.ValueString(), response, &resp.Diagnostics)
+	tflog.Trace(ctx, "read "+tagDataSourceName)
+	// Map response body to resource schema attribute
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func findSeries(title string, series []*sonarr.SeriesResource) (*sonarr.SeriesResource, error) {
-	for _, s := range series {
-		if s.GetTitle() == title {
-			return s, nil
+func (s *Series) find(ctx context.Context, title string, series []*sonarr.SeriesResource, diags *diag.Diagnostics) {
+	for _, ser := range series {
+		if ser.GetTitle() == title {
+			s.write(ctx, ser, diags)
+
+			return
 		}
 	}
 
-	return nil, helpers.ErrDataNotFoundError(seriesDataSourceName, "title", title)
+	diags.AddError(helpers.DataSourceError, helpers.ParseNotFoundError(seriesDataSourceName, "title", title))
 }

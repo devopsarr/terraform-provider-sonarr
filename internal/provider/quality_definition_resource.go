@@ -6,6 +6,7 @@ import (
 
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -43,6 +44,20 @@ type QualityDefinition struct {
 	ID          types.Int64   `tfsdk:"id"`
 	QualityID   types.Int64   `tfsdk:"quality_id"`
 	Resolution  types.Int64   `tfsdk:"resolution"`
+}
+
+func (p QualityDefinition) getType() attr.Type {
+	return types.ObjectType{}.WithAttributeTypes(
+		map[string]attr.Type{
+			"id":           types.Int64Type,
+			"quality_id":   types.Int64Type,
+			"resolution":   types.Int64Type,
+			"min_size":     types.Float64Type,
+			"max_size":     types.Float64Type,
+			"title":        types.StringType,
+			"quality_name": types.StringType,
+			"source":       types.StringType,
+		})
 }
 
 func (r *QualityDefinitionResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {

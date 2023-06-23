@@ -8,7 +8,6 @@ import (
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -76,14 +75,6 @@ func (d *LanguagesDataSource) Configure(ctx context.Context, req datasource.Conf
 }
 
 func (d *LanguagesDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var data *Languages
-
-	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
-
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
 	// Get languages current value
 	response, _, err := d.client.LanguageApi.ListLanguage(ctx).Execute()
 	if err != nil {
@@ -99,8 +90,7 @@ func (d *LanguagesDataSource) Read(ctx context.Context, req datasource.ReadReque
 		languages[i].write(t)
 	}
 
-	tfsdk.ValueFrom(ctx, languages, data.Languages.Type(ctx), &data.Languages)
-	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
-	data.ID = types.StringValue(strconv.Itoa(len(response)))
-	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
+	languageList, diags := types.SetValueFrom(ctx, Language{}.getType(), languages)
+	resp.Diagnostics.Append(diags...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, Languages{Languages: languageList, ID: types.StringValue(strconv.Itoa(len(response)))})...)
 }

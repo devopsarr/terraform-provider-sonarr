@@ -8,7 +8,6 @@ import (
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -98,13 +97,6 @@ func (d *QualityDefinitionsDataSource) Configure(ctx context.Context, req dataso
 }
 
 func (d *QualityDefinitionsDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var data *QualityDefinitions
-
-	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
-
-	if resp.Diagnostics.HasError() {
-		return
-	}
 	// Get qualitydefinitions current value
 	response, _, err := d.client.QualityDefinitionApi.ListQualityDefinition(ctx).Execute()
 	if err != nil {
@@ -115,19 +107,12 @@ func (d *QualityDefinitionsDataSource) Read(ctx context.Context, req datasource.
 
 	tflog.Trace(ctx, "read "+qualityDefinitionsDataSourceName)
 	// Map response body to resource schema attribute
-	definitions := *writeQualitiydefinitions(response)
-	tfsdk.ValueFrom(ctx, definitions, data.QualityDefinitions.Type(ctx), &data.QualityDefinitions)
-
-	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
-	data.ID = types.StringValue(strconv.Itoa(len(response)))
-	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
-}
-
-func writeQualitiydefinitions(qualities []*sonarr.QualityDefinitionResource) *[]QualityDefinition {
-	output := make([]QualityDefinition, len(qualities))
-	for i, p := range qualities {
-		output[i].write(p)
+	definitions := make([]QualityDefinition, len(response))
+	for i, p := range response {
+		definitions[i].write(p)
 	}
 
-	return &output
+	qualityList, diags := types.SetValueFrom(ctx, QualityDefinition{}.getType(), definitions)
+	resp.Diagnostics.Append(diags...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, QualityDefinitions{QualityDefinitions: qualityList, ID: types.StringValue(strconv.Itoa(len(response)))})...)
 }

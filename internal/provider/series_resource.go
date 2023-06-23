@@ -6,12 +6,13 @@ import (
 
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -46,6 +47,23 @@ type Series struct {
 	Monitored         types.Bool   `tfsdk:"monitored"`
 	SeasonFolder      types.Bool   `tfsdk:"season_folder"`
 	UseSceneNumbering types.Bool   `tfsdk:"use_scene_numbering"`
+}
+
+func (s Series) getType() attr.Type {
+	return types.ObjectType{}.WithAttributeTypes(
+		map[string]attr.Type{
+			"monitored":           types.BoolType,
+			"season_folder":       types.BoolType,
+			"use_scene_numbering": types.BoolType,
+			"id":                  types.Int64Type,
+			"quality_profile_id":  types.Int64Type,
+			"tvdb_id":             types.Int64Type,
+			"root_folder_path":    types.StringType,
+			"title_slug":          types.StringType,
+			"title":               types.StringType,
+			"path":                types.StringType,
+			"tags":                types.SetType{}.WithElementType(types.Int64Type),
+		})
 }
 
 // Season is part of Series.
@@ -149,7 +167,7 @@ func (r *SeriesResource) Create(ctx context.Context, req resource.CreateRequest,
 	}
 
 	// Create new Series
-	request := series.read(ctx)
+	request := series.read(ctx, &resp.Diagnostics)
 	// TODO: can parametrize AddSeriesOptions
 	options := sonarr.NewAddSeriesOptions()
 	options.SetSearchForMissingEpisodes(true)
@@ -168,7 +186,7 @@ func (r *SeriesResource) Create(ctx context.Context, req resource.CreateRequest,
 
 	tflog.Trace(ctx, "created "+seriesResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	series.write(ctx, response)
+	series.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &series)...)
 }
 
@@ -192,7 +210,7 @@ func (r *SeriesResource) Read(ctx context.Context, req resource.ReadRequest, res
 
 	tflog.Trace(ctx, "read "+seriesResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
-	series.write(ctx, response)
+	series.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &series)...)
 }
 
@@ -207,7 +225,7 @@ func (r *SeriesResource) Update(ctx context.Context, req resource.UpdateRequest,
 	}
 
 	// Update Series
-	request := series.read(ctx)
+	request := series.read(ctx, &resp.Diagnostics)
 
 	// TODO: manage movefiles on sdk
 	response, _, err := r.client.SeriesApi.UpdateSeries(ctx, strconv.Itoa(int(request.GetId()))).SeriesResource(*request).Execute()
@@ -219,14 +237,14 @@ func (r *SeriesResource) Update(ctx context.Context, req resource.UpdateRequest,
 
 	tflog.Trace(ctx, "updated "+seriesResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
-	series.write(ctx, response)
+	series.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &series)...)
 }
 
 func (r *SeriesResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var series *Series
+	var ID int64
 
-	resp.Diagnostics.Append(req.State.Get(ctx, &series)...)
+	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("id"), &ID)...)
 
 	if resp.Diagnostics.HasError() {
 		return
@@ -234,14 +252,14 @@ func (r *SeriesResource) Delete(ctx context.Context, req resource.DeleteRequest,
 
 	// Delete series current value
 	// TODO: manage delete parameters on SDK
-	_, err := r.client.SeriesApi.DeleteSeries(ctx, int32(series.ID.ValueInt64())).Execute()
+	_, err := r.client.SeriesApi.DeleteSeries(ctx, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, seriesResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted "+seriesResourceName+": "+strconv.Itoa(int(series.ID.ValueInt64())))
+	tflog.Trace(ctx, "deleted "+seriesResourceName+": "+strconv.Itoa(int(ID)))
 	resp.State.RemoveResource(ctx)
 }
 
@@ -250,8 +268,9 @@ func (r *SeriesResource) ImportState(ctx context.Context, req resource.ImportSta
 	tflog.Trace(ctx, "imported "+seriesResourceName+": "+req.ID)
 }
 
-func (s *Series) write(ctx context.Context, series *sonarr.SeriesResource) {
-	s.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, series.GetTags())
+func (s *Series) write(ctx context.Context, series *sonarr.SeriesResource, diags *diag.Diagnostics) {
+	var tempDiag diag.Diagnostics
+
 	s.Monitored = types.BoolValue(series.GetMonitored())
 	s.SeasonFolder = types.BoolValue(series.GetSeasonFolder())
 	s.UseSceneNumbering = types.BoolValue(series.GetUseSceneNumbering())
@@ -262,12 +281,11 @@ func (s *Series) write(ctx context.Context, series *sonarr.SeriesResource) {
 	s.Title = types.StringValue(series.GetTitle())
 	s.TitleSlug = types.StringValue(series.GetTitleSlug())
 	s.RootFolderPath = types.StringValue(series.GetRootFolderPath())
+	s.Tags, tempDiag = types.SetValueFrom(ctx, types.Int64Type, series.GetTags())
+	diags.Append(tempDiag...)
 }
 
-func (s *Series) read(ctx context.Context) *sonarr.SeriesResource {
-	tags := make([]*int32, len(s.Tags.Elements()))
-	tfsdk.ValueAs(ctx, s.Tags, &tags)
-
+func (s *Series) read(ctx context.Context, diags *diag.Diagnostics) *sonarr.SeriesResource {
 	series := sonarr.NewSeriesResource()
 	series.SetId(int32(s.ID.ValueInt64()))
 	series.SetTvdbId(int32(s.TvdbID.ValueInt64()))
@@ -279,7 +297,7 @@ func (s *Series) read(ctx context.Context) *sonarr.SeriesResource {
 	series.SetPath(s.Path.ValueString())
 	series.SetRootFolderPath(s.Path.ValueString())
 	series.SetUseSceneNumbering(s.UseSceneNumbering.ValueBool())
-	series.SetTags(tags)
+	diags.Append(s.Tags.ElementsAs(ctx, &series.Tags, true)...)
 
 	return series
 }

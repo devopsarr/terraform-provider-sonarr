@@ -2,12 +2,13 @@ package provider
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -24,6 +25,24 @@ func NewQualityDataSource() datasource.DataSource {
 // QualityDataSource defines the quality implementation.
 type QualityDataSource struct {
 	client *sonarr.APIClient
+}
+
+// Quality is part of QualityGroup.
+type Quality struct {
+	Name       types.String `tfsdk:"name"`
+	Source     types.String `tfsdk:"source"`
+	ID         types.Int64  `tfsdk:"id"`
+	Resolution types.Int64  `tfsdk:"resolution"`
+}
+
+func (q Quality) getType() attr.Type {
+	return types.ObjectType{}.WithAttributeTypes(
+		map[string]attr.Type{
+			"name":       types.StringType,
+			"source":     types.StringType,
+			"id":         types.Int64Type,
+			"resolution": types.Int64Type,
+		})
 }
 
 func (d *QualityDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
@@ -77,26 +96,22 @@ func (d *QualityDataSource) Read(ctx context.Context, req datasource.ReadRequest
 		return
 	}
 
-	quality, err := findQuality(data.Name.ValueString(), response)
-	if err != nil {
-		resp.Diagnostics.AddError(helpers.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", qualityDataSourceName, err))
-
-		return
-	}
-
+	data.find(data.Name.ValueString(), response, &resp.Diagnostics)
 	tflog.Trace(ctx, "read "+qualityDataSourceName)
-	data.writeFromDefinition(quality)
+	// Map response body to resource schema attribute
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func findQuality(name string, s []*sonarr.QualityDefinitionResource) (*sonarr.QualityDefinitionResource, error) {
-	for _, p := range s {
-		if p.Quality.GetName() == name {
-			return p, nil
+func (q *Quality) find(name string, definitions []*sonarr.QualityDefinitionResource, diags *diag.Diagnostics) {
+	for _, def := range definitions {
+		if def.Quality.GetName() == name {
+			q.writeFromDefinition(def)
+
+			return
 		}
 	}
 
-	return nil, helpers.ErrDataNotFoundError(qualityDataSourceName, "name", name)
+	diags.AddError(helpers.DataSourceError, helpers.ParseNotFoundError(qualityDataSourceName, "name", name))
 }
 
 func (q *Quality) writeFromDefinition(quality *sonarr.QualityDefinitionResource) {

@@ -2,12 +2,12 @@ package provider
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -183,24 +183,20 @@ func (d *IndexerDataSource) Read(ctx context.Context, req datasource.ReadRequest
 		return
 	}
 
-	indexer, err := findIndexer(data.Name.ValueString(), response)
-	if err != nil {
-		resp.Diagnostics.AddError(helpers.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", indexerDataSourceName, err))
-
-		return
-	}
-
+	data.find(ctx, data.Name.ValueString(), response, &resp.Diagnostics)
 	tflog.Trace(ctx, "read "+indexerDataSourceName)
-	data.write(ctx, indexer)
+	// Map response body to resource schema attribute
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func findIndexer(name string, indexers []*sonarr.IndexerResource) (*sonarr.IndexerResource, error) {
-	for _, i := range indexers {
-		if i.GetName() == name {
-			return i, nil
+func (i *Indexer) find(ctx context.Context, name string, indexers []*sonarr.IndexerResource, diags *diag.Diagnostics) {
+	for _, indexer := range indexers {
+		if indexer.GetName() == name {
+			i.write(ctx, indexer, diags)
+
+			return
 		}
 	}
 
-	return nil, helpers.ErrDataNotFoundError(indexerDataSourceName, "name", name)
+	diags.AddError(helpers.DataSourceError, helpers.ParseNotFoundError(indexerDataSourceName, "name", name))
 }

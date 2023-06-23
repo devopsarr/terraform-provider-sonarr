@@ -6,6 +6,8 @@ import (
 
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -41,10 +43,28 @@ type RootFolder struct {
 	Accessible      types.Bool   `tfsdk:"accessible"`
 }
 
+func (r RootFolder) getType() attr.Type {
+	return types.ObjectType{}.WithAttributeTypes(
+		map[string]attr.Type{
+			"unmapped_folders": types.SetType{}.WithElementType(Path{}.getType()),
+			"path":             types.StringType,
+			"id":               types.Int64Type,
+			"accessible":       types.BoolType,
+		})
+}
+
 // Path part of RootFolder.
 type Path struct {
 	Name types.String `tfsdk:"name"`
 	Path types.String `tfsdk:"path"`
+}
+
+func (p Path) getType() attr.Type {
+	return types.ObjectType{}.WithAttributeTypes(
+		map[string]attr.Type{
+			"name": types.StringType,
+			"path": types.StringType,
+		})
 }
 
 func (r *RootFolderResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -129,7 +149,7 @@ func (r *RootFolderResource) Create(ctx context.Context, req resource.CreateRequ
 
 	tflog.Trace(ctx, "created "+rootFolderResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	folder.write(ctx, response)
+	folder.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &folder)...)
 }
 
@@ -153,7 +173,7 @@ func (r *RootFolderResource) Read(ctx context.Context, req resource.ReadRequest,
 
 	tflog.Trace(ctx, "read "+rootFolderResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
-	folder.write(ctx, response)
+	folder.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &folder)...)
 }
 
@@ -162,23 +182,23 @@ func (r *RootFolderResource) Update(ctx context.Context, req resource.UpdateRequ
 }
 
 func (r *RootFolderResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var folder *RootFolder
+	var ID int64
 
-	resp.Diagnostics.Append(req.State.Get(ctx, &folder)...)
+	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("id"), &ID)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Delete rootFolder current value
-	_, err := r.client.RootFolderApi.DeleteRootFolder(ctx, int32(folder.ID.ValueInt64())).Execute()
+	_, err := r.client.RootFolderApi.DeleteRootFolder(ctx, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, rootFolderResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted "+rootFolderResourceName+": "+strconv.Itoa(int(folder.ID.ValueInt64())))
+	tflog.Trace(ctx, "deleted "+rootFolderResourceName+": "+strconv.Itoa(int(ID)))
 	resp.State.RemoveResource(ctx)
 }
 
@@ -187,7 +207,9 @@ func (r *RootFolderResource) ImportState(ctx context.Context, req resource.Impor
 	tflog.Trace(ctx, "imported "+rootFolderResourceName+": "+req.ID)
 }
 
-func (r *RootFolder) write(ctx context.Context, rootFolder *sonarr.RootFolderResource) {
+func (r *RootFolder) write(ctx context.Context, rootFolder *sonarr.RootFolderResource, diags *diag.Diagnostics) {
+	var tempDiag diag.Diagnostics
+
 	r.Accessible = types.BoolValue(rootFolder.GetAccessible())
 	r.ID = types.Int64Value(int64(rootFolder.GetId()))
 	r.Path = types.StringValue(rootFolder.GetPath())
@@ -197,7 +219,8 @@ func (r *RootFolder) write(ctx context.Context, rootFolder *sonarr.RootFolderRes
 		unmapped[i].write(f)
 	}
 
-	r.UnmappedFolders, _ = types.SetValueFrom(ctx, RootFolderResource{}.getUnmappedFolderSchema().Type(), unmapped)
+	r.UnmappedFolders, tempDiag = types.SetValueFrom(ctx, Path{}.getType(), unmapped)
+	diags.Append(tempDiag...)
 }
 
 func (p *Path) write(folder *sonarr.UnmappedFolder) {

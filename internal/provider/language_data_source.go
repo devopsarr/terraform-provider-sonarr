@@ -2,12 +2,13 @@ package provider
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -31,6 +32,15 @@ type Language struct {
 	Name      types.String `tfsdk:"name"`
 	NameLower types.String `tfsdk:"name_lower"`
 	ID        types.Int64  `tfsdk:"id"`
+}
+
+func (l Language) getType() attr.Type {
+	return types.ObjectType{}.WithAttributeTypes(
+		map[string]attr.Type{
+			"id":         types.Int64Type,
+			"name":       types.StringType,
+			"name_lower": types.StringType,
+		})
 }
 
 func (d *LanguageDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
@@ -64,9 +74,9 @@ func (d *LanguageDataSource) Configure(ctx context.Context, req datasource.Confi
 }
 
 func (d *LanguageDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var language *Language
+	var data *Language
 
-	resp.Diagnostics.Append(req.Config.Get(ctx, &language)...)
+	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
 
 	if resp.Diagnostics.HasError() {
 		return
@@ -80,17 +90,10 @@ func (d *LanguageDataSource) Read(ctx context.Context, req datasource.ReadReques
 		return
 	}
 
-	value, err := findLanguage(language.Name.ValueString(), response)
-	if err != nil {
-		resp.Diagnostics.AddError(helpers.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", languageDataSourceName, err))
-
-		return
-	}
-
+	data.find(data.Name.ValueString(), response, &resp.Diagnostics)
 	tflog.Trace(ctx, "read "+languageDataSourceName)
-	language.write(value)
 	// Map response body to resource schema attribute
-	resp.Diagnostics.Append(resp.State.Set(ctx, &language)...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
 func (l *Language) write(language *sonarr.LanguageResource) {
@@ -99,12 +102,14 @@ func (l *Language) write(language *sonarr.LanguageResource) {
 	l.NameLower = types.StringValue(language.GetNameLower())
 }
 
-func findLanguage(name string, languages []*sonarr.LanguageResource) (*sonarr.LanguageResource, error) {
-	for _, t := range languages {
-		if t.GetName() == name {
-			return t, nil
+func (l *Language) find(name string, languages []*sonarr.LanguageResource, diags *diag.Diagnostics) {
+	for _, language := range languages {
+		if language.GetName() == name {
+			l.write(language)
+
+			return
 		}
 	}
 
-	return nil, helpers.ErrDataNotFoundError(languageDataSourceName, "name", name)
+	diags.AddError(helpers.DataSourceError, helpers.ParseNotFoundError(languageDataSourceName, "name", name))
 }

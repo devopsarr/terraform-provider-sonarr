@@ -6,6 +6,7 @@ import (
 
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -203,7 +204,7 @@ func (r *IndexerHdbitsResource) Create(ctx context.Context, req resource.CreateR
 	}
 
 	// Create new IndexerHdbits
-	request := indexer.read(ctx)
+	request := indexer.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.IndexerApi.CreateIndexer(ctx).IndexerResource(*request).Execute()
 	if err != nil {
@@ -214,7 +215,7 @@ func (r *IndexerHdbitsResource) Create(ctx context.Context, req resource.CreateR
 
 	tflog.Trace(ctx, "created "+indexerHdbitsResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	indexer.write(ctx, response)
+	indexer.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &indexer)...)
 }
 
@@ -238,7 +239,7 @@ func (r *IndexerHdbitsResource) Read(ctx context.Context, req resource.ReadReque
 
 	tflog.Trace(ctx, "read "+indexerHdbitsResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
-	indexer.write(ctx, response)
+	indexer.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &indexer)...)
 }
 
@@ -253,7 +254,7 @@ func (r *IndexerHdbitsResource) Update(ctx context.Context, req resource.UpdateR
 	}
 
 	// Update IndexerHdbits
-	request := indexer.read(ctx)
+	request := indexer.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.IndexerApi.UpdateIndexer(ctx, strconv.Itoa(int(request.GetId()))).IndexerResource(*request).Execute()
 	if err != nil {
@@ -264,28 +265,28 @@ func (r *IndexerHdbitsResource) Update(ctx context.Context, req resource.UpdateR
 
 	tflog.Trace(ctx, "updated "+indexerHdbitsResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	indexer.write(ctx, response)
+	indexer.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &indexer)...)
 }
 
 func (r *IndexerHdbitsResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var indexer *IndexerHdbits
+	var ID int64
 
-	resp.Diagnostics.Append(req.State.Get(ctx, &indexer)...)
+	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("id"), &ID)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Delete IndexerHdbits current value
-	_, err := r.client.IndexerApi.DeleteIndexer(ctx, int32(indexer.ID.ValueInt64())).Execute()
+	_, err := r.client.IndexerApi.DeleteIndexer(ctx, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, indexerHdbitsResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted "+indexerHdbitsResourceName+": "+strconv.Itoa(int(indexer.ID.ValueInt64())))
+	tflog.Trace(ctx, "deleted "+indexerHdbitsResourceName+": "+strconv.Itoa(int(ID)))
 	resp.State.RemoveResource(ctx)
 }
 
@@ -294,12 +295,12 @@ func (r *IndexerHdbitsResource) ImportState(ctx context.Context, req resource.Im
 	tflog.Trace(ctx, "imported "+indexerHdbitsResourceName+": "+req.ID)
 }
 
-func (i *IndexerHdbits) write(ctx context.Context, indexer *sonarr.IndexerResource) {
+func (i *IndexerHdbits) write(ctx context.Context, indexer *sonarr.IndexerResource, diags *diag.Diagnostics) {
 	genericIndexer := i.toIndexer()
-	genericIndexer.write(ctx, indexer)
+	genericIndexer.write(ctx, indexer, diags)
 	i.fromIndexer(genericIndexer)
 }
 
-func (i *IndexerHdbits) read(ctx context.Context) *sonarr.IndexerResource {
-	return i.toIndexer().read(ctx)
+func (i *IndexerHdbits) read(ctx context.Context, diags *diag.Diagnostics) *sonarr.IndexerResource {
+	return i.toIndexer().read(ctx, diags)
 }

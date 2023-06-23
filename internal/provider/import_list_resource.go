@@ -6,12 +6,13 @@ import (
 
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -72,6 +73,43 @@ type ImportList struct {
 	ListType                  types.Int64  `tfsdk:"list_type"`
 	EnableAutomaticAdd        types.Bool   `tfsdk:"enable_automatic_add"`
 	SeasonFolder              types.Bool   `tfsdk:"season_folder"`
+}
+
+func (i ImportList) getType() attr.Type {
+	return types.ObjectType{}.WithAttributeTypes(
+		map[string]attr.Type{
+			"tag_ids":                     types.SetType{}.WithElementType(types.Int64Type),
+			"tags":                        types.SetType{}.WithElementType(types.Int64Type),
+			"language_profile_ids":        types.SetType{}.WithElementType(types.Int64Type),
+			"quality_profile_ids":         types.SetType{}.WithElementType(types.Int64Type),
+			"implementation":              types.StringType,
+			"name":                        types.StringType,
+			"should_monitor":              types.StringType,
+			"root_folder_path":            types.StringType,
+			"series_type":                 types.StringType,
+			"config_contract":             types.StringType,
+			"access_token":                types.StringType,
+			"refresh_token":               types.StringType,
+			"expires":                     types.StringType,
+			"base_url":                    types.StringType,
+			"url":                         types.StringType,
+			"auth_user":                   types.StringType,
+			"username":                    types.StringType,
+			"rating":                      types.StringType,
+			"listname":                    types.StringType,
+			"list_id":                     types.StringType,
+			"genres":                      types.StringType,
+			"years":                       types.StringType,
+			"api_key":                     types.StringType,
+			"trakt_additional_parameters": types.StringType,
+			"quality_profile_id":          types.Int64Type,
+			"id":                          types.Int64Type,
+			"limit":                       types.Int64Type,
+			"trakt_list_type":             types.Int64Type,
+			"list_type":                   types.Int64Type,
+			"enable_automatic_add":        types.BoolType,
+			"season_folder":               types.BoolType,
+		})
 }
 
 func (r *ImportListResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -265,7 +303,7 @@ func (r *ImportListResource) Create(ctx context.Context, req resource.CreateRequ
 	}
 
 	// Create new ImportList
-	request := importList.read(ctx)
+	request := importList.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.ImportListApi.CreateImportList(ctx).ImportListResource(*request).Execute()
 	if err != nil {
@@ -279,7 +317,7 @@ func (r *ImportListResource) Create(ctx context.Context, req resource.CreateRequ
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state ImportList
 
-	state.write(ctx, response)
+	state.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
 
@@ -306,7 +344,7 @@ func (r *ImportListResource) Read(ctx context.Context, req resource.ReadRequest,
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state ImportList
 
-	state.write(ctx, response)
+	state.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
 
@@ -321,7 +359,7 @@ func (r *ImportListResource) Update(ctx context.Context, req resource.UpdateRequ
 	}
 
 	// Update ImportList
-	request := importList.read(ctx)
+	request := importList.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.ImportListApi.UpdateImportList(ctx, strconv.Itoa(int(request.GetId()))).ImportListResource(*request).Execute()
 	if err != nil {
@@ -335,28 +373,28 @@ func (r *ImportListResource) Update(ctx context.Context, req resource.UpdateRequ
 	// this is needed because of many empty fields are unknown in both plan and read
 	var state ImportList
 
-	state.write(ctx, response)
+	state.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
 
 func (r *ImportListResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var importList *ImportList
+	var ID int64
 
-	resp.Diagnostics.Append(req.State.Get(ctx, &importList)...)
+	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("id"), &ID)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Delete ImportList current value
-	_, err := r.client.ImportListApi.DeleteImportList(ctx, int32(importList.ID.ValueInt64())).Execute()
+	_, err := r.client.ImportListApi.DeleteImportList(ctx, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, importListResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted "+importListResourceName+": "+strconv.Itoa(int(importList.ID.ValueInt64())))
+	tflog.Trace(ctx, "deleted "+importListResourceName+": "+strconv.Itoa(int(ID)))
 	resp.State.RemoveResource(ctx)
 }
 
@@ -365,8 +403,12 @@ func (r *ImportListResource) ImportState(ctx context.Context, req resource.Impor
 	tflog.Trace(ctx, "imported "+importListResourceName+": "+req.ID)
 }
 
-func (i *ImportList) write(ctx context.Context, importList *sonarr.ImportListResource) {
-	i.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, importList.GetTags())
+func (i *ImportList) write(ctx context.Context, importList *sonarr.ImportListResource, diags *diag.Diagnostics) {
+	var localDiag diag.Diagnostics
+
+	i.Tags, localDiag = types.SetValueFrom(ctx, types.Int64Type, importList.Tags)
+	diags.Append(localDiag...)
+
 	i.EnableAutomaticAdd = types.BoolValue(importList.GetEnableAutomaticAdd())
 	i.SeasonFolder = types.BoolValue(importList.GetSeasonFolder())
 	i.QualityProfileID = types.Int64Value(int64(importList.GetQualityProfileId()))
@@ -383,10 +425,7 @@ func (i *ImportList) write(ctx context.Context, importList *sonarr.ImportListRes
 	helpers.WriteFields(ctx, i, importList.GetFields(), importListFields)
 }
 
-func (i *ImportList) read(ctx context.Context) *sonarr.ImportListResource {
-	tags := make([]*int32, len(i.Tags.Elements()))
-	tfsdk.ValueAs(ctx, i.Tags, &tags)
-
+func (i *ImportList) read(ctx context.Context, diags *diag.Diagnostics) *sonarr.ImportListResource {
 	list := sonarr.NewImportListResource()
 	list.SetEnableAutomaticAdd(i.EnableAutomaticAdd.ValueBool())
 	list.SetSeasonFolder(i.SeasonFolder.ValueBool())
@@ -398,7 +437,7 @@ func (i *ImportList) read(ctx context.Context) *sonarr.ImportListResource {
 	list.SetConfigContract(i.ConfigContract.ValueString())
 	list.SetImplementation(i.Implementation.ValueString())
 	list.SetName(i.Name.ValueString())
-	list.SetTags(tags)
+	diags.Append(i.Tags.ElementsAs(ctx, &list.Tags, true)...)
 	list.SetFields(helpers.ReadFields(ctx, i, importListFields))
 
 	return list

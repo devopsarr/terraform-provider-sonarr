@@ -6,6 +6,7 @@ import (
 
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -39,6 +40,17 @@ type AutoTagCondition struct {
 	Value          types.String `tfsdk:"value"`
 	Negate         types.Bool   `tfsdk:"negate"`
 	Required       types.Bool   `tfsdk:"required"`
+}
+
+func (c AutoTagCondition) getType() attr.Type {
+	return types.ObjectType{}.WithAttributeTypes(
+		map[string]attr.Type{
+			"name":           types.StringType,
+			"implementation": types.StringType,
+			"value":          types.StringType,
+			"negate":         types.BoolType,
+			"required":       types.BoolType,
+		})
 }
 
 func (d *AutoTagConditionDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {

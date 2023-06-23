@@ -5,6 +5,7 @@ import (
 
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -41,6 +42,19 @@ type CustomFormatCondition struct {
 	Max            types.Int64  `tfsdk:"max"`
 	Negate         types.Bool   `tfsdk:"negate"`
 	Required       types.Bool   `tfsdk:"required"`
+}
+
+func (c CustomFormatCondition) getType() attr.Type {
+	return types.ObjectType{}.WithAttributeTypes(
+		map[string]attr.Type{
+			"negate":         types.BoolType,
+			"required":       types.BoolType,
+			"min":            types.Int64Type,
+			"max":            types.Int64Type,
+			"name":           types.StringType,
+			"value":          types.StringType,
+			"implementation": types.StringType,
+		})
 }
 
 // CustomFormatValue describes the custom format value data model.

@@ -113,6 +113,6 @@ func (d *SearchSeriesDataSource) Read(ctx context.Context, req datasource.ReadRe
 	}
 
 	tflog.Trace(ctx, "read "+searchSearchSeriesDataSourceName)
-	data.write(ctx, response[0])
+	data.write(ctx, response[0], &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }

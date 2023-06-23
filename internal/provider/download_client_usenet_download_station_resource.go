@@ -6,6 +6,7 @@ import (
 
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -197,7 +198,7 @@ func (r *DownloadClientUsenetDownloadStationResource) Create(ctx context.Context
 	}
 
 	// Create new DownloadClientUsenetDownloadStation
-	request := client.read(ctx)
+	request := client.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.DownloadClientApi.CreateDownloadClient(ctx).DownloadClientResource(*request).Execute()
 	if err != nil {
@@ -208,7 +209,7 @@ func (r *DownloadClientUsenetDownloadStationResource) Create(ctx context.Context
 
 	tflog.Trace(ctx, "created "+downloadClientUsenetDownloadStationResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	client.write(ctx, response)
+	client.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &client)...)
 }
 
@@ -232,7 +233,7 @@ func (r *DownloadClientUsenetDownloadStationResource) Read(ctx context.Context, 
 
 	tflog.Trace(ctx, "read "+downloadClientUsenetDownloadStationResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
-	client.write(ctx, response)
+	client.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &client)...)
 }
 
@@ -247,7 +248,7 @@ func (r *DownloadClientUsenetDownloadStationResource) Update(ctx context.Context
 	}
 
 	// Update DownloadClientUsenetDownloadStation
-	request := client.read(ctx)
+	request := client.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.DownloadClientApi.UpdateDownloadClient(ctx, strconv.Itoa(int(request.GetId()))).DownloadClientResource(*request).Execute()
 	if err != nil {
@@ -258,28 +259,28 @@ func (r *DownloadClientUsenetDownloadStationResource) Update(ctx context.Context
 
 	tflog.Trace(ctx, "updated "+downloadClientUsenetDownloadStationResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	client.write(ctx, response)
+	client.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &client)...)
 }
 
 func (r *DownloadClientUsenetDownloadStationResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var client *DownloadClientUsenetDownloadStation
+	var ID int64
 
-	resp.Diagnostics.Append(req.State.Get(ctx, &client)...)
+	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("id"), &ID)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Delete DownloadClientUsenetDownloadStation current value
-	_, err := r.client.DownloadClientApi.DeleteDownloadClient(ctx, int32(client.ID.ValueInt64())).Execute()
+	_, err := r.client.DownloadClientApi.DeleteDownloadClient(ctx, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, downloadClientUsenetDownloadStationResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted "+downloadClientUsenetDownloadStationResourceName+": "+strconv.Itoa(int(client.ID.ValueInt64())))
+	tflog.Trace(ctx, "deleted "+downloadClientUsenetDownloadStationResourceName+": "+strconv.Itoa(int(ID)))
 	resp.State.RemoveResource(ctx)
 }
 
@@ -288,12 +289,12 @@ func (r *DownloadClientUsenetDownloadStationResource) ImportState(ctx context.Co
 	tflog.Trace(ctx, "imported "+downloadClientUsenetDownloadStationResourceName+": "+req.ID)
 }
 
-func (d *DownloadClientUsenetDownloadStation) write(ctx context.Context, downloadClient *sonarr.DownloadClientResource) {
+func (d *DownloadClientUsenetDownloadStation) write(ctx context.Context, downloadClient *sonarr.DownloadClientResource, diags *diag.Diagnostics) {
 	genericDownloadClient := d.toDownloadClient()
-	genericDownloadClient.write(ctx, downloadClient)
+	genericDownloadClient.write(ctx, downloadClient, diags)
 	d.fromDownloadClient(genericDownloadClient)
 }
 
-func (d *DownloadClientUsenetDownloadStation) read(ctx context.Context) *sonarr.DownloadClientResource {
-	return d.toDownloadClient().read(ctx)
+func (d *DownloadClientUsenetDownloadStation) read(ctx context.Context, diags *diag.Diagnostics) *sonarr.DownloadClientResource {
+	return d.toDownloadClient().read(ctx, diags)
 }

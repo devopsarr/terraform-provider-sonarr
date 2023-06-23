@@ -9,7 +9,6 @@ import (
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -115,13 +114,6 @@ func (d *CustomFormatsDataSource) Configure(ctx context.Context, req datasource.
 }
 
 func (d *CustomFormatsDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var data *CustomFormats
-
-	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
-
-	if resp.Diagnostics.HasError() {
-		return
-	}
 	// Get download clients current value
 	response, _, err := d.client.CustomFormatApi.ListCustomFormat(ctx).Execute()
 	if err != nil {
@@ -132,13 +124,12 @@ func (d *CustomFormatsDataSource) Read(ctx context.Context, req datasource.ReadR
 
 	tflog.Trace(ctx, "read "+customFormatsDataSourceName)
 	// Map response body to resource schema attribute
-	profiles := make([]CustomFormat, len(response))
+	formats := make([]CustomFormat, len(response))
 	for i, p := range response {
-		profiles[i].write(ctx, p)
+		formats[i].write(ctx, p, &resp.Diagnostics)
 	}
 
-	tfsdk.ValueFrom(ctx, profiles, data.CustomFormats.Type(ctx), &data.CustomFormats)
-	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
-	data.ID = types.StringValue(strconv.Itoa(len(response)))
-	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
+	formatList, diags := types.SetValueFrom(ctx, CustomFormat{}.getType(), formats)
+	resp.Diagnostics.Append(diags...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, CustomFormats{CustomFormats: formatList, ID: types.StringValue(strconv.Itoa(len(response)))})...)
 }

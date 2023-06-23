@@ -7,6 +7,7 @@ import (
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -163,7 +164,7 @@ func (r *ImportListImdbResource) Create(ctx context.Context, req resource.Create
 	}
 
 	// Create new ImportListImdb
-	request := importList.read(ctx)
+	request := importList.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.ImportListApi.CreateImportList(ctx).ImportListResource(*request).Execute()
 	if err != nil {
@@ -174,7 +175,7 @@ func (r *ImportListImdbResource) Create(ctx context.Context, req resource.Create
 
 	tflog.Trace(ctx, "created "+importListImdbResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	importList.write(ctx, response)
+	importList.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &importList)...)
 }
 
@@ -198,7 +199,7 @@ func (r *ImportListImdbResource) Read(ctx context.Context, req resource.ReadRequ
 
 	tflog.Trace(ctx, "read "+importListImdbResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
-	importList.write(ctx, response)
+	importList.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &importList)...)
 }
 
@@ -213,7 +214,7 @@ func (r *ImportListImdbResource) Update(ctx context.Context, req resource.Update
 	}
 
 	// Update ImportListImdb
-	request := importList.read(ctx)
+	request := importList.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.ImportListApi.UpdateImportList(ctx, strconv.Itoa(int(request.GetId()))).ImportListResource(*request).Execute()
 	if err != nil {
@@ -224,28 +225,28 @@ func (r *ImportListImdbResource) Update(ctx context.Context, req resource.Update
 
 	tflog.Trace(ctx, "updated "+importListImdbResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	importList.write(ctx, response)
+	importList.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &importList)...)
 }
 
 func (r *ImportListImdbResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var importList *ImportListImdb
+	var ID int64
 
-	resp.Diagnostics.Append(req.State.Get(ctx, &importList)...)
+	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("id"), &ID)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Delete ImportListImdb current value
-	_, err := r.client.ImportListApi.DeleteImportList(ctx, int32(importList.ID.ValueInt64())).Execute()
+	_, err := r.client.ImportListApi.DeleteImportList(ctx, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, importListImdbResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted "+importListImdbResourceName+": "+strconv.Itoa(int(importList.ID.ValueInt64())))
+	tflog.Trace(ctx, "deleted "+importListImdbResourceName+": "+strconv.Itoa(int(ID)))
 	resp.State.RemoveResource(ctx)
 }
 
@@ -254,12 +255,12 @@ func (r *ImportListImdbResource) ImportState(ctx context.Context, req resource.I
 	tflog.Trace(ctx, "imported "+importListImdbResourceName+": "+req.ID)
 }
 
-func (i *ImportListImdb) write(ctx context.Context, importList *sonarr.ImportListResource) {
+func (i *ImportListImdb) write(ctx context.Context, importList *sonarr.ImportListResource, diags *diag.Diagnostics) {
 	genericImportList := i.toImportList()
-	genericImportList.write(ctx, importList)
+	genericImportList.write(ctx, importList, diags)
 	i.fromImportList(genericImportList)
 }
 
-func (i *ImportListImdb) read(ctx context.Context) *sonarr.ImportListResource {
-	return i.toImportList().read(ctx)
+func (i *ImportListImdb) read(ctx context.Context, diags *diag.Diagnostics) *sonarr.ImportListResource {
+	return i.toImportList().read(ctx, diags)
 }

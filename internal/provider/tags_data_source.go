@@ -71,14 +71,6 @@ func (d *TagsDataSource) Configure(ctx context.Context, req datasource.Configure
 }
 
 func (d *TagsDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var data *Tags
-
-	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
-
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
 	// Get tags current value
 	response, _, err := d.client.TagApi.ListTag(ctx).Execute()
 	if err != nil {
@@ -94,9 +86,7 @@ func (d *TagsDataSource) Read(ctx context.Context, req datasource.ReadRequest, r
 		tags[i].write(t)
 	}
 
-	// tfsdk.ValueFrom(ctx, tags, data.Tags.Type(ctx), &data.Tags)
-	data.Tags, _ = types.SetValueFrom(ctx, data.Tags.ElementType(ctx), tags)
-	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
-	data.ID = types.StringValue(strconv.Itoa(len(response)))
-	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
+	tagList, diags := types.SetValueFrom(ctx, Tag{}.getType(), tags)
+	resp.Diagnostics.Append(diags...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, Tags{Tags: tagList, ID: types.StringValue(strconv.Itoa(len(response)))})...)
 }

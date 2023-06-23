@@ -92,13 +92,6 @@ func (d *RootFoldersDataSource) Configure(ctx context.Context, req datasource.Co
 }
 
 func (d *RootFoldersDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var data *RootFolders
-
-	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
-
-	if resp.Diagnostics.HasError() {
-		return
-	}
 	// Get rootfolders current value
 	response, _, err := d.client.RootFolderApi.ListRootFolder(ctx).Execute()
 	if err != nil {
@@ -109,18 +102,12 @@ func (d *RootFoldersDataSource) Read(ctx context.Context, req datasource.ReadReq
 
 	tflog.Trace(ctx, "read "+rootFoldersDataSourceName)
 	// Map response body to resource schema attribute
-	rootFolders := writes(ctx, response)
-	data.RootFolders, _ = types.SetValueFrom(ctx, data.RootFolders.ElementType(ctx), &rootFolders)
-	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
-	data.ID = types.StringValue(strconv.Itoa(len(response)))
-	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
-}
-
-func writes(ctx context.Context, folders []*sonarr.RootFolderResource) *[]RootFolder {
-	output := make([]RootFolder, len(folders))
-	for i, f := range folders {
-		output[i].write(ctx, f)
+	rootFolders := make([]RootFolder, len(response))
+	for i, f := range response {
+		rootFolders[i].write(ctx, f, &resp.Diagnostics)
 	}
 
-	return &output
+	folderList, diags := types.SetValueFrom(ctx, RootFolder{}.getType(), rootFolders)
+	resp.Diagnostics.Append(diags...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, RootFolders{RootFolders: folderList, ID: types.StringValue(strconv.Itoa(len(response)))})...)
 }

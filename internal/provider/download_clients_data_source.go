@@ -8,7 +8,6 @@ import (
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -245,13 +244,6 @@ func (d *DownloadClientsDataSource) Configure(ctx context.Context, req datasourc
 }
 
 func (d *DownloadClientsDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var data *DownloadClients
-
-	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
-
-	if resp.Diagnostics.HasError() {
-		return
-	}
 	// Get download clients current value
 	response, _, err := d.client.DownloadClientApi.ListDownloadClient(ctx).Execute()
 	if err != nil {
@@ -262,14 +254,12 @@ func (d *DownloadClientsDataSource) Read(ctx context.Context, req datasource.Rea
 
 	tflog.Trace(ctx, "read "+downloadClientsDataSourceName)
 	// Map response body to resource schema attribute
-	downloadClients := make([]DownloadClient, len(response))
+	clients := make([]DownloadClient, len(response))
 	for i, d := range response {
-		downloadClients[i].Tags = types.SetNull(types.Int64Type)
-		downloadClients[i].write(ctx, d)
+		clients[i].write(ctx, d, &resp.Diagnostics)
 	}
 
-	tfsdk.ValueFrom(ctx, downloadClients, data.DownloadClients.Type(ctx), &data.DownloadClients)
-	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
-	data.ID = types.StringValue(strconv.Itoa(len(response)))
-	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
+	clientList, diags := types.SetValueFrom(ctx, DownloadClient{}.getType(), clients)
+	resp.Diagnostics.Append(diags...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, DownloadClients{DownloadClients: clientList, ID: types.StringValue(strconv.Itoa(len(response)))})...)
 }

@@ -7,6 +7,7 @@ import (
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -237,7 +238,7 @@ func (r *DownloadClientVuzeResource) Create(ctx context.Context, req resource.Cr
 	}
 
 	// Create new DownloadClientVuze
-	request := client.read(ctx)
+	request := client.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.DownloadClientApi.CreateDownloadClient(ctx).DownloadClientResource(*request).Execute()
 	if err != nil {
@@ -248,7 +249,7 @@ func (r *DownloadClientVuzeResource) Create(ctx context.Context, req resource.Cr
 
 	tflog.Trace(ctx, "created "+downloadClientVuzeResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	client.write(ctx, response)
+	client.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &client)...)
 }
 
@@ -272,7 +273,7 @@ func (r *DownloadClientVuzeResource) Read(ctx context.Context, req resource.Read
 
 	tflog.Trace(ctx, "read "+downloadClientVuzeResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
-	client.write(ctx, response)
+	client.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &client)...)
 }
 
@@ -287,7 +288,7 @@ func (r *DownloadClientVuzeResource) Update(ctx context.Context, req resource.Up
 	}
 
 	// Update DownloadClientVuze
-	request := client.read(ctx)
+	request := client.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.DownloadClientApi.UpdateDownloadClient(ctx, strconv.Itoa(int(request.GetId()))).DownloadClientResource(*request).Execute()
 	if err != nil {
@@ -298,28 +299,28 @@ func (r *DownloadClientVuzeResource) Update(ctx context.Context, req resource.Up
 
 	tflog.Trace(ctx, "updated "+downloadClientVuzeResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	client.write(ctx, response)
+	client.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &client)...)
 }
 
 func (r *DownloadClientVuzeResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	var client *DownloadClientVuze
+	var ID int64
 
-	resp.Diagnostics.Append(req.State.Get(ctx, &client)...)
+	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("id"), &ID)...)
 
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
 	// Delete DownloadClientVuze current value
-	_, err := r.client.DownloadClientApi.DeleteDownloadClient(ctx, int32(client.ID.ValueInt64())).Execute()
+	_, err := r.client.DownloadClientApi.DeleteDownloadClient(ctx, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, downloadClientVuzeResourceName, err))
 
 		return
 	}
 
-	tflog.Trace(ctx, "deleted "+downloadClientVuzeResourceName+": "+strconv.Itoa(int(client.ID.ValueInt64())))
+	tflog.Trace(ctx, "deleted "+downloadClientVuzeResourceName+": "+strconv.Itoa(int(ID)))
 	resp.State.RemoveResource(ctx)
 }
 
@@ -328,12 +329,12 @@ func (r *DownloadClientVuzeResource) ImportState(ctx context.Context, req resour
 	tflog.Trace(ctx, "imported "+downloadClientVuzeResourceName+": "+req.ID)
 }
 
-func (d *DownloadClientVuze) write(ctx context.Context, downloadClient *sonarr.DownloadClientResource) {
+func (d *DownloadClientVuze) write(ctx context.Context, downloadClient *sonarr.DownloadClientResource, diags *diag.Diagnostics) {
 	genericDownloadClient := d.toDownloadClient()
-	genericDownloadClient.write(ctx, downloadClient)
+	genericDownloadClient.write(ctx, downloadClient, diags)
 	d.fromDownloadClient(genericDownloadClient)
 }
 
-func (d *DownloadClientVuze) read(ctx context.Context) *sonarr.DownloadClientResource {
-	return d.toDownloadClient().read(ctx)
+func (d *DownloadClientVuze) read(ctx context.Context, diags *diag.Diagnostics) *sonarr.DownloadClientResource {
+	return d.toDownloadClient().read(ctx, diags)
 }

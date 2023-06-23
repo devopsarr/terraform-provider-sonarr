@@ -8,7 +8,6 @@ import (
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -96,13 +95,6 @@ func (d *ReleaseProfilesDataSource) Configure(ctx context.Context, req datasourc
 }
 
 func (d *ReleaseProfilesDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var data *ReleaseProfiles
-
-	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
-
-	if resp.Diagnostics.HasError() {
-		return
-	}
 	// Get releaseprofiles current value
 	response, _, err := d.client.ReleaseProfileApi.ListReleaseProfile(ctx).Execute()
 	if err != nil {
@@ -115,11 +107,10 @@ func (d *ReleaseProfilesDataSource) Read(ctx context.Context, req datasource.Rea
 	// Map response body to resource schema attribute
 	profiles := make([]ReleaseProfile, len(response))
 	for i, p := range response {
-		profiles[i].write(ctx, p)
+		profiles[i].write(ctx, p, &resp.Diagnostics)
 	}
 
-	tfsdk.ValueFrom(ctx, profiles, data.ReleaseProfiles.Type(ctx), &data.ReleaseProfiles)
-	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
-	data.ID = types.StringValue(strconv.Itoa(len(response)))
-	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
+	profileList, diags := types.SetValueFrom(ctx, ReleaseProfile{}.getType(), profiles)
+	resp.Diagnostics.Append(diags...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, ReleaseProfiles{ReleaseProfiles: profileList, ID: types.StringValue(strconv.Itoa(len(response)))})...)
 }
