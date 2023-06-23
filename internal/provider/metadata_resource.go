@@ -6,6 +6,7 @@ import (
 
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -51,6 +52,24 @@ type Metadata struct {
 	SeasonImages      types.Bool   `tfsdk:"season_images"`
 	EpisodeMetadata   types.Bool   `tfsdk:"episode_metadata"`
 	EpisodeImages     types.Bool   `tfsdk:"episode_images"`
+}
+
+func (m Metadata) getType() attr.Type {
+	return types.ObjectType{}.WithAttributeTypes(
+		map[string]attr.Type{
+			"tags":                types.SetType{}.WithElementType(types.Int64Type),
+			"name":                types.StringType,
+			"config_contract":     types.StringType,
+			"implementation":      types.StringType,
+			"id":                  types.Int64Type,
+			"enable":              types.BoolType,
+			"series_metadata":     types.BoolType,
+			"series_metadata_url": types.BoolType,
+			"series_images":       types.BoolType,
+			"season_images":       types.BoolType,
+			"episode_metadata":    types.BoolType,
+			"episode_images":      types.BoolType,
+		})
 }
 
 func (r *MetadataResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -246,14 +265,13 @@ func (r *MetadataResource) ImportState(ctx context.Context, req resource.ImportS
 func (m *Metadata) write(ctx context.Context, metadata *sonarr.MetadataResource, diags *diag.Diagnostics) {
 	var localDiag diag.Diagnostics
 
-	m.Tags, localDiag = types.SetValueFrom(ctx, types.Int64Type, metadata.Tags)
-	diags.Append(localDiag...)
-
 	m.Enable = types.BoolValue(metadata.GetEnable())
 	m.ID = types.Int64Value(int64(metadata.GetId()))
 	m.ConfigContract = types.StringValue(metadata.GetConfigContract())
 	m.Implementation = types.StringValue(metadata.GetImplementation())
 	m.Name = types.StringValue(metadata.GetName())
+	m.Tags, localDiag = types.SetValueFrom(ctx, types.Int64Type, metadata.Tags)
+	diags.Append(localDiag...)
 	helpers.WriteFields(ctx, m, metadata.GetFields(), metadataFields)
 }
 

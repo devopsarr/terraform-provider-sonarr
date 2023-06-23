@@ -2,12 +2,12 @@ package provider
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -241,24 +241,20 @@ func (d *DownloadClientDataSource) Read(ctx context.Context, req datasource.Read
 		return
 	}
 
-	downloadClient, err := findDownloadClient(data.Name.ValueString(), response)
-	if err != nil {
-		resp.Diagnostics.AddError(helpers.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", downloadClientDataSourceName, err))
-
-		return
-	}
-
+	data.find(ctx, data.Name.ValueString(), response, &resp.Diagnostics)
 	tflog.Trace(ctx, "read "+downloadClientDataSourceName)
-	data.write(ctx, downloadClient, &resp.Diagnostics)
+	// Map response body to resource schema attribute
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func findDownloadClient(name string, downloadClients []*sonarr.DownloadClientResource) (*sonarr.DownloadClientResource, error) {
-	for _, i := range downloadClients {
-		if i.GetName() == name {
-			return i, nil
+func (d *DownloadClient) find(ctx context.Context, name string, downloadClients []*sonarr.DownloadClientResource, diags *diag.Diagnostics) {
+	for _, client := range downloadClients {
+		if client.GetName() == name {
+			d.write(ctx, client, diags)
+
+			return
 		}
 	}
 
-	return nil, helpers.ErrDataNotFoundError(downloadClientDataSourceName, "name", name)
+	diags.AddError(helpers.DataSourceError, helpers.ParseNotFoundError(downloadClientDataSourceName, "name", name))
 }

@@ -7,6 +7,7 @@ import (
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -48,6 +49,23 @@ type DelayProfile struct {
 	EnableTorrent                  types.Bool   `tfsdk:"enable_torrent"`
 	BypassIfHighestQuality         types.Bool   `tfsdk:"bypass_if_highest_quality"`
 	BypassIfAboveCustomFormatScore types.Bool   `tfsdk:"bypass_if_above_custom_format_score"`
+}
+
+func (p DelayProfile) getType() attr.Type {
+	return types.ObjectType{}.WithAttributeTypes(
+		map[string]attr.Type{
+			"tags":                                types.SetType{}.WithElementType(types.Int64Type),
+			"preferred_protocol":                  types.StringType,
+			"usenet_delay":                        types.Int64Type,
+			"torrent_delay":                       types.Int64Type,
+			"id":                                  types.Int64Type,
+			"order":                               types.Int64Type,
+			"minimum_custom_format_score":         types.Int64Type,
+			"enable_usenet":                       types.BoolType,
+			"enable_torrent":                      types.BoolType,
+			"bypass_if_highest_quality":           types.BoolType,
+			"bypass_if_above_custom_format_score": types.BoolType,
+		})
 }
 
 func (r *DelayProfileResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {

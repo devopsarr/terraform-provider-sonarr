@@ -6,6 +6,7 @@ import (
 
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -72,6 +73,43 @@ type ImportList struct {
 	ListType                  types.Int64  `tfsdk:"list_type"`
 	EnableAutomaticAdd        types.Bool   `tfsdk:"enable_automatic_add"`
 	SeasonFolder              types.Bool   `tfsdk:"season_folder"`
+}
+
+func (i ImportList) getType() attr.Type {
+	return types.ObjectType{}.WithAttributeTypes(
+		map[string]attr.Type{
+			"tag_ids":                     types.SetType{}.WithElementType(types.Int64Type),
+			"tags":                        types.SetType{}.WithElementType(types.Int64Type),
+			"language_profile_ids":        types.SetType{}.WithElementType(types.Int64Type),
+			"quality_profile_ids":         types.SetType{}.WithElementType(types.Int64Type),
+			"implementation":              types.StringType,
+			"name":                        types.StringType,
+			"should_monitor":              types.StringType,
+			"root_folder_path":            types.StringType,
+			"series_type":                 types.StringType,
+			"config_contract":             types.StringType,
+			"access_token":                types.StringType,
+			"refresh_token":               types.StringType,
+			"expires":                     types.StringType,
+			"base_url":                    types.StringType,
+			"url":                         types.StringType,
+			"auth_user":                   types.StringType,
+			"username":                    types.StringType,
+			"rating":                      types.StringType,
+			"listname":                    types.StringType,
+			"list_id":                     types.StringType,
+			"genres":                      types.StringType,
+			"years":                       types.StringType,
+			"api_key":                     types.StringType,
+			"trakt_additional_parameters": types.StringType,
+			"quality_profile_id":          types.Int64Type,
+			"id":                          types.Int64Type,
+			"limit":                       types.Int64Type,
+			"trakt_list_type":             types.Int64Type,
+			"list_type":                   types.Int64Type,
+			"enable_automatic_add":        types.BoolType,
+			"season_folder":               types.BoolType,
+		})
 }
 
 func (r *ImportListResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {

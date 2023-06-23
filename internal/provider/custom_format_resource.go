@@ -7,6 +7,7 @@ import (
 
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -40,6 +41,16 @@ type CustomFormat struct {
 	Name                            types.String `tfsdk:"name"`
 	ID                              types.Int64  `tfsdk:"id"`
 	IncludeCustomFormatWhenRenaming types.Bool   `tfsdk:"include_custom_format_when_renaming"`
+}
+
+func (c CustomFormat) getType() attr.Type {
+	return types.ObjectType{}.WithAttributeTypes(
+		map[string]attr.Type{
+			"include_custom_format_when_renaming": types.BoolType,
+			"id":                                  types.Int64Type,
+			"name":                                types.StringType,
+			"specifications":                      types.SetType{}.WithElementType(CustomFormatCondition{}.getType()),
+		})
 }
 
 func (r *CustomFormatResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {

@@ -6,6 +6,7 @@ import (
 
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -42,10 +43,28 @@ type RootFolder struct {
 	Accessible      types.Bool   `tfsdk:"accessible"`
 }
 
+func (r RootFolder) getType() attr.Type {
+	return types.ObjectType{}.WithAttributeTypes(
+		map[string]attr.Type{
+			"unmapped_folders": types.SetType{}.WithElementType(Path{}.getType()),
+			"path":             types.StringType,
+			"id":               types.Int64Type,
+			"accessible":       types.BoolType,
+		})
+}
+
 // Path part of RootFolder.
 type Path struct {
 	Name types.String `tfsdk:"name"`
 	Path types.String `tfsdk:"path"`
+}
+
+func (p Path) getType() attr.Type {
+	return types.ObjectType{}.WithAttributeTypes(
+		map[string]attr.Type{
+			"name": types.StringType,
+			"path": types.StringType,
+		})
 }
 
 func (r *RootFolderResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -166,6 +185,7 @@ func (r *RootFolderResource) Delete(ctx context.Context, req resource.DeleteRequ
 	var ID int64
 
 	resp.Diagnostics.Append(req.State.GetAttribute(ctx, path.Root("id"), &ID)...)
+
 	if resp.Diagnostics.HasError() {
 		return
 	}
@@ -199,7 +219,7 @@ func (r *RootFolder) write(ctx context.Context, rootFolder *sonarr.RootFolderRes
 		unmapped[i].write(f)
 	}
 
-	r.UnmappedFolders, tempDiag = types.SetValueFrom(ctx, RootFolderResource{}.getUnmappedFolderSchema().Type(), unmapped)
+	r.UnmappedFolders, tempDiag = types.SetValueFrom(ctx, Path{}.getType(), unmapped)
 	diags.Append(tempDiag...)
 }
 

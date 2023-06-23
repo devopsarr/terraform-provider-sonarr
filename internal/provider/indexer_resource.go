@@ -7,6 +7,7 @@ import (
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -77,6 +78,41 @@ type Indexer struct {
 	EnableAutomaticSearch     types.Bool    `tfsdk:"enable_automatic_search"`
 	EnableRss                 types.Bool    `tfsdk:"enable_rss"`
 	EnableInteractiveSearch   types.Bool    `tfsdk:"enable_interactive_search"`
+}
+
+func (i Indexer) getType() attr.Type {
+	return types.ObjectType{}.WithAttributeTypes(
+		map[string]attr.Type{
+			"tags":                         types.SetType{}.WithElementType(types.Int64Type),
+			"categories":                   types.SetType{}.WithElementType(types.Int64Type),
+			"anime_categories":             types.SetType{}.WithElementType(types.Int64Type),
+			"api_path":                     types.StringType,
+			"additional_parameters":        types.StringType,
+			"username":                     types.StringType,
+			"config_contract":              types.StringType,
+			"implementation":               types.StringType,
+			"name":                         types.StringType,
+			"protocol":                     types.StringType,
+			"passkey":                      types.StringType,
+			"cookie":                       types.StringType,
+			"captcha_token":                types.StringType,
+			"base_url":                     types.StringType,
+			"api_key":                      types.StringType,
+			"priority":                     types.Int64Type,
+			"download_client_id":           types.Int64Type,
+			"seed_time":                    types.Int64Type,
+			"seed_ratio":                   types.Float64Type,
+			"minimum_seeders":              types.Int64Type,
+			"delay":                        types.Int64Type,
+			"id":                           types.Int64Type,
+			"season_pack_seed_time":        types.Int64Type,
+			"anime_standard_format_search": types.BoolType,
+			"allow_zero_size":              types.BoolType,
+			"ranked_only":                  types.BoolType,
+			"enable_automatic_search":      types.BoolType,
+			"enable_rss":                   types.BoolType,
+			"enable_interactive_search":    types.BoolType,
+		})
 }
 
 func (r *IndexerResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {

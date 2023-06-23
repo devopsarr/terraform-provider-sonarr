@@ -2,12 +2,13 @@ package provider
 
 import (
 	"context"
-	"fmt"
+	"strconv"
 
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
@@ -93,24 +94,20 @@ func (d *QualityDefinitionDataSource) Read(ctx context.Context, req datasource.R
 		return
 	}
 
-	definition, err := findQualityDefinition(data.ID.ValueInt64(), response)
-	if err != nil {
-		resp.Diagnostics.AddError(helpers.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", qualityDefinitionDataSourceName, err))
-
-		return
-	}
-
+	data.find(data.ID.ValueInt64(), response, &resp.Diagnostics)
 	tflog.Trace(ctx, "read "+qualityDefinitionDataSourceName)
-	data.write(definition)
+	// Map response body to resource schema attribute
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func findQualityDefinition(id int64, definitions []*sonarr.QualityDefinitionResource) (*sonarr.QualityDefinitionResource, error) {
-	for _, p := range definitions {
-		if int64(p.GetId()) == id {
-			return p, nil
+func (p *QualityDefinition) find(id int64, definitions []*sonarr.QualityDefinitionResource, diags *diag.Diagnostics) {
+	for _, def := range definitions {
+		if int64(def.GetId()) == id {
+			p.write(def)
+
+			return
 		}
 	}
 
-	return nil, helpers.ErrDataNotFoundError(qualityDefinitionDataSourceName, "ID", fmt.Sprint(id))
+	diags.AddError(helpers.DataSourceError, helpers.ParseNotFoundError(qualityDefinitionDataSourceName, "id", strconv.Itoa(int(id))))
 }

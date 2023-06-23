@@ -1,7 +1,6 @@
 package helpers
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/devopsarr/sonarr-go/sonarr"
@@ -21,12 +20,6 @@ const (
 	UnexpectedResourceConfigureType   = "Unexpected Resource Configure Type"
 	UnexpectedDataSourceConfigureType = "Unexpected DataSource Configure Type"
 )
-
-var ErrDataNotFound = errors.New("data source not found")
-
-func ErrDataNotFoundError(kind, field, search string) error {
-	return fmt.Errorf("%w: no %s with %s '%s'", ErrDataNotFound, kind, field, search)
-}
 
 func ParseNotFoundError(kind, field, search string) string {
 	return fmt.Sprintf("Unable to find %s, got error: data source not found: no %s with %s '%s'", kind, kind, field, search)

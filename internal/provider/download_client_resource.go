@@ -8,6 +8,7 @@ import (
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework-validators/stringvalidator"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -91,6 +92,55 @@ type DownloadClient struct {
 	Enable                   types.Bool   `tfsdk:"enable"`
 	RemoveFailedDownloads    types.Bool   `tfsdk:"remove_failed_downloads"`
 	RemoveCompletedDownloads types.Bool   `tfsdk:"remove_completed_downloads"`
+}
+
+func (d DownloadClient) getType() attr.Type {
+	return types.ObjectType{}.WithAttributeTypes(
+		map[string]attr.Type{
+			"tags":                       types.SetType{}.WithElementType(types.Int64Type),
+			"additional_tags":            types.SetType{}.WithElementType(types.Int64Type),
+			"post_import_tags":           types.SetType{}.WithElementType(types.StringType),
+			"field_tags":                 types.SetType{}.WithElementType(types.StringType),
+			"nzb_folder":                 types.StringType,
+			"category":                   types.StringType,
+			"implementation":             types.StringType,
+			"name":                       types.StringType,
+			"protocol":                   types.StringType,
+			"magnet_file_extension":      types.StringType,
+			"torrent_folder":             types.StringType,
+			"watch_folder":               types.StringType,
+			"strm_folder":                types.StringType,
+			"host":                       types.StringType,
+			"config_contract":            types.StringType,
+			"destination":                types.StringType,
+			"tv_directory":               types.StringType,
+			"username":                   types.StringType,
+			"tv_imported_category":       types.StringType,
+			"tv_category":                types.StringType,
+			"password":                   types.StringType,
+			"secret_token":               types.StringType,
+			"rpc_path":                   types.StringType,
+			"url_base":                   types.StringType,
+			"api_key":                    types.StringType,
+			"recent_tv_priority":         types.Int64Type,
+			"intial_state":               types.Int64Type,
+			"initial_state":              types.Int64Type,
+			"older_tv_priority":          types.Int64Type,
+			"priority":                   types.Int64Type,
+			"port":                       types.Int64Type,
+			"id":                         types.Int64Type,
+			"add_stopped":                types.BoolType,
+			"save_magnet_files":          types.BoolType,
+			"read_only":                  types.BoolType,
+			"first_and_last":             types.BoolType,
+			"sequential_order":           types.BoolType,
+			"start_on_add":               types.BoolType,
+			"use_ssl":                    types.BoolType,
+			"add_paused":                 types.BoolType,
+			"enable":                     types.BoolType,
+			"remove_failed_downloads":    types.BoolType,
+			"remove_completed_downloads": types.BoolType,
+		})
 }
 
 func (r *DownloadClientResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {

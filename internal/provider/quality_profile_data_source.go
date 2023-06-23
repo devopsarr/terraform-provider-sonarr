@@ -2,12 +2,12 @@ package provider
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
@@ -144,24 +144,21 @@ func (d *QualityProfileDataSource) Read(ctx context.Context, req datasource.Read
 		return
 	}
 
-	profile, err := findQualityProfile(data.Name.ValueString(), response)
-	if err != nil {
-		resp.Diagnostics.AddError(helpers.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", qualityProfileDataSourceName, err))
-
-		return
-	}
+	data.find(ctx, data.Name.ValueString(), response, &resp.Diagnostics)
 
 	tflog.Trace(ctx, "read "+qualityProfileDataSourceName)
-	data.write(ctx, profile, &resp.Diagnostics)
+	// Map response body to resource schema attribute
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func findQualityProfile(name string, profiles []*sonarr.QualityProfileResource) (*sonarr.QualityProfileResource, error) {
-	for _, p := range profiles {
-		if p.GetName() == name {
-			return p, nil
+func (p *QualityProfile) find(ctx context.Context, name string, profiles []*sonarr.QualityProfileResource, diags *diag.Diagnostics) {
+	for _, profile := range profiles {
+		if profile.GetName() == name {
+			p.write(ctx, profile, diags)
+
+			return
 		}
 	}
 
-	return nil, helpers.ErrDataNotFoundError(qualityProfileDataSourceName, "name", name)
+	diags.AddError(helpers.DataSourceError, helpers.ParseNotFoundError(qualityProfileDataSourceName, "name", name))
 }

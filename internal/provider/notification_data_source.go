@@ -2,12 +2,12 @@ package provider
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -437,24 +437,20 @@ func (d *NotificationDataSource) Read(ctx context.Context, req datasource.ReadRe
 		return
 	}
 
-	notification, err := findNotification(data.Name.ValueString(), response)
-	if err != nil {
-		resp.Diagnostics.AddError(helpers.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", notificationDataSourceName, err))
-
-		return
-	}
-
+	data.find(ctx, data.Name.ValueString(), response, &resp.Diagnostics)
 	tflog.Trace(ctx, "read "+notificationDataSourceName)
-	data.write(ctx, notification, &resp.Diagnostics)
+	// Map response body to resource schema attribute
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func findNotification(name string, notifications []*sonarr.NotificationResource) (*sonarr.NotificationResource, error) {
-	for _, i := range notifications {
-		if i.GetName() == name {
-			return i, nil
+func (n *Notification) find(ctx context.Context, name string, notifications []*sonarr.NotificationResource, diags *diag.Diagnostics) {
+	for _, notification := range notifications {
+		if notification.GetName() == name {
+			n.write(ctx, notification, diags)
+
+			return
 		}
 	}
 
-	return nil, helpers.ErrDataNotFoundError(notificationDataSourceName, "name", name)
+	diags.AddError(helpers.DataSourceError, helpers.ParseNotFoundError(notificationDataSourceName, "name", name))
 }

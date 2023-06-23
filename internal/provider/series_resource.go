@@ -6,6 +6,7 @@ import (
 
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -46,6 +47,23 @@ type Series struct {
 	Monitored         types.Bool   `tfsdk:"monitored"`
 	SeasonFolder      types.Bool   `tfsdk:"season_folder"`
 	UseSceneNumbering types.Bool   `tfsdk:"use_scene_numbering"`
+}
+
+func (s Series) getType() attr.Type {
+	return types.ObjectType{}.WithAttributeTypes(
+		map[string]attr.Type{
+			"monitored":           types.BoolType,
+			"season_folder":       types.BoolType,
+			"use_scene_numbering": types.BoolType,
+			"id":                  types.Int64Type,
+			"quality_profile_id":  types.Int64Type,
+			"tvdb_id":             types.Int64Type,
+			"root_folder_path":    types.StringType,
+			"title_slug":          types.StringType,
+			"title":               types.StringType,
+			"path":                types.StringType,
+			"tags":                types.SetType{}.WithElementType(types.Int64Type),
+		})
 }
 
 // Season is part of Series.
@@ -253,8 +271,6 @@ func (r *SeriesResource) ImportState(ctx context.Context, req resource.ImportSta
 func (s *Series) write(ctx context.Context, series *sonarr.SeriesResource, diags *diag.Diagnostics) {
 	var tempDiag diag.Diagnostics
 
-	s.Tags, tempDiag = types.SetValueFrom(ctx, types.Int64Type, series.GetTags())
-	diags.Append(tempDiag...)
 	s.Monitored = types.BoolValue(series.GetMonitored())
 	s.SeasonFolder = types.BoolValue(series.GetSeasonFolder())
 	s.UseSceneNumbering = types.BoolValue(series.GetUseSceneNumbering())
@@ -265,6 +281,8 @@ func (s *Series) write(ctx context.Context, series *sonarr.SeriesResource, diags
 	s.Title = types.StringValue(series.GetTitle())
 	s.TitleSlug = types.StringValue(series.GetTitleSlug())
 	s.RootFolderPath = types.StringValue(series.GetRootFolderPath())
+	s.Tags, tempDiag = types.SetValueFrom(ctx, types.Int64Type, series.GetTags())
+	diags.Append(tempDiag...)
 }
 
 func (s *Series) read(ctx context.Context, diags *diag.Diagnostics) *sonarr.SeriesResource {

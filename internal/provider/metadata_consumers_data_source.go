@@ -8,7 +8,6 @@ import (
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -115,13 +114,6 @@ func (d *MetadataConsumersDataSource) Configure(ctx context.Context, req datasou
 }
 
 func (d *MetadataConsumersDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var data *MetadataConsumers
-
-	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
-
-	if resp.Diagnostics.HasError() {
-		return
-	}
 	// Get metadataConsumers current value
 	response, _, err := d.client.MetadataApi.ListMetadata(ctx).Execute()
 	if err != nil {
@@ -132,13 +124,12 @@ func (d *MetadataConsumersDataSource) Read(ctx context.Context, req datasource.R
 
 	tflog.Trace(ctx, "read "+metadataConsumersDataSourceName)
 	// Map response body to resource schema attribute
-	profiles := make([]Metadata, len(response))
+	consumers := make([]Metadata, len(response))
 	for i, p := range response {
-		profiles[i].write(ctx, p, &resp.Diagnostics)
+		consumers[i].write(ctx, p, &resp.Diagnostics)
 	}
 
-	tfsdk.ValueFrom(ctx, profiles, data.MetadataConsumers.Type(ctx), &data.MetadataConsumers)
-	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
-	data.ID = types.StringValue(strconv.Itoa(len(response)))
-	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
+	metadataList, diags := types.SetValueFrom(ctx, Metadata{}.getType(), consumers)
+	resp.Diagnostics.Append(diags...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, MetadataConsumers{MetadataConsumers: metadataList, ID: types.StringValue(strconv.Itoa(len(response)))})...)
 }

@@ -92,13 +92,6 @@ func (d *RootFoldersDataSource) Configure(ctx context.Context, req datasource.Co
 }
 
 func (d *RootFoldersDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var data *RootFolders
-
-	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
-
-	if resp.Diagnostics.HasError() {
-		return
-	}
 	// Get rootfolders current value
 	response, _, err := d.client.RootFolderApi.ListRootFolder(ctx).Execute()
 	if err != nil {
@@ -114,8 +107,7 @@ func (d *RootFoldersDataSource) Read(ctx context.Context, req datasource.ReadReq
 		rootFolders[i].write(ctx, f, &resp.Diagnostics)
 	}
 
-	data.RootFolders, _ = types.SetValueFrom(ctx, data.RootFolders.ElementType(ctx), &rootFolders)
-	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
-	data.ID = types.StringValue(strconv.Itoa(len(response)))
-	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
+	folderList, diags := types.SetValueFrom(ctx, RootFolder{}.getType(), rootFolders)
+	resp.Diagnostics.Append(diags...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, RootFolders{RootFolders: folderList, ID: types.StringValue(strconv.Itoa(len(response)))})...)
 }

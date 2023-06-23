@@ -8,6 +8,7 @@ import (
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -107,24 +108,19 @@ func (d *AutoTagDataSource) Read(ctx context.Context, req datasource.ReadRequest
 		return
 	}
 
-	autoTag, err := findAutoTag(data.Name.ValueString(), response)
-	if err != nil {
-		resp.Diagnostics.AddError(helpers.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", autoTagDataSourceName, err))
-
-		return
-	}
-
+	data.find(ctx, data.Name.ValueString(), response, &resp.Diagnostics)
 	tflog.Trace(ctx, "read "+autoTagDataSourceName)
-	data.write(ctx, autoTag)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func findAutoTag(name string, autoTags []*sonarr.AutoTaggingResource) (*sonarr.AutoTaggingResource, error) {
+func (c *AutoTag) find(ctx context.Context, name string, autoTags []*sonarr.AutoTaggingResource, diags *diag.Diagnostics) {
 	for _, i := range autoTags {
 		if i.GetName() == name {
-			return i, nil
+			c.write(ctx, i, diags)
+
+			return
 		}
 	}
 
-	return nil, helpers.ErrDataNotFoundError(autoTagDataSourceName, "name", name)
+	diags.AddError(helpers.DataSourceError, helpers.ParseNotFoundError(autoTagDataSourceName, "name", name))
 }

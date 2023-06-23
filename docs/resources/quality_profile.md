@@ -90,14 +90,11 @@ Optional:
 <a id="nestedatt--format_items"></a>
 ### Nested Schema for `format_items`
 
-Required:
-
-- `format` (Number) Format.
-- `score` (Number) Score.
-
 Optional:
 
+- `format` (Number) Format.
 - `name` (String) Name.
+- `score` (Number) Score.
 
 ## Import
 

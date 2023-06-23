@@ -6,12 +6,15 @@ import (
 
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/setdefault"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -35,13 +38,26 @@ type ReleaseProfileResource struct {
 
 // ReleaseProfile describes the release profile data model.
 type ReleaseProfile struct {
-	Required  types.Set    `tfsdk:"required"`
-	Ignored   types.Set    `tfsdk:"ignored"`
 	Tags      types.Set    `tfsdk:"tags"`
+	Ignored   types.Set    `tfsdk:"ignored"`
+	Required  types.Set    `tfsdk:"required"`
 	Name      types.String `tfsdk:"name"`
 	ID        types.Int64  `tfsdk:"id"`
 	IndexerID types.Int64  `tfsdk:"indexer_id"`
 	Enabled   types.Bool   `tfsdk:"enabled"`
+}
+
+func (p ReleaseProfile) getType() attr.Type {
+	return types.ObjectType{}.WithAttributeTypes(
+		map[string]attr.Type{
+			"tags":       types.SetType{}.WithElementType(types.Int64Type),
+			"ignored":    types.SetType{}.WithElementType(types.StringType),
+			"required":   types.SetType{}.WithElementType(types.StringType),
+			"name":       types.StringType,
+			"id":         types.Int64Type,
+			"indexer_id": types.Int64Type,
+			"enabled":    types.BoolType,
+		})
 }
 
 func (r *ReleaseProfileResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -60,7 +76,7 @@ func (r *ReleaseProfileResource) Schema(ctx context.Context, req resource.Schema
 				},
 			},
 			"enabled": schema.BoolAttribute{
-				MarkdownDescription: "Enabled",
+				MarkdownDescription: "Enabled.",
 				Optional:            true,
 				Computed:            true,
 			},
@@ -70,21 +86,24 @@ func (r *ReleaseProfileResource) Schema(ctx context.Context, req resource.Schema
 				Computed:            true,
 			},
 			"indexer_id": schema.Int64Attribute{
-				MarkdownDescription: "Indexer ID. Set `0` for all.",
+				MarkdownDescription: "Indexer ID. Default to all.",
 				Optional:            true,
 				Computed:            true,
+				Default:             int64default.StaticInt64(0),
 			},
 			"required": schema.SetAttribute{
 				MarkdownDescription: "Required terms. At least one of `required` and `ignored` must be set.",
 				Optional:            true,
 				Computed:            true,
 				ElementType:         types.StringType,
+				Default:             setdefault.StaticValue(types.SetValueMust(types.StringType, []attr.Value{})),
 			},
 			"ignored": schema.SetAttribute{
 				MarkdownDescription: "Ignored terms. At least one of `required` and `ignored` must be set.",
 				Optional:            true,
 				Computed:            true,
 				ElementType:         types.StringType,
+				Default:             setdefault.StaticValue(types.SetValueMust(types.StringType, []attr.Value{})),
 			},
 			"tags": schema.SetAttribute{
 				MarkdownDescription: "List of associated tags.",
@@ -227,9 +246,9 @@ func (p *ReleaseProfile) read(ctx context.Context, diags *diag.Diagnostics) *son
 	profile.SetId(int32(p.ID.ValueInt64()))
 	profile.SetIndexerId(int32(p.IndexerID.ValueInt64()))
 	profile.SetName(p.Name.ValueString())
-	diags.Append(p.Ignored.ElementsAs(ctx, &profile.Ignored, true)...)
-	diags.Append(p.Required.ElementsAs(ctx, &profile.Required, true)...)
 	diags.Append(p.Tags.ElementsAs(ctx, &profile.Tags, true)...)
+	diags.Append(p.Required.ElementsAs(ctx, &profile.Required, true)...)
+	diags.Append(p.Ignored.ElementsAs(ctx, &profile.Ignored, true)...)
 
 	return profile
 }

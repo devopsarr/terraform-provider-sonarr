@@ -7,12 +7,13 @@ import (
 
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -41,6 +42,17 @@ type AutoTag struct {
 	Name                    types.String `tfsdk:"name"`
 	ID                      types.Int64  `tfsdk:"id"`
 	RemoveTagsAutomatically types.Bool   `tfsdk:"remove_tags_automatically"`
+}
+
+func (t AutoTag) getType() attr.Type {
+	return types.ObjectType{}.WithAttributeTypes(
+		map[string]attr.Type{
+			"specifications":            types.SetType{}.WithElementType(AutoTagCondition{}.getType()),
+			"tags":                      types.SetType{}.WithElementType(types.Int64Type),
+			"name":                      types.StringType,
+			"id":                        types.Int64Type,
+			"remove_tags_automatically": types.BoolType,
+		})
 }
 
 func (r *AutoTagResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -134,7 +146,7 @@ func (r *AutoTagResource) Create(ctx context.Context, req resource.CreateRequest
 	}
 
 	// Create new auto tag
-	request := autoTag.read(ctx)
+	request := autoTag.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.AutoTaggingApi.CreateAutoTagging(ctx).AutoTaggingResource(*request).Execute()
 	if err != nil {
@@ -145,7 +157,7 @@ func (r *AutoTagResource) Create(ctx context.Context, req resource.CreateRequest
 
 	tflog.Trace(ctx, "created "+autoTagResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	autoTag.write(ctx, response)
+	autoTag.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &autoTag)...)
 }
 
@@ -169,7 +181,7 @@ func (r *AutoTagResource) Read(ctx context.Context, req resource.ReadRequest, re
 
 	tflog.Trace(ctx, "read "+autoTagResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Map response body to resource schema attribute
-	autoTag.write(ctx, response)
+	autoTag.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &autoTag)...)
 }
 
@@ -184,7 +196,7 @@ func (r *AutoTagResource) Update(ctx context.Context, req resource.UpdateRequest
 	}
 
 	// Update auto tag
-	request := autoTag.read(ctx)
+	request := autoTag.read(ctx, &resp.Diagnostics)
 
 	response, _, err := r.client.AutoTaggingApi.UpdateAutoTagging(ctx, fmt.Sprint(request.GetId())).AutoTaggingResource(*request).Execute()
 	if err != nil {
@@ -195,7 +207,7 @@ func (r *AutoTagResource) Update(ctx context.Context, req resource.UpdateRequest
 
 	tflog.Trace(ctx, "updated "+autoTagResourceName+": "+strconv.Itoa(int(response.GetId())))
 	// Generate resource state struct
-	autoTag.write(ctx, response)
+	autoTag.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &autoTag)...)
 }
 
@@ -225,27 +237,27 @@ func (r *AutoTagResource) ImportState(ctx context.Context, req resource.ImportSt
 	tflog.Trace(ctx, "imported "+autoTagResourceName+": "+req.ID)
 }
 
-func (t *AutoTag) write(ctx context.Context, autoTag *sonarr.AutoTaggingResource) {
-	t.Tags, _ = types.SetValueFrom(ctx, types.Int64Type, autoTag.GetTags())
+func (t *AutoTag) write(ctx context.Context, autoTag *sonarr.AutoTaggingResource, diags *diag.Diagnostics) {
+	var tempDiag diag.Diagnostics
+
 	t.ID = types.Int64Value(int64(autoTag.GetId()))
 	t.Name = types.StringValue(autoTag.GetName())
 	t.RemoveTagsAutomatically = types.BoolValue(autoTag.GetRemoveTagsAutomatically())
-	t.Specifications = types.SetValueMust(AutoTagResource{}.getSpecificationSchema().Type(), nil)
 
 	specs := make([]AutoTagCondition, len(autoTag.Specifications))
 	for n, s := range autoTag.Specifications {
 		specs[n].write(ctx, s)
 	}
 
-	tfsdk.ValueFrom(ctx, specs, t.Specifications.Type(ctx), &t.Specifications)
+	t.Tags, tempDiag = types.SetValueFrom(ctx, types.Int64Type, autoTag.GetTags())
+	diags.Append(tempDiag...)
+	t.Specifications, tempDiag = types.SetValueFrom(ctx, AutoTagCondition{}.getType(), specs)
+	diags.Append(tempDiag...)
 }
 
-func (t *AutoTag) read(ctx context.Context) *sonarr.AutoTaggingResource {
-	tags := make([]*int32, len(t.Tags.Elements()))
-	tfsdk.ValueAs(ctx, t.Tags, &tags)
-
+func (t *AutoTag) read(ctx context.Context, diags *diag.Diagnostics) *sonarr.AutoTaggingResource {
 	specifications := make([]AutoTagCondition, len(t.Specifications.Elements()))
-	tfsdk.ValueAs(ctx, t.Specifications, &specifications)
+	diags.Append(t.Specifications.ElementsAs(ctx, &specifications, false)...)
 	specs := make([]*sonarr.AutoTaggingSpecificationSchema, len(specifications))
 
 	for n, s := range specifications {
@@ -257,7 +269,7 @@ func (t *AutoTag) read(ctx context.Context) *sonarr.AutoTaggingResource {
 	autoTag.SetName(t.Name.ValueString())
 	autoTag.SetRemoveTagsAutomatically(t.RemoveTagsAutomatically.ValueBool())
 	autoTag.SetSpecifications(specs)
-	autoTag.SetTags(tags)
+	diags.Append(t.Tags.ElementsAs(ctx, &autoTag.Tags, true)...)
 
 	return autoTag
 }

@@ -9,7 +9,6 @@ import (
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -112,13 +111,6 @@ func (d *AutoTagsDataSource) Configure(ctx context.Context, req datasource.Confi
 }
 
 func (d *AutoTagsDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var data *AutoTags
-
-	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
-
-	if resp.Diagnostics.HasError() {
-		return
-	}
 	// Get download clients current value
 	response, _, err := d.client.AutoTaggingApi.ListAutoTagging(ctx).Execute()
 	if err != nil {
@@ -129,13 +121,12 @@ func (d *AutoTagsDataSource) Read(ctx context.Context, req datasource.ReadReques
 
 	tflog.Trace(ctx, "read "+autoTagsDataSourceName)
 	// Map response body to resource schema attribute
-	profiles := make([]AutoTag, len(response))
-	for i, p := range response {
-		profiles[i].write(ctx, p)
+	autoTags := make([]AutoTag, len(response))
+	for i, a := range response {
+		autoTags[i].write(ctx, a, &resp.Diagnostics)
 	}
 
-	tfsdk.ValueFrom(ctx, profiles, data.AutoTags.Type(ctx), &data.AutoTags)
-	// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
-	data.ID = types.StringValue(strconv.Itoa(len(response)))
-	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
+	autoList, diags := types.SetValueFrom(ctx, AutoTag{}.getType(), autoTags)
+	resp.Diagnostics.Append(diags...)
+	resp.Diagnostics.Append(resp.State.Set(ctx, AutoTags{AutoTags: autoList, ID: types.StringValue(strconv.Itoa(len(response)))})...)
 }

@@ -2,12 +2,12 @@ package provider
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -111,24 +111,20 @@ func (d *MetadataDataSource) Read(ctx context.Context, req datasource.ReadReques
 		return
 	}
 
-	metadata, err := findMetadata(data.Name.ValueString(), response)
-	if err != nil {
-		resp.Diagnostics.AddError(helpers.DataSourceError, fmt.Sprintf("Unable to find %s, got error: %s", metadataDataSourceName, err))
-
-		return
-	}
-
+	data.find(ctx, data.Name.ValueString(), response, &resp.Diagnostics)
 	tflog.Trace(ctx, "read "+metadataDataSourceName)
-	data.write(ctx, metadata, &resp.Diagnostics)
+	// Map response body to resource schema attribute
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func findMetadata(name string, metadatas []*sonarr.MetadataResource) (*sonarr.MetadataResource, error) {
-	for _, i := range metadatas {
-		if i.GetName() == name {
-			return i, nil
+func (m *Metadata) find(ctx context.Context, name string, metadatas []*sonarr.MetadataResource, diags *diag.Diagnostics) {
+	for _, metadata := range metadatas {
+		if metadata.GetName() == name {
+			m.write(ctx, metadata, diags)
+
+			return
 		}
 	}
 
-	return nil, helpers.ErrDataNotFoundError(metadataDataSourceName, "name", name)
+	diags.AddError(helpers.DataSourceError, helpers.ParseNotFoundError(metadataDataSourceName, "name", name))
 }
