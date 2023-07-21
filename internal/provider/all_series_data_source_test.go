@@ -21,7 +21,7 @@ func TestAccAllSeriesDataSource(t *testing.T) {
 			},
 			// Create a resource to test
 			{
-				Config: testAccSeriesResourceConfig(332606, "Friends", "friends", "false"),
+				Config: testAccSeriesResourceConfig(332606, "Friends (2010)", "friends-2010", "false"),
 			},
 			// Read testing
 			{
