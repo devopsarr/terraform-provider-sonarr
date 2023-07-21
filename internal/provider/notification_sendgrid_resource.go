@@ -105,11 +105,11 @@ func (n *NotificationSendgrid) fromNotification(notification *Notification) {
 	n.OnDownload = notification.OnDownload
 }
 
-func (r *NotificationSendgridResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+func (r *NotificationSendgridResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + notificationSendgridResourceName
 }
 
-func (r *NotificationSendgridResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+func (r *NotificationSendgridResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "<!-- subcategory:Notifications -->Notification Sendgrid resource.\nFor more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect) and [Sendgrid](https://wiki.servarr.com/sonarr/supported#sendgrid).",
 		Attributes: map[string]schema.Attribute{

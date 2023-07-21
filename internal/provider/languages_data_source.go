@@ -32,11 +32,11 @@ type Languages struct {
 	ID        types.String `tfsdk:"id"`
 }
 
-func (d *LanguagesDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+func (d *LanguagesDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + languagesDataSourceName
 }
 
-func (d *LanguagesDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+func (d *LanguagesDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "<!-- subcategory:Languages -->List all available [Languages](../data-sources/language).",
 		Attributes: map[string]schema.Attribute{
@@ -74,7 +74,7 @@ func (d *LanguagesDataSource) Configure(ctx context.Context, req datasource.Conf
 	}
 }
 
-func (d *LanguagesDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+func (d *LanguagesDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
 	// Get languages current value
 	response, _, err := d.client.LanguageApi.ListLanguage(ctx).Execute()
 	if err != nil {

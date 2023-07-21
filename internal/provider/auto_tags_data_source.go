@@ -33,11 +33,11 @@ type AutoTags struct {
 	ID       types.String `tfsdk:"id"`
 }
 
-func (d *AutoTagsDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+func (d *AutoTagsDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + autoTagsDataSourceName
 }
 
-func (d *AutoTagsDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+func (d *AutoTagsDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the delay server.
 		MarkdownDescription: "<!-- subcategory:Tags -->List all available [Auto Tags](../resources/auto_tag).",
@@ -110,7 +110,7 @@ func (d *AutoTagsDataSource) Configure(ctx context.Context, req datasource.Confi
 	}
 }
 
-func (d *AutoTagsDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+func (d *AutoTagsDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
 	// Get download clients current value
 	response, _, err := d.client.AutoTaggingApi.ListAutoTagging(ctx).Execute()
 	if err != nil {

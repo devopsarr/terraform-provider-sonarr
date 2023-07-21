@@ -32,11 +32,11 @@ type MetadataConsumers struct {
 	ID                types.String `tfsdk:"id"`
 }
 
-func (d *MetadataConsumersDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+func (d *MetadataConsumersDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + metadataConsumersDataSourceName
 }
 
-func (d *MetadataConsumersDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+func (d *MetadataConsumersDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the delay server.
 		MarkdownDescription: "<!-- subcategory:Metadata -->List all available [Metadata Consumers](../resources/metadata).",
@@ -113,7 +113,7 @@ func (d *MetadataConsumersDataSource) Configure(ctx context.Context, req datasou
 	}
 }
 
-func (d *MetadataConsumersDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+func (d *MetadataConsumersDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
 	// Get metadataConsumers current value
 	response, _, err := d.client.MetadataApi.ListMetadata(ctx).Execute()
 	if err != nil {

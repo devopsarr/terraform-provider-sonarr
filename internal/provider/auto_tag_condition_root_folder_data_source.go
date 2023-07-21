@@ -29,11 +29,11 @@ type AutoTagConditionRootFolderDataSource struct {
 	client *sonarr.APIClient
 }
 
-func (d *AutoTagConditionRootFolderDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+func (d *AutoTagConditionRootFolderDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + autoTagConditionRootFolderDataSourceName
 }
 
-func (d *AutoTagConditionRootFolderDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+func (d *AutoTagConditionRootFolderDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the delay server.
 		MarkdownDescription: "<!-- subcategory:Tags --> Auto Tag Condition Root Folder data source.\nFor more intagion refer to [Auto Tag Conditions](https://wiki.servarr.com/sonarr/settings#conditions).",
@@ -74,7 +74,7 @@ func (d *AutoTagConditionRootFolderDataSource) Configure(ctx context.Context, re
 	}
 }
 
-func (d *AutoTagConditionRootFolderDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+func (d *AutoTagConditionRootFolderDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
 	var data *AutoTagCondition
 
 	hash, err := hashstructure.Hash(&data, hashstructure.FormatV2, nil)

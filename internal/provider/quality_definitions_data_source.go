@@ -32,11 +32,11 @@ type QualityDefinitions struct {
 	ID                 types.String `tfsdk:"id"`
 }
 
-func (d *QualityDefinitionsDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+func (d *QualityDefinitionsDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + qualityDefinitionsDataSourceName
 }
 
-func (d *QualityDefinitionsDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+func (d *QualityDefinitionsDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the quality server.
 		MarkdownDescription: "<!-- subcategory:Profiles -->List all available [Quality Definitions](../resources/quality_definition).",
@@ -96,7 +96,7 @@ func (d *QualityDefinitionsDataSource) Configure(ctx context.Context, req dataso
 	}
 }
 
-func (d *QualityDefinitionsDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+func (d *QualityDefinitionsDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
 	// Get qualitydefinitions current value
 	response, _, err := d.client.QualityDefinitionApi.ListQualityDefinition(ctx).Execute()
 	if err != nil {

@@ -34,7 +34,7 @@ resource "sonarr_import_list_simkl_user" "example" {
 ### Required
 
 - `enable_automatic_add` (Boolean) Enable automatic add flag.
-- `list_type` (Number) Simkl list type. '0' Watching, '1' PlanToWatch, '2' Hold, '1' Completed, '2' Dropped.
+- `list_type` (Number) Simkl list type. '0' Watching, '1' PlanToWatch, '2' Hold, '3' Completed, '4' Dropped.
 - `name` (String) Import List name.
 - `quality_profile_id` (Number) Quality profile ID.
 - `root_folder_path` (String) Root folder path.

@@ -99,11 +99,11 @@ func (n *NotificationPlex) fromNotification(notification *Notification) {
 	n.OnDownload = notification.OnDownload
 }
 
-func (r *NotificationPlexResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+func (r *NotificationPlexResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + notificationPlexResourceName
 }
 
-func (r *NotificationPlexResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+func (r *NotificationPlexResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "<!-- subcategory:Notifications -->Notification Plex resource.\nFor more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect) and [Plex](https://wiki.servarr.com/sonarr/supported#plexserver).",
 		Attributes: map[string]schema.Attribute{
