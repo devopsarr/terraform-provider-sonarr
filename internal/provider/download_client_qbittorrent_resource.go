@@ -117,11 +117,11 @@ func (d *DownloadClientQbittorrent) fromDownloadClient(client *DownloadClient) {
 	d.SequentialOrder = client.SequentialOrder
 }
 
-func (r *DownloadClientQbittorrentResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+func (r *DownloadClientQbittorrentResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + downloadClientQbittorrentResourceName
 }
 
-func (r *DownloadClientQbittorrentResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+func (r *DownloadClientQbittorrentResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "<!-- subcategory:Download Clients -->Download Client qBittorrent resource.\nFor more information refer to [Download Client](https://wiki.servarr.com/sonarr/settings#download-clients) and [qBittorrent](https://wiki.servarr.com/sonarr/supported#qbittorrent).",
 		Attributes: map[string]schema.Attribute{

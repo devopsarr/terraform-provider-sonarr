@@ -29,11 +29,11 @@ type CustomFormatConditionReleaseTitleDataSource struct {
 	client *sonarr.APIClient
 }
 
-func (d *CustomFormatConditionReleaseTitleDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+func (d *CustomFormatConditionReleaseTitleDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + customFormatConditionReleaseTitleDataSourceName
 }
 
-func (d *CustomFormatConditionReleaseTitleDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+func (d *CustomFormatConditionReleaseTitleDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the delay server.
 		MarkdownDescription: "<!-- subcategory:Profiles --> Custom Format Condition Release Title data source.\nFor more information refer to [Custom Format Conditions](https://wiki.servarr.com/sonarr/settings#conditions).",
@@ -74,7 +74,7 @@ func (d *CustomFormatConditionReleaseTitleDataSource) Configure(ctx context.Cont
 	}
 }
 
-func (d *CustomFormatConditionReleaseTitleDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+func (d *CustomFormatConditionReleaseTitleDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
 	var data *CustomFormatConditionValue
 
 	hash, err := hashstructure.Hash(&data, hashstructure.FormatV2, nil)

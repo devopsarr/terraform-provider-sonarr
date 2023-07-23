@@ -32,12 +32,12 @@ type Sonarr struct {
 	URL    types.String `tfsdk:"url"`
 }
 
-func (p *SonarrProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {
+func (p *SonarrProvider) Metadata(_ context.Context, _ provider.MetadataRequest, resp *provider.MetadataResponse) {
 	resp.TypeName = "sonarr"
 	resp.Version = p.version
 }
 
-func (p *SonarrProvider) Schema(ctx context.Context, req provider.SchemaRequest, resp *provider.SchemaResponse) {
+func (p *SonarrProvider) Schema(_ context.Context, _ provider.SchemaRequest, resp *provider.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "The Sonarr provider is used to interact with any [Sonarr](https://sonarr.tv/) installation.\nYou must configure the provider with the proper [credentials](#api_key) before you can use it.\nUse the left navigation to read about the available resources.\n\nFor more information about Sonarr and its resources, as well as configuration guides and hints, visit the [Servarr wiki](https://wiki.servarr.com/en/sonarr).",
 		Attributes: map[string]schema.Attribute{
@@ -129,7 +129,7 @@ func (p *SonarrProvider) Configure(ctx context.Context, req provider.ConfigureRe
 	resp.ResourceData = client
 }
 
-func (p *SonarrProvider) Resources(ctx context.Context) []func() resource.Resource {
+func (p *SonarrProvider) Resources(_ context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
 		// Download Clients
 		NewDownloadClientConfigResource,
@@ -234,7 +234,7 @@ func (p *SonarrProvider) Resources(ctx context.Context) []func() resource.Resour
 	}
 }
 
-func (p *SonarrProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
+func (p *SonarrProvider) DataSources(_ context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
 		// Download Clients
 		NewDownloadClientConfigDataSource,

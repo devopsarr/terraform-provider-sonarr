@@ -26,11 +26,11 @@ type QualityDefinitionDataSource struct {
 	client *sonarr.APIClient
 }
 
-func (d *QualityDefinitionDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+func (d *QualityDefinitionDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + qualityDefinitionDataSourceName
 }
 
-func (d *QualityDefinitionDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+func (d *QualityDefinitionDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the quality server.
 		MarkdownDescription: "<!-- subcategory:Profiles -->Single [Quality Definition](../resources/quality_definition).",

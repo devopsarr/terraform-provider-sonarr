@@ -95,11 +95,11 @@ func (i *ImportListSonarr) fromImportList(importList *ImportList) {
 	i.SeasonFolder = importList.SeasonFolder
 }
 
-func (r *ImportListSonarrResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+func (r *ImportListSonarrResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + importListSonarrResourceName
 }
 
-func (r *ImportListSonarrResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+func (r *ImportListSonarrResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "<!-- subcategory:Import Lists -->ImportList Sonarr resource.\nFor more information refer to [Import List](https://wiki.servarr.com/sonarr/settings#import-lists) and [Sonarr](https://wiki.servarr.com/sonarr/supported#sonarr).",
 		Attributes: map[string]schema.Attribute{

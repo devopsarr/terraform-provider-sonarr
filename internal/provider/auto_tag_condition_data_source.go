@@ -53,11 +53,11 @@ func (c AutoTagCondition) getType() attr.Type {
 		})
 }
 
-func (d *AutoTagConditionDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+func (d *AutoTagConditionDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + autoTagConditionDataSourceName
 }
 
-func (d *AutoTagConditionDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+func (d *AutoTagConditionDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the delay server.
 		MarkdownDescription: "<!-- subcategory:Tags --> Generic Auto Tag Condition data source. When possible use a specific data source instead.\nFor more information refer to [ Format Conditions](https://wiki.servarr.com/sonarr/settings#conditions).\n To be used in conjunction with [ Format](../resources/auto_tag).",
@@ -99,7 +99,7 @@ func (d *AutoTagConditionDataSource) Configure(ctx context.Context, req datasour
 	}
 }
 
-func (d *AutoTagConditionDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+func (d *AutoTagConditionDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
 	var data *AutoTagCondition
 
 	hash, err := hashstructure.Hash(&data, hashstructure.FormatV2, nil)

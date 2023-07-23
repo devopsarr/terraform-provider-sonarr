@@ -96,11 +96,11 @@ func (i *ImportListSimklUser) fromImportList(importList *ImportList) {
 	i.SeasonFolder = importList.SeasonFolder
 }
 
-func (r *ImportListSimklUserResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+func (r *ImportListSimklUserResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + importListSimklUserResourceName
 }
 
-func (r *ImportListSimklUserResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+func (r *ImportListSimklUserResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "<!-- subcategory:Import Lists -->ImportList SimklUser resource.\nFor more information refer to [Import List](https://wiki.servarr.com/sonarr/settings#import-lists) and [SimklUser](https://wiki.servarr.com/sonarr/supported#simkl_user).",
 		Attributes: map[string]schema.Attribute{
@@ -153,7 +153,7 @@ func (r *ImportListSimklUserResource) Schema(ctx context.Context, req resource.S
 			},
 			// Field values
 			"list_type": schema.Int64Attribute{
-				MarkdownDescription: "Simkl list type. '0' Watching, '1' PlanToWatch, '2' Hold, '1' Completed, '2' Dropped.",
+				MarkdownDescription: "Simkl list type. '0' Watching, '1' PlanToWatch, '2' Hold, '3' Completed, '4' Dropped.",
 				Required:            true,
 				Validators: []validator.Int64{
 					int64validator.OneOf(0, 1, 2, 3, 4),

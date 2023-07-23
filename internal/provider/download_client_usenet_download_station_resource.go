@@ -95,11 +95,11 @@ func (d *DownloadClientUsenetDownloadStation) fromDownloadClient(client *Downloa
 	d.RemoveCompletedDownloads = client.RemoveCompletedDownloads
 }
 
-func (r *DownloadClientUsenetDownloadStationResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+func (r *DownloadClientUsenetDownloadStationResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + downloadClientUsenetDownloadStationResourceName
 }
 
-func (r *DownloadClientUsenetDownloadStationResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+func (r *DownloadClientUsenetDownloadStationResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "<!-- subcategory:Download Clients -->Download Client UsenetDownloadStation resource.\nFor more information refer to [Download Client](https://wiki.servarr.com/sonarr/settings#download-clients) and [UsenetDownloadStation](https://wiki.servarr.com/sonarr/supported#usenetdownloadstation).",
 		Attributes: map[string]schema.Attribute{

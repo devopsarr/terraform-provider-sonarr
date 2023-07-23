@@ -109,11 +109,11 @@ func (d *DownloadClientTransmission) fromDownloadClient(client *DownloadClient) 
 	d.RemoveCompletedDownloads = client.RemoveCompletedDownloads
 }
 
-func (r *DownloadClientTransmissionResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+func (r *DownloadClientTransmissionResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + downloadClientTransmissionResourceName
 }
 
-func (r *DownloadClientTransmissionResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+func (r *DownloadClientTransmissionResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "<!-- subcategory:Download Clients -->Download Client Transmission resource.\nFor more information refer to [Download Client](https://wiki.servarr.com/sonarr/settings#download-clients) and [Transmission](https://wiki.servarr.com/sonarr/supported#transmission).",
 		Attributes: map[string]schema.Attribute{

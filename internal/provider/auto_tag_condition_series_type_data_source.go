@@ -29,11 +29,11 @@ type AutoTagConditionSeriesTypeDataSource struct {
 	client *sonarr.APIClient
 }
 
-func (d *AutoTagConditionSeriesTypeDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+func (d *AutoTagConditionSeriesTypeDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + autoTagConditionSeriesTypeDataSourceName
 }
 
-func (d *AutoTagConditionSeriesTypeDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+func (d *AutoTagConditionSeriesTypeDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the delay server.
 		MarkdownDescription: "<!-- subcategory:Tags --> Auto Tag Condition Series Type data source.\nFor more intagion refer to [Auto Tag Conditions](https://wiki.servarr.com/sonarr/settings#conditions).",
@@ -74,7 +74,7 @@ func (d *AutoTagConditionSeriesTypeDataSource) Configure(ctx context.Context, re
 	}
 }
 
-func (d *AutoTagConditionSeriesTypeDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+func (d *AutoTagConditionSeriesTypeDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
 	var data *AutoTagCondition
 
 	hash, err := hashstructure.Hash(&data, hashstructure.FormatV2, nil)

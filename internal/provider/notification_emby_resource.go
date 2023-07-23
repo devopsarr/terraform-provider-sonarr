@@ -114,11 +114,11 @@ func (n *NotificationEmby) fromNotification(notification *Notification) {
 	n.OnDownload = notification.OnDownload
 }
 
-func (r *NotificationEmbyResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+func (r *NotificationEmbyResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + notificationEmbyResourceName
 }
 
-func (r *NotificationEmbyResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+func (r *NotificationEmbyResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "<!-- subcategory:Notifications -->Notification Emby resource.\nFor more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect) and [Emby](https://wiki.servarr.com/sonarr/supported#mediabrowser).",
 		Attributes: map[string]schema.Attribute{

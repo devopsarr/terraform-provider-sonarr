@@ -109,11 +109,11 @@ func (d *DownloadClientUtorrent) fromDownloadClient(client *DownloadClient) {
 	d.RemoveCompletedDownloads = client.RemoveCompletedDownloads
 }
 
-func (r *DownloadClientUtorrentResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+func (r *DownloadClientUtorrentResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + downloadClientUtorrentResourceName
 }
 
-func (r *DownloadClientUtorrentResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+func (r *DownloadClientUtorrentResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "<!-- subcategory:Download Clients -->Download Client uTorrent resource.\nFor more information refer to [Download Client](https://wiki.servarr.com/sonarr/settings#download-clients) and [uTorrent](https://wiki.servarr.com/sonarr/supported#utorrent).",
 		Attributes: map[string]schema.Attribute{

@@ -27,11 +27,11 @@ type SearchSeriesDataSource struct {
 	client *sonarr.APIClient
 }
 
-func (d *SearchSeriesDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+func (d *SearchSeriesDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + searchSearchSeriesDataSourceName
 }
 
-func (d *SearchSeriesDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+func (d *SearchSeriesDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "<!-- subcategory:Series -->Search a Single [Series](../resources/series) via tvdb_id.",
 		Attributes: map[string]schema.Attribute{

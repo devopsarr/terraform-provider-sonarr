@@ -105,11 +105,11 @@ func (i *ImportListTraktUser) fromImportList(importList *ImportList) {
 	i.SeasonFolder = importList.SeasonFolder
 }
 
-func (r *ImportListTraktUserResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+func (r *ImportListTraktUserResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + importListTraktUserResourceName
 }
 
-func (r *ImportListTraktUserResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+func (r *ImportListTraktUserResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "<!-- subcategory:Import Lists -->ImportList TraktUser resource.\nFor more information refer to [Import List](https://wiki.servarr.com/sonarr/settings#import-lists) and [TraktUser](https://wiki.servarr.com/sonarr/supported#trakt_user).",
 		Attributes: map[string]schema.Attribute{

@@ -32,11 +32,11 @@ type ImportListExclusions struct {
 	ID                   types.String `tfsdk:"id"`
 }
 
-func (d *ImportListExclusionsDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+func (d *ImportListExclusionsDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + importListExclusionsDataSourceName
 }
 
-func (d *ImportListExclusionsDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+func (d *ImportListExclusionsDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "<!-- subcategory:Import Lists -->List all available [ImportListExclusions](../resources/importListExclusion).",
 		Attributes: map[string]schema.Attribute{
@@ -74,7 +74,7 @@ func (d *ImportListExclusionsDataSource) Configure(ctx context.Context, req data
 	}
 }
 
-func (d *ImportListExclusionsDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+func (d *ImportListExclusionsDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
 	// Get importListExclusions current value
 	response, _, err := d.client.ImportListExclusionApi.ListImportListExclusion(ctx).Execute()
 	if err != nil {

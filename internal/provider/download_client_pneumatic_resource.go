@@ -80,11 +80,11 @@ func (d *DownloadClientPneumatic) fromDownloadClient(client *DownloadClient) {
 	d.RemoveCompletedDownloads = client.RemoveCompletedDownloads
 }
 
-func (r *DownloadClientPneumaticResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+func (r *DownloadClientPneumaticResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + downloadClientPneumaticResourceName
 }
 
-func (r *DownloadClientPneumaticResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+func (r *DownloadClientPneumaticResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "<!-- subcategory:Download Clients -->Download Client Pneumatic resource.\nFor more information refer to [Download Client](https://wiki.servarr.com/sonarr/settings#download-clients) and [Pneumatic](https://wiki.servarr.com/sonarr/supported#pneumatic).",
 		Attributes: map[string]schema.Attribute{

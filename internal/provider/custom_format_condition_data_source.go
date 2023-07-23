@@ -74,11 +74,11 @@ type CustomFormatConditionMinMax struct {
 	Required types.Bool   `tfsdk:"required"`
 }
 
-func (d *CustomFormatConditionDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+func (d *CustomFormatConditionDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + customFormatConditionDataSourceName
 }
 
-func (d *CustomFormatConditionDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+func (d *CustomFormatConditionDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the delay server.
 		MarkdownDescription: "<!-- subcategory:Profiles --> Generic Custom Format Condition data source. When possible use a specific data source instead.\nFor more information refer to [Custom Format Conditions](https://wiki.servarr.com/sonarr/settings#conditions).\n To be used in conjunction with [Custom Format](../resources/custom_format).",
@@ -130,7 +130,7 @@ func (d *CustomFormatConditionDataSource) Configure(ctx context.Context, req dat
 	}
 }
 
-func (d *CustomFormatConditionDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+func (d *CustomFormatConditionDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
 	var data *CustomFormatCondition
 
 	hash, err := hashstructure.Hash(&data, hashstructure.FormatV2, nil)

@@ -98,11 +98,11 @@ func (i *IndexerTorrentRss) fromIndexer(indexer *Indexer) {
 	i.Tags = indexer.Tags
 }
 
-func (r *IndexerTorrentRssResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+func (r *IndexerTorrentRssResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + indexerTorrentRssResourceName
 }
 
-func (r *IndexerTorrentRssResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+func (r *IndexerTorrentRssResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "<!-- subcategory:Indexers -->Indexer Torrent RSS resource.\nFor more information refer to [Indexer](https://wiki.servarr.com/sonarr/settings#indexers) and [Torrent RSS](https://wiki.servarr.com/sonarr/supported#torrentrssindexer).",
 		Attributes: map[string]schema.Attribute{

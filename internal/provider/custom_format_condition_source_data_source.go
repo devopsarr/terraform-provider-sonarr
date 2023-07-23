@@ -29,11 +29,11 @@ type CustomFormatConditionSourceDataSource struct {
 	client *sonarr.APIClient
 }
 
-func (d *CustomFormatConditionSourceDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+func (d *CustomFormatConditionSourceDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + customFormatConditionSourceDataSourceName
 }
 
-func (d *CustomFormatConditionSourceDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+func (d *CustomFormatConditionSourceDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the delay server.
 		MarkdownDescription: "<!-- subcategory:Profiles --> Custom Format Condition Source data source.\nFor more information refer to [Custom Format Conditions](https://wiki.servarr.com/sonarr/settings#conditions).",
@@ -74,7 +74,7 @@ func (d *CustomFormatConditionSourceDataSource) Configure(ctx context.Context, r
 	}
 }
 
-func (d *CustomFormatConditionSourceDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+func (d *CustomFormatConditionSourceDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
 	var data *CustomFormatConditionValue
 
 	hash, err := hashstructure.Hash(&data, hashstructure.FormatV2, nil)

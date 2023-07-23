@@ -117,11 +117,11 @@ func (n *NotificationSignal) fromNotification(notification *Notification) {
 	n.OnDownload = notification.OnDownload
 }
 
-func (r *NotificationSignalResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+func (r *NotificationSignalResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + notificationSignalResourceName
 }
 
-func (r *NotificationSignalResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+func (r *NotificationSignalResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "<!-- subcategory:Notifications -->Notification Signal resource.\nFor more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect) and [Signal](https://wiki.servarr.com/sonarr/supported#signal).",
 		Attributes: map[string]schema.Attribute{

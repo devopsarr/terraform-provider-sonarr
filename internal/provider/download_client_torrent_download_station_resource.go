@@ -95,11 +95,11 @@ func (d *DownloadClientTorrentDownloadStation) fromDownloadClient(client *Downlo
 	d.RemoveCompletedDownloads = client.RemoveCompletedDownloads
 }
 
-func (r *DownloadClientTorrentDownloadStationResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+func (r *DownloadClientTorrentDownloadStationResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + downloadClientTorrentDownloadStationResourceName
 }
 
-func (r *DownloadClientTorrentDownloadStationResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+func (r *DownloadClientTorrentDownloadStationResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "<!-- subcategory:Download Clients -->Download Client TorrentDownloadStation resource.\nFor more information refer to [Download Client](https://wiki.servarr.com/sonarr/settings#download-clients) and [TorrentDownloadStation](https://wiki.servarr.com/sonarr/supported#torrentdownloadstation).",
 		Attributes: map[string]schema.Attribute{

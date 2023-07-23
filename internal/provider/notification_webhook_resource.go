@@ -113,11 +113,11 @@ func (n *NotificationWebhook) fromNotification(notification *Notification) {
 	n.OnDownload = notification.OnDownload
 }
 
-func (r *NotificationWebhookResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+func (r *NotificationWebhookResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + notificationWebhookResourceName
 }
 
-func (r *NotificationWebhookResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+func (r *NotificationWebhookResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "<!-- subcategory:Notifications -->Notification Webhook resource.\nFor more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect) and [Webhook](https://wiki.servarr.com/sonarr/supported#webhook).",
 		Attributes: map[string]schema.Attribute{

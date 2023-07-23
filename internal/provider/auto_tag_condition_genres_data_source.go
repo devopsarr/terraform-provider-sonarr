@@ -29,11 +29,11 @@ type AutoTagConditionGenresDataSource struct {
 	client *sonarr.APIClient
 }
 
-func (d *AutoTagConditionGenresDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+func (d *AutoTagConditionGenresDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + autoTagConditionGenresDataSourceName
 }
 
-func (d *AutoTagConditionGenresDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+func (d *AutoTagConditionGenresDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the delay server.
 		MarkdownDescription: "<!-- subcategory:Tags --> Auto Tag Condition Genres data source.\nFor more intagion refer to [Auto Tag Conditions](https://wiki.servarr.com/sonarr/settings#conditions).",
@@ -74,7 +74,7 @@ func (d *AutoTagConditionGenresDataSource) Configure(ctx context.Context, req da
 	}
 }
 
-func (d *AutoTagConditionGenresDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+func (d *AutoTagConditionGenresDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
 	var data *AutoTagCondition
 
 	hash, err := hashstructure.Hash(&data, hashstructure.FormatV2, nil)

@@ -32,11 +32,11 @@ type ImportLists struct {
 	ID          types.String `tfsdk:"id"`
 }
 
-func (d *ImportListsDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+func (d *ImportListsDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + importListsDataSourceName
 }
 
-func (d *ImportListsDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+func (d *ImportListsDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the delay server.
 		MarkdownDescription: "<!-- subcategory:Import Lists -->List all available [Import Lists](../resources/import_list).",
@@ -195,7 +195,7 @@ func (d *ImportListsDataSource) Configure(ctx context.Context, req datasource.Co
 	}
 }
 
-func (d *ImportListsDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+func (d *ImportListsDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
 	// Get import lists current value
 	response, _, err := d.client.ImportListApi.ListImportList(ctx).Execute()
 	if err != nil {

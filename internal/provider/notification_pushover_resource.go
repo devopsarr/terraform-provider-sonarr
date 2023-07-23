@@ -119,11 +119,11 @@ func (n *NotificationPushover) fromNotification(notification *Notification) {
 	n.OnDownload = notification.OnDownload
 }
 
-func (r *NotificationPushoverResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+func (r *NotificationPushoverResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + notificationPushoverResourceName
 }
 
-func (r *NotificationPushoverResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+func (r *NotificationPushoverResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "<!-- subcategory:Notifications -->Notification Pushover resource.\nFor more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect) and [Pushover](https://wiki.servarr.com/sonarr/supported#pushover).",
 		Attributes: map[string]schema.Attribute{

@@ -29,11 +29,11 @@ type CustomFormatConditionSizeDataSource struct {
 	client *sonarr.APIClient
 }
 
-func (d *CustomFormatConditionSizeDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+func (d *CustomFormatConditionSizeDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + customFormatConditionSizeDataSourceName
 }
 
-func (d *CustomFormatConditionSizeDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+func (d *CustomFormatConditionSizeDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the delay server.
 		MarkdownDescription: "<!-- subcategory:Profiles --> Custom Format Condition Size data source.\nFor more information refer to [Custom Format Conditions](https://wiki.servarr.com/sonarr/settings#conditions).",
@@ -78,7 +78,7 @@ func (d *CustomFormatConditionSizeDataSource) Configure(ctx context.Context, req
 	}
 }
 
-func (d *CustomFormatConditionSizeDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+func (d *CustomFormatConditionSizeDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
 	var data *CustomFormatConditionMinMax
 
 	hash, err := hashstructure.Hash(&data, hashstructure.FormatV2, nil)

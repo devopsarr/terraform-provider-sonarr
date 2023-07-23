@@ -36,7 +36,7 @@ func ImportStatePassthroughIntID(ctx context.Context, attrPath path.Path, req re
 }
 
 // ResourceConfigure is a helper function to set the client for a specific resource.
-func ResourceConfigure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) *sonarr.APIClient {
+func ResourceConfigure(_ context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) *sonarr.APIClient {
 	// Prevent panic if the provider has not been configured.
 	if req.ProviderData == nil {
 		return nil
@@ -56,7 +56,7 @@ func ResourceConfigure(ctx context.Context, req resource.ConfigureRequest, resp 
 }
 
 // DataSourceConfigure is a helper function to set the client for a specific data source.
-func DataSourceConfigure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) *sonarr.APIClient {
+func DataSourceConfigure(_ context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) *sonarr.APIClient {
 	// Prevent panic if the provider has not been configured.
 	if req.ProviderData == nil {
 		return nil

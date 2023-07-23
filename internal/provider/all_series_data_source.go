@@ -32,11 +32,11 @@ type SeriesList struct {
 	ID     types.String `tfsdk:"id"`
 }
 
-func (d *AllSeriessDataSource) Metadata(ctx context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+func (d *AllSeriessDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + allSeriesDataSourceName
 }
 
-func (d *AllSeriessDataSource) Schema(ctx context.Context, req datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+func (d *AllSeriessDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "<!-- subcategory:Series -->List all available [Series](../resources/series).",
 		Attributes: map[string]schema.Attribute{
@@ -107,7 +107,7 @@ func (d *AllSeriessDataSource) Configure(ctx context.Context, req datasource.Con
 	}
 }
 
-func (d *AllSeriessDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+func (d *AllSeriessDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
 	// Get series current value
 	response, _, err := d.client.SeriesApi.ListSeries(ctx).Execute()
 	if err != nil {

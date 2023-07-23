@@ -83,11 +83,11 @@ func (i *ImportListCustom) fromImportList(importList *ImportList) {
 	i.SeasonFolder = importList.SeasonFolder
 }
 
-func (r *ImportListCustomResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+func (r *ImportListCustomResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + importListCustomResourceName
 }
 
-func (r *ImportListCustomResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+func (r *ImportListCustomResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "<!-- subcategory:Import Lists -->ImportList Custom resource.\nFor more information refer to [Import List](https://wiki.servarr.com/sonarr/settings#import-lists) and [Custom](https://wiki.servarr.com/sonarr/supported#customimport).",
 		Attributes: map[string]schema.Attribute{

@@ -83,11 +83,11 @@ func (i *ImportListImdb) fromImportList(importList *ImportList) {
 	i.SeasonFolder = importList.SeasonFolder
 }
 
-func (r *ImportListImdbResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+func (r *ImportListImdbResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_" + importListImdbResourceName
 }
 
-func (r *ImportListImdbResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+func (r *ImportListImdbResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "<!-- subcategory:Import Lists -->ImportList Imdb resource.\nFor more information refer to [Import List](https://wiki.servarr.com/sonarr/settings#import-lists) and [Imdb](https://wiki.servarr.com/sonarr/supported#imdbimport).",
 		Attributes: map[string]schema.Attribute{
