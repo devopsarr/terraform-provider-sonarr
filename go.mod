@@ -12,7 +12,7 @@ require (
 	github.com/hashicorp/terraform-plugin-testing v1.2.0
 	github.com/mitchellh/hashstructure/v2 v2.0.2
 	github.com/stretchr/testify v1.8.4
-	golang.org/x/exp v0.0.0-20230801115018-d63ba01acd4b
+	golang.org/x/exp v0.0.0-20230807204917-050eac23e9de
 )
 
 require (
