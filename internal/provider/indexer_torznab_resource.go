@@ -40,21 +40,21 @@ type IndexerTorznabResource struct {
 
 // IndexerTorznab describes the Torznab indexer data model.
 type IndexerTorznab struct {
-	Tags                      types.Set     `tfsdk:"tags"`
+	SeedRatio                 types.Float64 `tfsdk:"seed_ratio"`
 	Categories                types.Set     `tfsdk:"categories"`
 	AnimeCategories           types.Set     `tfsdk:"anime_categories"`
+	Tags                      types.Set     `tfsdk:"tags"`
 	Name                      types.String  `tfsdk:"name"`
 	BaseURL                   types.String  `tfsdk:"base_url"`
 	APIPath                   types.String  `tfsdk:"api_path"`
 	APIKey                    types.String  `tfsdk:"api_key"`
 	AdditionalParameters      types.String  `tfsdk:"additional_parameters"`
 	Priority                  types.Int64   `tfsdk:"priority"`
-	ID                        types.Int64   `tfsdk:"id"`
 	DownloadClientID          types.Int64   `tfsdk:"download_client_id"`
 	MinimumSeeders            types.Int64   `tfsdk:"minimum_seeders"`
 	SeasonPackSeedTime        types.Int64   `tfsdk:"season_pack_seed_time"`
 	SeedTime                  types.Int64   `tfsdk:"seed_time"`
-	SeedRatio                 types.Float64 `tfsdk:"seed_ratio"`
+	ID                        types.Int64   `tfsdk:"id"`
 	AnimeStandardFormatSearch types.Bool    `tfsdk:"anime_standard_format_search"`
 	EnableAutomaticSearch     types.Bool    `tfsdk:"enable_automatic_search"`
 	EnableRss                 types.Bool    `tfsdk:"enable_rss"`

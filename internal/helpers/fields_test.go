@@ -11,12 +11,12 @@ import (
 )
 
 type Test struct {
+	Fl       types.Float64
 	Set      types.Set
 	Str      types.String
 	In       types.Int64
-	Fl       types.Float64
-	Boo      types.Bool
 	SeedTime types.Int64
+	Boo      types.Bool
 }
 
 func TestWriteStringField(t *testing.T) {

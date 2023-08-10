@@ -36,11 +36,11 @@ type QualityDefinitionResource struct {
 
 // QualityDefinition describes the quality definition data model.
 type QualityDefinition struct {
+	MinSize     types.Float64 `tfsdk:"min_size"`
+	MaxSize     types.Float64 `tfsdk:"max_size"`
 	Title       types.String  `tfsdk:"title"`
 	QualityName types.String  `tfsdk:"quality_name"`
 	Source      types.String  `tfsdk:"source"`
-	MinSize     types.Float64 `tfsdk:"min_size"`
-	MaxSize     types.Float64 `tfsdk:"max_size"`
 	ID          types.Int64   `tfsdk:"id"`
 	QualityID   types.Int64   `tfsdk:"quality_id"`
 	Resolution  types.Int64   `tfsdk:"resolution"`
