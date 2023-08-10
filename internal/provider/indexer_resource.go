@@ -49,11 +49,11 @@ type IndexerResource struct {
 
 // Indexer describes the indexer data model.
 type Indexer struct {
+	SeedRatio                 types.Float64 `tfsdk:"seed_ratio"`
 	Tags                      types.Set     `tfsdk:"tags"`
 	Categories                types.Set     `tfsdk:"categories"`
 	AnimeCategories           types.Set     `tfsdk:"anime_categories"`
-	APIPath                   types.String  `tfsdk:"api_path"`
-	AdditionalParameters      types.String  `tfsdk:"additional_parameters"`
+	APIKey                    types.String  `tfsdk:"api_key"`
 	Username                  types.String  `tfsdk:"username"`
 	ConfigContract            types.String  `tfsdk:"config_contract"`
 	Implementation            types.String  `tfsdk:"implementation"`
@@ -63,11 +63,11 @@ type Indexer struct {
 	Cookie                    types.String  `tfsdk:"cookie"`
 	CaptchaToken              types.String  `tfsdk:"captcha_token"`
 	BaseURL                   types.String  `tfsdk:"base_url"`
-	APIKey                    types.String  `tfsdk:"api_key"`
-	Priority                  types.Int64   `tfsdk:"priority"`
-	DownloadClientID          types.Int64   `tfsdk:"download_client_id"`
+	AdditionalParameters      types.String  `tfsdk:"additional_parameters"`
+	APIPath                   types.String  `tfsdk:"api_path"`
 	SeedTime                  types.Int64   `tfsdk:"seed_time"`
-	SeedRatio                 types.Float64 `tfsdk:"seed_ratio"`
+	DownloadClientID          types.Int64   `tfsdk:"download_client_id"`
+	Priority                  types.Int64   `tfsdk:"priority"`
 	MinimumSeeders            types.Int64   `tfsdk:"minimum_seeders"`
 	Delay                     types.Int64   `tfsdk:"delay"`
 	ID                        types.Int64   `tfsdk:"id"`
