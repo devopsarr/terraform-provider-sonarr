@@ -12,7 +12,7 @@ require (
 	github.com/hashicorp/terraform-plugin-testing v1.4.0
 	github.com/mitchellh/hashstructure/v2 v2.0.2
 	github.com/stretchr/testify v1.8.4
-	golang.org/x/exp v0.0.0-20230811145659-89c5cff77bcb
+	golang.org/x/exp v0.0.0-20230817173708-d852ddb80c63
 )
 
 require (
@@ -69,10 +69,10 @@ require (
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	github.com/zclconf/go-cty v1.13.2 // indirect
 	golang.org/x/crypto v0.11.0 // indirect
-	golang.org/x/mod v0.11.0 // indirect
+	golang.org/x/mod v0.12.0 // indirect
 	golang.org/x/net v0.11.0 // indirect
 	golang.org/x/oauth2 v0.7.0 // indirect
-	golang.org/x/sys v0.10.0 // indirect
+	golang.org/x/sys v0.11.0 // indirect
 	golang.org/x/text v0.11.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1 // indirect
