@@ -26,8 +26,8 @@ github.com/cloudflare/circl v1.3.3/go.mod h1:5XYMA4rFBvNIrhs50XuiBJ15vF2pZn4nnUK
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/devopsarr/sonarr-go v0.5.1 h1:8TKNl5Rroo6nyf07DcG/JZiG1AfH4g98FDqeITyv5jk=
-github.com/devopsarr/sonarr-go v0.5.1/go.mod h1:Yee9Np/YReYqQQCXZnmlgv9oJPWLwLD5lTXGEIInwB8=
+github.com/devopsarr/sonarr-go v0.6.0 h1:4Gj0Y2LR8g67CrAIminNfPCcSbe/mKw/02DrIs5cAuo=
+github.com/devopsarr/sonarr-go v0.6.0/go.mod h1:Yee9Np/YReYqQQCXZnmlgv9oJPWLwLD5lTXGEIInwB8=
 github.com/emirpasic/gods v1.18.1 h1:FXtiHYKDGKCW2KzwZKx0iC0PQmdlorYgdFG9jPXJ1Bc=
 github.com/fatih/color v1.7.0/go.mod h1:Zm6kSWBoL9eyXnKyktHP6abPY2pDugNf5KwzbycvMj4=
 github.com/fatih/color v1.13.0 h1:8LOYc1KYPPmyKMuN8QV2DNRWNbLo6LZ0iLs8+mlH53w=
