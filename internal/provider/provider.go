@@ -300,6 +300,7 @@ func (p *SonarrProvider) DataSources(_ context.Context) []func() datasource.Data
 		NewLanguageDataSource,
 		NewLanguagesDataSource,
 		NewSystemStatusDataSource,
+		NewHostDataSource,
 
 		// Tags
 		NewTagDataSource,
