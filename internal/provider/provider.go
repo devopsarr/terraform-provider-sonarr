@@ -228,6 +228,9 @@ func (p *SonarrProvider) Resources(_ context.Context) []func() resource.Resource
 		// Series
 		NewSeriesResource,
 
+		// System
+		NewHostResource,
+
 		// Tags
 		NewTagResource,
 		NewAutoTagResource,
@@ -293,7 +296,7 @@ func (p *SonarrProvider) DataSources(_ context.Context) []func() datasource.Data
 		NewAllSeriessDataSource,
 		NewSearchSeriesDataSource,
 
-		// System Status
+		// System
 		NewLanguageDataSource,
 		NewLanguagesDataSource,
 		NewSystemStatusDataSource,
