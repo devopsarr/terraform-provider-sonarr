@@ -86,6 +86,10 @@ Optional:
 - `required` (String) Required for everyone or disabled for local addresses.
 - `username` (String) Username.
 
+Read-Only:
+
+- `encrypted_password` (String, Sensitive) Needed for validation.
+
 
 <a id="nestedatt--backup"></a>
 ### Nested Schema for `backup`

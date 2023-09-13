@@ -5,8 +5,11 @@ import (
 
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
+	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
@@ -136,6 +139,11 @@ func (d *HostDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, r
 						Computed:            true,
 						Sensitive:           true,
 					},
+					"encrypted_password": schema.StringAttribute{
+						MarkdownDescription: "Needed for validation.",
+						Computed:            true,
+						Sensitive:           true,
+					},
 					"required": schema.StringAttribute{
 						MarkdownDescription: "Required for everyone or disabled for local addresses.",
 						Computed:            true,
@@ -219,6 +227,15 @@ func (d *HostDataSource) Configure(ctx context.Context, req datasource.Configure
 }
 
 func (d *HostDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
+	var tempDiag diag.Diagnostics
+	// assign default empty password value to empty string since it cannot be read
+	auth := AuthConfig{
+		Password: types.StringValue(""),
+	}
+	state := Host{}
+	state.AuthConfig, tempDiag = types.ObjectValueFrom(ctx, auth.getType().(attr.TypeWithAttributeTypes).AttributeTypes(), auth)
+	resp.Diagnostics.Append(tempDiag...)
+
 	// Get host current value
 	response, _, err := d.client.HostConfigApi.GetHostConfig(ctx).Execute()
 	if err != nil {
@@ -229,7 +246,6 @@ func (d *HostDataSource) Read(ctx context.Context, _ datasource.ReadRequest, res
 
 	tflog.Trace(ctx, "read "+hostDataSourceName)
 
-	state := Host{}
 	state.write(ctx, response, &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, state)...)
 }
