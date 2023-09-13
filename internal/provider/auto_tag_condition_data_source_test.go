@@ -33,7 +33,7 @@ resource "sonarr_tag" "test" {
 data  "sonarr_auto_tag_condition" "test" {
 	name = "type"
 	implementation = "SeriesTypeSpecification"
-	value = "1"
+	value = "2"
 	required = false
 	negate = true
 }
