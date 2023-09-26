@@ -64,7 +64,7 @@ func testAccQualityProfileResourceConfig(name string) string {
 	resource "sonarr_custom_format" "test" {
 		include_custom_format_when_renaming = false
 		name = "QualityFormatTest"
-		
+
 		specifications = [
 			{
 				name = "Arabic"
@@ -73,11 +73,7 @@ func testAccQualityProfileResourceConfig(name string) string {
 				required = false
 				value = "31"
 			}
-		]	
-	}
-
-	data "sonarr_custom_formats" "test" {
-		depends_on = [sonarr_custom_format.test]
+		]
 	}
 
 	data "sonarr_quality" "bluray" {
@@ -112,11 +108,10 @@ func testAccQualityProfileResourceConfig(name string) string {
 		]
 
 		format_items = [
-			for format in data.sonarr_custom_formats.test.custom_formats :
 			{
-				name   = format.name
-				format = format.id
-				score  = 0
+				name   = sonarr_custom_format.test.name
+				format = sonarr_custom_format.test.id
+				score  = 10
 			}
 		]
 	}

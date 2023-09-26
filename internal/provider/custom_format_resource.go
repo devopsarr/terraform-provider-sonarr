@@ -2,7 +2,6 @@ package provider
 
 import (
 	"context"
-	"fmt"
 	"strconv"
 
 	"github.com/devopsarr/sonarr-go/sonarr"
@@ -152,7 +151,7 @@ func (r *CustomFormatResource) Create(ctx context.Context, req resource.CreateRe
 
 	response, _, err := r.client.CustomFormatApi.CreateCustomFormat(ctx).CustomFormatResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to create %s, got error: %s", customFormatResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, customFormatResourceName, err))
 
 		return
 	}
@@ -179,7 +178,7 @@ func (r *CustomFormatResource) Read(ctx context.Context, req resource.ReadReques
 	// Get CustomFormat current value
 	response, _, err := r.client.CustomFormatApi.GetCustomFormatById(ctx, int32(client.ID.ValueInt64())).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", customFormatResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, customFormatResourceName, err))
 
 		return
 	}
@@ -208,7 +207,7 @@ func (r *CustomFormatResource) Update(ctx context.Context, req resource.UpdateRe
 
 	response, _, err := r.client.CustomFormatApi.UpdateCustomFormat(ctx, strconv.Itoa(int(request.GetId()))).CustomFormatResource(*request).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to update %s, got error: %s", customFormatResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, customFormatResourceName, err))
 
 		return
 	}
@@ -234,7 +233,7 @@ func (r *CustomFormatResource) Delete(ctx context.Context, req resource.DeleteRe
 	// Delete CustomFormat current value
 	_, err := r.client.CustomFormatApi.DeleteCustomFormat(ctx, int32(ID)).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", customFormatResourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, customFormatResourceName, err))
 
 		return
 	}
