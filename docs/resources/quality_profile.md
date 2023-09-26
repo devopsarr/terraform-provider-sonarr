@@ -49,13 +49,13 @@ resource "sonarr_quality_profile" "example" {
 ### Required
 
 - `name` (String) Quality Profile Name.
-- `quality_groups` (Attributes Set) Quality groups. (see [below for nested schema](#nestedatt--quality_groups))
+- `quality_groups` (Attributes List) Ordered list of allowed quality groups. (see [below for nested schema](#nestedatt--quality_groups))
 
 ### Optional
 
 - `cutoff` (Number) Quality ID to which cutoff.
 - `cutoff_format_score` (Number) Cutoff format score.
-- `format_items` (Attributes Set) Format items. (see [below for nested schema](#nestedatt--format_items))
+- `format_items` (Attributes Set) Format items. Only the ones with score > 0 are needed. (see [below for nested schema](#nestedatt--format_items))
 - `min_format_score` (Number) Min format score.
 - `upgrade_allowed` (Boolean) Upgrade allowed flag.
 
@@ -68,7 +68,7 @@ resource "sonarr_quality_profile" "example" {
 
 Required:
 
-- `qualities` (Attributes Set) Qualities in group. (see [below for nested schema](#nestedatt--quality_groups--qualities))
+- `qualities` (Attributes List) Ordered list of qualities in group. (see [below for nested schema](#nestedatt--quality_groups--qualities))
 
 Optional:
 
