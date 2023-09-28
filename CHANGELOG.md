@@ -1,5 +1,23 @@
 # Changelog
 
+## [3.1.0](https://github.com/devopsarr/terraform-provider-sonarr/compare/v3.0.0...v3.1.0) (2023-09-26)
+
+
+### Features
+
+* **devopsarr/terraform-provider-radarr#203:** add host data source ([de7d2cd](https://github.com/devopsarr/terraform-provider-sonarr/commit/de7d2cd32a755be0aa6e0540803128da2e984616))
+* **devopsarr/terraform-provider-radarr#203:** add host resource ([fe89050](https://github.com/devopsarr/terraform-provider-sonarr/commit/fe89050e8da66d8d2a56173763dc3d45efea6957))
+* improve diagnostics part 1 ([bfa7b62](https://github.com/devopsarr/terraform-provider-sonarr/commit/bfa7b623b30a77ac73b1094029a3c29c9b10a1fa))
+* improve diagnostics part 2 ([b0037e1](https://github.com/devopsarr/terraform-provider-sonarr/commit/b0037e12f3208f3657f9e0acb7052eb0b1a0ad33))
+* remove closed rarbg ([f3c0228](https://github.com/devopsarr/terraform-provider-sonarr/commit/f3c0228ef5243e6238255931ff8b1745e8526f16))
+* use only ID for delete ([1f16f66](https://github.com/devopsarr/terraform-provider-sonarr/commit/1f16f6628a5d3334b148947a868c984e09e192ac))
+
+
+### Bug Fixes
+
+* delete error message ([f1ba3fd](https://github.com/devopsarr/terraform-provider-sonarr/commit/f1ba3fd3815a3ec11490a477e03d5c019fefad04))
+* quality profile use all formats and ordered quality groups ([206bd72](https://github.com/devopsarr/terraform-provider-sonarr/commit/206bd728320564b85e4318740304c63a22371d7b))
+
 ## [3.0.0](https://github.com/devopsarr/terraform-provider-sonarr/compare/v3.0.0...v2.7.0) (2023-05-21)
 
 
