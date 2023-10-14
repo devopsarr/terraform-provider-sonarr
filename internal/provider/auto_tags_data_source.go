@@ -2,7 +2,6 @@ package provider
 
 import (
 	"context"
-	"fmt"
 	"strconv"
 
 	"github.com/devopsarr/sonarr-go/sonarr"
@@ -114,7 +113,7 @@ func (d *AutoTagsDataSource) Read(ctx context.Context, _ datasource.ReadRequest,
 	// Get download clients current value
 	response, _, err := d.client.AutoTaggingApi.ListAutoTagging(ctx).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", autoTagsDataSourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, autoTagsDataSourceName, err))
 
 		return
 	}
