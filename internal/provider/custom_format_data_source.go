@@ -2,7 +2,6 @@ package provider
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
@@ -105,7 +104,7 @@ func (d *CustomFormatDataSource) Read(ctx context.Context, req datasource.ReadRe
 	// Get customFormat current value
 	response, _, err := d.client.CustomFormatApi.ListCustomFormat(ctx).Execute()
 	if err != nil {
-		resp.Diagnostics.AddError(helpers.ClientError, fmt.Sprintf("Unable to read %s, got error: %s", customFormatDataSourceName, err))
+		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, customFormatDataSourceName, err))
 
 		return
 	}

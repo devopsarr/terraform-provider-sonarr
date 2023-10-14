@@ -2,7 +2,6 @@ package provider
 
 import (
 	"context"
-	"fmt"
 	"strconv"
 
 	"github.com/devopsarr/sonarr-go/sonarr"
@@ -107,7 +106,7 @@ func (d *SearchSeriesDataSource) Read(ctx context.Context, req datasource.ReadRe
 	}
 
 	if !(int64(response[0].GetTvdbId()) == data.TvdbID.ValueInt64()) {
-		resp.Diagnostics.AddError(helpers.DataSourceError, fmt.Sprintf("Unable to find %s with TVDBID: %d", searchSearchSeriesDataSourceName, data.TvdbID.ValueInt64()))
+		resp.Diagnostics.AddError(helpers.DataSourceError, helpers.ParseNotFoundError(searchSearchSeriesDataSourceName, "TVDBID", strconv.Itoa(int(data.TvdbID.ValueInt64()))))
 
 		return
 	}
