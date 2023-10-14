@@ -196,6 +196,7 @@ func (r *DownloadClientDelugeResource) Schema(_ context.Context, _ resource.Sche
 			"password": schema.StringAttribute{
 				MarkdownDescription: "Password.",
 				Required:            true,
+				Sensitive:           true,
 			},
 			"tv_category": schema.StringAttribute{
 				MarkdownDescription: "TV category.",

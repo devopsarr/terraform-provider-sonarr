@@ -43,9 +43,10 @@ func TestAccDownloadClientAria2Resource(t *testing.T) {
 			},
 			// ImportState testing
 			{
-				ResourceName:      "sonarr_download_client_aria2.test",
-				ImportState:       true,
-				ImportStateVerify: true,
+				ResourceName:            "sonarr_download_client_aria2.test",
+				ImportState:             true,
+				ImportStateVerify:       true,
+				ImportStateVerifyIgnore: []string{"secret_token"},
 			},
 			// Delete testing automatically occurs in TestCase
 		},

@@ -34,7 +34,6 @@ var notificationFields = helpers.Fields{
 	StringSlices:           []string{"channelTags", "deviceIds", "devices", "recipients", "to", "cc", "bcc", "topics", "fieldTags"},
 	StringSlicesExceptions: []string{"tags"},
 	IntSlices:              []string{"grabFields", "importFields"},
-	Sensitive:              []string{"apiKey", "token", "password", "appToken", "authToken", "botToken", "accessToken", "accessTokenSecret", "consumerKey", "consumerSecret", "configurationKey", "authPassword", "senderNumber", "key"},
 }
 
 func NewNotificationResource() resource.Resource {
@@ -909,5 +908,37 @@ func (n *Notification) writeSensitive(notification *Notification) {
 
 	if !notification.Password.IsUnknown() {
 		n.Password = notification.Password
+	}
+
+	if !notification.AppToken.IsUnknown() {
+		n.AppToken = notification.AppToken
+	}
+
+	if !notification.BotToken.IsUnknown() {
+		n.BotToken = notification.BotToken
+	}
+
+	if !notification.AccessToken.IsUnknown() {
+		n.AccessToken = notification.AccessToken
+	}
+
+	if !notification.AccessTokenSecret.IsUnknown() {
+		n.AccessTokenSecret = notification.AccessTokenSecret
+	}
+
+	if !notification.ConsumerKey.IsUnknown() {
+		n.ConsumerKey = notification.ConsumerKey
+	}
+
+	if !notification.ConsumerSecret.IsUnknown() {
+		n.ConsumerSecret = notification.ConsumerSecret
+	}
+
+	if !notification.ConfigurationKey.IsUnknown() {
+		n.ConfigurationKey = notification.ConfigurationKey
+	}
+
+	if !notification.AuthPassword.IsUnknown() {
+		n.AuthPassword = notification.AuthPassword
 	}
 }

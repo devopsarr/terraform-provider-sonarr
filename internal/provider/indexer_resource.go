@@ -35,7 +35,6 @@ var indexerFields = helpers.Fields{
 	Strings:          []string{"additionalParameters", "apiKey", "apiPath", "baseUrl", "captchaToken", "cookie", "passkey", "username"},
 	Floats:           []string{"seedRatio"},
 	FloatsExceptions: []string{"seedCriteria.seedRatio"},
-	Sensitive:        []string{"apiKey", "passkey"},
 }
 
 func NewIndexerResource() resource.Resource {

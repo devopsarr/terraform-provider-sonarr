@@ -41,7 +41,7 @@ resource "sonarr_download_client_aria2" "example" {
 - `remove_completed_downloads` (Boolean) Remove completed downloads flag.
 - `remove_failed_downloads` (Boolean) Remove failed downloads flag.
 - `rpc_path` (String) RPC path.
-- `secret_token` (String) Secret token.
+- `secret_token` (String, Sensitive) Secret token.
 - `tags` (Set of Number) List of associated tags.
 - `use_ssl` (Boolean) Use SSL flag.
 

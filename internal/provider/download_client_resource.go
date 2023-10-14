@@ -35,7 +35,6 @@ var downloadClientFields = helpers.Fields{
 	StringSlices:           []string{"fieldTags", "postImportTags"},
 	StringSlicesExceptions: []string{"tags"},
 	IntSlices:              []string{"additionalTags"},
-	Sensitive:              []string{"apiKey", "password"},
 }
 
 func NewDownloadClientResource() resource.Resource {
@@ -554,5 +553,9 @@ func (d *DownloadClient) writeSensitive(client *DownloadClient) {
 
 	if !client.APIKey.IsUnknown() {
 		d.APIKey = client.APIKey
+	}
+
+	if !client.SecretToken.IsUnknown() {
+		d.SecretToken = client.SecretToken
 	}
 }

@@ -9,7 +9,8 @@ import (
 )
 
 func TestAccQualityProfileResource(t *testing.T) {
-	// no parallel to avoid conflict with custom formats
+	t.Parallel()
+
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,

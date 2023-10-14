@@ -608,9 +608,9 @@ func TestWriteFields(t *testing.T) {
 			fieldContainer: Test{Set: types.SetValueMust(types.StringType, nil)},
 		},
 		"sensitive": {
-			fieldLists:     Fields{Sensitive: []string{"str"}},
+			fieldLists:     Fields{Strings: []string{"str"}},
 			name:           "str",
-			value:          "String",
+			value:          SensitiveValue,
 			fieldContainer: Test{Str: types.StringValue("String")},
 		},
 	}
@@ -630,7 +630,7 @@ func TestWriteFields(t *testing.T) {
 			fields[0].SetValue(test.value)
 
 			container := Test{}
-			if len(test.fieldLists.Sensitive) != 0 {
+			if test.value == SensitiveValue {
 				// emulate the sensitive behaviour
 				container = Test{
 					Str: types.StringValue("String"),
