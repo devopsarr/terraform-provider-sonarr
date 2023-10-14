@@ -31,7 +31,7 @@ resource "sonarr_download_client_deluge" "example" {
 ### Required
 
 - `name` (String) Download Client name.
-- `password` (String) Password.
+- `password` (String, Sensitive) Password.
 
 ### Optional
 

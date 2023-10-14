@@ -159,6 +159,7 @@ func (r *DownloadClientAria2Resource) Schema(_ context.Context, _ resource.Schem
 				MarkdownDescription: "Secret token.",
 				Optional:            true,
 				Computed:            true,
+				Sensitive:           true,
 			},
 		},
 	}

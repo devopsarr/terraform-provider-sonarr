@@ -65,3 +65,27 @@ func TestParseNotFoundError(t *testing.T) {
 		})
 	}
 }
+
+func TestWrongClient(t *testing.T) {
+	t.Parallel()
+
+	tests := map[string]struct {
+		wanted   string
+		received interface{}
+		expected string
+	}{
+		"generic": {
+			expected: "Expected string, got: int. Please report this issue to the provider developers.",
+			wanted:   "string",
+			received: 3,
+		},
+	}
+	for name, test := range tests {
+		test := test
+
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			assert.Equal(t, test.expected, WrongClient(test.wanted, test.received))
+		})
+	}
+}
