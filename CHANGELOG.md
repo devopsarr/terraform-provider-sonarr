@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.1.1](https://github.com/devopsarr/terraform-provider-sonarr/compare/v3.1.0...v3.1.1) (2023-10-25)
+
+
+### Bug Fixes
+
+* correct and simplify sensitive field management ([c68245f](https://github.com/devopsarr/terraform-provider-sonarr/commit/c68245f0bfaf348e602990198624f9d2fa2915fe))
+
 ## [3.1.0](https://github.com/devopsarr/terraform-provider-sonarr/compare/v3.0.0...v3.1.0) (2023-09-26)
 
 
