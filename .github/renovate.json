@@ -9,10 +9,6 @@
   ],
   "packageRules": [
     {
-      "matchPackageNames": ["golang.org/x/exp"],
-      "automerge": true
-    },
-    {
       "matchPackagePatterns": ["^github.com/hashicorp/terraform-plugin-"],
       "groupName": "terraform-framework"
     },
