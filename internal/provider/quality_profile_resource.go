@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+	"slices"
 	"strconv"
 
 	"github.com/devopsarr/sonarr-go/sonarr"
@@ -16,7 +17,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"golang.org/x/exp/slices"
 )
 
 const qualityProfileResourceName = "quality_profile"
