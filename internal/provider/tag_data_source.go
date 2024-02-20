@@ -23,6 +23,7 @@ func NewTagDataSource() datasource.DataSource {
 // TagDataSource defines the tag implementation.
 type TagDataSource struct {
 	client *sonarr.APIClient
+	auth   context.Context
 }
 
 func (d *TagDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
@@ -46,8 +47,9 @@ func (d *TagDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, re
 }
 
 func (d *TagDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
-	if client := helpers.DataSourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := dataSourceConfigure(ctx, req, resp); client != nil {
 		d.client = client
+		d.auth = auth
 	}
 }
 
@@ -61,7 +63,7 @@ func (d *TagDataSource) Read(ctx context.Context, req datasource.ReadRequest, re
 	}
 
 	// Get tags current value
-	response, _, err := d.client.TagAPI.ListTag(ctx).Execute()
+	response, _, err := d.client.TagAPI.ListTag(d.auth).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, tagDataSourceName, err))
 

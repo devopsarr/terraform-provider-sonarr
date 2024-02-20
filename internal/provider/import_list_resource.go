@@ -38,6 +38,7 @@ func NewImportListResource() resource.Resource {
 // ImportListResource defines the download client implementation.
 type ImportListResource struct {
 	client *sonarr.APIClient
+	auth   context.Context
 }
 
 // ImportList describes the download client data model.
@@ -287,8 +288,9 @@ func (r *ImportListResource) Schema(_ context.Context, _ resource.SchemaRequest,
 }
 
 func (r *ImportListResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
-	if client := helpers.ResourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := resourceConfigure(ctx, req, resp); client != nil {
 		r.client = client
+		r.auth = auth
 	}
 }
 
@@ -305,7 +307,7 @@ func (r *ImportListResource) Create(ctx context.Context, req resource.CreateRequ
 	// Create new ImportList
 	request := importList.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.ImportListAPI.CreateImportList(ctx).ImportListResource(*request).Execute()
+	response, _, err := r.client.ImportListAPI.CreateImportList(r.auth).ImportListResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, importListResourceName, err))
 
@@ -332,7 +334,7 @@ func (r *ImportListResource) Read(ctx context.Context, req resource.ReadRequest,
 	}
 
 	// Get ImportList current value
-	response, _, err := r.client.ImportListAPI.GetImportListById(ctx, int32(importList.ID.ValueInt64())).Execute()
+	response, _, err := r.client.ImportListAPI.GetImportListById(r.auth, int32(importList.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, importListResourceName, err))
 
@@ -361,7 +363,7 @@ func (r *ImportListResource) Update(ctx context.Context, req resource.UpdateRequ
 	// Update ImportList
 	request := importList.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.ImportListAPI.UpdateImportList(ctx, strconv.Itoa(int(request.GetId()))).ImportListResource(*request).Execute()
+	response, _, err := r.client.ImportListAPI.UpdateImportList(r.auth, strconv.Itoa(int(request.GetId()))).ImportListResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, importListResourceName, err))
 
@@ -387,7 +389,7 @@ func (r *ImportListResource) Delete(ctx context.Context, req resource.DeleteRequ
 	}
 
 	// Delete ImportList current value
-	_, err := r.client.ImportListAPI.DeleteImportList(ctx, int32(ID)).Execute()
+	_, err := r.client.ImportListAPI.DeleteImportList(r.auth, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, importListResourceName, err))
 

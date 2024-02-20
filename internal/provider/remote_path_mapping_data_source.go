@@ -24,6 +24,7 @@ func NewRemotePathMappingDataSource() datasource.DataSource {
 // RemotePathMappingDataSource defines the remote path mapping implementation.
 type RemotePathMappingDataSource struct {
 	client *sonarr.APIClient
+	auth   context.Context
 }
 
 func (d *RemotePathMappingDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
@@ -56,8 +57,9 @@ func (d *RemotePathMappingDataSource) Schema(_ context.Context, _ datasource.Sch
 }
 
 func (d *RemotePathMappingDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
-	if client := helpers.DataSourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := dataSourceConfigure(ctx, req, resp); client != nil {
 		d.client = client
+		d.auth = auth
 	}
 }
 
@@ -70,7 +72,7 @@ func (d *RemotePathMappingDataSource) Read(ctx context.Context, req datasource.R
 		return
 	}
 	// Get remote path mapping current value
-	response, _, err := d.client.RemotePathMappingAPI.ListRemotePathMapping(ctx).Execute()
+	response, _, err := d.client.RemotePathMappingAPI.ListRemotePathMapping(d.auth).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, remotePathMappingDataSourceName, err))
 

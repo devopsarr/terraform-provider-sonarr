@@ -24,6 +24,7 @@ func NewLanguagesDataSource() datasource.DataSource {
 // LanguagesDataSource defines the languages implementation.
 type LanguagesDataSource struct {
 	client *sonarr.APIClient
+	auth   context.Context
 }
 
 // Languages describes the languages data model.
@@ -69,14 +70,15 @@ func (d *LanguagesDataSource) Schema(_ context.Context, _ datasource.SchemaReque
 }
 
 func (d *LanguagesDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
-	if client := helpers.DataSourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := dataSourceConfigure(ctx, req, resp); client != nil {
 		d.client = client
+		d.auth = auth
 	}
 }
 
 func (d *LanguagesDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
 	// Get languages current value
-	response, _, err := d.client.LanguageAPI.ListLanguage(ctx).Execute()
+	response, _, err := d.client.LanguageAPI.ListLanguage(d.auth).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, languagesDataSourceName, err))
 

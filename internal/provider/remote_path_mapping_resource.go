@@ -31,6 +31,7 @@ func NewRemotePathMappingResource() resource.Resource {
 // RemotePathMappingResource defines the remote path mapping implementation.
 type RemotePathMappingResource struct {
 	client *sonarr.APIClient
+	auth   context.Context
 }
 
 // RemotePathMapping describes the remote path mapping data model.
@@ -83,8 +84,9 @@ func (r *RemotePathMappingResource) Metadata(_ context.Context, req resource.Met
 }
 
 func (r *RemotePathMappingResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
-	if client := helpers.ResourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := resourceConfigure(ctx, req, resp); client != nil {
 		r.client = client
+		r.auth = auth
 	}
 }
 
@@ -101,7 +103,7 @@ func (r *RemotePathMappingResource) Create(ctx context.Context, req resource.Cre
 	// Create new RemotePathMapping
 	request := mapping.read()
 
-	response, _, err := r.client.RemotePathMappingAPI.CreateRemotePathMapping(ctx).RemotePathMappingResource(*request).Execute()
+	response, _, err := r.client.RemotePathMappingAPI.CreateRemotePathMapping(r.auth).RemotePathMappingResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, remotePathMappingResourceName, err))
 
@@ -125,7 +127,7 @@ func (r *RemotePathMappingResource) Read(ctx context.Context, req resource.ReadR
 	}
 
 	// Get remotePathMapping current value
-	response, _, err := r.client.RemotePathMappingAPI.GetRemotePathMappingById(ctx, int32(mapping.ID.ValueInt64())).Execute()
+	response, _, err := r.client.RemotePathMappingAPI.GetRemotePathMappingById(r.auth, int32(mapping.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, remotePathMappingResourceName, err))
 
@@ -151,7 +153,7 @@ func (r *RemotePathMappingResource) Update(ctx context.Context, req resource.Upd
 	// Update RemotePathMapping
 	request := mapping.read()
 
-	response, _, err := r.client.RemotePathMappingAPI.UpdateRemotePathMapping(ctx, strconv.Itoa(int(request.GetId()))).RemotePathMappingResource(*request).Execute()
+	response, _, err := r.client.RemotePathMappingAPI.UpdateRemotePathMapping(r.auth, strconv.Itoa(int(request.GetId()))).RemotePathMappingResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, remotePathMappingResourceName, err))
 
@@ -174,7 +176,7 @@ func (r *RemotePathMappingResource) Delete(ctx context.Context, req resource.Del
 	}
 
 	// Delete remotePathMapping current value
-	_, err := r.client.RemotePathMappingAPI.DeleteRemotePathMapping(ctx, int32(ID)).Execute()
+	_, err := r.client.RemotePathMappingAPI.DeleteRemotePathMapping(r.auth, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, remotePathMappingResourceName, err))
 

@@ -30,6 +30,7 @@ func NewDownloadClientConfigResource() resource.Resource {
 // DownloadClientConfigResource defines the download client config implementation.
 type DownloadClientConfigResource struct {
 	client *sonarr.APIClient
+	auth   context.Context
 }
 
 // DownloadClientConfig describes the download client config data model.
@@ -72,8 +73,9 @@ func (r *DownloadClientConfigResource) Schema(_ context.Context, _ resource.Sche
 }
 
 func (r *DownloadClientConfigResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
-	if client := helpers.ResourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := resourceConfigure(ctx, req, resp); client != nil {
 		r.client = client
+		r.auth = auth
 	}
 }
 
@@ -92,7 +94,7 @@ func (r *DownloadClientConfigResource) Create(ctx context.Context, req resource.
 	request.SetId(1)
 
 	// Create new DownloadClientConfig
-	response, _, err := r.client.DownloadClientConfigAPI.UpdateDownloadClientConfig(ctx, strconv.Itoa(int(request.GetId()))).DownloadClientConfigResource(*request).Execute()
+	response, _, err := r.client.DownloadClientConfigAPI.UpdateDownloadClientConfig(r.auth, strconv.Itoa(int(request.GetId()))).DownloadClientConfigResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, downloadClientConfigResourceName, err))
 
@@ -116,7 +118,7 @@ func (r *DownloadClientConfigResource) Read(ctx context.Context, req resource.Re
 	}
 
 	// Get downloadClientConfig current value
-	response, _, err := r.client.DownloadClientConfigAPI.GetDownloadClientConfig(ctx).Execute()
+	response, _, err := r.client.DownloadClientConfigAPI.GetDownloadClientConfig(r.auth).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, downloadClientConfigResourceName, err))
 
@@ -143,7 +145,7 @@ func (r *DownloadClientConfigResource) Update(ctx context.Context, req resource.
 	request := config.read()
 
 	// Update DownloadClientConfig
-	response, _, err := r.client.DownloadClientConfigAPI.UpdateDownloadClientConfig(ctx, strconv.Itoa(int(request.GetId()))).DownloadClientConfigResource(*request).Execute()
+	response, _, err := r.client.DownloadClientConfigAPI.UpdateDownloadClientConfig(r.auth, strconv.Itoa(int(request.GetId()))).DownloadClientConfigResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, downloadClientConfigResourceName, err))
 

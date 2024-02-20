@@ -36,6 +36,7 @@ func NewDownloadClientPneumaticResource() resource.Resource {
 // DownloadClientPneumaticResource defines the download client implementation.
 type DownloadClientPneumaticResource struct {
 	client *sonarr.APIClient
+	auth   context.Context
 }
 
 // DownloadClientPneumatic describes the download client data model.
@@ -139,8 +140,9 @@ func (r *DownloadClientPneumaticResource) Schema(_ context.Context, _ resource.S
 }
 
 func (r *DownloadClientPneumaticResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
-	if client := helpers.ResourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := resourceConfigure(ctx, req, resp); client != nil {
 		r.client = client
+		r.auth = auth
 	}
 }
 
@@ -157,7 +159,7 @@ func (r *DownloadClientPneumaticResource) Create(ctx context.Context, req resour
 	// Create new DownloadClientPneumatic
 	request := client.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.DownloadClientAPI.CreateDownloadClient(ctx).DownloadClientResource(*request).Execute()
+	response, _, err := r.client.DownloadClientAPI.CreateDownloadClient(r.auth).DownloadClientResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, downloadClientPneumaticResourceName, err))
 
@@ -181,7 +183,7 @@ func (r *DownloadClientPneumaticResource) Read(ctx context.Context, req resource
 	}
 
 	// Get DownloadClientPneumatic current value
-	response, _, err := r.client.DownloadClientAPI.GetDownloadClientById(ctx, int32(client.ID.ValueInt64())).Execute()
+	response, _, err := r.client.DownloadClientAPI.GetDownloadClientById(r.auth, int32(client.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, downloadClientPneumaticResourceName, err))
 
@@ -207,7 +209,7 @@ func (r *DownloadClientPneumaticResource) Update(ctx context.Context, req resour
 	// Update DownloadClientPneumatic
 	request := client.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.DownloadClientAPI.UpdateDownloadClient(ctx, strconv.Itoa(int(request.GetId()))).DownloadClientResource(*request).Execute()
+	response, _, err := r.client.DownloadClientAPI.UpdateDownloadClient(r.auth, strconv.Itoa(int(request.GetId()))).DownloadClientResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, downloadClientPneumaticResourceName, err))
 
@@ -230,7 +232,7 @@ func (r *DownloadClientPneumaticResource) Delete(ctx context.Context, req resour
 	}
 
 	// Delete DownloadClientPneumatic current value
-	_, err := r.client.DownloadClientAPI.DeleteDownloadClient(ctx, int32(ID)).Execute()
+	_, err := r.client.DownloadClientAPI.DeleteDownloadClient(r.auth, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, downloadClientPneumaticResourceName, err))
 

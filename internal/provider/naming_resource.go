@@ -32,6 +32,7 @@ func NewNamingResource() resource.Resource {
 // NamingResource defines the naming implementation.
 type NamingResource struct {
 	client *sonarr.APIClient
+	auth   context.Context
 }
 
 // Naming describes the naming data model.
@@ -115,8 +116,9 @@ func (r *NamingResource) Schema(_ context.Context, _ resource.SchemaRequest, res
 }
 
 func (r *NamingResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
-	if client := helpers.ResourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := resourceConfigure(ctx, req, resp); client != nil {
 		r.client = client
+		r.auth = auth
 	}
 }
 
@@ -131,7 +133,7 @@ func (r *NamingResource) Create(ctx context.Context, req resource.CreateRequest,
 	}
 
 	// Init call if we remove this it the very first update on a brand new instance will fail
-	if _, _, err := r.client.NamingConfigAPI.GetNamingConfig(ctx).Execute(); err != nil {
+	if _, _, err := r.client.NamingConfigAPI.GetNamingConfig(r.auth).Execute(); err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError("init", namingResourceName, err))
 
 		return
@@ -142,7 +144,7 @@ func (r *NamingResource) Create(ctx context.Context, req resource.CreateRequest,
 	request.SetId(1)
 
 	// Create new Naming
-	response, _, err := r.client.NamingConfigAPI.UpdateNamingConfig(ctx, strconv.Itoa(int(request.GetId()))).NamingConfigResource(*request).Execute()
+	response, _, err := r.client.NamingConfigAPI.UpdateNamingConfig(r.auth, strconv.Itoa(int(request.GetId()))).NamingConfigResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, namingResourceName, err))
 
@@ -166,7 +168,7 @@ func (r *NamingResource) Read(ctx context.Context, req resource.ReadRequest, res
 	}
 
 	// Get naming current value
-	response, _, err := r.client.NamingConfigAPI.GetNamingConfig(ctx).Execute()
+	response, _, err := r.client.NamingConfigAPI.GetNamingConfig(r.auth).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, namingResourceName, err))
 
@@ -193,7 +195,7 @@ func (r *NamingResource) Update(ctx context.Context, req resource.UpdateRequest,
 	request := naming.read()
 
 	// Update Naming
-	response, _, err := r.client.NamingConfigAPI.UpdateNamingConfig(ctx, strconv.Itoa(int(request.GetId()))).NamingConfigResource(*request).Execute()
+	response, _, err := r.client.NamingConfigAPI.UpdateNamingConfig(r.auth, strconv.Itoa(int(request.GetId()))).NamingConfigResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, namingResourceName, err))
 

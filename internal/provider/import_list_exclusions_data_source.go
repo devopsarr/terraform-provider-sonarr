@@ -24,6 +24,7 @@ func NewImportListExclusionsDataSource() datasource.DataSource {
 // ImportListExclusionsDataSource defines the importListExclusions implementation.
 type ImportListExclusionsDataSource struct {
 	client *sonarr.APIClient
+	auth   context.Context
 }
 
 // ImportListExclusions describes the importListExclusions data model.
@@ -69,14 +70,15 @@ func (d *ImportListExclusionsDataSource) Schema(_ context.Context, _ datasource.
 }
 
 func (d *ImportListExclusionsDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
-	if client := helpers.DataSourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := dataSourceConfigure(ctx, req, resp); client != nil {
 		d.client = client
+		d.auth = auth
 	}
 }
 
 func (d *ImportListExclusionsDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
 	// Get importListExclusions current value
-	response, _, err := d.client.ImportListExclusionAPI.ListImportListExclusion(ctx).Execute()
+	response, _, err := d.client.ImportListExclusionAPI.ListImportListExclusion(d.auth).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, importListExclusionsDataSourceName, err))
 

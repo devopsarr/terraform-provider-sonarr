@@ -24,6 +24,7 @@ func NewRootFoldersDataSource() datasource.DataSource {
 // RootFoldersDataSource defines the root folders implementation.
 type RootFoldersDataSource struct {
 	client *sonarr.APIClient
+	auth   context.Context
 }
 
 // RootFolders describes the root folders data model.
@@ -86,14 +87,15 @@ func (d *RootFoldersDataSource) Schema(_ context.Context, _ datasource.SchemaReq
 }
 
 func (d *RootFoldersDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
-	if client := helpers.DataSourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := dataSourceConfigure(ctx, req, resp); client != nil {
 		d.client = client
+		d.auth = auth
 	}
 }
 
 func (d *RootFoldersDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
 	// Get rootfolders current value
-	response, _, err := d.client.RootFolderAPI.ListRootFolder(ctx).Execute()
+	response, _, err := d.client.RootFolderAPI.ListRootFolder(d.auth).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, rootFoldersDataSourceName, err))
 

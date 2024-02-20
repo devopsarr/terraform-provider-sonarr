@@ -24,6 +24,7 @@ func NewDownloadClientsDataSource() datasource.DataSource {
 // DownloadClientsDataSource defines the download clients implementation.
 type DownloadClientsDataSource struct {
 	client *sonarr.APIClient
+	auth   context.Context
 }
 
 // DownloadClients describes the download clients data model.
@@ -238,14 +239,15 @@ func (d *DownloadClientsDataSource) Schema(_ context.Context, _ datasource.Schem
 }
 
 func (d *DownloadClientsDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
-	if client := helpers.DataSourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := dataSourceConfigure(ctx, req, resp); client != nil {
 		d.client = client
+		d.auth = auth
 	}
 }
 
 func (d *DownloadClientsDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
 	// Get download clients current value
-	response, _, err := d.client.DownloadClientAPI.ListDownloadClient(ctx).Execute()
+	response, _, err := d.client.DownloadClientAPI.ListDownloadClient(d.auth).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, downloadClientsDataSourceName, err))
 

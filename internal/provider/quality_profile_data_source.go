@@ -23,6 +23,7 @@ func NewQualityProfileDataSource() datasource.DataSource {
 // QualityProfileDataSource defines the quality profiles implementation.
 type QualityProfileDataSource struct {
 	client *sonarr.APIClient
+	auth   context.Context
 }
 
 func (d *QualityProfileDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
@@ -123,8 +124,9 @@ func (d *QualityProfileDataSource) Schema(_ context.Context, _ datasource.Schema
 }
 
 func (d *QualityProfileDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
-	if client := helpers.DataSourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := dataSourceConfigure(ctx, req, resp); client != nil {
 		d.client = client
+		d.auth = auth
 	}
 }
 
@@ -137,7 +139,7 @@ func (d *QualityProfileDataSource) Read(ctx context.Context, req datasource.Read
 		return
 	}
 	// Get qualityprofiles current value
-	response, _, err := d.client.QualityProfileAPI.ListQualityProfile(ctx).Execute()
+	response, _, err := d.client.QualityProfileAPI.ListQualityProfile(d.auth).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, qualityProfileDataSourceName, err))
 

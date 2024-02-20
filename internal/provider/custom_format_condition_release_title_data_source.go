@@ -27,6 +27,7 @@ func NewCustomFormatConditionReleaseTitleDataSource() datasource.DataSource {
 // CustomFormatConditionReleaseTitleDataSource defines the custom_format_condition_release_title implementation.
 type CustomFormatConditionReleaseTitleDataSource struct {
 	client *sonarr.APIClient
+	auth   context.Context
 }
 
 func (d *CustomFormatConditionReleaseTitleDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
@@ -69,8 +70,9 @@ func (d *CustomFormatConditionReleaseTitleDataSource) Schema(_ context.Context, 
 }
 
 func (d *CustomFormatConditionReleaseTitleDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
-	if client := helpers.DataSourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := dataSourceConfigure(ctx, req, resp); client != nil {
 		d.client = client
+		d.auth = auth
 	}
 }
 

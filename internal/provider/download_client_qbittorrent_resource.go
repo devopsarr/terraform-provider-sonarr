@@ -40,6 +40,7 @@ func NewDownloadClientQbittorrentResource() resource.Resource {
 // DownloadClientQbittorrentResource defines the download client implementation.
 type DownloadClientQbittorrentResource struct {
 	client *sonarr.APIClient
+	auth   context.Context
 }
 
 // DownloadClientQbittorrent describes the download client data model.
@@ -243,8 +244,9 @@ func (r *DownloadClientQbittorrentResource) Schema(_ context.Context, _ resource
 }
 
 func (r *DownloadClientQbittorrentResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
-	if client := helpers.ResourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := resourceConfigure(ctx, req, resp); client != nil {
 		r.client = client
+		r.auth = auth
 	}
 }
 
@@ -261,7 +263,7 @@ func (r *DownloadClientQbittorrentResource) Create(ctx context.Context, req reso
 	// Create new DownloadClientQbittorrent
 	request := client.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.DownloadClientAPI.CreateDownloadClient(ctx).DownloadClientResource(*request).Execute()
+	response, _, err := r.client.DownloadClientAPI.CreateDownloadClient(r.auth).DownloadClientResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, downloadClientQbittorrentResourceName, err))
 
@@ -285,7 +287,7 @@ func (r *DownloadClientQbittorrentResource) Read(ctx context.Context, req resour
 	}
 
 	// Get DownloadClientQbittorrent current value
-	response, _, err := r.client.DownloadClientAPI.GetDownloadClientById(ctx, int32(client.ID.ValueInt64())).Execute()
+	response, _, err := r.client.DownloadClientAPI.GetDownloadClientById(r.auth, int32(client.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, downloadClientQbittorrentResourceName, err))
 
@@ -311,7 +313,7 @@ func (r *DownloadClientQbittorrentResource) Update(ctx context.Context, req reso
 	// Update DownloadClientQbittorrent
 	request := client.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.DownloadClientAPI.UpdateDownloadClient(ctx, strconv.Itoa(int(request.GetId()))).DownloadClientResource(*request).Execute()
+	response, _, err := r.client.DownloadClientAPI.UpdateDownloadClient(r.auth, strconv.Itoa(int(request.GetId()))).DownloadClientResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, downloadClientQbittorrentResourceName, err))
 
@@ -334,7 +336,7 @@ func (r *DownloadClientQbittorrentResource) Delete(ctx context.Context, req reso
 	}
 
 	// Delete DownloadClientQbittorrent current value
-	_, err := r.client.DownloadClientAPI.DeleteDownloadClient(ctx, int32(ID)).Execute()
+	_, err := r.client.DownloadClientAPI.DeleteDownloadClient(r.auth, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, downloadClientQbittorrentResourceName, err))
 

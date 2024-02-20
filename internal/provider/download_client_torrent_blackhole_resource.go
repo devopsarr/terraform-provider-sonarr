@@ -36,6 +36,7 @@ func NewDownloadClientTorrentBlackholeResource() resource.Resource {
 // DownloadClientTorrentBlackholeResource defines the download client implementation.
 type DownloadClientTorrentBlackholeResource struct {
 	client *sonarr.APIClient
+	auth   context.Context
 }
 
 // DownloadClientTorrentBlackhole describes the download client data model.
@@ -163,8 +164,9 @@ func (r *DownloadClientTorrentBlackholeResource) Schema(_ context.Context, _ res
 }
 
 func (r *DownloadClientTorrentBlackholeResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
-	if client := helpers.ResourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := resourceConfigure(ctx, req, resp); client != nil {
 		r.client = client
+		r.auth = auth
 	}
 }
 
@@ -181,7 +183,7 @@ func (r *DownloadClientTorrentBlackholeResource) Create(ctx context.Context, req
 	// Create new DownloadClientTorrentBlackhole
 	request := client.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.DownloadClientAPI.CreateDownloadClient(ctx).DownloadClientResource(*request).Execute()
+	response, _, err := r.client.DownloadClientAPI.CreateDownloadClient(r.auth).DownloadClientResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, downloadClientTorrentBlackholeResourceName, err))
 
@@ -205,7 +207,7 @@ func (r *DownloadClientTorrentBlackholeResource) Read(ctx context.Context, req r
 	}
 
 	// Get DownloadClientTorrentBlackhole current value
-	response, _, err := r.client.DownloadClientAPI.GetDownloadClientById(ctx, int32(client.ID.ValueInt64())).Execute()
+	response, _, err := r.client.DownloadClientAPI.GetDownloadClientById(r.auth, int32(client.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, downloadClientTorrentBlackholeResourceName, err))
 
@@ -231,7 +233,7 @@ func (r *DownloadClientTorrentBlackholeResource) Update(ctx context.Context, req
 	// Update DownloadClientTorrentBlackhole
 	request := client.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.DownloadClientAPI.UpdateDownloadClient(ctx, strconv.Itoa(int(request.GetId()))).DownloadClientResource(*request).Execute()
+	response, _, err := r.client.DownloadClientAPI.UpdateDownloadClient(r.auth, strconv.Itoa(int(request.GetId()))).DownloadClientResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, downloadClientTorrentBlackholeResourceName, err))
 
@@ -254,7 +256,7 @@ func (r *DownloadClientTorrentBlackholeResource) Delete(ctx context.Context, req
 	}
 
 	// Delete DownloadClientTorrentBlackhole current value
-	_, err := r.client.DownloadClientAPI.DeleteDownloadClient(ctx, int32(ID)).Execute()
+	_, err := r.client.DownloadClientAPI.DeleteDownloadClient(r.auth, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, downloadClientTorrentBlackholeResourceName, err))
 

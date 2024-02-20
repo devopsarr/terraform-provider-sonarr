@@ -32,6 +32,7 @@ func NewMediaManagementResource() resource.Resource {
 // MediaManagementResource defines the media management implementation.
 type MediaManagementResource struct {
 	client *sonarr.APIClient
+	auth   context.Context
 }
 
 // MediaManagement describes the media management data model.
@@ -161,8 +162,9 @@ func (r *MediaManagementResource) Schema(_ context.Context, _ resource.SchemaReq
 }
 
 func (r *MediaManagementResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
-	if client := helpers.ResourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := resourceConfigure(ctx, req, resp); client != nil {
 		r.client = client
+		r.auth = auth
 	}
 }
 
@@ -181,7 +183,7 @@ func (r *MediaManagementResource) Create(ctx context.Context, req resource.Creat
 	request.SetId(1)
 
 	// Create new MediaManagement
-	response, _, err := r.client.MediaManagementConfigAPI.UpdateMediaManagementConfig(ctx, strconv.Itoa(int(request.GetId()))).MediaManagementConfigResource(*request).Execute()
+	response, _, err := r.client.MediaManagementConfigAPI.UpdateMediaManagementConfig(r.auth, strconv.Itoa(int(request.GetId()))).MediaManagementConfigResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, mediaManagementResourceName, err))
 
@@ -205,7 +207,7 @@ func (r *MediaManagementResource) Read(ctx context.Context, req resource.ReadReq
 	}
 
 	// Get mediamanagement current value
-	response, _, err := r.client.MediaManagementConfigAPI.GetMediaManagementConfig(ctx).Execute()
+	response, _, err := r.client.MediaManagementConfigAPI.GetMediaManagementConfig(r.auth).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, mediaManagementResourceName, err))
 
@@ -232,7 +234,7 @@ func (r *MediaManagementResource) Update(ctx context.Context, req resource.Updat
 	request := management.read()
 
 	// Update MediaManagement
-	response, _, err := r.client.MediaManagementConfigAPI.UpdateMediaManagementConfig(ctx, strconv.Itoa(int(request.GetId()))).MediaManagementConfigResource(*request).Execute()
+	response, _, err := r.client.MediaManagementConfigAPI.UpdateMediaManagementConfig(r.auth, strconv.Itoa(int(request.GetId()))).MediaManagementConfigResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, mediaManagementResourceName, err))
 

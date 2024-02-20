@@ -24,6 +24,7 @@ func NewQualityDefinitionsDataSource() datasource.DataSource {
 // QualityDefinitionsDataSource defines the qyality definitions implementation.
 type QualityDefinitionsDataSource struct {
 	client *sonarr.APIClient
+	auth   context.Context
 }
 
 // QualityDefinitions describes the qyality definitions data model.
@@ -91,14 +92,15 @@ func (d *QualityDefinitionsDataSource) Schema(_ context.Context, _ datasource.Sc
 }
 
 func (d *QualityDefinitionsDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
-	if client := helpers.DataSourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := dataSourceConfigure(ctx, req, resp); client != nil {
 		d.client = client
+		d.auth = auth
 	}
 }
 
 func (d *QualityDefinitionsDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
 	// Get qualitydefinitions current value
-	response, _, err := d.client.QualityDefinitionAPI.ListQualityDefinition(ctx).Execute()
+	response, _, err := d.client.QualityDefinitionAPI.ListQualityDefinition(d.auth).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, qualityDefinitionsDataSourceName, err))
 

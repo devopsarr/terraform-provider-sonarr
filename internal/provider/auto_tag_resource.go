@@ -33,6 +33,7 @@ func NewAutoTagResource() resource.Resource {
 // AutoTagResource defines the tag implementation.
 type AutoTagResource struct {
 	client *sonarr.APIClient
+	auth   context.Context
 }
 
 // AutoTag describes the tag data model.
@@ -130,8 +131,9 @@ func (r AutoTagResource) getSpecificationSchema() schema.Schema {
 }
 
 func (r *AutoTagResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
-	if client := helpers.ResourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := resourceConfigure(ctx, req, resp); client != nil {
 		r.client = client
+		r.auth = auth
 	}
 }
 
@@ -148,7 +150,7 @@ func (r *AutoTagResource) Create(ctx context.Context, req resource.CreateRequest
 	// Create new auto tag
 	request := autoTag.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.AutoTaggingAPI.CreateAutoTagging(ctx).AutoTaggingResource(*request).Execute()
+	response, _, err := r.client.AutoTaggingAPI.CreateAutoTagging(r.auth).AutoTaggingResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, autoTagResourceName, err))
 
@@ -172,7 +174,7 @@ func (r *AutoTagResource) Read(ctx context.Context, req resource.ReadRequest, re
 	}
 
 	// Get auto tag current value
-	response, _, err := r.client.AutoTaggingAPI.GetAutoTaggingById(ctx, int32(autoTag.ID.ValueInt64())).Execute()
+	response, _, err := r.client.AutoTaggingAPI.GetAutoTaggingById(r.auth, int32(autoTag.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, autoTagResourceName, err))
 
@@ -198,7 +200,7 @@ func (r *AutoTagResource) Update(ctx context.Context, req resource.UpdateRequest
 	// Update auto tag
 	request := autoTag.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.AutoTaggingAPI.UpdateAutoTagging(ctx, fmt.Sprint(request.GetId())).AutoTaggingResource(*request).Execute()
+	response, _, err := r.client.AutoTaggingAPI.UpdateAutoTagging(r.auth, fmt.Sprint(request.GetId())).AutoTaggingResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, autoTagResourceName, err))
 
@@ -221,7 +223,7 @@ func (r *AutoTagResource) Delete(ctx context.Context, req resource.DeleteRequest
 	}
 
 	// Delete auto tag current value
-	_, err := r.client.AutoTaggingAPI.DeleteAutoTagging(ctx, int32(ID)).Execute()
+	_, err := r.client.AutoTaggingAPI.DeleteAutoTagging(r.auth, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, autoTagResourceName, err))
 

@@ -22,6 +22,7 @@ func NewMediaManagementDataSource() datasource.DataSource {
 // MediaManagementDataSource defines the media management implementation.
 type MediaManagementDataSource struct {
 	client *sonarr.APIClient
+	auth   context.Context
 }
 
 func (d *MediaManagementDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
@@ -114,14 +115,15 @@ func (d *MediaManagementDataSource) Schema(_ context.Context, _ datasource.Schem
 }
 
 func (d *MediaManagementDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
-	if client := helpers.DataSourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := dataSourceConfigure(ctx, req, resp); client != nil {
 		d.client = client
+		d.auth = auth
 	}
 }
 
 func (d *MediaManagementDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
 	// Get indexer config current value
-	response, _, err := d.client.MediaManagementConfigAPI.GetMediaManagementConfig(ctx).Execute()
+	response, _, err := d.client.MediaManagementConfigAPI.GetMediaManagementConfig(d.auth).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, mediaManagementDataSourceName, err))
 

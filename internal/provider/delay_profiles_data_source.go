@@ -24,6 +24,7 @@ func NewDelayProfilesDataSource() datasource.DataSource {
 // DelayProfilesDataSource defines the delay profiles implementation.
 type DelayProfilesDataSource struct {
 	client *sonarr.APIClient
+	auth   context.Context
 }
 
 // DelayProfiles describes the delay profiles data model.
@@ -103,14 +104,15 @@ func (d *DelayProfilesDataSource) Schema(_ context.Context, _ datasource.SchemaR
 }
 
 func (d *DelayProfilesDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
-	if client := helpers.DataSourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := dataSourceConfigure(ctx, req, resp); client != nil {
 		d.client = client
+		d.auth = auth
 	}
 }
 
 func (d *DelayProfilesDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
 	// Get delayprofiles current value
-	response, _, err := d.client.DelayProfileAPI.ListDelayProfile(ctx).Execute()
+	response, _, err := d.client.DelayProfileAPI.ListDelayProfile(d.auth).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, delayProfileResourceName, err))
 
