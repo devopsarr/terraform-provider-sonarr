@@ -416,7 +416,7 @@ func (r *HostResource) Create(ctx context.Context, req resource.CreateRequest, r
 	request.SetId(1)
 
 	// Create new Host
-	response, _, err := r.client.HostConfigApi.UpdateHostConfig(ctx, strconv.Itoa(int(request.GetId()))).HostConfigResource(*request).Execute()
+	response, _, err := r.client.HostConfigAPI.UpdateHostConfig(ctx, strconv.Itoa(int(request.GetId()))).HostConfigResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, hostResourceName, err))
 
@@ -440,7 +440,7 @@ func (r *HostResource) Read(ctx context.Context, req resource.ReadRequest, resp 
 	}
 
 	// Get host current value
-	response, _, err := r.client.HostConfigApi.GetHostConfig(ctx).Execute()
+	response, _, err := r.client.HostConfigAPI.GetHostConfig(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, hostResourceName, err))
 
@@ -467,7 +467,7 @@ func (r *HostResource) Update(ctx context.Context, req resource.UpdateRequest, r
 	request := host.read(ctx, &resp.Diagnostics)
 
 	// Update Host
-	response, _, err := r.client.HostConfigApi.UpdateHostConfig(ctx, strconv.Itoa(int(request.GetId()))).HostConfigResource(*request).Execute()
+	response, _, err := r.client.HostConfigAPI.UpdateHostConfig(ctx, strconv.Itoa(int(request.GetId()))).HostConfigResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, hostResourceName, err))
 
@@ -641,6 +641,7 @@ func (a *AuthConfig) read(host *sonarr.HostConfigResource) {
 	host.SetUsername(a.Username.ValueString())
 	host.SetAuthenticationRequired(sonarr.AuthenticationRequiredType(a.Required.ValueString()))
 	host.SetPassword(a.Password.ValueString())
+	host.SetPasswordConfirmation(a.Password.ValueString())
 }
 
 func (s *SSLConfig) read(host *sonarr.HostConfigResource) {

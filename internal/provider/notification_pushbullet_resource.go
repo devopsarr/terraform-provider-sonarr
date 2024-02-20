@@ -239,7 +239,7 @@ func (r *NotificationPushbulletResource) Create(ctx context.Context, req resourc
 	// Create new NotificationPushbullet
 	request := notification.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.NotificationApi.CreateNotification(ctx).NotificationResource(*request).Execute()
+	response, _, err := r.client.NotificationAPI.CreateNotification(ctx).NotificationResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, notificationPushbulletResourceName, err))
 
@@ -263,7 +263,7 @@ func (r *NotificationPushbulletResource) Read(ctx context.Context, req resource.
 	}
 
 	// Get NotificationPushbullet current value
-	response, _, err := r.client.NotificationApi.GetNotificationById(ctx, int32(notification.ID.ValueInt64())).Execute()
+	response, _, err := r.client.NotificationAPI.GetNotificationById(ctx, int32(notification.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, notificationPushbulletResourceName, err))
 
@@ -289,7 +289,7 @@ func (r *NotificationPushbulletResource) Update(ctx context.Context, req resourc
 	// Update NotificationPushbullet
 	request := notification.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.NotificationApi.UpdateNotification(ctx, strconv.Itoa(int(request.GetId()))).NotificationResource(*request).Execute()
+	response, _, err := r.client.NotificationAPI.UpdateNotification(ctx, strconv.Itoa(int(request.GetId()))).NotificationResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, notificationPushbulletResourceName, err))
 
@@ -312,7 +312,7 @@ func (r *NotificationPushbulletResource) Delete(ctx context.Context, req resourc
 	}
 
 	// Delete NotificationPushbullet current value
-	_, err := r.client.NotificationApi.DeleteNotification(ctx, int32(ID)).Execute()
+	_, err := r.client.NotificationAPI.DeleteNotification(ctx, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, notificationPushbulletResourceName, err))
 

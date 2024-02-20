@@ -93,7 +93,7 @@ func (d *RootFoldersDataSource) Configure(ctx context.Context, req datasource.Co
 
 func (d *RootFoldersDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
 	// Get rootfolders current value
-	response, _, err := d.client.RootFolderApi.ListRootFolder(ctx).Execute()
+	response, _, err := d.client.RootFolderAPI.ListRootFolder(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, rootFoldersDataSourceName, err))
 
@@ -104,7 +104,7 @@ func (d *RootFoldersDataSource) Read(ctx context.Context, _ datasource.ReadReque
 	// Map response body to resource schema attribute
 	rootFolders := make([]RootFolder, len(response))
 	for i, f := range response {
-		rootFolders[i].write(ctx, f, &resp.Diagnostics)
+		rootFolders[i].write(ctx, &f, &resp.Diagnostics)
 	}
 
 	folderList, diags := types.SetValueFrom(ctx, RootFolder{}.getType(), rootFolders)

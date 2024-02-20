@@ -240,7 +240,7 @@ func (r *DownloadClientTransmissionResource) Create(ctx context.Context, req res
 	// Create new DownloadClientTransmission
 	request := client.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.DownloadClientApi.CreateDownloadClient(ctx).DownloadClientResource(*request).Execute()
+	response, _, err := r.client.DownloadClientAPI.CreateDownloadClient(ctx).DownloadClientResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, downloadClientTransmissionResourceName, err))
 
@@ -264,7 +264,7 @@ func (r *DownloadClientTransmissionResource) Read(ctx context.Context, req resou
 	}
 
 	// Get DownloadClientTransmission current value
-	response, _, err := r.client.DownloadClientApi.GetDownloadClientById(ctx, int32(client.ID.ValueInt64())).Execute()
+	response, _, err := r.client.DownloadClientAPI.GetDownloadClientById(ctx, int32(client.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, downloadClientTransmissionResourceName, err))
 
@@ -290,7 +290,7 @@ func (r *DownloadClientTransmissionResource) Update(ctx context.Context, req res
 	// Update DownloadClientTransmission
 	request := client.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.DownloadClientApi.UpdateDownloadClient(ctx, strconv.Itoa(int(request.GetId()))).DownloadClientResource(*request).Execute()
+	response, _, err := r.client.DownloadClientAPI.UpdateDownloadClient(ctx, strconv.Itoa(int(request.GetId()))).DownloadClientResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, downloadClientTransmissionResourceName, err))
 
@@ -313,7 +313,7 @@ func (r *DownloadClientTransmissionResource) Delete(ctx context.Context, req res
 	}
 
 	// Delete DownloadClientTransmission current value
-	_, err := r.client.DownloadClientApi.DeleteDownloadClient(ctx, int32(ID)).Execute()
+	_, err := r.client.DownloadClientAPI.DeleteDownloadClient(ctx, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, downloadClientTransmissionResourceName, err))
 

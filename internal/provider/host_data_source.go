@@ -237,7 +237,7 @@ func (d *HostDataSource) Read(ctx context.Context, _ datasource.ReadRequest, res
 	resp.Diagnostics.Append(tempDiag...)
 
 	// Get host current value
-	response, _, err := d.client.HostConfigApi.GetHostConfig(ctx).Execute()
+	response, _, err := d.client.HostConfigAPI.GetHostConfig(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, hostDataSourceName, err))
 

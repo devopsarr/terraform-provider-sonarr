@@ -186,7 +186,7 @@ func (d *ImportListDataSource) Read(ctx context.Context, req datasource.ReadRequ
 		return
 	}
 	// Get importList current value
-	response, _, err := d.client.ImportListApi.ListImportList(ctx).Execute()
+	response, _, err := d.client.ImportListAPI.ListImportList(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, importListDataSourceName, err))
 
@@ -199,10 +199,10 @@ func (d *ImportListDataSource) Read(ctx context.Context, req datasource.ReadRequ
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func (i *ImportList) find(ctx context.Context, name string, importLists []*sonarr.ImportListResource, diags *diag.Diagnostics) {
+func (i *ImportList) find(ctx context.Context, name string, importLists []sonarr.ImportListResource, diags *diag.Diagnostics) {
 	for _, list := range importLists {
 		if list.GetName() == name {
-			i.write(ctx, list, diags)
+			i.write(ctx, &list, diags)
 
 			return
 		}

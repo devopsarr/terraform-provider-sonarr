@@ -110,7 +110,7 @@ func (d *DelayProfilesDataSource) Configure(ctx context.Context, req datasource.
 
 func (d *DelayProfilesDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
 	// Get delayprofiles current value
-	response, _, err := d.client.DelayProfileApi.ListDelayProfile(ctx).Execute()
+	response, _, err := d.client.DelayProfileAPI.ListDelayProfile(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, delayProfileResourceName, err))
 
@@ -121,7 +121,7 @@ func (d *DelayProfilesDataSource) Read(ctx context.Context, _ datasource.ReadReq
 	// Map response body to resource schema attribute
 	profiles := make([]DelayProfile, len(response))
 	for i, p := range response {
-		profiles[i].write(ctx, p, &resp.Diagnostics)
+		profiles[i].write(ctx, &p, &resp.Diagnostics)
 	}
 
 	profileList, diags := types.SetValueFrom(ctx, DelayProfile{}.getType(), profiles)

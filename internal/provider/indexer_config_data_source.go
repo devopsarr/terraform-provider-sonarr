@@ -65,7 +65,7 @@ func (d *IndexerConfigDataSource) Configure(ctx context.Context, req datasource.
 
 func (d *IndexerConfigDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
 	// Get indexer config current value
-	response, _, err := d.client.IndexerConfigApi.GetIndexerConfig(ctx).Execute()
+	response, _, err := d.client.IndexerConfigAPI.GetIndexerConfig(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerConfigDataSourceName, err))
 

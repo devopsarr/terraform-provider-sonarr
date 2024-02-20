@@ -137,7 +137,7 @@ func (d *QualityProfileDataSource) Read(ctx context.Context, req datasource.Read
 		return
 	}
 	// Get qualityprofiles current value
-	response, _, err := d.client.QualityProfileApi.ListQualityProfile(ctx).Execute()
+	response, _, err := d.client.QualityProfileAPI.ListQualityProfile(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, qualityProfileDataSourceName, err))
 
@@ -151,10 +151,10 @@ func (d *QualityProfileDataSource) Read(ctx context.Context, req datasource.Read
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func (p *QualityProfile) find(ctx context.Context, name string, profiles []*sonarr.QualityProfileResource, diags *diag.Diagnostics) {
+func (p *QualityProfile) find(ctx context.Context, name string, profiles []sonarr.QualityProfileResource, diags *diag.Diagnostics) {
 	for _, profile := range profiles {
 		if profile.GetName() == name {
-			p.write(ctx, profile, diags)
+			p.write(ctx, &profile, diags)
 
 			return
 		}

@@ -72,7 +72,7 @@ func (d *TagsDataSource) Configure(ctx context.Context, req datasource.Configure
 
 func (d *TagsDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
 	// Get tags current value
-	response, _, err := d.client.TagApi.ListTag(ctx).Execute()
+	response, _, err := d.client.TagAPI.ListTag(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, tagsDataSourceName, err))
 
@@ -83,7 +83,7 @@ func (d *TagsDataSource) Read(ctx context.Context, _ datasource.ReadRequest, res
 	// Map response body to resource schema attribute
 	tags := make([]Tag, len(response))
 	for i, t := range response {
-		tags[i].write(t)
+		tags[i].write(&t)
 	}
 
 	tagList, diags := types.SetValueFrom(ctx, Tag{}.getType(), tags)

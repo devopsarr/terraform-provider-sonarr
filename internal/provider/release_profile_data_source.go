@@ -86,7 +86,7 @@ func (d *ReleaseProfileDataSource) Read(ctx context.Context, req datasource.Read
 		return
 	}
 	// Get releaseprofiles current value
-	response, _, err := d.client.ReleaseProfileApi.ListReleaseProfile(ctx).Execute()
+	response, _, err := d.client.ReleaseProfileAPI.ListReleaseProfile(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, releaseProfileDataSourceName, err))
 
@@ -100,10 +100,10 @@ func (d *ReleaseProfileDataSource) Read(ctx context.Context, req datasource.Read
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func (p *ReleaseProfile) find(ctx context.Context, id int64, profiles []*sonarr.ReleaseProfileResource, diags *diag.Diagnostics) {
+func (p *ReleaseProfile) find(ctx context.Context, id int64, profiles []sonarr.ReleaseProfileResource, diags *diag.Diagnostics) {
 	for _, profile := range profiles {
 		if int64(profile.GetId()) == id {
-			p.write(ctx, profile, diags)
+			p.write(ctx, &profile, diags)
 
 			return
 		}

@@ -101,7 +101,7 @@ func (r *RemotePathMappingResource) Create(ctx context.Context, req resource.Cre
 	// Create new RemotePathMapping
 	request := mapping.read()
 
-	response, _, err := r.client.RemotePathMappingApi.CreateRemotePathMapping(ctx).RemotePathMappingResource(*request).Execute()
+	response, _, err := r.client.RemotePathMappingAPI.CreateRemotePathMapping(ctx).RemotePathMappingResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, remotePathMappingResourceName, err))
 
@@ -125,7 +125,7 @@ func (r *RemotePathMappingResource) Read(ctx context.Context, req resource.ReadR
 	}
 
 	// Get remotePathMapping current value
-	response, _, err := r.client.RemotePathMappingApi.GetRemotePathMappingById(ctx, int32(mapping.ID.ValueInt64())).Execute()
+	response, _, err := r.client.RemotePathMappingAPI.GetRemotePathMappingById(ctx, int32(mapping.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, remotePathMappingResourceName, err))
 
@@ -151,7 +151,7 @@ func (r *RemotePathMappingResource) Update(ctx context.Context, req resource.Upd
 	// Update RemotePathMapping
 	request := mapping.read()
 
-	response, _, err := r.client.RemotePathMappingApi.UpdateRemotePathMapping(ctx, strconv.Itoa(int(request.GetId()))).RemotePathMappingResource(*request).Execute()
+	response, _, err := r.client.RemotePathMappingAPI.UpdateRemotePathMapping(ctx, strconv.Itoa(int(request.GetId()))).RemotePathMappingResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, remotePathMappingResourceName, err))
 
@@ -174,7 +174,7 @@ func (r *RemotePathMappingResource) Delete(ctx context.Context, req resource.Del
 	}
 
 	// Delete remotePathMapping current value
-	_, err := r.client.RemotePathMappingApi.DeleteRemotePathMapping(ctx, int32(ID)).Execute()
+	_, err := r.client.RemotePathMappingAPI.DeleteRemotePathMapping(ctx, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, remotePathMappingResourceName, err))
 

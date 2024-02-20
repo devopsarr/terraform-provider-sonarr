@@ -267,7 +267,7 @@ func (r *NotificationPushoverResource) Create(ctx context.Context, req resource.
 	// Create new NotificationPushover
 	request := notification.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.NotificationApi.CreateNotification(ctx).NotificationResource(*request).Execute()
+	response, _, err := r.client.NotificationAPI.CreateNotification(ctx).NotificationResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, notificationPushoverResourceName, err))
 
@@ -291,7 +291,7 @@ func (r *NotificationPushoverResource) Read(ctx context.Context, req resource.Re
 	}
 
 	// Get NotificationPushover current value
-	response, _, err := r.client.NotificationApi.GetNotificationById(ctx, int32(notification.ID.ValueInt64())).Execute()
+	response, _, err := r.client.NotificationAPI.GetNotificationById(ctx, int32(notification.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, notificationPushoverResourceName, err))
 
@@ -317,7 +317,7 @@ func (r *NotificationPushoverResource) Update(ctx context.Context, req resource.
 	// Update NotificationPushover
 	request := notification.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.NotificationApi.UpdateNotification(ctx, strconv.Itoa(int(request.GetId()))).NotificationResource(*request).Execute()
+	response, _, err := r.client.NotificationAPI.UpdateNotification(ctx, strconv.Itoa(int(request.GetId()))).NotificationResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, notificationPushoverResourceName, err))
 
@@ -340,7 +340,7 @@ func (r *NotificationPushoverResource) Delete(ctx context.Context, req resource.
 	}
 
 	// Delete NotificationPushover current value
-	_, err := r.client.NotificationApi.DeleteNotification(ctx, int32(ID)).Execute()
+	_, err := r.client.NotificationAPI.DeleteNotification(ctx, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, notificationPushoverResourceName, err))
 

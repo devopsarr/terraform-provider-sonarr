@@ -89,7 +89,7 @@ func (d *QualityDataSource) Read(ctx context.Context, req datasource.ReadRequest
 		return
 	}
 	// Get qualitys current value
-	response, _, err := d.client.QualityDefinitionApi.ListQualityDefinition(ctx).Execute()
+	response, _, err := d.client.QualityDefinitionAPI.ListQualityDefinition(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, qualityDataSourceName, err))
 
@@ -102,10 +102,10 @@ func (d *QualityDataSource) Read(ctx context.Context, req datasource.ReadRequest
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func (q *Quality) find(name string, definitions []*sonarr.QualityDefinitionResource, diags *diag.Diagnostics) {
+func (q *Quality) find(name string, definitions []sonarr.QualityDefinitionResource, diags *diag.Diagnostics) {
 	for _, def := range definitions {
 		if def.Quality.GetName() == name {
-			q.writeFromDefinition(def)
+			q.writeFromDefinition(&def)
 
 			return
 		}

@@ -159,7 +159,7 @@ func (r *MetadataKodiResource) Create(ctx context.Context, req resource.CreateRe
 	// Create new MetadataKodi
 	request := metadata.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.MetadataApi.CreateMetadata(ctx).MetadataResource(*request).Execute()
+	response, _, err := r.client.MetadataAPI.CreateMetadata(ctx).MetadataResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, metadataKodiResourceName, err))
 
@@ -183,7 +183,7 @@ func (r *MetadataKodiResource) Read(ctx context.Context, req resource.ReadReques
 	}
 
 	// Get MetadataKodi current value
-	response, _, err := r.client.MetadataApi.GetMetadataById(ctx, int32(metadata.ID.ValueInt64())).Execute()
+	response, _, err := r.client.MetadataAPI.GetMetadataById(ctx, int32(metadata.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, metadataKodiResourceName, err))
 
@@ -209,7 +209,7 @@ func (r *MetadataKodiResource) Update(ctx context.Context, req resource.UpdateRe
 	// Update MetadataKodi
 	request := metadata.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.MetadataApi.UpdateMetadata(ctx, strconv.Itoa(int(request.GetId()))).MetadataResource(*request).Execute()
+	response, _, err := r.client.MetadataAPI.UpdateMetadata(ctx, strconv.Itoa(int(request.GetId()))).MetadataResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, metadataKodiResourceName, err))
 
@@ -232,7 +232,7 @@ func (r *MetadataKodiResource) Delete(ctx context.Context, req resource.DeleteRe
 	}
 
 	// Delete MetadataKodi current value
-	_, err := r.client.MetadataApi.DeleteMetadata(ctx, int32(ID)).Execute()
+	_, err := r.client.MetadataAPI.DeleteMetadata(ctx, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, metadataKodiResourceName, err))
 

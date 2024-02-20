@@ -109,7 +109,7 @@ func (d *AllSeriessDataSource) Configure(ctx context.Context, req datasource.Con
 
 func (d *AllSeriessDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
 	// Get series current value
-	response, _, err := d.client.SeriesApi.ListSeries(ctx).Execute()
+	response, _, err := d.client.SeriesAPI.ListSeries(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, allSeriesDataSourceName, err))
 
@@ -120,7 +120,7 @@ func (d *AllSeriessDataSource) Read(ctx context.Context, _ datasource.ReadReques
 	// Map response body to resource schema attribute
 	series := make([]Series, len(response))
 	for i, t := range response {
-		series[i].write(ctx, t, &resp.Diagnostics)
+		series[i].write(ctx, &t, &resp.Diagnostics)
 	}
 
 	seriesList, diags := types.SetValueFrom(ctx, Series{}.getType(), series)

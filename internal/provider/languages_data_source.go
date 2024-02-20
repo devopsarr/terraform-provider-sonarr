@@ -76,7 +76,7 @@ func (d *LanguagesDataSource) Configure(ctx context.Context, req datasource.Conf
 
 func (d *LanguagesDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
 	// Get languages current value
-	response, _, err := d.client.LanguageApi.ListLanguage(ctx).Execute()
+	response, _, err := d.client.LanguageAPI.ListLanguage(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, languagesDataSourceName, err))
 
@@ -87,7 +87,7 @@ func (d *LanguagesDataSource) Read(ctx context.Context, _ datasource.ReadRequest
 	// Map response body to resource schema attribute
 	languages := make([]Language, len(response))
 	for i, t := range response {
-		languages[i].write(t)
+		languages[i].write(&t)
 	}
 
 	languageList, diags := types.SetValueFrom(ctx, Language{}.getType(), languages)

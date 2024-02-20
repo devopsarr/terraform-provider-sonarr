@@ -245,7 +245,7 @@ func (d *DownloadClientsDataSource) Configure(ctx context.Context, req datasourc
 
 func (d *DownloadClientsDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
 	// Get download clients current value
-	response, _, err := d.client.DownloadClientApi.ListDownloadClient(ctx).Execute()
+	response, _, err := d.client.DownloadClientAPI.ListDownloadClient(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, downloadClientsDataSourceName, err))
 
@@ -256,7 +256,7 @@ func (d *DownloadClientsDataSource) Read(ctx context.Context, _ datasource.ReadR
 	// Map response body to resource schema attribute
 	clients := make([]DownloadClient, len(response))
 	for i, d := range response {
-		clients[i].write(ctx, d, &resp.Diagnostics)
+		clients[i].write(ctx, &d, &resp.Diagnostics)
 	}
 
 	clientList, diags := types.SetValueFrom(ctx, DownloadClient{}.getType(), clients)

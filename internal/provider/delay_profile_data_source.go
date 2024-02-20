@@ -100,7 +100,7 @@ func (d *DelayProfileDataSource) Read(ctx context.Context, req datasource.ReadRe
 		return
 	}
 	// Get delayprofiles current value
-	response, _, err := d.client.DelayProfileApi.ListDelayProfile(ctx).Execute()
+	response, _, err := d.client.DelayProfileAPI.ListDelayProfile(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, delayProfileDataSourceName, err))
 
@@ -114,10 +114,10 @@ func (d *DelayProfileDataSource) Read(ctx context.Context, req datasource.ReadRe
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func (p *DelayProfile) find(ctx context.Context, id int64, profiles []*sonarr.DelayProfileResource, diags *diag.Diagnostics) {
+func (p *DelayProfile) find(ctx context.Context, id int64, profiles []sonarr.DelayProfileResource, diags *diag.Diagnostics) {
 	for _, profile := range profiles {
 		if int64(profile.GetId()) == id {
-			p.write(ctx, profile, diags)
+			p.write(ctx, &profile, diags)
 
 			return
 		}

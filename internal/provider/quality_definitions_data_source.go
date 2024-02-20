@@ -98,7 +98,7 @@ func (d *QualityDefinitionsDataSource) Configure(ctx context.Context, req dataso
 
 func (d *QualityDefinitionsDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
 	// Get qualitydefinitions current value
-	response, _, err := d.client.QualityDefinitionApi.ListQualityDefinition(ctx).Execute()
+	response, _, err := d.client.QualityDefinitionAPI.ListQualityDefinition(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, qualityDefinitionsDataSourceName, err))
 
@@ -109,7 +109,7 @@ func (d *QualityDefinitionsDataSource) Read(ctx context.Context, _ datasource.Re
 	// Map response body to resource schema attribute
 	definitions := make([]QualityDefinition, len(response))
 	for i, p := range response {
-		definitions[i].write(p)
+		definitions[i].write(&p)
 	}
 
 	qualityList, diags := types.SetValueFrom(ctx, QualityDefinition{}.getType(), definitions)

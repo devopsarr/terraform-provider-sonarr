@@ -148,7 +148,7 @@ func (r *AutoTagResource) Create(ctx context.Context, req resource.CreateRequest
 	// Create new auto tag
 	request := autoTag.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.AutoTaggingApi.CreateAutoTagging(ctx).AutoTaggingResource(*request).Execute()
+	response, _, err := r.client.AutoTaggingAPI.CreateAutoTagging(ctx).AutoTaggingResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, autoTagResourceName, err))
 
@@ -172,7 +172,7 @@ func (r *AutoTagResource) Read(ctx context.Context, req resource.ReadRequest, re
 	}
 
 	// Get auto tag current value
-	response, _, err := r.client.AutoTaggingApi.GetAutoTaggingById(ctx, int32(autoTag.ID.ValueInt64())).Execute()
+	response, _, err := r.client.AutoTaggingAPI.GetAutoTaggingById(ctx, int32(autoTag.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, autoTagResourceName, err))
 
@@ -198,7 +198,7 @@ func (r *AutoTagResource) Update(ctx context.Context, req resource.UpdateRequest
 	// Update auto tag
 	request := autoTag.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.AutoTaggingApi.UpdateAutoTagging(ctx, fmt.Sprint(request.GetId())).AutoTaggingResource(*request).Execute()
+	response, _, err := r.client.AutoTaggingAPI.UpdateAutoTagging(ctx, fmt.Sprint(request.GetId())).AutoTaggingResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, autoTagResourceName, err))
 
@@ -221,7 +221,7 @@ func (r *AutoTagResource) Delete(ctx context.Context, req resource.DeleteRequest
 	}
 
 	// Delete auto tag current value
-	_, err := r.client.AutoTaggingApi.DeleteAutoTagging(ctx, int32(ID)).Execute()
+	_, err := r.client.AutoTaggingAPI.DeleteAutoTagging(ctx, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, autoTagResourceName, err))
 
@@ -246,7 +246,7 @@ func (t *AutoTag) write(ctx context.Context, autoTag *sonarr.AutoTaggingResource
 
 	specs := make([]AutoTagCondition, len(autoTag.Specifications))
 	for n, s := range autoTag.Specifications {
-		specs[n].write(ctx, s)
+		specs[n].write(ctx, &s)
 	}
 
 	t.Tags, tempDiag = types.SetValueFrom(ctx, types.Int64Type, autoTag.GetTags())
@@ -258,10 +258,10 @@ func (t *AutoTag) write(ctx context.Context, autoTag *sonarr.AutoTaggingResource
 func (t *AutoTag) read(ctx context.Context, diags *diag.Diagnostics) *sonarr.AutoTaggingResource {
 	specifications := make([]AutoTagCondition, len(t.Specifications.Elements()))
 	diags.Append(t.Specifications.ElementsAs(ctx, &specifications, false)...)
-	specs := make([]*sonarr.AutoTaggingSpecificationSchema, len(specifications))
+	specs := make([]sonarr.AutoTaggingSpecificationSchema, len(specifications))
 
 	for n, s := range specifications {
-		specs[n] = s.read(ctx)
+		specs[n] = *s.read(ctx)
 	}
 
 	autoTag := sonarr.NewAutoTaggingResource()

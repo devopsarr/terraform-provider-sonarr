@@ -52,5 +52,5 @@ func rootFolderDSInit() {
 	client := testAccAPIClient()
 	folder := sonarr.NewRootFolderResource()
 	folder.SetPath("/config")
-	_, _, _ = client.RootFolderApi.CreateRootFolder(context.TODO()).RootFolderResource(*folder).Execute()
+	_, _, _ = client.RootFolderAPI.CreateRootFolder(context.TODO()).RootFolderResource(*folder).Execute()
 }
