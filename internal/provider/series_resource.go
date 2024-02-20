@@ -177,7 +177,7 @@ func (r *SeriesResource) Create(ctx context.Context, req resource.CreateRequest,
 
 	request.SetAddOptions(*options)
 
-	response, _, err := r.client.SeriesApi.CreateSeries(ctx).SeriesResource(*request).Execute()
+	response, _, err := r.client.SeriesAPI.CreateSeries(ctx).SeriesResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, seriesResourceName, err))
 
@@ -201,7 +201,7 @@ func (r *SeriesResource) Read(ctx context.Context, req resource.ReadRequest, res
 	}
 
 	// Get series current value
-	response, _, err := r.client.SeriesApi.GetSeriesById(ctx, int32(series.ID.ValueInt64())).Execute()
+	response, _, err := r.client.SeriesAPI.GetSeriesById(ctx, int32(series.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, seriesResourceName, err))
 
@@ -228,7 +228,7 @@ func (r *SeriesResource) Update(ctx context.Context, req resource.UpdateRequest,
 	request := series.read(ctx, &resp.Diagnostics)
 
 	// TODO: manage movefiles on sdk
-	response, _, err := r.client.SeriesApi.UpdateSeries(ctx, strconv.Itoa(int(request.GetId()))).SeriesResource(*request).Execute()
+	response, _, err := r.client.SeriesAPI.UpdateSeries(ctx, strconv.Itoa(int(request.GetId()))).SeriesResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, seriesResourceName, err))
 
@@ -252,7 +252,7 @@ func (r *SeriesResource) Delete(ctx context.Context, req resource.DeleteRequest,
 
 	// Delete series current value
 	// TODO: manage delete parameters on SDK
-	_, err := r.client.SeriesApi.DeleteSeries(ctx, int32(ID)).Execute()
+	_, err := r.client.SeriesAPI.DeleteSeries(ctx, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, seriesResourceName, err))
 

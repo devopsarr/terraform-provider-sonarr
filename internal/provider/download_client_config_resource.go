@@ -92,7 +92,7 @@ func (r *DownloadClientConfigResource) Create(ctx context.Context, req resource.
 	request.SetId(1)
 
 	// Create new DownloadClientConfig
-	response, _, err := r.client.DownloadClientConfigApi.UpdateDownloadClientConfig(ctx, strconv.Itoa(int(request.GetId()))).DownloadClientConfigResource(*request).Execute()
+	response, _, err := r.client.DownloadClientConfigAPI.UpdateDownloadClientConfig(ctx, strconv.Itoa(int(request.GetId()))).DownloadClientConfigResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, downloadClientConfigResourceName, err))
 
@@ -116,7 +116,7 @@ func (r *DownloadClientConfigResource) Read(ctx context.Context, req resource.Re
 	}
 
 	// Get downloadClientConfig current value
-	response, _, err := r.client.DownloadClientConfigApi.GetDownloadClientConfig(ctx).Execute()
+	response, _, err := r.client.DownloadClientConfigAPI.GetDownloadClientConfig(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, downloadClientConfigResourceName, err))
 
@@ -143,7 +143,7 @@ func (r *DownloadClientConfigResource) Update(ctx context.Context, req resource.
 	request := config.read()
 
 	// Update DownloadClientConfig
-	response, _, err := r.client.DownloadClientConfigApi.UpdateDownloadClientConfig(ctx, strconv.Itoa(int(request.GetId()))).DownloadClientConfigResource(*request).Execute()
+	response, _, err := r.client.DownloadClientConfigAPI.UpdateDownloadClientConfig(ctx, strconv.Itoa(int(request.GetId()))).DownloadClientConfigResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, downloadClientConfigResourceName, err))
 

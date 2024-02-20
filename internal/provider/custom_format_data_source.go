@@ -102,7 +102,7 @@ func (d *CustomFormatDataSource) Read(ctx context.Context, req datasource.ReadRe
 		return
 	}
 	// Get customFormat current value
-	response, _, err := d.client.CustomFormatApi.ListCustomFormat(ctx).Execute()
+	response, _, err := d.client.CustomFormatAPI.ListCustomFormat(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, customFormatDataSourceName, err))
 
@@ -114,10 +114,10 @@ func (d *CustomFormatDataSource) Read(ctx context.Context, req datasource.ReadRe
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func (c *CustomFormat) find(ctx context.Context, name string, customFormats []*sonarr.CustomFormatResource, diags *diag.Diagnostics) {
+func (c *CustomFormat) find(ctx context.Context, name string, customFormats []sonarr.CustomFormatResource, diags *diag.Diagnostics) {
 	for _, i := range customFormats {
 		if i.GetName() == name {
-			c.write(ctx, i, diags)
+			c.write(ctx, &i, diags)
 
 			return
 		}

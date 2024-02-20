@@ -89,7 +89,7 @@ func (d *NamingDataSource) Configure(ctx context.Context, req datasource.Configu
 
 func (d *NamingDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
 	// Get naming current value
-	response, _, err := d.client.NamingConfigApi.GetNamingConfig(ctx).Execute()
+	response, _, err := d.client.NamingConfigAPI.GetNamingConfig(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, namingDataSourceName, err))
 

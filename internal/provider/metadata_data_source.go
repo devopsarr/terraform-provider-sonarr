@@ -104,7 +104,7 @@ func (d *MetadataDataSource) Read(ctx context.Context, req datasource.ReadReques
 		return
 	}
 	// Get metadata current value
-	response, _, err := d.client.MetadataApi.ListMetadata(ctx).Execute()
+	response, _, err := d.client.MetadataAPI.ListMetadata(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, metadataDataSourceName, err))
 
@@ -117,10 +117,10 @@ func (d *MetadataDataSource) Read(ctx context.Context, req datasource.ReadReques
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func (m *Metadata) find(ctx context.Context, name string, metadatas []*sonarr.MetadataResource, diags *diag.Diagnostics) {
+func (m *Metadata) find(ctx context.Context, name string, metadatas []sonarr.MetadataResource, diags *diag.Diagnostics) {
 	for _, metadata := range metadatas {
 		if metadata.GetName() == name {
-			m.write(ctx, metadata, diags)
+			m.write(ctx, &metadata, diags)
 
 			return
 		}

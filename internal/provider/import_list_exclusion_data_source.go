@@ -66,7 +66,7 @@ func (d *ImportListExclusionDataSource) Read(ctx context.Context, req datasource
 	}
 
 	// Get importListExclusions current value
-	response, _, err := d.client.ImportListExclusionApi.ListImportListExclusion(ctx).Execute()
+	response, _, err := d.client.ImportListExclusionAPI.ListImportListExclusion(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, importListExclusionDataSourceName, err))
 
@@ -79,10 +79,10 @@ func (d *ImportListExclusionDataSource) Read(ctx context.Context, req datasource
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func (i *ImportListExclusion) find(tvID int64, importListExclusions []*sonarr.ImportListExclusionResource, diags *diag.Diagnostics) {
+func (i *ImportListExclusion) find(tvID int64, importListExclusions []sonarr.ImportListExclusionResource, diags *diag.Diagnostics) {
 	for _, t := range importListExclusions {
 		if t.GetTvdbId() == int32(tvID) {
-			i.write(t)
+			i.write(&t)
 
 			return
 		}

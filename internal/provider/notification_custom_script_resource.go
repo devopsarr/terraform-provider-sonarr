@@ -228,7 +228,7 @@ func (r *NotificationCustomScriptResource) Create(ctx context.Context, req resou
 	// Create new NotificationCustomScript
 	request := notification.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.NotificationApi.CreateNotification(ctx).NotificationResource(*request).Execute()
+	response, _, err := r.client.NotificationAPI.CreateNotification(ctx).NotificationResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, notificationCustomScriptResourceName, err))
 
@@ -252,7 +252,7 @@ func (r *NotificationCustomScriptResource) Read(ctx context.Context, req resourc
 	}
 
 	// Get NotificationCustomScript current value
-	response, _, err := r.client.NotificationApi.GetNotificationById(ctx, int32(notification.ID.ValueInt64())).Execute()
+	response, _, err := r.client.NotificationAPI.GetNotificationById(ctx, int32(notification.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, notificationCustomScriptResourceName, err))
 
@@ -278,7 +278,7 @@ func (r *NotificationCustomScriptResource) Update(ctx context.Context, req resou
 	// Update NotificationCustomScript
 	request := notification.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.NotificationApi.UpdateNotification(ctx, strconv.Itoa(int(request.GetId()))).NotificationResource(*request).Execute()
+	response, _, err := r.client.NotificationAPI.UpdateNotification(ctx, strconv.Itoa(int(request.GetId()))).NotificationResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, notificationCustomScriptResourceName, err))
 
@@ -301,7 +301,7 @@ func (r *NotificationCustomScriptResource) Delete(ctx context.Context, req resou
 	}
 
 	// Delete NotificationCustomScript current value
-	_, err := r.client.NotificationApi.DeleteNotification(ctx, int32(ID)).Execute()
+	_, err := r.client.NotificationAPI.DeleteNotification(ctx, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, notificationCustomScriptResourceName, err))
 

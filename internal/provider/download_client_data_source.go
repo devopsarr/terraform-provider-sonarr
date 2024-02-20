@@ -234,7 +234,7 @@ func (d *DownloadClientDataSource) Read(ctx context.Context, req datasource.Read
 		return
 	}
 	// Get downloadClient current value
-	response, _, err := d.client.DownloadClientApi.ListDownloadClient(ctx).Execute()
+	response, _, err := d.client.DownloadClientAPI.ListDownloadClient(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, downloadClientDataSourceName, err))
 
@@ -247,10 +247,10 @@ func (d *DownloadClientDataSource) Read(ctx context.Context, req datasource.Read
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func (d *DownloadClient) find(ctx context.Context, name string, downloadClients []*sonarr.DownloadClientResource, diags *diag.Diagnostics) {
+func (d *DownloadClient) find(ctx context.Context, name string, downloadClients []sonarr.DownloadClientResource, diags *diag.Diagnostics) {
 	for _, client := range downloadClients {
 		if client.GetName() == name {
-			d.write(ctx, client, diags)
+			d.write(ctx, &client, diags)
 
 			return
 		}

@@ -70,7 +70,7 @@ func (d *RemotePathMappingDataSource) Read(ctx context.Context, req datasource.R
 		return
 	}
 	// Get remote path mapping current value
-	response, _, err := d.client.RemotePathMappingApi.ListRemotePathMapping(ctx).Execute()
+	response, _, err := d.client.RemotePathMappingAPI.ListRemotePathMapping(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, remotePathMappingDataSourceName, err))
 
@@ -83,10 +83,10 @@ func (d *RemotePathMappingDataSource) Read(ctx context.Context, req datasource.R
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func (r *RemotePathMapping) find(id int64, mappings []*sonarr.RemotePathMappingResource, diags *diag.Diagnostics) {
+func (r *RemotePathMapping) find(id int64, mappings []sonarr.RemotePathMappingResource, diags *diag.Diagnostics) {
 	for _, m := range mappings {
 		if int64(m.GetId()) == id {
-			r.write(m)
+			r.write(&m)
 
 			return
 		}

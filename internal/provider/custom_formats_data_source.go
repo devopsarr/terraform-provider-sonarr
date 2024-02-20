@@ -114,7 +114,7 @@ func (d *CustomFormatsDataSource) Configure(ctx context.Context, req datasource.
 
 func (d *CustomFormatsDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
 	// Get download clients current value
-	response, _, err := d.client.CustomFormatApi.ListCustomFormat(ctx).Execute()
+	response, _, err := d.client.CustomFormatAPI.ListCustomFormat(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, customFormatsDataSourceName, err))
 
@@ -125,7 +125,7 @@ func (d *CustomFormatsDataSource) Read(ctx context.Context, _ datasource.ReadReq
 	// Map response body to resource schema attribute
 	formats := make([]CustomFormat, len(response))
 	for i, p := range response {
-		formats[i].write(ctx, p, &resp.Diagnostics)
+		formats[i].write(ctx, &p, &resp.Diagnostics)
 	}
 
 	formatList, diags := types.SetValueFrom(ctx, CustomFormat{}.getType(), formats)

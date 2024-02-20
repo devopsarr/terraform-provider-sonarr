@@ -98,7 +98,7 @@ func (d *SeriesDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 		return
 	}
 	// Get series current value
-	response, _, err := d.client.SeriesApi.ListSeries(ctx).Execute()
+	response, _, err := d.client.SeriesAPI.ListSeries(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, seriesDataSourceName, err))
 
@@ -111,10 +111,10 @@ func (d *SeriesDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func (s *Series) find(ctx context.Context, title string, series []*sonarr.SeriesResource, diags *diag.Diagnostics) {
+func (s *Series) find(ctx context.Context, title string, series []sonarr.SeriesResource, diags *diag.Diagnostics) {
 	for _, ser := range series {
 		if ser.GetTitle() == title {
-			s.write(ctx, ser, diags)
+			s.write(ctx, &ser, diags)
 
 			return
 		}

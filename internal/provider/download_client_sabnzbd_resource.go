@@ -233,7 +233,7 @@ func (r *DownloadClientSabnzbdResource) Create(ctx context.Context, req resource
 	// Create new DownloadClientSabnzbd
 	request := client.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.DownloadClientApi.CreateDownloadClient(ctx).DownloadClientResource(*request).Execute()
+	response, _, err := r.client.DownloadClientAPI.CreateDownloadClient(ctx).DownloadClientResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, downloadClientSabnzbdResourceName, err))
 
@@ -257,7 +257,7 @@ func (r *DownloadClientSabnzbdResource) Read(ctx context.Context, req resource.R
 	}
 
 	// Get DownloadClientSabnzbd current value
-	response, _, err := r.client.DownloadClientApi.GetDownloadClientById(ctx, int32(client.ID.ValueInt64())).Execute()
+	response, _, err := r.client.DownloadClientAPI.GetDownloadClientById(ctx, int32(client.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, downloadClientSabnzbdResourceName, err))
 
@@ -283,7 +283,7 @@ func (r *DownloadClientSabnzbdResource) Update(ctx context.Context, req resource
 	// Update DownloadClientSabnzbd
 	request := client.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.DownloadClientApi.UpdateDownloadClient(ctx, strconv.Itoa(int(request.GetId()))).DownloadClientResource(*request).Execute()
+	response, _, err := r.client.DownloadClientAPI.UpdateDownloadClient(ctx, strconv.Itoa(int(request.GetId()))).DownloadClientResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, downloadClientSabnzbdResourceName, err))
 
@@ -306,7 +306,7 @@ func (r *DownloadClientSabnzbdResource) Delete(ctx context.Context, req resource
 	}
 
 	// Delete DownloadClientSabnzbd current value
-	_, err := r.client.DownloadClientApi.DeleteDownloadClient(ctx, int32(ID)).Execute()
+	_, err := r.client.DownloadClientAPI.DeleteDownloadClient(ctx, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, downloadClientSabnzbdResourceName, err))
 

@@ -176,7 +176,7 @@ func (d *IndexerDataSource) Read(ctx context.Context, req datasource.ReadRequest
 		return
 	}
 	// Get indexer current value
-	response, _, err := d.client.IndexerApi.ListIndexer(ctx).Execute()
+	response, _, err := d.client.IndexerAPI.ListIndexer(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerDataSourceName, err))
 
@@ -189,10 +189,10 @@ func (d *IndexerDataSource) Read(ctx context.Context, req datasource.ReadRequest
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func (i *Indexer) find(ctx context.Context, name string, indexers []*sonarr.IndexerResource, diags *diag.Diagnostics) {
+func (i *Indexer) find(ctx context.Context, name string, indexers []sonarr.IndexerResource, diags *diag.Diagnostics) {
 	for _, indexer := range indexers {
 		if indexer.GetName() == name {
-			i.write(ctx, indexer, diags)
+			i.write(ctx, &indexer, diags)
 
 			return
 		}

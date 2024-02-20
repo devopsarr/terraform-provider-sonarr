@@ -198,7 +198,7 @@ func (r *IndexerBroadcastheNetResource) Create(ctx context.Context, req resource
 	// Create new IndexerBroadcastheNet
 	request := indexer.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.IndexerApi.CreateIndexer(ctx).IndexerResource(*request).Execute()
+	response, _, err := r.client.IndexerAPI.CreateIndexer(ctx).IndexerResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, indexerBroadcastheNetResourceName, err))
 
@@ -222,7 +222,7 @@ func (r *IndexerBroadcastheNetResource) Read(ctx context.Context, req resource.R
 	}
 
 	// Get IndexerBroadcastheNet current value
-	response, _, err := r.client.IndexerApi.GetIndexerById(ctx, int32(indexer.ID.ValueInt64())).Execute()
+	response, _, err := r.client.IndexerAPI.GetIndexerById(ctx, int32(indexer.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerBroadcastheNetResourceName, err))
 
@@ -248,7 +248,7 @@ func (r *IndexerBroadcastheNetResource) Update(ctx context.Context, req resource
 	// Update IndexerBroadcastheNet
 	request := indexer.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.IndexerApi.UpdateIndexer(ctx, strconv.Itoa(int(request.GetId()))).IndexerResource(*request).Execute()
+	response, _, err := r.client.IndexerAPI.UpdateIndexer(ctx, strconv.Itoa(int(request.GetId()))).IndexerResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, indexerBroadcastheNetResourceName, err))
 
@@ -271,7 +271,7 @@ func (r *IndexerBroadcastheNetResource) Delete(ctx context.Context, req resource
 	}
 
 	// Delete IndexerBroadcastheNet current value
-	_, err := r.client.IndexerApi.DeleteIndexer(ctx, int32(ID)).Execute()
+	_, err := r.client.IndexerAPI.DeleteIndexer(ctx, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, indexerBroadcastheNetResourceName, err))
 

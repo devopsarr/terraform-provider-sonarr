@@ -115,7 +115,7 @@ func (d *MetadataConsumersDataSource) Configure(ctx context.Context, req datasou
 
 func (d *MetadataConsumersDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
 	// Get metadataConsumers current value
-	response, _, err := d.client.MetadataApi.ListMetadata(ctx).Execute()
+	response, _, err := d.client.MetadataAPI.ListMetadata(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.List, metadataConsumersDataSourceName, err))
 
@@ -126,7 +126,7 @@ func (d *MetadataConsumersDataSource) Read(ctx context.Context, _ datasource.Rea
 	// Map response body to resource schema attribute
 	consumers := make([]Metadata, len(response))
 	for i, p := range response {
-		consumers[i].write(ctx, p, &resp.Diagnostics)
+		consumers[i].write(ctx, &p, &resp.Diagnostics)
 	}
 
 	metadataList, diags := types.SetValueFrom(ctx, Metadata{}.getType(), consumers)

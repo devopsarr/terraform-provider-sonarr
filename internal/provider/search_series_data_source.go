@@ -98,7 +98,7 @@ func (d *SearchSeriesDataSource) Read(ctx context.Context, req datasource.ReadRe
 		return
 	}
 	// Get series current value
-	response, _, err := d.client.SeriesLookupApi.ListSeriesLookup(ctx).Term(strconv.Itoa(int(data.TvdbID.ValueInt64()))).Execute()
+	response, _, err := d.client.SeriesLookupAPI.ListSeriesLookup(ctx).Term(strconv.Itoa(int(data.TvdbID.ValueInt64()))).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, searchSearchSeriesDataSourceName, err))
 
@@ -112,6 +112,6 @@ func (d *SearchSeriesDataSource) Read(ctx context.Context, req datasource.ReadRe
 	}
 
 	tflog.Trace(ctx, "read "+searchSearchSeriesDataSourceName)
-	data.write(ctx, response[0], &resp.Diagnostics)
+	data.write(ctx, &response[0], &resp.Diagnostics)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }

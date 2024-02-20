@@ -111,7 +111,7 @@ func (d *AutoTagsDataSource) Configure(ctx context.Context, req datasource.Confi
 
 func (d *AutoTagsDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
 	// Get download clients current value
-	response, _, err := d.client.AutoTaggingApi.ListAutoTagging(ctx).Execute()
+	response, _, err := d.client.AutoTaggingAPI.ListAutoTagging(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, autoTagsDataSourceName, err))
 
@@ -122,7 +122,7 @@ func (d *AutoTagsDataSource) Read(ctx context.Context, _ datasource.ReadRequest,
 	// Map response body to resource schema attribute
 	autoTags := make([]AutoTag, len(response))
 	for i, a := range response {
-		autoTags[i].write(ctx, a, &resp.Diagnostics)
+		autoTags[i].write(ctx, &a, &resp.Diagnostics)
 	}
 
 	autoList, diags := types.SetValueFrom(ctx, AutoTag{}.getType(), autoTags)

@@ -95,7 +95,7 @@ func (r *ImportListExclusionResource) Create(ctx context.Context, req resource.C
 	// Create new ImportListExclusion
 	request := importListExclusion.read()
 
-	response, _, err := r.client.ImportListExclusionApi.CreateImportListExclusion(ctx).ImportListExclusionResource(*request).Execute()
+	response, _, err := r.client.ImportListExclusionAPI.CreateImportListExclusion(ctx).ImportListExclusionResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, importListExclusionResourceName, err))
 
@@ -119,7 +119,7 @@ func (r *ImportListExclusionResource) Read(ctx context.Context, req resource.Rea
 	}
 
 	// Get importListExclusion current value
-	response, _, err := r.client.ImportListExclusionApi.GetImportListExclusionById(ctx, int32(importListExclusion.ID.ValueInt64())).Execute()
+	response, _, err := r.client.ImportListExclusionAPI.GetImportListExclusionById(ctx, int32(importListExclusion.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, importListExclusionResourceName, err))
 
@@ -145,7 +145,7 @@ func (r *ImportListExclusionResource) Update(ctx context.Context, req resource.U
 	// Update ImportListExclusion
 	request := importListExclusion.read()
 
-	response, _, err := r.client.ImportListExclusionApi.UpdateImportListExclusion(ctx, strconv.Itoa(int(request.GetId()))).ImportListExclusionResource(*request).Execute()
+	response, _, err := r.client.ImportListExclusionAPI.UpdateImportListExclusion(ctx, strconv.Itoa(int(request.GetId()))).ImportListExclusionResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, importListExclusionResourceName, err))
 
@@ -168,7 +168,7 @@ func (r *ImportListExclusionResource) Delete(ctx context.Context, req resource.D
 	}
 
 	// Delete importListExclusion current value
-	_, err := r.client.ImportListExclusionApi.DeleteImportListExclusion(ctx, int32(ID)).Execute()
+	_, err := r.client.ImportListExclusionAPI.DeleteImportListExclusion(ctx, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, importListExclusionResourceName, err))
 

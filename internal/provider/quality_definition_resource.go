@@ -132,7 +132,7 @@ func (r *QualityDefinitionResource) Create(ctx context.Context, req resource.Cre
 	request := definition.read()
 
 	// Read to get the quality ID
-	read, _, err := r.client.QualityDefinitionApi.GetQualityDefinitionById(ctx, request.GetId()).Execute()
+	read, _, err := r.client.QualityDefinitionAPI.GetQualityDefinitionById(ctx, request.GetId()).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, qualityDefinitionResourceName, err))
 
@@ -143,7 +143,7 @@ func (r *QualityDefinitionResource) Create(ctx context.Context, req resource.Cre
 	request.Quality.SetSource(read.Quality.GetSource())
 
 	// Create new QualityDefinition
-	response, _, err := r.client.QualityDefinitionApi.UpdateQualityDefinition(ctx, strconv.Itoa(int(request.GetId()))).QualityDefinitionResource(*request).Execute()
+	response, _, err := r.client.QualityDefinitionAPI.UpdateQualityDefinition(ctx, strconv.Itoa(int(request.GetId()))).QualityDefinitionResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, qualityDefinitionResourceName, err))
 
@@ -167,7 +167,7 @@ func (r *QualityDefinitionResource) Read(ctx context.Context, req resource.ReadR
 	}
 
 	// Get qualitydefinition current value
-	response, _, err := r.client.QualityDefinitionApi.GetQualityDefinitionById(ctx, int32(definition.ID.ValueInt64())).Execute()
+	response, _, err := r.client.QualityDefinitionAPI.GetQualityDefinitionById(ctx, int32(definition.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, qualityDefinitionResourceName, err))
 
@@ -194,7 +194,7 @@ func (r *QualityDefinitionResource) Update(ctx context.Context, req resource.Upd
 	request := definition.read()
 
 	// Update QualityDefinition
-	response, _, err := r.client.QualityDefinitionApi.UpdateQualityDefinition(ctx, strconv.Itoa(int(request.GetId()))).QualityDefinitionResource(*request).Execute()
+	response, _, err := r.client.QualityDefinitionAPI.UpdateQualityDefinition(ctx, strconv.Itoa(int(request.GetId()))).QualityDefinitionResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, qualityDefinitionResourceName, err))
 

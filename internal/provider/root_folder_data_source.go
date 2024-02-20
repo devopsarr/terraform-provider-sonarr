@@ -81,7 +81,7 @@ func (d *RootFolderDataSource) Read(ctx context.Context, req datasource.ReadRequ
 		return
 	}
 	// Get rootfolders current value
-	response, _, err := d.client.RootFolderApi.ListRootFolder(ctx).Execute()
+	response, _, err := d.client.RootFolderAPI.ListRootFolder(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, rootFolderDataSourceName, err))
 
@@ -95,10 +95,10 @@ func (d *RootFolderDataSource) Read(ctx context.Context, req datasource.ReadRequ
 	resp.Diagnostics.Append(resp.State.Set(ctx, &folder)...)
 }
 
-func (r *RootFolder) find(ctx context.Context, path string, folders []*sonarr.RootFolderResource, diags *diag.Diagnostics) {
+func (r *RootFolder) find(ctx context.Context, path string, folders []sonarr.RootFolderResource, diags *diag.Diagnostics) {
 	for _, folder := range folders {
 		if folder.GetPath() == path {
-			r.write(ctx, folder, diags)
+			r.write(ctx, &folder, diags)
 
 			return
 		}

@@ -61,7 +61,7 @@ func (d *DownloadClientConfigDataSource) Configure(ctx context.Context, req data
 
 func (d *DownloadClientConfigDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
 	// Get indexer config current value
-	response, _, err := d.client.DownloadClientConfigApi.GetDownloadClientConfig(ctx).Execute()
+	response, _, err := d.client.DownloadClientConfigAPI.GetDownloadClientConfig(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, downloadClientConfigDataSourceName, err))
 

@@ -87,7 +87,7 @@ func (d *QualityDefinitionDataSource) Read(ctx context.Context, req datasource.R
 		return
 	}
 	// Get qualitydefinitions current value
-	response, _, err := d.client.QualityDefinitionApi.ListQualityDefinition(ctx).Execute()
+	response, _, err := d.client.QualityDefinitionAPI.ListQualityDefinition(ctx).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, qualityDefinitionDataSourceName, err))
 
@@ -100,10 +100,10 @@ func (d *QualityDefinitionDataSource) Read(ctx context.Context, req datasource.R
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
-func (p *QualityDefinition) find(id int64, definitions []*sonarr.QualityDefinitionResource, diags *diag.Diagnostics) {
+func (p *QualityDefinition) find(id int64, definitions []sonarr.QualityDefinitionResource, diags *diag.Diagnostics) {
 	for _, def := range definitions {
 		if int64(def.GetId()) == id {
-			p.write(def)
+			p.write(&def)
 
 			return
 		}
