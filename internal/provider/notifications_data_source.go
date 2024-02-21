@@ -24,6 +24,7 @@ func NewNotificationsDataSource() datasource.DataSource {
 // NotificationsDataSource defines the notifications implementation.
 type NotificationsDataSource struct {
 	client *sonarr.APIClient
+	auth   context.Context
 }
 
 // Notifications describes the notifications data model.
@@ -434,14 +435,15 @@ func (d *NotificationsDataSource) Schema(_ context.Context, _ datasource.SchemaR
 }
 
 func (d *NotificationsDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
-	if client := helpers.DataSourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := dataSourceConfigure(ctx, req, resp); client != nil {
 		d.client = client
+		d.auth = auth
 	}
 }
 
 func (d *NotificationsDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
 	// Get notifications current value
-	response, _, err := d.client.NotificationAPI.ListNotification(ctx).Execute()
+	response, _, err := d.client.NotificationAPI.ListNotification(d.auth).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, notificationsDataSourceName, err))
 

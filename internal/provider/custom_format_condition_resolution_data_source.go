@@ -27,6 +27,7 @@ func NewCustomFormatConditionResolutionDataSource() datasource.DataSource {
 // CustomFormatConditionResolutionDataSource defines the custom_format_condition_resolution implementation.
 type CustomFormatConditionResolutionDataSource struct {
 	client *sonarr.APIClient
+	auth   context.Context
 }
 
 func (d *CustomFormatConditionResolutionDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
@@ -69,8 +70,9 @@ func (d *CustomFormatConditionResolutionDataSource) Schema(_ context.Context, _ 
 }
 
 func (d *CustomFormatConditionResolutionDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
-	if client := helpers.DataSourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := dataSourceConfigure(ctx, req, resp); client != nil {
 		d.client = client
+		d.auth = auth
 	}
 }
 

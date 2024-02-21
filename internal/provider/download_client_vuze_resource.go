@@ -38,6 +38,7 @@ func NewDownloadClientVuzeResource() resource.Resource {
 // DownloadClientVuzeResource defines the download client implementation.
 type DownloadClientVuzeResource struct {
 	client *sonarr.APIClient
+	auth   context.Context
 }
 
 // DownloadClientVuze describes the download client data model.
@@ -222,8 +223,9 @@ func (r *DownloadClientVuzeResource) Schema(_ context.Context, _ resource.Schema
 }
 
 func (r *DownloadClientVuzeResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
-	if client := helpers.ResourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := resourceConfigure(ctx, req, resp); client != nil {
 		r.client = client
+		r.auth = auth
 	}
 }
 
@@ -240,7 +242,7 @@ func (r *DownloadClientVuzeResource) Create(ctx context.Context, req resource.Cr
 	// Create new DownloadClientVuze
 	request := client.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.DownloadClientAPI.CreateDownloadClient(ctx).DownloadClientResource(*request).Execute()
+	response, _, err := r.client.DownloadClientAPI.CreateDownloadClient(r.auth).DownloadClientResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, downloadClientVuzeResourceName, err))
 
@@ -264,7 +266,7 @@ func (r *DownloadClientVuzeResource) Read(ctx context.Context, req resource.Read
 	}
 
 	// Get DownloadClientVuze current value
-	response, _, err := r.client.DownloadClientAPI.GetDownloadClientById(ctx, int32(client.ID.ValueInt64())).Execute()
+	response, _, err := r.client.DownloadClientAPI.GetDownloadClientById(r.auth, int32(client.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, downloadClientVuzeResourceName, err))
 
@@ -290,7 +292,7 @@ func (r *DownloadClientVuzeResource) Update(ctx context.Context, req resource.Up
 	// Update DownloadClientVuze
 	request := client.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.DownloadClientAPI.UpdateDownloadClient(ctx, strconv.Itoa(int(request.GetId()))).DownloadClientResource(*request).Execute()
+	response, _, err := r.client.DownloadClientAPI.UpdateDownloadClient(r.auth, strconv.Itoa(int(request.GetId()))).DownloadClientResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, downloadClientVuzeResourceName, err))
 
@@ -313,7 +315,7 @@ func (r *DownloadClientVuzeResource) Delete(ctx context.Context, req resource.De
 	}
 
 	// Delete DownloadClientVuze current value
-	_, err := r.client.DownloadClientAPI.DeleteDownloadClient(ctx, int32(ID)).Execute()
+	_, err := r.client.DownloadClientAPI.DeleteDownloadClient(r.auth, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, downloadClientVuzeResourceName, err))
 

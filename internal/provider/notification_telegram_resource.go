@@ -35,6 +35,7 @@ func NewNotificationTelegramResource() resource.Resource {
 // NotificationTelegramResource defines the notification implementation.
 type NotificationTelegramResource struct {
 	client *sonarr.APIClient
+	auth   context.Context
 }
 
 // NotificationTelegram describes the notification data model.
@@ -210,8 +211,9 @@ func (r *NotificationTelegramResource) Schema(_ context.Context, _ resource.Sche
 }
 
 func (r *NotificationTelegramResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
-	if client := helpers.ResourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := resourceConfigure(ctx, req, resp); client != nil {
 		r.client = client
+		r.auth = auth
 	}
 }
 
@@ -228,7 +230,7 @@ func (r *NotificationTelegramResource) Create(ctx context.Context, req resource.
 	// Create new NotificationTelegram
 	request := notification.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.NotificationAPI.CreateNotification(ctx).NotificationResource(*request).Execute()
+	response, _, err := r.client.NotificationAPI.CreateNotification(r.auth).NotificationResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, notificationTelegramResourceName, err))
 
@@ -252,7 +254,7 @@ func (r *NotificationTelegramResource) Read(ctx context.Context, req resource.Re
 	}
 
 	// Get NotificationTelegram current value
-	response, _, err := r.client.NotificationAPI.GetNotificationById(ctx, int32(notification.ID.ValueInt64())).Execute()
+	response, _, err := r.client.NotificationAPI.GetNotificationById(r.auth, int32(notification.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, notificationTelegramResourceName, err))
 
@@ -278,7 +280,7 @@ func (r *NotificationTelegramResource) Update(ctx context.Context, req resource.
 	// Update NotificationTelegram
 	request := notification.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.NotificationAPI.UpdateNotification(ctx, strconv.Itoa(int(request.GetId()))).NotificationResource(*request).Execute()
+	response, _, err := r.client.NotificationAPI.UpdateNotification(r.auth, strconv.Itoa(int(request.GetId()))).NotificationResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, notificationTelegramResourceName, err))
 
@@ -301,7 +303,7 @@ func (r *NotificationTelegramResource) Delete(ctx context.Context, req resource.
 	}
 
 	// Delete NotificationTelegram current value
-	_, err := r.client.NotificationAPI.DeleteNotification(ctx, int32(ID)).Execute()
+	_, err := r.client.NotificationAPI.DeleteNotification(r.auth, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, notificationTelegramResourceName, err))
 

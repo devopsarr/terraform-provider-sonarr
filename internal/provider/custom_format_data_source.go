@@ -23,6 +23,7 @@ func NewCustomFormatDataSource() datasource.DataSource {
 // CustomFormatDataSource defines the custom_format implementation.
 type CustomFormatDataSource struct {
 	client *sonarr.APIClient
+	auth   context.Context
 }
 
 func (d *CustomFormatDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
@@ -88,8 +89,9 @@ func (d *CustomFormatDataSource) Schema(_ context.Context, _ datasource.SchemaRe
 }
 
 func (d *CustomFormatDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
-	if client := helpers.DataSourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := dataSourceConfigure(ctx, req, resp); client != nil {
 		d.client = client
+		d.auth = auth
 	}
 }
 
@@ -102,7 +104,7 @@ func (d *CustomFormatDataSource) Read(ctx context.Context, req datasource.ReadRe
 		return
 	}
 	// Get customFormat current value
-	response, _, err := d.client.CustomFormatAPI.ListCustomFormat(ctx).Execute()
+	response, _, err := d.client.CustomFormatAPI.ListCustomFormat(d.auth).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, customFormatDataSourceName, err))
 

@@ -27,6 +27,7 @@ func NewAutoTagConditionSeriesTypeDataSource() datasource.DataSource {
 // AutoTagConditionSeriesTypeDataSource defines the auto_tag_condition_series type implementation.
 type AutoTagConditionSeriesTypeDataSource struct {
 	client *sonarr.APIClient
+	auth   context.Context
 }
 
 func (d *AutoTagConditionSeriesTypeDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
@@ -69,8 +70,9 @@ func (d *AutoTagConditionSeriesTypeDataSource) Schema(_ context.Context, _ datas
 }
 
 func (d *AutoTagConditionSeriesTypeDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
-	if client := helpers.DataSourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := dataSourceConfigure(ctx, req, resp); client != nil {
 		d.client = client
+		d.auth = auth
 	}
 }
 

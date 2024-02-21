@@ -37,6 +37,7 @@ func NewNotificationWebhookResource() resource.Resource {
 // NotificationWebhookResource defines the notification implementation.
 type NotificationWebhookResource struct {
 	client *sonarr.APIClient
+	auth   context.Context
 }
 
 // NotificationWebhook describes the notification data model.
@@ -231,8 +232,9 @@ func (r *NotificationWebhookResource) Schema(_ context.Context, _ resource.Schem
 }
 
 func (r *NotificationWebhookResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
-	if client := helpers.ResourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := resourceConfigure(ctx, req, resp); client != nil {
 		r.client = client
+		r.auth = auth
 	}
 }
 
@@ -249,7 +251,7 @@ func (r *NotificationWebhookResource) Create(ctx context.Context, req resource.C
 	// Create new NotificationWebhook
 	request := notification.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.NotificationAPI.CreateNotification(ctx).NotificationResource(*request).Execute()
+	response, _, err := r.client.NotificationAPI.CreateNotification(r.auth).NotificationResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, notificationWebhookResourceName, err))
 
@@ -273,7 +275,7 @@ func (r *NotificationWebhookResource) Read(ctx context.Context, req resource.Rea
 	}
 
 	// Get NotificationWebhook current value
-	response, _, err := r.client.NotificationAPI.GetNotificationById(ctx, int32(notification.ID.ValueInt64())).Execute()
+	response, _, err := r.client.NotificationAPI.GetNotificationById(r.auth, int32(notification.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, notificationWebhookResourceName, err))
 
@@ -299,7 +301,7 @@ func (r *NotificationWebhookResource) Update(ctx context.Context, req resource.U
 	// Update NotificationWebhook
 	request := notification.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.NotificationAPI.UpdateNotification(ctx, strconv.Itoa(int(request.GetId()))).NotificationResource(*request).Execute()
+	response, _, err := r.client.NotificationAPI.UpdateNotification(r.auth, strconv.Itoa(int(request.GetId()))).NotificationResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, notificationWebhookResourceName, err))
 
@@ -322,7 +324,7 @@ func (r *NotificationWebhookResource) Delete(ctx context.Context, req resource.D
 	}
 
 	// Delete NotificationWebhook current value
-	_, err := r.client.NotificationAPI.DeleteNotification(ctx, int32(ID)).Execute()
+	_, err := r.client.NotificationAPI.DeleteNotification(r.auth, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, notificationWebhookResourceName, err))
 

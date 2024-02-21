@@ -24,6 +24,7 @@ func NewSeriesDataSource() datasource.DataSource {
 // SeriesDataSource defines the tags implementation.
 type SeriesDataSource struct {
 	client *sonarr.APIClient
+	auth   context.Context
 }
 
 func (d *SeriesDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
@@ -84,8 +85,9 @@ func (d *SeriesDataSource) Schema(_ context.Context, _ datasource.SchemaRequest,
 }
 
 func (d *SeriesDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
-	if client := helpers.DataSourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := dataSourceConfigure(ctx, req, resp); client != nil {
 		d.client = client
+		d.auth = auth
 	}
 }
 
@@ -98,7 +100,7 @@ func (d *SeriesDataSource) Read(ctx context.Context, req datasource.ReadRequest,
 		return
 	}
 	// Get series current value
-	response, _, err := d.client.SeriesAPI.ListSeries(ctx).Execute()
+	response, _, err := d.client.SeriesAPI.ListSeries(d.auth).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, seriesDataSourceName, err))
 

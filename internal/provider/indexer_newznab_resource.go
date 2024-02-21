@@ -36,6 +36,7 @@ func NewIndexerNewznabResource() resource.Resource {
 // IndexerNewznabResource defines the Newznab indexer implementation.
 type IndexerNewznabResource struct {
 	client *sonarr.APIClient
+	auth   context.Context
 }
 
 // IndexerNewznab describes the Newznab indexer data model.
@@ -192,8 +193,9 @@ func (r *IndexerNewznabResource) Schema(_ context.Context, _ resource.SchemaRequ
 }
 
 func (r *IndexerNewznabResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
-	if client := helpers.ResourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := resourceConfigure(ctx, req, resp); client != nil {
 		r.client = client
+		r.auth = auth
 	}
 }
 
@@ -210,7 +212,7 @@ func (r *IndexerNewznabResource) Create(ctx context.Context, req resource.Create
 	// Create new IndexerNewznab
 	request := indexer.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.IndexerAPI.CreateIndexer(ctx).IndexerResource(*request).Execute()
+	response, _, err := r.client.IndexerAPI.CreateIndexer(r.auth).IndexerResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, indexerNewznabResourceName, err))
 
@@ -234,7 +236,7 @@ func (r *IndexerNewznabResource) Read(ctx context.Context, req resource.ReadRequ
 	}
 
 	// Get IndexerNewznab current value
-	response, _, err := r.client.IndexerAPI.GetIndexerById(ctx, int32(indexer.ID.ValueInt64())).Execute()
+	response, _, err := r.client.IndexerAPI.GetIndexerById(r.auth, int32(indexer.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerNewznabResourceName, err))
 
@@ -260,7 +262,7 @@ func (r *IndexerNewznabResource) Update(ctx context.Context, req resource.Update
 	// Update IndexerNewznab
 	request := indexer.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.IndexerAPI.UpdateIndexer(ctx, strconv.Itoa(int(request.GetId()))).IndexerResource(*request).Execute()
+	response, _, err := r.client.IndexerAPI.UpdateIndexer(r.auth, strconv.Itoa(int(request.GetId()))).IndexerResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, indexerNewznabResourceName, err))
 
@@ -283,7 +285,7 @@ func (r *IndexerNewznabResource) Delete(ctx context.Context, req resource.Delete
 	}
 
 	// Delete IndexerNewznab current value
-	_, err := r.client.IndexerAPI.DeleteIndexer(ctx, int32(ID)).Execute()
+	_, err := r.client.IndexerAPI.DeleteIndexer(r.auth, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, indexerNewznabResourceName, err))
 

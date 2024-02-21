@@ -38,6 +38,7 @@ func NewHostResource() resource.Resource {
 // HostResource defines the host implementation.
 type HostResource struct {
 	client *sonarr.APIClient
+	auth   context.Context
 }
 
 // Host describes the host data model.
@@ -396,8 +397,9 @@ func (r *HostResource) Schema(_ context.Context, _ resource.SchemaRequest, resp 
 }
 
 func (r *HostResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
-	if client := helpers.ResourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := resourceConfigure(ctx, req, resp); client != nil {
 		r.client = client
+		r.auth = auth
 	}
 }
 
@@ -416,7 +418,7 @@ func (r *HostResource) Create(ctx context.Context, req resource.CreateRequest, r
 	request.SetId(1)
 
 	// Create new Host
-	response, _, err := r.client.HostConfigAPI.UpdateHostConfig(ctx, strconv.Itoa(int(request.GetId()))).HostConfigResource(*request).Execute()
+	response, _, err := r.client.HostConfigAPI.UpdateHostConfig(r.auth, strconv.Itoa(int(request.GetId()))).HostConfigResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, hostResourceName, err))
 
@@ -440,7 +442,7 @@ func (r *HostResource) Read(ctx context.Context, req resource.ReadRequest, resp 
 	}
 
 	// Get host current value
-	response, _, err := r.client.HostConfigAPI.GetHostConfig(ctx).Execute()
+	response, _, err := r.client.HostConfigAPI.GetHostConfig(r.auth).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, hostResourceName, err))
 
@@ -467,7 +469,7 @@ func (r *HostResource) Update(ctx context.Context, req resource.UpdateRequest, r
 	request := host.read(ctx, &resp.Diagnostics)
 
 	// Update Host
-	response, _, err := r.client.HostConfigAPI.UpdateHostConfig(ctx, strconv.Itoa(int(request.GetId()))).HostConfigResource(*request).Execute()
+	response, _, err := r.client.HostConfigAPI.UpdateHostConfig(r.auth, strconv.Itoa(int(request.GetId()))).HostConfigResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, hostResourceName, err))
 

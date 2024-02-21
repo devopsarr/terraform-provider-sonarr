@@ -38,6 +38,7 @@ func NewImportListSimklUserResource() resource.Resource {
 // ImportListSimklUserResource defines the import list implementation.
 type ImportListSimklUserResource struct {
 	client *sonarr.APIClient
+	auth   context.Context
 }
 
 // ImportListSimklUser describes the import list data model.
@@ -186,8 +187,9 @@ func (r *ImportListSimklUserResource) Schema(_ context.Context, _ resource.Schem
 }
 
 func (r *ImportListSimklUserResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
-	if client := helpers.ResourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := resourceConfigure(ctx, req, resp); client != nil {
 		r.client = client
+		r.auth = auth
 	}
 }
 
@@ -204,7 +206,7 @@ func (r *ImportListSimklUserResource) Create(ctx context.Context, req resource.C
 	// Create new ImportListSimklUser
 	request := importList.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.ImportListAPI.CreateImportList(ctx).ImportListResource(*request).Execute()
+	response, _, err := r.client.ImportListAPI.CreateImportList(r.auth).ImportListResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, importListSimklUserResourceName, err))
 
@@ -228,7 +230,7 @@ func (r *ImportListSimklUserResource) Read(ctx context.Context, req resource.Rea
 	}
 
 	// Get ImportListSimklUser current value
-	response, _, err := r.client.ImportListAPI.GetImportListById(ctx, int32(importList.ID.ValueInt64())).Execute()
+	response, _, err := r.client.ImportListAPI.GetImportListById(r.auth, int32(importList.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, importListSimklUserResourceName, err))
 
@@ -254,7 +256,7 @@ func (r *ImportListSimklUserResource) Update(ctx context.Context, req resource.U
 	// Update ImportListSimklUser
 	request := importList.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.ImportListAPI.UpdateImportList(ctx, strconv.Itoa(int(request.GetId()))).ImportListResource(*request).Execute()
+	response, _, err := r.client.ImportListAPI.UpdateImportList(r.auth, strconv.Itoa(int(request.GetId()))).ImportListResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, importListSimklUserResourceName, err))
 
@@ -277,7 +279,7 @@ func (r *ImportListSimklUserResource) Delete(ctx context.Context, req resource.D
 	}
 
 	// Delete ImportListSimklUser current value
-	_, err := r.client.ImportListAPI.DeleteImportList(ctx, int32(ID)).Execute()
+	_, err := r.client.ImportListAPI.DeleteImportList(r.auth, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, importListSimklUserResourceName, err))
 

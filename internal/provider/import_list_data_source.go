@@ -24,6 +24,7 @@ func NewImportListDataSource() datasource.DataSource {
 // ImportListDataSource defines the import_list implementation.
 type ImportListDataSource struct {
 	client *sonarr.APIClient
+	auth   context.Context
 }
 
 func (d *ImportListDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
@@ -172,8 +173,9 @@ func (d *ImportListDataSource) Schema(_ context.Context, _ datasource.SchemaRequ
 }
 
 func (d *ImportListDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
-	if client := helpers.DataSourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := dataSourceConfigure(ctx, req, resp); client != nil {
 		d.client = client
+		d.auth = auth
 	}
 }
 
@@ -186,7 +188,7 @@ func (d *ImportListDataSource) Read(ctx context.Context, req datasource.ReadRequ
 		return
 	}
 	// Get importList current value
-	response, _, err := d.client.ImportListAPI.ListImportList(ctx).Execute()
+	response, _, err := d.client.ImportListAPI.ListImportList(d.auth).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, importListDataSourceName, err))
 

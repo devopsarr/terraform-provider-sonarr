@@ -24,6 +24,7 @@ func NewSearchSeriesDataSource() datasource.DataSource {
 // SearchSeriesDataSource defines the tags implementation.
 type SearchSeriesDataSource struct {
 	client *sonarr.APIClient
+	auth   context.Context
 }
 
 func (d *SearchSeriesDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
@@ -84,8 +85,9 @@ func (d *SearchSeriesDataSource) Schema(_ context.Context, _ datasource.SchemaRe
 }
 
 func (d *SearchSeriesDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
-	if client := helpers.DataSourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := dataSourceConfigure(ctx, req, resp); client != nil {
 		d.client = client
+		d.auth = auth
 	}
 }
 
@@ -98,7 +100,7 @@ func (d *SearchSeriesDataSource) Read(ctx context.Context, req datasource.ReadRe
 		return
 	}
 	// Get series current value
-	response, _, err := d.client.SeriesLookupAPI.ListSeriesLookup(ctx).Term(strconv.Itoa(int(data.TvdbID.ValueInt64()))).Execute()
+	response, _, err := d.client.SeriesLookupAPI.ListSeriesLookup(d.auth).Term(strconv.Itoa(int(data.TvdbID.ValueInt64()))).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, searchSearchSeriesDataSourceName, err))
 

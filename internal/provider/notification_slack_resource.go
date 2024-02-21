@@ -35,6 +35,7 @@ func NewNotificationSlackResource() resource.Resource {
 // NotificationSlackResource defines the notification implementation.
 type NotificationSlackResource struct {
 	client *sonarr.APIClient
+	auth   context.Context
 }
 
 // NotificationSlack describes the notification data model.
@@ -225,8 +226,9 @@ func (r *NotificationSlackResource) Schema(_ context.Context, _ resource.SchemaR
 }
 
 func (r *NotificationSlackResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
-	if client := helpers.ResourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := resourceConfigure(ctx, req, resp); client != nil {
 		r.client = client
+		r.auth = auth
 	}
 }
 
@@ -243,7 +245,7 @@ func (r *NotificationSlackResource) Create(ctx context.Context, req resource.Cre
 	// Create new NotificationSlack
 	request := notification.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.NotificationAPI.CreateNotification(ctx).NotificationResource(*request).Execute()
+	response, _, err := r.client.NotificationAPI.CreateNotification(r.auth).NotificationResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Create, notificationSlackResourceName, err))
 
@@ -267,7 +269,7 @@ func (r *NotificationSlackResource) Read(ctx context.Context, req resource.ReadR
 	}
 
 	// Get NotificationSlack current value
-	response, _, err := r.client.NotificationAPI.GetNotificationById(ctx, int32(notification.ID.ValueInt64())).Execute()
+	response, _, err := r.client.NotificationAPI.GetNotificationById(r.auth, int32(notification.ID.ValueInt64())).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, notificationSlackResourceName, err))
 
@@ -293,7 +295,7 @@ func (r *NotificationSlackResource) Update(ctx context.Context, req resource.Upd
 	// Update NotificationSlack
 	request := notification.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.NotificationAPI.UpdateNotification(ctx, strconv.Itoa(int(request.GetId()))).NotificationResource(*request).Execute()
+	response, _, err := r.client.NotificationAPI.UpdateNotification(r.auth, strconv.Itoa(int(request.GetId()))).NotificationResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, notificationSlackResourceName, err))
 
@@ -316,7 +318,7 @@ func (r *NotificationSlackResource) Delete(ctx context.Context, req resource.Del
 	}
 
 	// Delete NotificationSlack current value
-	_, err := r.client.NotificationAPI.DeleteNotification(ctx, int32(ID)).Execute()
+	_, err := r.client.NotificationAPI.DeleteNotification(r.auth, int32(ID)).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, notificationSlackResourceName, err))
 

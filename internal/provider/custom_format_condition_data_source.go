@@ -31,6 +31,7 @@ func NewCustomFormatConditionDataSource() datasource.DataSource {
 // CustomFormatConditionDataSource defines the custom format condition implementation.
 type CustomFormatConditionDataSource struct {
 	client *sonarr.APIClient
+	auth   context.Context
 }
 
 // CustomFormatCondition describes the custom format condition data model.
@@ -125,8 +126,9 @@ func (d *CustomFormatConditionDataSource) Schema(_ context.Context, _ datasource
 }
 
 func (d *CustomFormatConditionDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
-	if client := helpers.DataSourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := dataSourceConfigure(ctx, req, resp); client != nil {
 		d.client = client
+		d.auth = auth
 	}
 }
 

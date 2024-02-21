@@ -22,6 +22,7 @@ func NewDownloadClientConfigDataSource() datasource.DataSource {
 // DownloadClientConfigDataSource defines the download client config implementation.
 type DownloadClientConfigDataSource struct {
 	client *sonarr.APIClient
+	auth   context.Context
 }
 
 func (d *DownloadClientConfigDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
@@ -54,14 +55,15 @@ func (d *DownloadClientConfigDataSource) Schema(_ context.Context, _ datasource.
 }
 
 func (d *DownloadClientConfigDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
-	if client := helpers.DataSourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := dataSourceConfigure(ctx, req, resp); client != nil {
 		d.client = client
+		d.auth = auth
 	}
 }
 
 func (d *DownloadClientConfigDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
 	// Get indexer config current value
-	response, _, err := d.client.DownloadClientConfigAPI.GetDownloadClientConfig(ctx).Execute()
+	response, _, err := d.client.DownloadClientConfigAPI.GetDownloadClientConfig(d.auth).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, downloadClientConfigDataSourceName, err))
 

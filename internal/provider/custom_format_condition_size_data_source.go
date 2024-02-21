@@ -27,6 +27,7 @@ func NewCustomFormatConditionSizeDataSource() datasource.DataSource {
 // CustomFormatConditionSizeDataSource defines the custom_format_condition_size implementation.
 type CustomFormatConditionSizeDataSource struct {
 	client *sonarr.APIClient
+	auth   context.Context
 }
 
 func (d *CustomFormatConditionSizeDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
@@ -73,8 +74,9 @@ func (d *CustomFormatConditionSizeDataSource) Schema(_ context.Context, _ dataso
 }
 
 func (d *CustomFormatConditionSizeDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
-	if client := helpers.DataSourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := dataSourceConfigure(ctx, req, resp); client != nil {
 		d.client = client
+		d.auth = auth
 	}
 }
 

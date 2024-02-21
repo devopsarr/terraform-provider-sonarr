@@ -24,6 +24,7 @@ func NewAutoTagsDataSource() datasource.DataSource {
 // AutoTagsDataSource defines the download clients implementation.
 type AutoTagsDataSource struct {
 	client *sonarr.APIClient
+	auth   context.Context
 }
 
 // AutoTags describes the download clients data model.
@@ -104,14 +105,15 @@ func (d *AutoTagsDataSource) Schema(_ context.Context, _ datasource.SchemaReques
 }
 
 func (d *AutoTagsDataSource) Configure(ctx context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) {
-	if client := helpers.DataSourceConfigure(ctx, req, resp); client != nil {
+	if auth, client := dataSourceConfigure(ctx, req, resp); client != nil {
 		d.client = client
+		d.auth = auth
 	}
 }
 
 func (d *AutoTagsDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
 	// Get download clients current value
-	response, _, err := d.client.AutoTaggingAPI.ListAutoTagging(ctx).Execute()
+	response, _, err := d.client.AutoTaggingAPI.ListAutoTagging(d.auth).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, autoTagsDataSourceName, err))
 
