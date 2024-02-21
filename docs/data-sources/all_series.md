@@ -8,7 +8,8 @@ description: |-
 
 # sonarr_all_series (Data Source)
 
-<!-- subcategory:Series -->List all available [Series](../resources/series).
+<!-- subcategory:Series -->
+List all available [Series](../resources/series).
 
 ## Example Usage
 
@@ -41,5 +42,3 @@ Read-Only:
 - `title_slug` (String) Series Title in kebab format.
 - `tvdb_id` (Number) TVDB ID.
 - `use_scene_numbering` (Boolean) Scene numbering flag.
-
-

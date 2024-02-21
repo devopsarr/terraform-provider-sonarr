@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_auto_tag_condition_root_folder (Data Source)
 
-<!-- subcategory:Tags --> Auto Tag Condition Root Folder data source.
+<!-- subcategory:Tags -->
+ Auto Tag Condition Root Folder data source.
 For more intagion refer to [Auto Tag Conditions](https://wiki.servarr.com/sonarr/settings#conditions).
 
 ## Example Usage
@@ -46,5 +47,3 @@ resource "sonarr_custom_format" "example" {
 
 - `id` (Number) Auto tag condition root folder ID.
 - `implementation` (String) Implementation.
-
-

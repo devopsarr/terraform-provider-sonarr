@@ -8,7 +8,8 @@ description: |-
 
 # sonarr_import_list_exclusions (Data Source)
 
-<!-- subcategory:Import Lists -->List all available [ImportListExclusions](../resources/importListExclusion).
+<!-- subcategory:Import Lists -->
+List all available [ImportListExclusions](../resources/importListExclusion).
 
 ## Example Usage
 
@@ -33,5 +34,3 @@ Read-Only:
 - `id` (Number) ImportListExclusion ID.
 - `title` (String) Series to be excluded.
 - `tvdb_id` (Number) Series TVDB ID.
-
-

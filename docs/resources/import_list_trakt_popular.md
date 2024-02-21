@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_import_list_trakt_popular (Resource)
 
-<!-- subcategory:Import Lists -->ImportList TraktPopular resource.
+<!-- subcategory:Import Lists -->
+ImportList TraktPopular resource.
 For more information refer to [Import List](https://wiki.servarr.com/sonarr/settings#import-lists) and [TraktPopular](https://wiki.servarr.com/sonarr/supported#trakt_popular).
 
 ## Example Usage

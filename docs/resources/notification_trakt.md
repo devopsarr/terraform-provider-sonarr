@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_notification_trakt (Resource)
 
-<!-- subcategory:Notifications -->Notification Trakt resource.
+<!-- subcategory:Notifications -->
+Notification Trakt resource.
 For more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect) and [Trakt](https://wiki.servarr.com/sonarr/supported#trakt).
 
 ## Example Usage

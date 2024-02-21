@@ -90,7 +90,7 @@ func (r *ImportListPlexRSSResource) Metadata(_ context.Context, req resource.Met
 
 func (r *ImportListPlexRSSResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Import Lists -->ImportList Plex RSS resource.\nFor more information refer to [Import List](https://wiki.servarr.com/sonarr/settings#import-lists) and [Plex RSS](https://wiki.servarr.com/sonarr/supported#plexrssimport).",
+		MarkdownDescription: "<!-- subcategory:Import Lists -->\nImportList Plex RSS resource.\nFor more information refer to [Import List](https://wiki.servarr.com/sonarr/settings#import-lists) and [Plex RSS](https://wiki.servarr.com/sonarr/supported#plexrssimport).",
 		Attributes: map[string]schema.Attribute{
 			"enable_automatic_add": schema.BoolAttribute{
 				MarkdownDescription: "Enable automatic add flag.",

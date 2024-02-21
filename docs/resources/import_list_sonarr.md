@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_import_list_sonarr (Resource)
 
-<!-- subcategory:Import Lists -->ImportList Sonarr resource.
+<!-- subcategory:Import Lists -->
+ImportList Sonarr resource.
 For more information refer to [Import List](https://wiki.servarr.com/sonarr/settings#import-lists) and [Sonarr](https://wiki.servarr.com/sonarr/supported#sonarr).
 
 ## Example Usage

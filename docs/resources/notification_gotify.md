@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_notification_gotify (Resource)
 
-<!-- subcategory:Notifications -->Notification Gotify resource.
+<!-- subcategory:Notifications -->
+Notification Gotify resource.
 For more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect) and [Gotify](https://wiki.servarr.com/sonarr/supported#gotify).
 
 ## Example Usage

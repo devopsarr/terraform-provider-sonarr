@@ -40,7 +40,7 @@ func (d *NotificationsDataSource) Metadata(_ context.Context, req datasource.Met
 func (d *NotificationsDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the delay server.
-		MarkdownDescription: "<!-- subcategory:Notifications -->List all available [Notifications](../resources/notification).",
+		MarkdownDescription: "<!-- subcategory:Notifications -->\nList all available [Notifications](../resources/notification).",
 		Attributes: map[string]schema.Attribute{
 			// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 			"id": schema.StringAttribute{

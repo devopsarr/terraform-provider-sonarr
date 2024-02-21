@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_indexer_nyaa (Resource)
 
-<!-- subcategory:Indexers -->Indexer Nyaa resource.
+<!-- subcategory:Indexers -->
+Indexer Nyaa resource.
 For more information refer to [Indexer](https://wiki.servarr.com/sonarr/settings#indexers) and [Nyaa](https://wiki.servarr.com/sonarr/supported#nyaa).
 
 ## Example Usage

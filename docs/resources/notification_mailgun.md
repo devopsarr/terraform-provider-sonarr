@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_notification_mailgun (Resource)
 
-<!-- subcategory:Notifications -->Notification Mailgun resource.
+<!-- subcategory:Notifications -->
+Notification Mailgun resource.
 For more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect) and [Mailgun](https://wiki.servarr.com/sonarr/supported#mailgun).
 
 ## Example Usage

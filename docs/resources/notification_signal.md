@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_notification_signal (Resource)
 
-<!-- subcategory:Notifications -->Notification Signal resource.
+<!-- subcategory:Notifications -->
+Notification Signal resource.
 For more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect) and [Signal](https://wiki.servarr.com/sonarr/supported#signal).
 
 ## Example Usage

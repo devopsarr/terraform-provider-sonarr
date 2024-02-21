@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_import_list_plex_rss (Resource)
 
-<!-- subcategory:Import Lists -->ImportList Plex RSS resource.
+<!-- subcategory:Import Lists -->
+ImportList Plex RSS resource.
 For more information refer to [Import List](https://wiki.servarr.com/sonarr/settings#import-lists) and [Plex RSS](https://wiki.servarr.com/sonarr/supported#plexrssimport).
 
 ## Example Usage

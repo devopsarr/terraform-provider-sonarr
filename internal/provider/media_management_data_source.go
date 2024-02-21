@@ -32,7 +32,7 @@ func (d *MediaManagementDataSource) Metadata(_ context.Context, req datasource.M
 func (d *MediaManagementDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the delay server.
-		MarkdownDescription: "<!-- subcategory:Media Management -->[Media Management](../resources/media_management).",
+		MarkdownDescription: "<!-- subcategory:Media Management -->\n[Media Management](../resources/media_management).",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
 				MarkdownDescription: "Delay Profile ID.",

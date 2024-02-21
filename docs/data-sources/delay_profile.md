@@ -8,7 +8,8 @@ description: |-
 
 # sonarr_delay_profile (Data Source)
 
-<!-- subcategory:Profiles -->Single [Delay Profile](../resources/delay_profile).
+<!-- subcategory:Profiles -->
+Single [Delay Profile](../resources/delay_profile).
 
 ## Example Usage
 
@@ -37,5 +38,3 @@ data "sonarr_delay_profile" "example" {
 - `tags` (Set of Number) List of associated tags.
 - `torrent_delay` (Number) Torrent Delay.
 - `usenet_delay` (Number) Usenet delay.
-
-

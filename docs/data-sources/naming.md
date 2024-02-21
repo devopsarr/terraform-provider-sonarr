@@ -8,7 +8,8 @@ description: |-
 
 # sonarr_naming (Data Source)
 
-<!-- subcategory:Media Management -->[Naming](../resources/naming).
+<!-- subcategory:Media Management -->
+[Naming](../resources/naming).
 
 ## Example Usage
 
@@ -33,5 +34,3 @@ data "sonarr_naming" "example" {
 - `series_folder_format` (String) Series folder format.
 - `specials_folder_format` (String) Special folder format.
 - `standard_episode_format` (String) Standard episode formatss.
-
-

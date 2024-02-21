@@ -56,7 +56,7 @@ func (r *ImportListExclusionResource) Metadata(_ context.Context, req resource.M
 
 func (r *ImportListExclusionResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Import Lists -->Import List Exclusion resource.\nFor more information refer to [ImportListExclusions](https://wiki.servarr.com/sonarr/settings#list-exclusions) documentation.",
+		MarkdownDescription: "<!-- subcategory:Import Lists -->\nImport List Exclusion resource.\nFor more information refer to [ImportListExclusions](https://wiki.servarr.com/sonarr/settings#list-exclusions) documentation.",
 		Attributes: map[string]schema.Attribute{
 			"tvdb_id": schema.Int64Attribute{
 				MarkdownDescription: "Series TVDB ID.",

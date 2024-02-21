@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_indexer_newznab (Resource)
 
-<!-- subcategory:Indexers -->Indexer Newznab resource.
+<!-- subcategory:Indexers -->
+Indexer Newznab resource.
 For more information refer to [Indexer](https://wiki.servarr.com/sonarr/settings#indexers) and [Newznab](https://wiki.servarr.com/sonarr/supported#newznab).
 
 ## Example Usage

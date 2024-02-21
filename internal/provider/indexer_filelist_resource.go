@@ -111,7 +111,7 @@ func (r *IndexerFilelistResource) Metadata(_ context.Context, req resource.Metad
 
 func (r *IndexerFilelistResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Indexers -->Indexer FileList resource.\nFor more information refer to [Indexer](https://wiki.servarr.com/sonarr/settings#indexers) and [FileList](https://wiki.servarr.com/sonarr/supported#filelist).",
+		MarkdownDescription: "<!-- subcategory:Indexers -->\nIndexer FileList resource.\nFor more information refer to [Indexer](https://wiki.servarr.com/sonarr/settings#indexers) and [FileList](https://wiki.servarr.com/sonarr/supported#filelist).",
 		Attributes: map[string]schema.Attribute{
 			"enable_automatic_search": schema.BoolAttribute{
 				MarkdownDescription: "Enable automatic search flag.",

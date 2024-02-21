@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_metadata_kodi (Resource)
 
-<!-- subcategory:Metadata -->Metadata Kodi resource.
+<!-- subcategory:Metadata -->
+Metadata Kodi resource.
 For more information refer to [Metadata](https://wiki.servarr.com/sonarr/settings#metadata) and [KODI](https://wiki.servarr.com/sonarr/supported#xbmcmetadata).
 
 ## Example Usage

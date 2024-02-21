@@ -124,7 +124,7 @@ func (r *DownloadClientQbittorrentResource) Metadata(_ context.Context, req reso
 
 func (r *DownloadClientQbittorrentResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Download Clients -->Download Client qBittorrent resource.\nFor more information refer to [Download Client](https://wiki.servarr.com/sonarr/settings#download-clients) and [qBittorrent](https://wiki.servarr.com/sonarr/supported#qbittorrent).",
+		MarkdownDescription: "<!-- subcategory:Download Clients -->\nDownload Client qBittorrent resource.\nFor more information refer to [Download Client](https://wiki.servarr.com/sonarr/settings#download-clients) and [qBittorrent](https://wiki.servarr.com/sonarr/supported#qbittorrent).",
 		Attributes: map[string]schema.Attribute{
 			"enable": schema.BoolAttribute{
 				MarkdownDescription: "Enable flag.",

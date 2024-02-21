@@ -8,7 +8,8 @@ description: |-
 
 # sonarr_host (Data Source)
 
-<!-- subcategory:System -->[Host](../resources/host).
+<!-- subcategory:System -->
+[Host](../resources/host).
 
 ## Example Usage
 
@@ -104,5 +105,3 @@ Read-Only:
 - `mechanism` (String) Update mechanism.
 - `script_path` (String) Script path.
 - `update_automatically` (Boolean) Update automatically flag.
-
-

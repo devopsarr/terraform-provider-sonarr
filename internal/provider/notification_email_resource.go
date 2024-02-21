@@ -130,7 +130,7 @@ func (r *NotificationEmailResource) Metadata(_ context.Context, req resource.Met
 
 func (r *NotificationEmailResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Notifications -->Notification Email resource.\nFor more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect) and [Email](https://wiki.servarr.com/sonarr/supported#email).",
+		MarkdownDescription: "<!-- subcategory:Notifications -->\nNotification Email resource.\nFor more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect) and [Email](https://wiki.servarr.com/sonarr/supported#email).",
 		Attributes: map[string]schema.Attribute{
 			"on_grab": schema.BoolAttribute{
 				MarkdownDescription: "On grab flag.",

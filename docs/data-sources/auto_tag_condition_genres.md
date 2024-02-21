@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_auto_tag_condition_genres (Data Source)
 
-<!-- subcategory:Tags --> Auto Tag Condition Genres data source.
+<!-- subcategory:Tags -->
+ Auto Tag Condition Genres data source.
 For more intagion refer to [Auto Tag Conditions](https://wiki.servarr.com/sonarr/settings#conditions).
 
 
@@ -28,5 +29,3 @@ For more intagion refer to [Auto Tag Conditions](https://wiki.servarr.com/sonarr
 
 - `id` (Number) Auto tag condition series type ID.
 - `implementation` (String) Implementation.
-
-

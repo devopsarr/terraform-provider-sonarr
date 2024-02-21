@@ -5,12 +5,13 @@ subcategory: "Profiles"
 description: |-
   Generic Custom Format Condition data source. When possible use a specific data source instead.
   For more information refer to Custom Format Conditions https://wiki.servarr.com/sonarr/settings#conditions.
-   To be used in conjunction with Custom Format ../resources/custom_format.
+  To be used in conjunction with Custom Format ../resources/custom_format.
 ---
 
 # sonarr_custom_format_condition (Data Source)
 
-<!-- subcategory:Profiles --> Generic Custom Format Condition data source. When possible use a specific data source instead.
+<!-- subcategory:Profiles -->
+ Generic Custom Format Condition data source. When possible use a specific data source instead.
 For more information refer to [Custom Format Conditions](https://wiki.servarr.com/sonarr/settings#conditions).
  To be used in conjunction with [Custom Format](../resources/custom_format).
 
@@ -53,5 +54,3 @@ resource "sonarr_custom_format" "example" {
 ### Read-Only
 
 - `id` (Number) Custom format condition ID.
-
-

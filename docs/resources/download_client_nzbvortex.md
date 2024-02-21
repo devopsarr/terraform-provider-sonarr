@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_download_client_nzbvortex (Resource)
 
-<!-- subcategory:Download Clients -->Download Client Nzbvortex resource.
+<!-- subcategory:Download Clients -->
+Download Client Nzbvortex resource.
 For more information refer to [Download Client](https://wiki.servarr.com/sonarr/settings#download-clients) and [Nzbvortex](https://wiki.servarr.com/sonarr/supported#nzbvortex).
 
 ## Example Usage

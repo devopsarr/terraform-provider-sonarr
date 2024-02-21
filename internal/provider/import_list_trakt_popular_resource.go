@@ -118,7 +118,7 @@ func (r *ImportListTraktPopularResource) Metadata(_ context.Context, req resourc
 
 func (r *ImportListTraktPopularResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Import Lists -->ImportList TraktPopular resource.\nFor more information refer to [Import List](https://wiki.servarr.com/sonarr/settings#import-lists) and [TraktPopular](https://wiki.servarr.com/sonarr/supported#trakt_popular).",
+		MarkdownDescription: "<!-- subcategory:Import Lists -->\nImportList TraktPopular resource.\nFor more information refer to [Import List](https://wiki.servarr.com/sonarr/settings#import-lists) and [TraktPopular](https://wiki.servarr.com/sonarr/supported#trakt_popular).",
 		Attributes: map[string]schema.Attribute{
 			"enable_automatic_add": schema.BoolAttribute{
 				MarkdownDescription: "Enable automatic add flag.",

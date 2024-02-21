@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_import_list_custom (Resource)
 
-<!-- subcategory:Import Lists -->ImportList Custom resource.
+<!-- subcategory:Import Lists -->
+ImportList Custom resource.
 For more information refer to [Import List](https://wiki.servarr.com/sonarr/settings#import-lists) and [Custom](https://wiki.servarr.com/sonarr/supported#customimport).
 
 ## Example Usage

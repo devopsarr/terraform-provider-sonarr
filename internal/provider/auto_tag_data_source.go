@@ -34,7 +34,7 @@ func (d *AutoTagDataSource) Metadata(_ context.Context, req datasource.MetadataR
 func (d *AutoTagDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the delay server.
-		MarkdownDescription: "<!-- subcategory:Tags -->Single [Auto Tag](../resources/auto_tag).",
+		MarkdownDescription: "<!-- subcategory:Tags -->\nSingle [Auto Tag](../resources/auto_tag).",
 		Attributes: map[string]schema.Attribute{
 			"remove_tags_automatically": schema.BoolAttribute{
 				MarkdownDescription: "Remove tags automatically flag.",

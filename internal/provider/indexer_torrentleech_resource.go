@@ -102,7 +102,7 @@ func (r *IndexerTorrentleechResource) Metadata(_ context.Context, req resource.M
 
 func (r *IndexerTorrentleechResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Indexers -->Indexer Torrentleech resource.\nFor more information refer to [Indexer](https://wiki.servarr.com/sonarr/settings#indexers) and [Torrentleech](https://wiki.servarr.com/sonarr/supported#torrentleech).",
+		MarkdownDescription: "<!-- subcategory:Indexers -->\nIndexer Torrentleech resource.\nFor more information refer to [Indexer](https://wiki.servarr.com/sonarr/settings#indexers) and [Torrentleech](https://wiki.servarr.com/sonarr/supported#torrentleech).",
 		Attributes: map[string]schema.Attribute{
 			"enable_automatic_search": schema.BoolAttribute{
 				MarkdownDescription: "Enable automatic search flag.",

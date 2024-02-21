@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_indexer_torrentleech (Resource)
 
-<!-- subcategory:Indexers -->Indexer Torrentleech resource.
+<!-- subcategory:Indexers -->
+Indexer Torrentleech resource.
 For more information refer to [Indexer](https://wiki.servarr.com/sonarr/settings#indexers) and [Torrentleech](https://wiki.servarr.com/sonarr/supported#torrentleech).
 
 ## Example Usage

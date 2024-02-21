@@ -8,7 +8,8 @@ description: |-
 
 # sonarr_remote_path_mappings (Data Source)
 
-<!-- subcategory:Download Clients -->List all available [Remote Path Mappings](../resources/remote_path_mapping).
+<!-- subcategory:Download Clients -->
+List all available [Remote Path Mappings](../resources/remote_path_mapping).
 
 ## Example Usage
 
@@ -34,5 +35,3 @@ Read-Only:
 - `id` (Number) RemotePathMapping ID.
 - `local_path` (String) Local path.
 - `remote_path` (String) Download Client remote path.
-
-

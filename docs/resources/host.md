@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_host (Resource)
 
-<!-- subcategory:System -->Host resource.
+<!-- subcategory:System -->
+Host resource.
 For more information refer to [Host](https://wiki.servarr.com/sonarr/settings#general) documentation.
 
 ## Example Usage

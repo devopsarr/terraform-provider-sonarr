@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_download_client_torrent_download_station (Resource)
 
-<!-- subcategory:Download Clients -->Download Client TorrentDownloadStation resource.
+<!-- subcategory:Download Clients -->
+Download Client TorrentDownloadStation resource.
 For more information refer to [Download Client](https://wiki.servarr.com/sonarr/settings#download-clients) and [TorrentDownloadStation](https://wiki.servarr.com/sonarr/supported#torrentdownloadstation).
 
 ## Example Usage

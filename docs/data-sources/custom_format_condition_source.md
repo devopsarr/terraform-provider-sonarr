@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_custom_format_condition_source (Data Source)
 
-<!-- subcategory:Profiles --> Custom Format Condition Source data source.
+<!-- subcategory:Profiles -->
+ Custom Format Condition Source data source.
 For more information refer to [Custom Format Conditions](https://wiki.servarr.com/sonarr/settings#conditions).
 
 ## Example Usage
@@ -44,5 +45,3 @@ resource "sonarr_custom_format" "example" {
 
 - `id` (Number) Custom format condition source ID.
 - `implementation` (String) Implementation.
-
-

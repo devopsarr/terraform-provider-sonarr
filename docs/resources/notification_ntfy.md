@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_notification_ntfy (Resource)
 
-<!-- subcategory:Notifications -->Notification Ntfy.sh resource.
+<!-- subcategory:Notifications -->
+Notification Ntfy.sh resource.
 For more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect) and [Ntfy](https://wiki.servarr.com/sonarr/supported#ntfy).
 
 ## Example Usage

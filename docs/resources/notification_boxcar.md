@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_notification_boxcar (Resource)
 
-<!-- subcategory:Notifications -->Notification Boxcar resource.
+<!-- subcategory:Notifications -->
+Notification Boxcar resource.
 For more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect) and [Boxcar](https://wiki.servarr.com/sonarr/supported#boxcar).
 
 ## Example Usage

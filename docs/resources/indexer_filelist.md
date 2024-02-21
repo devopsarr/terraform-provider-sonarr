@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_indexer_filelist (Resource)
 
-<!-- subcategory:Indexers -->Indexer FileList resource.
+<!-- subcategory:Indexers -->
+Indexer FileList resource.
 For more information refer to [Indexer](https://wiki.servarr.com/sonarr/settings#indexers) and [FileList](https://wiki.servarr.com/sonarr/supported#filelist).
 
 ## Example Usage

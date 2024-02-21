@@ -8,7 +8,8 @@ description: |-
 
 # sonarr_notifications (Data Source)
 
-<!-- subcategory:Notifications -->List all available [Notifications](../resources/notification).
+<!-- subcategory:Notifications -->
+List all available [Notifications](../resources/notification).
 
 ## Example Usage
 
@@ -121,5 +122,3 @@ Read-Only:
 - `user_key` (String) User key.
 - `username` (String) Username.
 - `web_hook_url` (String) Web hook url.
-
-

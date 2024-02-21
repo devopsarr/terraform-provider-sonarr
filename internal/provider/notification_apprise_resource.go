@@ -126,7 +126,7 @@ func (r *NotificationAppriseResource) Metadata(_ context.Context, req resource.M
 
 func (r *NotificationAppriseResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Notifications -->Notification Apprise resource.\nFor more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect) and [Apprise](https://wiki.servarr.com/sonarr/supported#apprise).",
+		MarkdownDescription: "<!-- subcategory:Notifications -->\nNotification Apprise resource.\nFor more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect) and [Apprise](https://wiki.servarr.com/sonarr/supported#apprise).",
 		Attributes: map[string]schema.Attribute{
 			"on_grab": schema.BoolAttribute{
 				MarkdownDescription: "On grab flag.",

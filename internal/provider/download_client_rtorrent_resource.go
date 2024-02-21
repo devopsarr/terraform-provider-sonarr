@@ -119,7 +119,7 @@ func (r *DownloadClientRtorrentResource) Metadata(_ context.Context, req resourc
 
 func (r *DownloadClientRtorrentResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Download Clients -->Download Client RTorrent resource.\nFor more information refer to [Download Client](https://wiki.servarr.com/sonarr/settings#download-clients) and [RTorrent](https://wiki.servarr.com/sonarr/supported#rtorrent).",
+		MarkdownDescription: "<!-- subcategory:Download Clients -->\nDownload Client RTorrent resource.\nFor more information refer to [Download Client](https://wiki.servarr.com/sonarr/settings#download-clients) and [RTorrent](https://wiki.servarr.com/sonarr/supported#rtorrent).",
 		Attributes: map[string]schema.Attribute{
 			"enable": schema.BoolAttribute{
 				MarkdownDescription: "Enable flag.",

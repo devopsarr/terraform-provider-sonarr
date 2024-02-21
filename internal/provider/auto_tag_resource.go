@@ -62,7 +62,7 @@ func (r *AutoTagResource) Metadata(_ context.Context, req resource.MetadataReque
 
 func (r *AutoTagResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Tags -->Auto Tag resource.\nFor more information refer to [Tags](https://wiki.servarr.com/sonarr/settings#tags) documentation.",
+		MarkdownDescription: "<!-- subcategory:Tags -->\nAuto Tag resource.\nFor more information refer to [Tags](https://wiki.servarr.com/sonarr/settings#tags) documentation.",
 		Attributes: map[string]schema.Attribute{
 			"remove_tags_automatically": schema.BoolAttribute{
 				MarkdownDescription: "Remove tags automatically flag.",

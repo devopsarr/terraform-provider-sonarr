@@ -79,7 +79,7 @@ func (r *MetadataResource) Metadata(_ context.Context, req resource.MetadataRequ
 
 func (r *MetadataResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Metadata -->Generic Metadata resource. When possible use a specific resource instead.\nFor more information refer to [Metadata](https://wiki.servarr.com/sonarr/settings#metadata) documentation.",
+		MarkdownDescription: "<!-- subcategory:Metadata -->\nGeneric Metadata resource. When possible use a specific resource instead.\nFor more information refer to [Metadata](https://wiki.servarr.com/sonarr/settings#metadata) documentation.",
 		Attributes: map[string]schema.Attribute{
 			"enable": schema.BoolAttribute{
 				MarkdownDescription: "Enable flag.",

@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_download_client_hadouken (Resource)
 
-<!-- subcategory:Download Clients -->Download Client Hadouken resource.
+<!-- subcategory:Download Clients -->
+Download Client Hadouken resource.
 For more information refer to [Download Client](https://wiki.servarr.com/sonarr/settings#download-clients) and [Hadouken](https://wiki.servarr.com/sonarr/supported#hadouken).
 
 ## Example Usage

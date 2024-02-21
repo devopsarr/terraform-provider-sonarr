@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_download_client_nzbget (Resource)
 
-<!-- subcategory:Download Clients -->Download Client NZBGet resource.
+<!-- subcategory:Download Clients -->
+Download Client NZBGet resource.
 For more information refer to [Download Client](https://wiki.servarr.com/sonarr/settings#download-clients) and [NZBGet](https://wiki.servarr.com/sonarr/supported#nzbget).
 
 ## Example Usage

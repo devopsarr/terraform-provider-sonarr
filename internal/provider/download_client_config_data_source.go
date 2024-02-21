@@ -32,7 +32,7 @@ func (d *DownloadClientConfigDataSource) Metadata(_ context.Context, req datasou
 func (d *DownloadClientConfigDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the delay server.
-		MarkdownDescription: "<!-- subcategory:Download Clients -->[Download Client Config](../resources/download_client_config).",
+		MarkdownDescription: "<!-- subcategory:Download Clients -->\n[Download Client Config](../resources/download_client_config).",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
 				MarkdownDescription: "Download Client Config ID.",

@@ -40,7 +40,7 @@ func (d *AutoTagsDataSource) Metadata(_ context.Context, req datasource.Metadata
 func (d *AutoTagsDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the delay server.
-		MarkdownDescription: "<!-- subcategory:Tags -->List all available [Auto Tags](../resources/auto_tag).",
+		MarkdownDescription: "<!-- subcategory:Tags -->\nList all available [Auto Tags](../resources/auto_tag).",
 		Attributes: map[string]schema.Attribute{
 			// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 			"id": schema.StringAttribute{

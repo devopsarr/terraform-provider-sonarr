@@ -8,7 +8,8 @@ description: |-
 
 # sonarr_custom_formats (Data Source)
 
-<!-- subcategory:Profiles -->List all available [Custom Formats](../resources/custom_format).
+<!-- subcategory:Profiles -->
+List all available [Custom Formats](../resources/custom_format).
 
 ## Example Usage
 
@@ -47,5 +48,3 @@ Read-Only:
 - `negate` (Boolean) Negate flag.
 - `required` (Boolean) Computed flag.
 - `value` (String) Value.
-
-

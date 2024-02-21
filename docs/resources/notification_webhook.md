@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_notification_webhook (Resource)
 
-<!-- subcategory:Notifications -->Notification Webhook resource.
+<!-- subcategory:Notifications -->
+Notification Webhook resource.
 For more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect) and [Webhook](https://wiki.servarr.com/sonarr/supported#webhook).
 
 ## Example Usage

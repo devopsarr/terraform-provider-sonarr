@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_release_profile (Resource)
 
-<!-- subcategory:Profiles -->Release Profile resource.
+<!-- subcategory:Profiles -->
+Release Profile resource.
 For more information refer to [Release Profiles](https://wiki.servarr.com/sonarr/settings#release-profiles) documentation.
 
 ## Example Usage

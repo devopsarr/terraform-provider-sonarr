@@ -112,7 +112,7 @@ func (r *NotificationSendgridResource) Metadata(_ context.Context, req resource.
 
 func (r *NotificationSendgridResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Notifications -->Notification Sendgrid resource.\nFor more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect) and [Sendgrid](https://wiki.servarr.com/sonarr/supported#sendgrid).",
+		MarkdownDescription: "<!-- subcategory:Notifications -->\nNotification Sendgrid resource.\nFor more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect) and [Sendgrid](https://wiki.servarr.com/sonarr/supported#sendgrid).",
 		Attributes: map[string]schema.Attribute{
 			"on_grab": schema.BoolAttribute{
 				MarkdownDescription: "On grab flag.",

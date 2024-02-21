@@ -105,7 +105,7 @@ func (r *IndexerNewznabResource) Metadata(_ context.Context, req resource.Metada
 
 func (r *IndexerNewznabResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Indexers -->Indexer Newznab resource.\nFor more information refer to [Indexer](https://wiki.servarr.com/sonarr/settings#indexers) and [Newznab](https://wiki.servarr.com/sonarr/supported#newznab).",
+		MarkdownDescription: "<!-- subcategory:Indexers -->\nIndexer Newznab resource.\nFor more information refer to [Indexer](https://wiki.servarr.com/sonarr/settings#indexers) and [Newznab](https://wiki.servarr.com/sonarr/supported#newznab).",
 		Attributes: map[string]schema.Attribute{
 			"enable_automatic_search": schema.BoolAttribute{
 				MarkdownDescription: "Enable automatic search flag.",

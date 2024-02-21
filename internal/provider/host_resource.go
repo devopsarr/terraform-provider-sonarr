@@ -180,7 +180,7 @@ func (r *HostResource) Metadata(_ context.Context, req resource.MetadataRequest,
 
 func (r *HostResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:System -->Host resource.\nFor more information refer to [Host](https://wiki.servarr.com/sonarr/settings#general) documentation.",
+		MarkdownDescription: "<!-- subcategory:System -->\nHost resource.\nFor more information refer to [Host](https://wiki.servarr.com/sonarr/settings#general) documentation.",
 		Attributes: map[string]schema.Attribute{
 			"launch_browser": schema.BoolAttribute{
 				MarkdownDescription: "Launch browser flag.",

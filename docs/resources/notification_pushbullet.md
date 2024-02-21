@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_notification_pushbullet (Resource)
 
-<!-- subcategory:Notifications -->Notification Pushbullet resource.
+<!-- subcategory:Notifications -->
+Notification Pushbullet resource.
 For more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect) and [Pushbullet](https://wiki.servarr.com/sonarr/supported#pushbullet).
 
 ## Example Usage

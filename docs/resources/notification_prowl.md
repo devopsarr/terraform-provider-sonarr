@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_notification_prowl (Resource)
 
-<!-- subcategory:Notifications -->Notification Prowl resource.
+<!-- subcategory:Notifications -->
+Notification Prowl resource.
 For more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect) and [Prowl](https://wiki.servarr.com/sonarr/supported#prowl).
 
 ## Example Usage

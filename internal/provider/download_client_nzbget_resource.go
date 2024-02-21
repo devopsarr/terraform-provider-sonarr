@@ -113,7 +113,7 @@ func (r *DownloadClientNzbgetResource) Metadata(_ context.Context, req resource.
 
 func (r *DownloadClientNzbgetResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Download Clients -->Download Client NZBGet resource.\nFor more information refer to [Download Client](https://wiki.servarr.com/sonarr/settings#download-clients) and [NZBGet](https://wiki.servarr.com/sonarr/supported#nzbget).",
+		MarkdownDescription: "<!-- subcategory:Download Clients -->\nDownload Client NZBGet resource.\nFor more information refer to [Download Client](https://wiki.servarr.com/sonarr/settings#download-clients) and [NZBGet](https://wiki.servarr.com/sonarr/supported#nzbget).",
 		Attributes: map[string]schema.Attribute{
 			"enable": schema.BoolAttribute{
 				MarkdownDescription: "Enable flag.",

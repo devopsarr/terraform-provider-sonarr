@@ -90,7 +90,7 @@ func (r *ImportListImdbResource) Metadata(_ context.Context, req resource.Metada
 
 func (r *ImportListImdbResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Import Lists -->ImportList Imdb resource.\nFor more information refer to [Import List](https://wiki.servarr.com/sonarr/settings#import-lists) and [Imdb](https://wiki.servarr.com/sonarr/supported#imdbimport).",
+		MarkdownDescription: "<!-- subcategory:Import Lists -->\nImportList Imdb resource.\nFor more information refer to [Import List](https://wiki.servarr.com/sonarr/settings#import-lists) and [Imdb](https://wiki.servarr.com/sonarr/supported#imdbimport).",
 		Attributes: map[string]schema.Attribute{
 			"enable_automatic_add": schema.BoolAttribute{
 				MarkdownDescription: "Enable automatic add flag.",

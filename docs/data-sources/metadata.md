@@ -8,7 +8,8 @@ description: |-
 
 # sonarr_metadata (Data Source)
 
-<!-- subcategory:Metadata -->Single [Metadata](../resources/metadata).
+<!-- subcategory:Metadata -->
+Single [Metadata](../resources/metadata).
 
 ## Example Usage
 
@@ -41,5 +42,3 @@ data "sonarr_metadata" "example" {
 - `series_metadata` (Boolean) Series metadata flag.
 - `series_metadata_url` (Boolean) Series metadata URL flag.
 - `tags` (Set of Number) List of associated tags.
-
-

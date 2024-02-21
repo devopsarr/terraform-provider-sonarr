@@ -35,7 +35,7 @@ func (d *ReleaseProfileDataSource) Metadata(_ context.Context, req datasource.Me
 func (d *ReleaseProfileDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the release server.
-		MarkdownDescription: "<!-- subcategory:Profiles -->Single [Release Profile](../resources/release_profile).",
+		MarkdownDescription: "<!-- subcategory:Profiles -->\nSingle [Release Profile](../resources/release_profile).",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
 				MarkdownDescription: "Release Profile ID.",

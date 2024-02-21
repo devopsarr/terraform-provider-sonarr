@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_download_client_torrent_blackhole (Resource)
 
-<!-- subcategory:Download Clients -->Download Client Torrent Blackhole resource.
+<!-- subcategory:Download Clients -->
+Download Client Torrent Blackhole resource.
 For more information refer to [Download Client](https://wiki.servarr.com/sonarr/settings#download-clients) and [TorrentBlackhole](https://wiki.servarr.com/sonarr/supported#torrentblackhole).
 
 ## Example Usage

@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_download_client_qbittorrent (Resource)
 
-<!-- subcategory:Download Clients -->Download Client qBittorrent resource.
+<!-- subcategory:Download Clients -->
+Download Client qBittorrent resource.
 For more information refer to [Download Client](https://wiki.servarr.com/sonarr/settings#download-clients) and [qBittorrent](https://wiki.servarr.com/sonarr/supported#qbittorrent).
 
 ## Example Usage

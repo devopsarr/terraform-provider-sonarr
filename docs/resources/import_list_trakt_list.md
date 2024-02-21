@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_import_list_trakt_list (Resource)
 
-<!-- subcategory:Import Lists -->ImportList TraktList resource.
+<!-- subcategory:Import Lists -->
+ImportList TraktList resource.
 For more information refer to [Import List](https://wiki.servarr.com/sonarr/settings#import-lists) and [TraktList](https://wiki.servarr.com/sonarr/supported#trakt_list).
 
 ## Example Usage

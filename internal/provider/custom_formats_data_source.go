@@ -40,7 +40,7 @@ func (d *CustomFormatsDataSource) Metadata(_ context.Context, req datasource.Met
 func (d *CustomFormatsDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the delay server.
-		MarkdownDescription: "<!-- subcategory:Profiles -->List all available [Custom Formats](../resources/custom_format).",
+		MarkdownDescription: "<!-- subcategory:Profiles -->\nList all available [Custom Formats](../resources/custom_format).",
 		Attributes: map[string]schema.Attribute{
 			// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 			"id": schema.StringAttribute{

@@ -8,7 +8,8 @@ description: |-
 
 # sonarr_media_management (Data Source)
 
-<!-- subcategory:Media Management -->[Media Management](../resources/media_management).
+<!-- subcategory:Media Management -->
+[Media Management](../resources/media_management).
 
 ## Example Usage
 
@@ -41,5 +42,3 @@ data "sonarr_media_management" "example" {
 - `set_permissions` (Boolean) Set permission for imported files.
 - `skip_free_space_check` (Boolean) Skip free space check before importing.
 - `unmonitor_previous_episodes` (Boolean) Unmonitor deleted files.
-
-

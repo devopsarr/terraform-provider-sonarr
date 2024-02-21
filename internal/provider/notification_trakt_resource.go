@@ -100,7 +100,7 @@ func (r *NotificationTraktResource) Metadata(_ context.Context, req resource.Met
 
 func (r *NotificationTraktResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Notifications -->Notification Trakt resource.\nFor more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect) and [Trakt](https://wiki.servarr.com/sonarr/supported#trakt).",
+		MarkdownDescription: "<!-- subcategory:Notifications -->\nNotification Trakt resource.\nFor more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect) and [Trakt](https://wiki.servarr.com/sonarr/supported#trakt).",
 		Attributes: map[string]schema.Attribute{
 			"on_download": schema.BoolAttribute{
 				MarkdownDescription: "On download flag.",

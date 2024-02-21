@@ -37,7 +37,7 @@ func (d *AutoTagConditionGenresDataSource) Metadata(_ context.Context, req datas
 func (d *AutoTagConditionGenresDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the delay server.
-		MarkdownDescription: "<!-- subcategory:Tags --> Auto Tag Condition Genres data source.\nFor more intagion refer to [Auto Tag Conditions](https://wiki.servarr.com/sonarr/settings#conditions).",
+		MarkdownDescription: "<!-- subcategory:Tags -->\n Auto Tag Condition Genres data source.\nFor more intagion refer to [Auto Tag Conditions](https://wiki.servarr.com/sonarr/settings#conditions).",
 		Attributes: map[string]schema.Attribute{
 			"negate": schema.BoolAttribute{
 				MarkdownDescription: "Negate flag.",

@@ -34,7 +34,7 @@ func (d *RemotePathMappingDataSource) Metadata(_ context.Context, req datasource
 func (d *RemotePathMappingDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the delay server.
-		MarkdownDescription: "<!-- subcategory:Download Clients -->Single [Remote Path Mapping](../resources/remote_path_mapping).",
+		MarkdownDescription: "<!-- subcategory:Download Clients -->\nSingle [Remote Path Mapping](../resources/remote_path_mapping).",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
 				MarkdownDescription: "Remote Path Mapping ID.",

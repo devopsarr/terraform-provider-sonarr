@@ -103,7 +103,7 @@ func (r *ImportListSimklUserResource) Metadata(_ context.Context, req resource.M
 
 func (r *ImportListSimklUserResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Import Lists -->ImportList SimklUser resource.\nFor more information refer to [Import List](https://wiki.servarr.com/sonarr/settings#import-lists) and [SimklUser](https://wiki.servarr.com/sonarr/supported#simkl_user).",
+		MarkdownDescription: "<!-- subcategory:Import Lists -->\nImportList SimklUser resource.\nFor more information refer to [Import List](https://wiki.servarr.com/sonarr/settings#import-lists) and [SimklUser](https://wiki.servarr.com/sonarr/supported#simkl_user).",
 		Attributes: map[string]schema.Attribute{
 			"enable_automatic_add": schema.BoolAttribute{
 				MarkdownDescription: "Enable automatic add flag.",

@@ -8,7 +8,8 @@ description: |-
 
 # sonarr_tags (Data Source)
 
-<!-- subcategory:Tags -->List all available [Tags](../resources/tag).
+<!-- subcategory:Tags -->
+List all available [Tags](../resources/tag).
 
 ## Example Usage
 
@@ -32,5 +33,3 @@ Read-Only:
 
 - `id` (Number) Tag ID.
 - `label` (String) Tag label.
-
-

@@ -8,7 +8,8 @@ description: |-
 
 # sonarr_indexer_config (Data Source)
 
-<!-- subcategory:Indexers -->[Indexer Config](../resources/indexer_config).
+<!-- subcategory:Indexers -->
+[Indexer Config](../resources/indexer_config).
 
 ## Example Usage
 
@@ -27,5 +28,3 @@ data "sonarr_indexer_config" "example" {
 - `minimum_age` (Number) Minimum age.
 - `retention` (Number) Retention.
 - `rss_sync_interval` (Number) RSS sync interval.
-
-

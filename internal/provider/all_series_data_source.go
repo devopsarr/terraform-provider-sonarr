@@ -39,7 +39,7 @@ func (d *AllSeriessDataSource) Metadata(_ context.Context, req datasource.Metada
 
 func (d *AllSeriessDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Series -->List all available [Series](../resources/series).",
+		MarkdownDescription: "<!-- subcategory:Series -->\nList all available [Series](../resources/series).",
 		Attributes: map[string]schema.Attribute{
 			// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 			"id": schema.StringAttribute{

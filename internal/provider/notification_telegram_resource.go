@@ -112,7 +112,7 @@ func (r *NotificationTelegramResource) Metadata(_ context.Context, req resource.
 
 func (r *NotificationTelegramResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Notifications -->Notification Telegram resource.\nFor more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect) and [Telegram](https://wiki.servarr.com/sonarr/supported#telegram).",
+		MarkdownDescription: "<!-- subcategory:Notifications -->\nNotification Telegram resource.\nFor more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect) and [Telegram](https://wiki.servarr.com/sonarr/supported#telegram).",
 		Attributes: map[string]schema.Attribute{
 			"on_grab": schema.BoolAttribute{
 				MarkdownDescription: "On grab flag.",

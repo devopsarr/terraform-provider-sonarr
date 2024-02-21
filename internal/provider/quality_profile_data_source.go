@@ -33,7 +33,7 @@ func (d *QualityProfileDataSource) Metadata(_ context.Context, req datasource.Me
 func (d *QualityProfileDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the quality server.
-		MarkdownDescription: "<!-- subcategory:Profiles -->Single [Quality Profile](../resources/quality_profile).",
+		MarkdownDescription: "<!-- subcategory:Profiles -->\nSingle [Quality Profile](../resources/quality_profile).",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
 				MarkdownDescription: "Quality Profile ID.",

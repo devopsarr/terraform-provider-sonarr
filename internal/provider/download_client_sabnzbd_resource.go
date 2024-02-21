@@ -113,7 +113,7 @@ func (r *DownloadClientSabnzbdResource) Metadata(_ context.Context, req resource
 
 func (r *DownloadClientSabnzbdResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Download Clients -->Download Client Sabnzbd resource.\nFor more information refer to [Download Client](https://wiki.servarr.com/sonarr/settings#download-clients) and [Sabnzbd](https://wiki.servarr.com/sonarr/supported#sabnzbd).",
+		MarkdownDescription: "<!-- subcategory:Download Clients -->\nDownload Client Sabnzbd resource.\nFor more information refer to [Download Client](https://wiki.servarr.com/sonarr/settings#download-clients) and [Sabnzbd](https://wiki.servarr.com/sonarr/supported#sabnzbd).",
 		Attributes: map[string]schema.Attribute{
 			"enable": schema.BoolAttribute{
 				MarkdownDescription: "Enable flag.",

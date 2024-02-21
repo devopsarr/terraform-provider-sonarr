@@ -106,7 +106,7 @@ func (r *NotificationBoxcarResource) Metadata(_ context.Context, req resource.Me
 
 func (r *NotificationBoxcarResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Notifications -->Notification Boxcar resource.\nFor more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect) and [Boxcar](https://wiki.servarr.com/sonarr/supported#boxcar).",
+		MarkdownDescription: "<!-- subcategory:Notifications -->\nNotification Boxcar resource.\nFor more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect) and [Boxcar](https://wiki.servarr.com/sonarr/supported#boxcar).",
 		Attributes: map[string]schema.Attribute{
 			"on_grab": schema.BoolAttribute{
 				MarkdownDescription: "On grab flag.",
