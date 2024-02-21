@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_download_client_flood (Resource)
 
-<!-- subcategory:Download Clients -->Download Client Flood resource.
+<!-- subcategory:Download Clients -->
+Download Client Flood resource.
 For more information refer to [Download Client](https://wiki.servarr.com/sonarr/settings#download-clients) and [Flood](https://wiki.servarr.com/sonarr/supported#flood).
 
 ## Example Usage

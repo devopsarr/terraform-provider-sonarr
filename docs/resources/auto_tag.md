@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_auto_tag (Resource)
 
-<!-- subcategory:Tags -->Auto Tag resource.
+<!-- subcategory:Tags -->
+Auto Tag resource.
 For more information refer to [Tags](https://wiki.servarr.com/sonarr/settings#tags) documentation.
 
 ## Example Usage

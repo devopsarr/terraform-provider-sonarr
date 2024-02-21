@@ -114,7 +114,7 @@ func (r *DownloadClientFloodResource) Metadata(_ context.Context, req resource.M
 
 func (r *DownloadClientFloodResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Download Clients -->Download Client Flood resource.\nFor more information refer to [Download Client](https://wiki.servarr.com/sonarr/settings#download-clients) and [Flood](https://wiki.servarr.com/sonarr/supported#flood).",
+		MarkdownDescription: "<!-- subcategory:Download Clients -->\nDownload Client Flood resource.\nFor more information refer to [Download Client](https://wiki.servarr.com/sonarr/settings#download-clients) and [Flood](https://wiki.servarr.com/sonarr/supported#flood).",
 		Attributes: map[string]schema.Attribute{
 			"enable": schema.BoolAttribute{
 				MarkdownDescription: "Enable flag.",

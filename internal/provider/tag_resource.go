@@ -58,7 +58,7 @@ func (r *TagResource) Metadata(_ context.Context, req resource.MetadataRequest, 
 
 func (r *TagResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Tags -->Tag resource.\nFor more information refer to [Tags](https://wiki.servarr.com/sonarr/settings#tags) documentation.",
+		MarkdownDescription: "<!-- subcategory:Tags -->\nTag resource.\nFor more information refer to [Tags](https://wiki.servarr.com/sonarr/settings#tags) documentation.",
 		Attributes: map[string]schema.Attribute{
 			"label": schema.StringAttribute{
 				MarkdownDescription: "Tag label. It must be lowercase.",

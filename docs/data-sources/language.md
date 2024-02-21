@@ -8,7 +8,8 @@ description: |-
 
 # sonarr_language (Data Source)
 
-<!-- subcategory:Languages -->Single available Language.
+<!-- subcategory:Languages -->
+Single available Language.
 
 ## Example Usage
 
@@ -29,5 +30,3 @@ data "sonarr_language" "example" {
 
 - `id` (Number) Language ID.
 - `name_lower` (String) Language in lowercase.
-
-

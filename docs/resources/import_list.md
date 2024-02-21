@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_import_list (Resource)
 
-<!-- subcategory:Import Lists -->Generic Import List resource. When possible use a specific resource instead.
+<!-- subcategory:Import Lists -->
+Generic Import List resource. When possible use a specific resource instead.
 For more information refer to [Import List](https://wiki.servarr.com/sonarr/settings#import-lists).
 
 ## Example Usage

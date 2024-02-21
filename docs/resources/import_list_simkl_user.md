@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_import_list_simkl_user (Resource)
 
-<!-- subcategory:Import Lists -->ImportList SimklUser resource.
+<!-- subcategory:Import Lists -->
+ImportList SimklUser resource.
 For more information refer to [Import List](https://wiki.servarr.com/sonarr/settings#import-lists) and [SimklUser](https://wiki.servarr.com/sonarr/supported#simkl_user).
 
 ## Example Usage

@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_download_client_usenet_blackhole (Resource)
 
-<!-- subcategory:Download Clients -->Download Client Usenet Blackhole resource.
+<!-- subcategory:Download Clients -->
+Download Client Usenet Blackhole resource.
 For more information refer to [Download Client](https://wiki.servarr.com/sonarr/settings#download-clients) and [UsenetBlackhole](https://wiki.servarr.com/sonarr/supported#usenetblackhole).
 
 ## Example Usage

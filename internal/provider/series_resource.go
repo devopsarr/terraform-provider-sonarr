@@ -96,7 +96,7 @@ func (r *SeriesResource) Metadata(_ context.Context, req resource.MetadataReques
 func (r *SeriesResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	// TODO: waiting to implement seasons and images until empty conversion is managed natively https://www.terraform.io/plugin/framework/accessing-values#conversion-rules
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Series -->Series resource.\nFor more information refer to [Series](https://wiki.servarr.com/sonarr/library#series) documentation.",
+		MarkdownDescription: "<!-- subcategory:Series -->\nSeries resource.\nFor more information refer to [Series](https://wiki.servarr.com/sonarr/library#series) documentation.",
 		Attributes: map[string]schema.Attribute{
 			"title": schema.StringAttribute{
 				MarkdownDescription: "Series Title.",

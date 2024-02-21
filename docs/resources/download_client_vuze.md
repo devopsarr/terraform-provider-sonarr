@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_download_client_vuze (Resource)
 
-<!-- subcategory:Download Clients -->Download Client Vuze resource.
+<!-- subcategory:Download Clients -->
+Download Client Vuze resource.
 For more information refer to [Download Client](https://wiki.servarr.com/sonarr/settings#download-clients) and [Vuze](https://wiki.servarr.com/sonarr/supported#vuze).
 
 ## Example Usage

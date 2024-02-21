@@ -33,7 +33,7 @@ func (d *ImportListExclusionDataSource) Metadata(_ context.Context, req datasour
 
 func (d *ImportListExclusionDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Import Lists -->Single [ImportListExclusion](../resources/import_list_exclusion).",
+		MarkdownDescription: "<!-- subcategory:Import Lists -->\nSingle [ImportListExclusion](../resources/import_list_exclusion).",
 		Attributes: map[string]schema.Attribute{
 			"tvdb_id": schema.Int64Attribute{
 				MarkdownDescription: "Series TVDB ID.",

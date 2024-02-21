@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_indexer_torznab (Resource)
 
-<!-- subcategory:Indexers -->Indexer Torznab resource.
+<!-- subcategory:Indexers -->
+Indexer Torznab resource.
 For more information refer to [Indexer](https://wiki.servarr.com/sonarr/settings#indexers) and [Torznab](https://wiki.servarr.com/sonarr/supported#torznab).
 
 ## Example Usage

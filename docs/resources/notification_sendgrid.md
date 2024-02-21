@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_notification_sendgrid (Resource)
 
-<!-- subcategory:Notifications -->Notification Sendgrid resource.
+<!-- subcategory:Notifications -->
+Notification Sendgrid resource.
 For more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect) and [Sendgrid](https://wiki.servarr.com/sonarr/supported#sendgrid).
 
 ## Example Usage

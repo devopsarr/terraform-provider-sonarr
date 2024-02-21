@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_notification (Resource)
 
-<!-- subcategory:Notifications -->Generic Notification resource. When possible use a specific resource instead.
+<!-- subcategory:Notifications -->
+Generic Notification resource. When possible use a specific resource instead.
 For more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect).
 
 ## Example Usage

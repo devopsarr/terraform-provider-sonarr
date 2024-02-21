@@ -8,7 +8,8 @@ description: |-
 
 # sonarr_quality (Data Source)
 
-<!-- subcategory:Profiles -->Single Quality.
+<!-- subcategory:Profiles -->
+Single Quality.
 
 ## Example Usage
 
@@ -58,5 +59,3 @@ resource "sonarr_quality_profile" "Example" {
 - `id` (Number) Quality  ID.
 - `resolution` (Number) Quality Resolution.
 - `source` (String) Quality source.
-
-

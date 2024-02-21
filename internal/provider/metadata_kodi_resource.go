@@ -88,7 +88,7 @@ func (r *MetadataKodiResource) Metadata(_ context.Context, req resource.Metadata
 
 func (r *MetadataKodiResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Metadata -->Metadata Kodi resource.\nFor more information refer to [Metadata](https://wiki.servarr.com/sonarr/settings#metadata) and [KODI](https://wiki.servarr.com/sonarr/supported#xbmcmetadata).",
+		MarkdownDescription: "<!-- subcategory:Metadata -->\nMetadata Kodi resource.\nFor more information refer to [Metadata](https://wiki.servarr.com/sonarr/settings#metadata) and [KODI](https://wiki.servarr.com/sonarr/supported#xbmcmetadata).",
 		Attributes: map[string]schema.Attribute{
 			"enable": schema.BoolAttribute{
 				MarkdownDescription: "Enable flag.",

@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_indexer_hdbits (Resource)
 
-<!-- subcategory:Indexers -->Indexer HDBits resource.
+<!-- subcategory:Indexers -->
+Indexer HDBits resource.
 For more information refer to [Indexer](https://wiki.servarr.com/sonarr/settings#indexers) and [HDBits](https://wiki.servarr.com/sonarr/supported#hdbits).
 
 ## Example Usage

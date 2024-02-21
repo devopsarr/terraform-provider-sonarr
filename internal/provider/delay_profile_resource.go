@@ -75,7 +75,7 @@ func (r *DelayProfileResource) Metadata(_ context.Context, req resource.Metadata
 
 func (r *DelayProfileResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Profiles -->Delay Profile resource.\nFor more information refer to [Delay Profiles](https://wiki.servarr.com/sonarr/settings#delay-profiles) documentation.",
+		MarkdownDescription: "<!-- subcategory:Profiles -->\nDelay Profile resource.\nFor more information refer to [Delay Profiles](https://wiki.servarr.com/sonarr/settings#delay-profiles) documentation.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
 				MarkdownDescription: "Delay Profile ID.",

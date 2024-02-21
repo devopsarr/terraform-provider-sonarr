@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_notification_synology_indexer (Resource)
 
-<!-- subcategory:Notifications -->Notification Synology Indexer resource.
+<!-- subcategory:Notifications -->
+Notification Synology Indexer resource.
 For more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect) and [Synology](https://wiki.servarr.com/sonarr/supported#synologyindexer).
 
 ## Example Usage

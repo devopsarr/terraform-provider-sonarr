@@ -8,7 +8,8 @@ description: |-
 
 # sonarr_search_series (Data Source)
 
-<!-- subcategory:Series -->Search a Single [Series](../resources/series) via tvdb_id.
+<!-- subcategory:Series -->
+Search a Single [Series](../resources/series) via tvdb_id.
 
 ## Example Usage
 
@@ -37,5 +38,3 @@ data "sonarr_search_series" "example" {
 - `title` (String) Series Title.
 - `title_slug` (String) Series Title in kebab format.
 - `use_scene_numbering` (Boolean) Scene numbering flag.
-
-

@@ -35,7 +35,7 @@ func (d *DelayProfileDataSource) Metadata(_ context.Context, req datasource.Meta
 func (d *DelayProfileDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the delay server.
-		MarkdownDescription: "<!-- subcategory:Profiles -->Single [Delay Profile](../resources/delay_profile).",
+		MarkdownDescription: "<!-- subcategory:Profiles -->\nSingle [Delay Profile](../resources/delay_profile).",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
 				MarkdownDescription: "Delay Profile ID.",

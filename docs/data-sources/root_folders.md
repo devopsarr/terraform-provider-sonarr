@@ -8,7 +8,8 @@ description: |-
 
 # sonarr_root_folders (Data Source)
 
-<!-- subcategory:Media Management -->List all available [Root Folders](../resources/root_folder).
+<!-- subcategory:Media Management -->
+List all available [Root Folders](../resources/root_folder).
 
 ## Example Usage
 
@@ -42,5 +43,3 @@ Read-Only:
 
 - `name` (String) Name of unmapped folder.
 - `path` (String) Path of unmapped folder.
-
-

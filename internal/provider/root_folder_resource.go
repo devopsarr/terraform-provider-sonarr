@@ -74,7 +74,7 @@ func (r *RootFolderResource) Metadata(_ context.Context, req resource.MetadataRe
 
 func (r *RootFolderResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Media Management -->Root Folder resource.\nFor more information refer to [Root Folders](https://wiki.servarr.com/sonarr/settings#root-folders) documentation.",
+		MarkdownDescription: "<!-- subcategory:Media Management -->\nRoot Folder resource.\nFor more information refer to [Root Folders](https://wiki.servarr.com/sonarr/settings#root-folders) documentation.",
 		Attributes: map[string]schema.Attribute{
 			// TODO: add validator
 			"path": schema.StringAttribute{

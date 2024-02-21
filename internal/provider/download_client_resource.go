@@ -149,7 +149,7 @@ func (r *DownloadClientResource) Metadata(_ context.Context, req resource.Metada
 
 func (r *DownloadClientResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Download Clients -->Generic Download Client resource. When possible use a specific resource instead.\nFor more information refer to [Download Client](https://wiki.servarr.com/sonarr/settings#download-clients).",
+		MarkdownDescription: "<!-- subcategory:Download Clients -->\nGeneric Download Client resource. When possible use a specific resource instead.\nFor more information refer to [Download Client](https://wiki.servarr.com/sonarr/settings#download-clients).",
 		Attributes: map[string]schema.Attribute{
 			"enable": schema.BoolAttribute{
 				MarkdownDescription: "Enable flag.",

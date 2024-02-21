@@ -238,7 +238,7 @@ func (r *NotificationResource) Metadata(_ context.Context, req resource.Metadata
 
 func (r *NotificationResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Notifications -->Generic Notification resource. When possible use a specific resource instead.\nFor more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect).",
+		MarkdownDescription: "<!-- subcategory:Notifications -->\nGeneric Notification resource. When possible use a specific resource instead.\nFor more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect).",
 		Attributes: map[string]schema.Attribute{
 			"on_grab": schema.BoolAttribute{
 				MarkdownDescription: "On grab flag.",

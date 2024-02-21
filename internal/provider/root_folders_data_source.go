@@ -40,7 +40,7 @@ func (d *RootFoldersDataSource) Metadata(_ context.Context, req datasource.Metad
 func (d *RootFoldersDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the delay server.
-		MarkdownDescription: "<!-- subcategory:Media Management -->List all available [Root Folders](../resources/root_folder).",
+		MarkdownDescription: "<!-- subcategory:Media Management -->\nList all available [Root Folders](../resources/root_folder).",
 		Attributes: map[string]schema.Attribute{
 			// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 			"id": schema.StringAttribute{

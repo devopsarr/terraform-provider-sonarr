@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_indexer_fanzub (Resource)
 
-<!-- subcategory:Indexers -->Indexer Fanzub resource.
+<!-- subcategory:Indexers -->
+Indexer Fanzub resource.
 For more information refer to [Indexer](https://wiki.servarr.com/sonarr/settings#indexers) and [Fanzub](https://wiki.servarr.com/sonarr/supported#fanzub).
 
 ## Example Usage

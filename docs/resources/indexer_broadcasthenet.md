@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_indexer_broadcasthenet (Resource)
 
-<!-- subcategory:Indexers -->Indexer BroadcastheNet resource.
+<!-- subcategory:Indexers -->
+Indexer BroadcastheNet resource.
 For more information refer to [Indexer](https://wiki.servarr.com/sonarr/settings#indexers) and [BroadcastheNet](https://wiki.servarr.com/sonarr/supported#broadcasthenet).
 
 ## Example Usage

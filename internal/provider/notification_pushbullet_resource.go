@@ -115,7 +115,7 @@ func (r *NotificationPushbulletResource) Metadata(_ context.Context, req resourc
 
 func (r *NotificationPushbulletResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Notifications -->Notification Pushbullet resource.\nFor more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect) and [Pushbullet](https://wiki.servarr.com/sonarr/supported#pushbullet).",
+		MarkdownDescription: "<!-- subcategory:Notifications -->\nNotification Pushbullet resource.\nFor more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect) and [Pushbullet](https://wiki.servarr.com/sonarr/supported#pushbullet).",
 		Attributes: map[string]schema.Attribute{
 			"on_grab": schema.BoolAttribute{
 				MarkdownDescription: "On grab flag.",

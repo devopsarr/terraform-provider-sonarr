@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_notification_discord (Resource)
 
-<!-- subcategory:Notifications -->Notification Discord resource.
+<!-- subcategory:Notifications -->
+Notification Discord resource.
 For more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect) and [Discord](https://wiki.servarr.com/sonarr/supported#discord).
 
 ## Example Usage

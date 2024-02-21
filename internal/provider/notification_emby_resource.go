@@ -121,7 +121,7 @@ func (r *NotificationEmbyResource) Metadata(_ context.Context, req resource.Meta
 
 func (r *NotificationEmbyResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Notifications -->Notification Emby resource.\nFor more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect) and [Emby](https://wiki.servarr.com/sonarr/supported#mediabrowser).",
+		MarkdownDescription: "<!-- subcategory:Notifications -->\nNotification Emby resource.\nFor more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect) and [Emby](https://wiki.servarr.com/sonarr/supported#mediabrowser).",
 		Attributes: map[string]schema.Attribute{
 			"on_grab": schema.BoolAttribute{
 				MarkdownDescription: "On grab flag.",

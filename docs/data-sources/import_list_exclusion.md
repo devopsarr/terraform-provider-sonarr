@@ -8,7 +8,8 @@ description: |-
 
 # sonarr_import_list_exclusion (Data Source)
 
-<!-- subcategory:Import Lists -->Single [ImportListExclusion](../resources/import_list_exclusion).
+<!-- subcategory:Import Lists -->
+Single [ImportListExclusion](../resources/import_list_exclusion).
 
 ## Example Usage
 
@@ -29,5 +30,3 @@ data "sonarr_import_list_exclusion" "example" {
 
 - `id` (Number) ImportListExclusion ID.
 - `title` (String) Series to be excluded.
-
-

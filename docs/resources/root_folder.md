@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_root_folder (Resource)
 
-<!-- subcategory:Media Management -->Root Folder resource.
+<!-- subcategory:Media Management -->
+Root Folder resource.
 For more information refer to [Root Folders](https://wiki.servarr.com/sonarr/settings#root-folders) documentation.
 
 ## Example Usage

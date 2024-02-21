@@ -32,7 +32,7 @@ func (d *IndexerConfigDataSource) Metadata(_ context.Context, req datasource.Met
 func (d *IndexerConfigDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the delay server.
-		MarkdownDescription: "<!-- subcategory:Indexers -->[Indexer Config](../resources/indexer_config).",
+		MarkdownDescription: "<!-- subcategory:Indexers -->\n[Indexer Config](../resources/indexer_config).",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
 				MarkdownDescription: "Delay Profile ID.",

@@ -34,7 +34,7 @@ func (d *MetadataDataSource) Metadata(_ context.Context, req datasource.Metadata
 func (d *MetadataDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the delay server.
-		MarkdownDescription: "<!-- subcategory:Metadata -->Single [Metadata](../resources/metadata).",
+		MarkdownDescription: "<!-- subcategory:Metadata -->\nSingle [Metadata](../resources/metadata).",
 		Attributes: map[string]schema.Attribute{
 			"enable": schema.BoolAttribute{
 				MarkdownDescription: "Enable flag.",

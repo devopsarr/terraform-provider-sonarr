@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_import_list_imdb (Resource)
 
-<!-- subcategory:Import Lists -->ImportList Imdb resource.
+<!-- subcategory:Import Lists -->
+ImportList Imdb resource.
 For more information refer to [Import List](https://wiki.servarr.com/sonarr/settings#import-lists) and [Imdb](https://wiki.servarr.com/sonarr/supported#imdbimport).
 
 ## Example Usage

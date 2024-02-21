@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_notification_kodi (Resource)
 
-<!-- subcategory:Notifications -->Notification Kodi resource.
+<!-- subcategory:Notifications -->
+Notification Kodi resource.
 For more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect) and [Kodi](https://wiki.servarr.com/sonarr/supported#xbmc).
 
 ## Example Usage

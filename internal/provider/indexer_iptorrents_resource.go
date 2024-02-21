@@ -99,7 +99,7 @@ func (r *IndexerIptorrentsResource) Metadata(_ context.Context, req resource.Met
 
 func (r *IndexerIptorrentsResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Indexers -->Indexer IP Torrents resource.\nFor more information refer to [Indexer](https://wiki.servarr.com/sonarr/settings#indexers) and [IP Torrents](https://wiki.servarr.com/sonarr/supported#iptorrents).",
+		MarkdownDescription: "<!-- subcategory:Indexers -->\nIndexer IP Torrents resource.\nFor more information refer to [Indexer](https://wiki.servarr.com/sonarr/settings#indexers) and [IP Torrents](https://wiki.servarr.com/sonarr/supported#iptorrents).",
 		Attributes: map[string]schema.Attribute{
 			"enable_automatic_search": schema.BoolAttribute{
 				MarkdownDescription: "Enable automatic search flag.",

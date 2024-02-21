@@ -8,7 +8,8 @@ description: |-
 
 # sonarr_indexers (Data Source)
 
-<!-- subcategory:Indexers -->List all available [Indexers](../resources/indexer).
+<!-- subcategory:Indexers -->
+List all available [Indexers](../resources/indexer).
 
 ## Example Usage
 
@@ -59,5 +60,3 @@ Read-Only:
 - `seed_time` (Number) Seed time.
 - `tags` (Set of Number) List of associated tags.
 - `username` (String) Username.
-
-

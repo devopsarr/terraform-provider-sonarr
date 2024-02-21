@@ -33,7 +33,7 @@ func (d *SearchSeriesDataSource) Metadata(_ context.Context, req datasource.Meta
 
 func (d *SearchSeriesDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Series -->Search a Single [Series](../resources/series) via tvdb_id.",
+		MarkdownDescription: "<!-- subcategory:Series -->\nSearch a Single [Series](../resources/series) via tvdb_id.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
 				MarkdownDescription: "Series ID.",

@@ -8,7 +8,8 @@ description: |-
 
 # sonarr_indexer (Data Source)
 
-<!-- subcategory:Indexers -->Single [Indexer](../resources/indexer).
+<!-- subcategory:Indexers -->
+Single [Indexer](../resources/indexer).
 
 ## Example Usage
 
@@ -55,5 +56,3 @@ data "sonarr_indexer" "example" {
 - `seed_time` (Number) Seed time.
 - `tags` (Set of Number) List of associated tags.
 - `username` (String) Username.
-
-

@@ -105,7 +105,7 @@ func (r *IndexerNyaaResource) Metadata(_ context.Context, req resource.MetadataR
 
 func (r *IndexerNyaaResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Indexers -->Indexer Nyaa resource.\nFor more information refer to [Indexer](https://wiki.servarr.com/sonarr/settings#indexers) and [Nyaa](https://wiki.servarr.com/sonarr/supported#nyaa).",
+		MarkdownDescription: "<!-- subcategory:Indexers -->\nIndexer Nyaa resource.\nFor more information refer to [Indexer](https://wiki.servarr.com/sonarr/settings#indexers) and [Nyaa](https://wiki.servarr.com/sonarr/supported#nyaa).",
 		Attributes: map[string]schema.Attribute{
 			"enable_automatic_search": schema.BoolAttribute{
 				MarkdownDescription: "Enable automatic search flag.",

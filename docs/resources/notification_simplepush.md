@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_notification_simplepush (Resource)
 
-<!-- subcategory:Notifications -->Notification Simplepush resource.
+<!-- subcategory:Notifications -->
+Notification Simplepush resource.
 For more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect) and [Simplepush](https://wiki.servarr.com/sonarr/supported#simplepush).
 
 ## Example Usage

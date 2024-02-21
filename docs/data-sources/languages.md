@@ -8,7 +8,8 @@ description: |-
 
 # sonarr_languages (Data Source)
 
-<!-- subcategory:Languages -->List all available [Languages](../data-sources/language).
+<!-- subcategory:Languages -->
+List all available [Languages](../data-sources/language).
 
 ## Example Usage
 
@@ -33,5 +34,3 @@ Read-Only:
 - `id` (Number) Language ID.
 - `name` (String) Language.
 - `name_lower` (String) Language in lowercase.
-
-

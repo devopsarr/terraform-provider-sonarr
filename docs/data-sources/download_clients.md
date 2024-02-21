@@ -8,7 +8,8 @@ description: |-
 
 # sonarr_download_clients (Data Source)
 
-<!-- subcategory:Download Clients -->List all available [Download Clients](../resources/download_client).
+<!-- subcategory:Download Clients -->
+List all available [Download Clients](../resources/download_client).
 
 ## Example Usage
 
@@ -73,5 +74,3 @@ Read-Only:
 - `use_ssl` (Boolean) Use SSL flag.
 - `username` (String) Username.
 - `watch_folder` (String) Watch folder flag.
-
-

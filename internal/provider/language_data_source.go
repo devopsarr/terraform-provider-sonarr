@@ -50,7 +50,7 @@ func (d *LanguageDataSource) Metadata(_ context.Context, req datasource.Metadata
 
 func (d *LanguageDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Languages -->Single available Language.",
+		MarkdownDescription: "<!-- subcategory:Languages -->\nSingle available Language.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
 				MarkdownDescription: "Language ID.",

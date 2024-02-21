@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_notification_telegram (Resource)
 
-<!-- subcategory:Notifications -->Notification Telegram resource.
+<!-- subcategory:Notifications -->
+Notification Telegram resource.
 For more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect) and [Telegram](https://wiki.servarr.com/sonarr/supported#telegram).
 
 ## Example Usage

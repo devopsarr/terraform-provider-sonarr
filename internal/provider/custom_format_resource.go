@@ -59,7 +59,7 @@ func (r *CustomFormatResource) Metadata(_ context.Context, req resource.Metadata
 
 func (r *CustomFormatResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Profiles -->Custom Format resource.\nFor more information refer to [Custom Format](https://wiki.servarr.com/sonarr/settings#custom-formats).",
+		MarkdownDescription: "<!-- subcategory:Profiles -->\nCustom Format resource.\nFor more information refer to [Custom Format](https://wiki.servarr.com/sonarr/settings#custom-formats).",
 		Attributes: map[string]schema.Attribute{
 			"include_custom_format_when_renaming": schema.BoolAttribute{
 				MarkdownDescription: "Include custom format when renaming flag.",

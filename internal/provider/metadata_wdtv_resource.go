@@ -82,7 +82,7 @@ func (r *MetadataWdtvResource) Metadata(_ context.Context, req resource.Metadata
 
 func (r *MetadataWdtvResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Metadata -->Metadata Wdtv resource.\nFor more information refer to [Metadata](https://wiki.servarr.com/sonarr/settings#metadata) and [WDTV](https://wiki.servarr.com/sonarr/supported#wdtvmetadata).",
+		MarkdownDescription: "<!-- subcategory:Metadata -->\nMetadata Wdtv resource.\nFor more information refer to [Metadata](https://wiki.servarr.com/sonarr/settings#metadata) and [WDTV](https://wiki.servarr.com/sonarr/supported#wdtvmetadata).",
 		Attributes: map[string]schema.Attribute{
 			"enable": schema.BoolAttribute{
 				MarkdownDescription: "Enable flag.",

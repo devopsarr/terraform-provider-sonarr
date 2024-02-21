@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_naming (Resource)
 
-<!-- subcategory:Media Management -->Naming resource.
+<!-- subcategory:Media Management -->
+Naming resource.
 For more information refer to [Naming](https://wiki.servarr.com/sonarr/settings#community-naming-suggestions) documentation.
 
 ## Example Usage

@@ -8,7 +8,8 @@ description: |-
 
 # sonarr_quality_definitions (Data Source)
 
-<!-- subcategory:Profiles -->List all available [Quality Definitions](../resources/quality_definition).
+<!-- subcategory:Profiles -->
+List all available [Quality Definitions](../resources/quality_definition).
 
 ## Example Usage
 
@@ -41,5 +42,3 @@ Read-Only:
 - `resolution` (Number) Quality Resolution.
 - `source` (String) Quality source.
 - `title` (String) Quality Definition Title.
-
-

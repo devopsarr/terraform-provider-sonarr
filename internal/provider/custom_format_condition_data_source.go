@@ -82,7 +82,7 @@ func (d *CustomFormatConditionDataSource) Metadata(_ context.Context, req dataso
 func (d *CustomFormatConditionDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the delay server.
-		MarkdownDescription: "<!-- subcategory:Profiles --> Generic Custom Format Condition data source. When possible use a specific data source instead.\nFor more information refer to [Custom Format Conditions](https://wiki.servarr.com/sonarr/settings#conditions).\n To be used in conjunction with [Custom Format](../resources/custom_format).",
+		MarkdownDescription: "<!-- subcategory:Profiles -->\n Generic Custom Format Condition data source. When possible use a specific data source instead.\nFor more information refer to [Custom Format Conditions](https://wiki.servarr.com/sonarr/settings#conditions).\n To be used in conjunction with [Custom Format](../resources/custom_format).",
 		Attributes: map[string]schema.Attribute{
 			"negate": schema.BoolAttribute{
 				MarkdownDescription: "Negate flag.",

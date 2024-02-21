@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_series (Resource)
 
-<!-- subcategory:Series -->Series resource.
+<!-- subcategory:Series -->
+Series resource.
 For more information refer to [Series](https://wiki.servarr.com/sonarr/library#series) documentation.
 
 ## Example Usage

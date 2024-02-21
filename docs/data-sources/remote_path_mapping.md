@@ -8,7 +8,8 @@ description: |-
 
 # sonarr_remote_path_mapping (Data Source)
 
-<!-- subcategory:Download Clients -->Single [Remote Path Mapping](../resources/remote_path_mapping).
+<!-- subcategory:Download Clients -->
+Single [Remote Path Mapping](../resources/remote_path_mapping).
 
 ## Example Usage
 
@@ -30,5 +31,3 @@ data "sonarr_remote_path_mapping" "example" {
 - `host` (String) Download Client host.
 - `local_path` (String) Local path.
 - `remote_path` (String) Download Client remote path.
-
-

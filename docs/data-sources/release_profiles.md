@@ -8,7 +8,8 @@ description: |-
 
 # sonarr_release_profiles (Data Source)
 
-<!-- subcategory:Profiles -->List all available [Release Profiles](../resources/release_profile).
+<!-- subcategory:Profiles -->
+List all available [Release Profiles](../resources/release_profile).
 
 ## Example Usage
 
@@ -37,5 +38,3 @@ Read-Only:
 - `name` (String) Release profile name.
 - `required` (Set of String) Required terms.
 - `tags` (Set of Number) List of associated tags.
-
-

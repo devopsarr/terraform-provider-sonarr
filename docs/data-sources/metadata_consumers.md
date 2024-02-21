@@ -8,7 +8,8 @@ description: |-
 
 # sonarr_metadata_consumers (Data Source)
 
-<!-- subcategory:Metadata -->List all available [Metadata Consumers](../resources/metadata).
+<!-- subcategory:Metadata -->
+List all available [Metadata Consumers](../resources/metadata).
 
 ## Example Usage
 
@@ -45,5 +46,3 @@ Read-Only:
 - `series_metadata` (Boolean) Series metadata flag.
 - `series_metadata_url` (Boolean) Series metadata URL flag.
 - `tags` (Set of Number) List of associated tags.
-
-

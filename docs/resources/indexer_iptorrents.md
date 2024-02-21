@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_indexer_iptorrents (Resource)
 
-<!-- subcategory:Indexers -->Indexer IP Torrents resource.
+<!-- subcategory:Indexers -->
+Indexer IP Torrents resource.
 For more information refer to [Indexer](https://wiki.servarr.com/sonarr/settings#indexers) and [IP Torrents](https://wiki.servarr.com/sonarr/supported#iptorrents).
 
 ## Example Usage

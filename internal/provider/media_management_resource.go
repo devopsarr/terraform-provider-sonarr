@@ -64,7 +64,7 @@ func (r *MediaManagementResource) Metadata(_ context.Context, req resource.Metad
 
 func (r *MediaManagementResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Media Management -->Media Management resource.\nFor more information refer to [Naming](https://wiki.servarr.com/sonarr/settings#file-management) documentation.",
+		MarkdownDescription: "<!-- subcategory:Media Management -->\nMedia Management resource.\nFor more information refer to [Naming](https://wiki.servarr.com/sonarr/settings#file-management) documentation.",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
 				MarkdownDescription: "Media Management ID.",

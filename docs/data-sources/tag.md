@@ -8,7 +8,8 @@ description: |-
 
 # sonarr_tag (Data Source)
 
-<!-- subcategory:Tags -->Single [Tag](../resources/tag).
+<!-- subcategory:Tags -->
+Single [Tag](../resources/tag).
 
 ## Example Usage
 
@@ -28,5 +29,3 @@ data "sonarr_tag" "example" {
 ### Read-Only
 
 - `id` (Number) Tag ID.
-
-

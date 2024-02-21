@@ -35,7 +35,7 @@ func (d *HostDataSource) Metadata(_ context.Context, req datasource.MetadataRequ
 func (d *HostDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the delay server.
-		MarkdownDescription: "<!-- subcategory:System -->[Host](../resources/host).",
+		MarkdownDescription: "<!-- subcategory:System -->\n[Host](../resources/host).",
 		Attributes: map[string]schema.Attribute{
 			"launch_browser": schema.BoolAttribute{
 				MarkdownDescription: "Launch browser flag.",

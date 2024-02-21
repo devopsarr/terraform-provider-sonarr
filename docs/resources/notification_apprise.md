@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_notification_apprise (Resource)
 
-<!-- subcategory:Notifications -->Notification Apprise resource.
+<!-- subcategory:Notifications -->
+Notification Apprise resource.
 For more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect) and [Apprise](https://wiki.servarr.com/sonarr/supported#apprise).
 
 ## Example Usage

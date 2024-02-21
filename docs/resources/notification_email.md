@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_notification_email (Resource)
 
-<!-- subcategory:Notifications -->Notification Email resource.
+<!-- subcategory:Notifications -->
+Notification Email resource.
 For more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect) and [Email](https://wiki.servarr.com/sonarr/supported#email).
 
 ## Example Usage

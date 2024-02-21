@@ -8,7 +8,8 @@ description: |-
 
 # sonarr_release_profile (Data Source)
 
-<!-- subcategory:Profiles -->Single [Release Profile](../resources/release_profile).
+<!-- subcategory:Profiles -->
+Single [Release Profile](../resources/release_profile).
 
 ## Example Usage
 
@@ -33,5 +34,3 @@ data "sonarr_release_profile" "example" {
 - `name` (String) Release profile name.
 - `required` (Set of String) Required terms.
 - `tags` (Set of Number) List of associated tags.
-
-

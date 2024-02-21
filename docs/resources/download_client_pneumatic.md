@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_download_client_pneumatic (Resource)
 
-<!-- subcategory:Download Clients -->Download Client Pneumatic resource.
+<!-- subcategory:Download Clients -->
+Download Client Pneumatic resource.
 For more information refer to [Download Client](https://wiki.servarr.com/sonarr/settings#download-clients) and [Pneumatic](https://wiki.servarr.com/sonarr/supported#pneumatic).
 
 ## Example Usage

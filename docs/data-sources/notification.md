@@ -8,7 +8,8 @@ description: |-
 
 # sonarr_notification (Data Source)
 
-<!-- subcategory:Notifications -->Single [Notification](../resources/notification).
+<!-- subcategory:Notifications -->
+Single [Notification](../resources/notification).
 
 ## Example Usage
 
@@ -114,5 +115,3 @@ data "sonarr_notification" "example" {
 - `user_key` (String) User key.
 - `username` (String) Username.
 - `web_hook_url` (String) Web hook url.
-
-

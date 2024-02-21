@@ -8,7 +8,8 @@ description: |-
 
 # sonarr_quality_profiles (Data Source)
 
-<!-- subcategory:Profiles -->List all available [Quality Profiles](../resources/quality_profile).
+<!-- subcategory:Profiles -->
+List all available [Quality Profiles](../resources/quality_profile).
 
 ## Example Usage
 
@@ -67,5 +68,3 @@ Read-Only:
 - `name` (String) Quality name.
 - `resolution` (Number) Resolution.
 - `source` (String) Source.
-
-

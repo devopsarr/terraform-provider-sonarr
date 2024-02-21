@@ -33,7 +33,7 @@ func (d *RootFolderDataSource) Metadata(_ context.Context, req datasource.Metada
 func (d *RootFolderDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the delay server.
-		MarkdownDescription: "<!-- subcategory:Media Management -->Single [Root Folder](../resources/root_folder).",
+		MarkdownDescription: "<!-- subcategory:Media Management -->\nSingle [Root Folder](../resources/root_folder).",
 		Attributes: map[string]schema.Attribute{
 			"path": schema.StringAttribute{
 				MarkdownDescription: "Root Folder absolute path.",

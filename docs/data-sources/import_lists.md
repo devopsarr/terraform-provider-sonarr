@@ -8,7 +8,8 @@ description: |-
 
 # sonarr_import_lists (Data Source)
 
-<!-- subcategory:Import Lists -->List all available [Import Lists](../resources/import_list).
+<!-- subcategory:Import Lists -->
+List all available [Import Lists](../resources/import_list).
 
 ## Example Usage
 
@@ -61,5 +62,3 @@ Read-Only:
 - `url` (String) URL.
 - `username` (String) Username.
 - `years` (String) Years.
-
-

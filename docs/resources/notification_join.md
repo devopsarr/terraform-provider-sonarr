@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_notification_join (Resource)
 
-<!-- subcategory:Notifications -->Notification Join resource.
+<!-- subcategory:Notifications -->
+Notification Join resource.
 For more information refer to [Notification](https://wiki.servarr.com/sonarr/settings#connect) and [Join](https://wiki.servarr.com/sonarr/supported#join).
 
 ## Example Usage

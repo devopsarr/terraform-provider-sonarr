@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_metadata_wdtv (Resource)
 
-<!-- subcategory:Metadata -->Metadata Wdtv resource.
+<!-- subcategory:Metadata -->
+Metadata Wdtv resource.
 For more information refer to [Metadata](https://wiki.servarr.com/sonarr/settings#metadata) and [WDTV](https://wiki.servarr.com/sonarr/supported#wdtvmetadata).
 
 ## Example Usage

@@ -9,7 +9,8 @@ description: |-
 
 # sonarr_download_client_aria2 (Resource)
 
-<!-- subcategory:Download Clients -->Download Client Aria2 resource.
+<!-- subcategory:Download Clients -->
+Download Client Aria2 resource.
 For more information refer to [Download Client](https://wiki.servarr.com/sonarr/settings#download-clients) and [Aria2](https://wiki.servarr.com/sonarr/supported#aria2).
 
 ## Example Usage

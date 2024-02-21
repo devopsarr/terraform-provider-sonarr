@@ -40,7 +40,7 @@ func (d *RemotePathMappingsDataSource) Metadata(_ context.Context, req datasourc
 func (d *RemotePathMappingsDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		// This description is used by the documentation generator and the delay server.
-		MarkdownDescription: "<!-- subcategory:Download Clients -->List all available [Remote Path Mappings](../resources/remote_path_mapping).",
+		MarkdownDescription: "<!-- subcategory:Download Clients -->\nList all available [Remote Path Mappings](../resources/remote_path_mapping).",
 		Attributes: map[string]schema.Attribute{
 			// TODO: remove ID once framework support tests without ID https://www.terraform.io/plugin/framework/acctests#implement-id-attribute
 			"id": schema.StringAttribute{

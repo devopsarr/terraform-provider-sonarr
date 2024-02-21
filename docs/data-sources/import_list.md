@@ -8,7 +8,8 @@ description: |-
 
 # sonarr_import_list (Data Source)
 
-<!-- subcategory:Download Clients -->Single [Download Client](../resources/import_list).
+<!-- subcategory:Download Clients -->
+Single [Download Client](../resources/import_list).
 
 ## Example Usage
 
@@ -57,5 +58,3 @@ data "sonarr_import_list" "example" {
 - `url` (String) URL.
 - `username` (String) Username.
 - `years` (String) Years.
-
-

@@ -33,7 +33,7 @@ func (d *SeriesDataSource) Metadata(_ context.Context, req datasource.MetadataRe
 
 func (d *SeriesDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = schema.Schema{
-		MarkdownDescription: "<!-- subcategory:Series -->Single [Series](../resources/series).",
+		MarkdownDescription: "<!-- subcategory:Series -->\nSingle [Series](../resources/series).",
 		Attributes: map[string]schema.Attribute{
 			"id": schema.Int64Attribute{
 				MarkdownDescription: "Series ID.",
