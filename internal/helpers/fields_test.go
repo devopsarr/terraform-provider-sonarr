@@ -46,11 +46,13 @@ func TestWriteStringField(t *testing.T) {
 
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
+
 			field := sonarr.NewField()
-			field.SetName("str")
 			if test.value != nil {
 				field.SetValue(*test.value)
 			}
+
+			field.SetName("str")
 			writeStringField(field, &test.written)
 			assert.Equal(t, test.expected, test.written)
 		})
@@ -83,11 +85,13 @@ func TestWriteBoolField(t *testing.T) {
 
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
+
 			field := sonarr.NewField()
-			field.SetName("boo")
 			if test.value != nil {
 				field.SetValue(*test.value)
 			}
+
+			field.SetName("boo")
 			writeBoolField(field, &test.written)
 			assert.Equal(t, test.expected, test.written)
 		})
@@ -130,11 +134,13 @@ func TestWriteIntField(t *testing.T) {
 
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
+
 			field := sonarr.NewField()
-			field.SetName(test.name)
 			if test.value != nil {
 				field.SetValue(*test.value)
 			}
+
+			field.SetName(test.name)
 			writeIntField(field, &test.written)
 			assert.Equal(t, test.expected, test.written)
 		})
@@ -163,11 +169,13 @@ func TestWriteFloatField(t *testing.T) {
 
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
+
 			field := sonarr.NewField()
-			field.SetName("fl")
 			if test.value != nil {
 				field.SetValue(*test.value)
 			}
+
+			field.SetName("fl")
 			writeFloatField(field, &test.written)
 			assert.Equal(t, test.expected, test.written)
 		})
@@ -200,6 +208,7 @@ func TestWriteIntSliceField(t *testing.T) {
 
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
+
 			tfsdk.ValueFrom(context.Background(), test.set, test.expected.Set.Type(context.Background()), &test.expected.Set)
 			writeIntSliceField(context.Background(), &test.fieldOutput, &test.written)
 			assert.Equal(t, test.expected, test.written)
@@ -233,6 +242,7 @@ func TestWriteStringSliceField(t *testing.T) {
 
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
+
 			tfsdk.ValueFrom(context.Background(), test.set, test.expected.Set.Type(context.Background()), &test.expected.Set)
 			writeStringSliceField(context.Background(), &test.fieldOutput, &test.written)
 			assert.Equal(t, test.expected, test.written)
@@ -270,6 +280,7 @@ func TestReadStringField(t *testing.T) {
 
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
+
 			field := readStringField(test.name, &test.fieldCase)
 			assert.Equal(t, test.expected, field)
 		})
@@ -319,6 +330,7 @@ func TestReadIntField(t *testing.T) {
 
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
+
 			field := readIntField(test.tfName, &test.fieldCase)
 			assert.Equal(t, expected, field)
 		})
@@ -355,6 +367,7 @@ func TestReadBoolField(t *testing.T) {
 
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
+
 			field := readBoolField(test.name, &test.fieldCase)
 			assert.Equal(t, test.expected, field)
 		})
@@ -391,6 +404,7 @@ func TestReadFloatField(t *testing.T) {
 
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
+
 			field := readFloatField(test.name, &test.fieldCase)
 			assert.Equal(t, test.expected, field)
 		})
@@ -432,6 +446,7 @@ func TestReadStringSliceField(t *testing.T) {
 
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
+
 			tfsdk.ValueFrom(context.Background(), test.set, test.fieldCase.Set.Type(context.Background()), &test.fieldCase.Set)
 			field := readStringSliceField(context.Background(), test.name, &test.fieldCase)
 			assert.Equal(t, test.expected, field)
@@ -474,6 +489,7 @@ func TestReadIntSliceField(t *testing.T) {
 
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
+
 			tfsdk.ValueFrom(context.Background(), test.set, test.fieldCase.Set.Type(context.Background()), &test.fieldCase.Set)
 			field := readIntSliceField(context.Background(), test.name, &test.fieldCase)
 			assert.Equal(t, test.expected, field)

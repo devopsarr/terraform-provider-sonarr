@@ -28,7 +28,7 @@ var (
 var importListFields = helpers.Fields{
 	Ints:      []string{"limit", "traktListType", "listType"},
 	Strings:   []string{"accessToken", "baseUrl", "apiKey", "refreshToken", "expires", "authUser", "username", "rating", "listname", "genres", "years", "traktAdditionalParameters", "listId", "url"},
-	IntSlices: []string{"profileIds", "languageProfileIds", "tagIds"},
+	IntSlices: []string{"profileIds", "languageProfileIDs", "tagIds"},
 }
 
 func NewImportListResource() resource.Resource {
@@ -44,9 +44,9 @@ type ImportListResource struct {
 // ImportList describes the download client data model.
 type ImportList struct {
 	Tags                      types.Set    `tfsdk:"tags"`
-	LanguageProfileIds        types.Set    `tfsdk:"language_profile_ids"`
-	ProfileIds                types.Set    `tfsdk:"quality_profile_ids"`
-	TagIds                    types.Set    `tfsdk:"tag_ids"`
+	LanguageProfileIDs        types.Set    `tfsdk:"language_profile_ids"`
+	ProfileIDs                types.Set    `tfsdk:"quality_profile_ids"`
+	TagIDs                    types.Set    `tfsdk:"tag_ids"`
 	Implementation            types.String `tfsdk:"implementation"`
 	Name                      types.String `tfsdk:"name"`
 	ShouldMonitor             types.String `tfsdk:"should_monitor"`
@@ -421,9 +421,9 @@ func (i *ImportList) write(ctx context.Context, importList *sonarr.ImportListRes
 	i.RootFolderPath = types.StringValue(importList.GetRootFolderPath())
 	i.SeriesType = types.StringValue(string(importList.GetSeriesType()))
 	i.Name = types.StringValue(importList.GetName())
-	i.LanguageProfileIds = types.SetValueMust(types.Int64Type, nil)
-	i.ProfileIds = types.SetValueMust(types.Int64Type, nil)
-	i.TagIds = types.SetValueMust(types.Int64Type, nil)
+	i.LanguageProfileIDs = types.SetValueMust(types.Int64Type, nil)
+	i.ProfileIDs = types.SetValueMust(types.Int64Type, nil)
+	i.TagIDs = types.SetValueMust(types.Int64Type, nil)
 	helpers.WriteFields(ctx, i, importList.GetFields(), importListFields)
 }
 
