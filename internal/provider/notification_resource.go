@@ -53,7 +53,7 @@ type Notification struct {
 	Topics                        types.Set    `tfsdk:"topics"`
 	Recipients                    types.Set    `tfsdk:"recipients"`
 	Devices                       types.Set    `tfsdk:"devices"`
-	DeviceIds                     types.Set    `tfsdk:"device_ids"`
+	DeviceIDs                     types.Set    `tfsdk:"device_ids"`
 	ChannelTags                   types.Set    `tfsdk:"channel_tags"`
 	ImportFields                  types.Set    `tfsdk:"import_fields"`
 	GrabFields                    types.Set    `tfsdk:"grab_fields"`
@@ -862,7 +862,7 @@ func (n *Notification) write(ctx context.Context, notification *sonarr.Notificat
 	n.ImportFields = types.SetValueMust(types.Int64Type, nil)
 	n.GrabFields = types.SetValueMust(types.Int64Type, nil)
 	n.ChannelTags = types.SetValueMust(types.StringType, nil)
-	n.DeviceIds = types.SetValueMust(types.StringType, nil)
+	n.DeviceIDs = types.SetValueMust(types.StringType, nil)
 	n.Devices = types.SetValueMust(types.StringType, nil)
 	n.Recipients = types.SetValueMust(types.StringType, nil)
 	n.To = types.SetValueMust(types.StringType, nil)

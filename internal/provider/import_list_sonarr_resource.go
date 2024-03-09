@@ -43,9 +43,9 @@ type ImportListSonarrResource struct {
 // ImportListSonarr describes the import list data model.
 type ImportListSonarr struct {
 	Tags               types.Set    `tfsdk:"tags"`
-	LanguageProfileIds types.Set    `tfsdk:"language_profile_ids"`
-	ProfileIds         types.Set    `tfsdk:"quality_profile_ids"`
-	TagIds             types.Set    `tfsdk:"tag_ids"`
+	LanguageProfileIDs types.Set    `tfsdk:"language_profile_ids"`
+	ProfileIDs         types.Set    `tfsdk:"quality_profile_ids"`
+	TagIDs             types.Set    `tfsdk:"tag_ids"`
 	Name               types.String `tfsdk:"name"`
 	ShouldMonitor      types.String `tfsdk:"should_monitor"`
 	RootFolderPath     types.String `tfsdk:"root_folder_path"`
@@ -61,9 +61,9 @@ type ImportListSonarr struct {
 func (i ImportListSonarr) toImportList() *ImportList {
 	return &ImportList{
 		Tags:               i.Tags,
-		LanguageProfileIds: i.LanguageProfileIds,
-		ProfileIds:         i.ProfileIds,
-		TagIds:             i.TagIds,
+		LanguageProfileIDs: i.LanguageProfileIDs,
+		ProfileIDs:         i.ProfileIDs,
+		TagIDs:             i.TagIDs,
 		Name:               i.Name,
 		ShouldMonitor:      i.ShouldMonitor,
 		RootFolderPath:     i.RootFolderPath,
@@ -81,9 +81,9 @@ func (i ImportListSonarr) toImportList() *ImportList {
 
 func (i *ImportListSonarr) fromImportList(importList *ImportList) {
 	i.Tags = importList.Tags
-	i.LanguageProfileIds = importList.LanguageProfileIds
-	i.ProfileIds = importList.ProfileIds
-	i.TagIds = importList.TagIds
+	i.LanguageProfileIDs = importList.LanguageProfileIDs
+	i.ProfileIDs = importList.ProfileIDs
+	i.TagIDs = importList.TagIDs
 	i.Name = importList.Name
 	i.ShouldMonitor = importList.ShouldMonitor
 	i.RootFolderPath = importList.RootFolderPath
