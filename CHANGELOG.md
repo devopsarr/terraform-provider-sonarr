@@ -1,5 +1,21 @@
 # Changelog
 
+## [3.2.0](https://github.com/devopsarr/terraform-provider-sonarr/compare/v3.1.1...v3.2.0) (2024-03-09)
+
+
+### Features
+
+* add fields to use client extra headers ([2056b42](https://github.com/devopsarr/terraform-provider-sonarr/commit/2056b42d65bbc1f2bafa49246722bfdc243c5a80))
+* align with new sdk version ([4961b78](https://github.com/devopsarr/terraform-provider-sonarr/commit/4961b78dd0f388c2a9887f6f620784c127216302))
+* move to context based authentication ([e3183de](https://github.com/devopsarr/terraform-provider-sonarr/commit/e3183def5462bb7e6c2f6316996843fcd8f5606b))
+* remove deprecated boxcar notification ([c1b8500](https://github.com/devopsarr/terraform-provider-sonarr/commit/c1b850018ecfcaf80e4edbf20203416e8dfd58ae))
+* update go to 1.21 ([d633029](https://github.com/devopsarr/terraform-provider-sonarr/commit/d633029bc6a6f50522b3b4c17c8f47be676da152))
+
+
+### Bug Fixes
+
+* email encryption field ([e4b1976](https://github.com/devopsarr/terraform-provider-sonarr/commit/e4b1976574cc8e0095d8058cd5632b4790605163))
+
 ## [3.1.1](https://github.com/devopsarr/terraform-provider-sonarr/compare/v3.1.0...v3.1.1) (2023-10-25)
 
 
