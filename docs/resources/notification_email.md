@@ -29,10 +29,11 @@ resource "sonarr_notification_email" "example" {
   include_health_warnings = false
   name                    = "Example"
 
-  server = "http://email-server.net"
-  port   = 587
-  from   = "from_email@example.com"
-  to     = ["user1@example.com", "user2@example.com"]
+  server         = "http://email-server.net"
+  port           = 587
+  from           = "from_email@example.com"
+  to             = ["user1@example.com", "user2@example.com"]
+  use_encryption = 0
 }
 ```
 
@@ -64,8 +65,8 @@ resource "sonarr_notification_email" "example" {
 - `on_upgrade` (Boolean) On upgrade flag.
 - `password` (String, Sensitive) Password.
 - `port` (Number) Port.
-- `require_encryption` (Boolean) Require encryption flag.
 - `tags` (Set of Number) List of associated tags.
+- `use_encryption` (Number) Require encryption. `0` Preferred, `1` Always, `2` Never.
 - `username` (String) Username.
 
 ### Read-Only

@@ -16,7 +16,7 @@ For more information refer to [Notification](https://wiki.servarr.com/sonarr/set
 ## Example Usage
 
 ```terraform
-resource "sonarr_notification_boxcar" "example" {
+resource "sonarr_notification_signal" "example" {
   on_grab                            = false
   on_download                        = true
   on_upgrade                         = true

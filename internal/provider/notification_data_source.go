@@ -126,10 +126,6 @@ func (d *NotificationDataSource) Schema(_ context.Context, _ datasource.SchemaRe
 				MarkdownDescription: "Notify flag.",
 				Computed:            true,
 			},
-			"require_encryption": schema.BoolAttribute{
-				MarkdownDescription: "Require encryption flag.",
-				Computed:            true,
-			},
 			"send_silently": schema.BoolAttribute{
 				MarkdownDescription: "Add silently flag.",
 				Computed:            true,
@@ -144,6 +140,10 @@ func (d *NotificationDataSource) Schema(_ context.Context, _ datasource.SchemaRe
 			},
 			"use_ssl": schema.BoolAttribute{
 				MarkdownDescription: "Use SSL flag.",
+				Computed:            true,
+			},
+			"use_encryption": schema.Int64Attribute{
+				MarkdownDescription: "Require encryption.",
 				Computed:            true,
 			},
 			"expire": schema.Int64Attribute{

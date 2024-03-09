@@ -178,7 +178,6 @@ func (p *SonarrProvider) Resources(_ context.Context) []func() resource.Resource
 		// Notifications
 		NewNotificationResource,
 		NewNotificationAppriseResource,
-		NewNotificationBoxcarResource,
 		NewNotificationCustomScriptResource,
 		NewNotificationWebhookResource,
 		NewNotificationDiscordResource,
