@@ -41,5 +41,11 @@ const testUnauthorizedProvider = `
 provider "sonarr" {
 	url = "http://localhost:8989"
 	api_key = "ErrorAPIKey"
+	extra_headers = [
+		{
+			name = "testName"
+			value = "testValue"
+		}
+	]
   }
 `
