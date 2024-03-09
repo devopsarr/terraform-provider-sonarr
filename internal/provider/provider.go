@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/url"
 	"os"
+	"strings"
 
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
@@ -31,8 +32,21 @@ type SonarrProvider struct {
 
 // Sonarr describes the provider data model.
 type Sonarr struct {
-	APIKey types.String `tfsdk:"api_key"`
-	URL    types.String `tfsdk:"url"`
+	ExtraHeaders types.Set    `tfsdk:"extra_headers"`
+	APIKey       types.String `tfsdk:"api_key"`
+	URL          types.String `tfsdk:"url"`
+}
+
+// ExtraHeader is part of Sonarr.
+type ExtraHeader struct {
+	Name  types.String `tfsdk:"name"`
+	Value types.String `tfsdk:"value"`
+}
+
+// SonarrData defines auth and client to be used when connecting to Sonarr.
+type SonarrData struct {
+	Auth   context.Context
+	Client *sonarr.APIClient
 }
 
 func (p *SonarrProvider) Metadata(_ context.Context, _ provider.MetadataRequest, resp *provider.MetadataResponse) {
@@ -52,6 +66,22 @@ func (p *SonarrProvider) Schema(_ context.Context, _ provider.SchemaRequest, res
 			"url": schema.StringAttribute{
 				MarkdownDescription: "Full Sonarr URL with protocol and port (e.g. `https://test.sonarr.tv:8989`). You should **NOT** supply any path (`/api`), the SDK will use the appropriate paths. Can be specified via the `SONARR_URL` environment variable.",
 				Optional:            true,
+			},
+			"extra_headers": schema.SetNestedAttribute{
+				MarkdownDescription: "Extra headers to be sent along with all Sonarr requests. If this attribute is unset, it can be specified via environment variables following this pattern `SONARR_EXTRA_HEADER_${Header-Name}=${Header-Value}`.",
+				Optional:            true,
+				NestedObject: schema.NestedAttributeObject{
+					Attributes: map[string]schema.Attribute{
+						"name": schema.StringAttribute{
+							MarkdownDescription: "Header name.",
+							Required:            true,
+						},
+						"value": schema.StringAttribute{
+							MarkdownDescription: "Header value.",
+							Required:            true,
+						},
+					},
+				},
 			},
 		},
 	}
@@ -97,6 +127,26 @@ func (p *SonarrProvider) Configure(ctx context.Context, req provider.ConfigureRe
 		return
 	}
 
+	// Init config
+	config := sonarr.NewConfiguration()
+	// Check extra headers
+	if len(data.ExtraHeaders.Elements()) > 0 {
+		headers := make([]ExtraHeader, len(data.ExtraHeaders.Elements()))
+		resp.Diagnostics.Append(data.ExtraHeaders.ElementsAs(ctx, &headers, false)...)
+
+		for _, header := range headers {
+			config.AddDefaultHeader(header.Name.ValueString(), header.Value.ValueString())
+		}
+	} else {
+		env := os.Environ()
+		for _, v := range env {
+			if strings.HasPrefix(v, "SONARR_EXTRA_HEADER_") {
+				header := strings.Split(v, "=")
+				config.AddDefaultHeader(strings.TrimPrefix(header[0], "SONARR_EXTRA_HEADER_"), header[1])
+			}
+		}
+	}
+
 	// Set context for API calls
 	auth := context.WithValue(
 		context.Background(),
@@ -109,8 +159,13 @@ func (p *SonarrProvider) Configure(ctx context.Context, req provider.ConfigureRe
 		"protocol": parsedAPIURL.Scheme,
 		"hostpath": parsedAPIURL.Host,
 	})
-	resp.DataSourceData = auth
-	resp.ResourceData = auth
+
+	sonarrData := SonarrData{
+		Auth:   auth,
+		Client: sonarr.NewAPIClient(config),
+	}
+	resp.DataSourceData = &sonarrData
+	resp.ResourceData = &sonarrData
 }
 
 func (p *SonarrProvider) Resources(_ context.Context) []func() resource.Resource {
@@ -313,17 +368,17 @@ func resourceConfigure(_ context.Context, req resource.ConfigureRequest, resp *r
 		return nil, nil
 	}
 
-	providerData, ok := req.ProviderData.(context.Context)
+	providerData, ok := req.ProviderData.(*SonarrData)
 	if !ok {
 		resp.Diagnostics.AddError(
 			helpers.UnexpectedResourceConfigureType,
-			fmt.Sprintf("Expected context.Context, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *SonarrData, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return nil, nil
 	}
 
-	return providerData, sonarr.NewAPIClient(sonarr.NewConfiguration())
+	return providerData.Auth, providerData.Client
 }
 
 func dataSourceConfigure(_ context.Context, req datasource.ConfigureRequest, resp *datasource.ConfigureResponse) (context.Context, *sonarr.APIClient) {
@@ -332,15 +387,15 @@ func dataSourceConfigure(_ context.Context, req datasource.ConfigureRequest, res
 		return nil, nil
 	}
 
-	providerData, ok := req.ProviderData.(context.Context)
+	providerData, ok := req.ProviderData.(*SonarrData)
 	if !ok {
 		resp.Diagnostics.AddError(
 			helpers.UnexpectedDataSourceConfigureType,
-			fmt.Sprintf("Expected context.Context, got: %T. Please report this issue to the provider developers.", req.ProviderData),
+			fmt.Sprintf("Expected *SonarrData, got: %T. Please report this issue to the provider developers.", req.ProviderData),
 		)
 
 		return nil, nil
 	}
 
-	return providerData, sonarr.NewAPIClient(sonarr.NewConfiguration())
+	return providerData.Auth, providerData.Client
 }

@@ -32,4 +32,13 @@ provider "sonarr" {
 ### Optional
 
 - `api_key` (String, Sensitive) API key for Sonarr authentication. Can be specified via the `SONARR_API_KEY` environment variable.
+- `extra_headers` (Attributes Set) Extra headers to be sent along with all Sonarr requests. If this attribute is unset, it can be specified via environment variables following this pattern `SONARR_EXTRA_HEADER_${Header-Name}=${Header-Value}`. (see [below for nested schema](#nestedatt--extra_headers))
 - `url` (String) Full Sonarr URL with protocol and port (e.g. `https://test.sonarr.tv:8989`). You should **NOT** supply any path (`/api`), the SDK will use the appropriate paths. Can be specified via the `SONARR_URL` environment variable.
+
+<a id="nestedatt--extra_headers"></a>
+### Nested Schema for `extra_headers`
+
+Required:
+
+- `name` (String) Header name.
+- `value` (String) Header value.
