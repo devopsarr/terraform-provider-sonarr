@@ -110,7 +110,6 @@ resource "sonarr_notification" "example" {
 - `receiver_id` (String) Receiver ID.
 - `recipients` (Set of String) Recipients.
 - `refresh_token` (String) Refresh token.
-- `require_encryption` (Boolean) Require encryption flag.
 - `retry` (Number) Retry.
 - `send_silently` (Boolean) Add silently flag.
 - `sender_domain` (String) Sender domain.
@@ -127,6 +126,7 @@ resource "sonarr_notification" "example" {
 - `topics` (Set of String) Topics.
 - `update_library` (Boolean) Update library flag.
 - `url` (String) URL.
+- `use_encryption` (Number) Require encryption. `0` Preferred, `1` Always, `2` Never.
 - `use_eu_endpoint` (Boolean) Use EU endpoint flag.
 - `use_ssl` (Boolean) Use SSL flag.
 - `user_key` (String) User key.

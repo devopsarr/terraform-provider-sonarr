@@ -28,9 +28,9 @@ var (
 )
 
 var notificationFields = helpers.Fields{
-	Bools:                  []string{"alwaysUpdate", "cleanLibrary", "directMessage", "notify", "requireEncryption", "sendSilently", "updateLibrary", "useEuEndpoint", "useSsl"},
+	Bools:                  []string{"alwaysUpdate", "cleanLibrary", "directMessage", "notify", "sendSilently", "updateLibrary", "useEuEndpoint", "useSsl"},
 	Strings:                []string{"accessToken", "accessTokenSecret", "apiKey", "appToken", "arguments", "author", "authToken", "authUser", "avatar", "botToken", "channel", "chatId", "consumerKey", "consumerSecret", "deviceNames", "expires", "from", "host", "icon", "mention", "password", "path", "refreshToken", "senderDomain", "senderId", "server", "signIn", "sound", "token", "url", "userKey", "username", "userName", "webHookUrl", "clickUrl", "serverUrl", "authUsername", "authPassword", "statelessUrls", "configurationKey", "senderNumber", "receiverId", "key", "event"},
-	Ints:                   []string{"method", "port", "priority", "retry", "expire", "displayTime", "notificationType"},
+	Ints:                   []string{"method", "port", "priority", "retry", "expire", "displayTime", "notificationType", "useEncryption"},
 	StringSlices:           []string{"channelTags", "deviceIds", "devices", "recipients", "to", "cc", "bcc", "topics", "fieldTags"},
 	StringSlicesExceptions: []string{"tags"},
 	IntSlices:              []string{"grabFields", "importFields"},
@@ -113,6 +113,7 @@ type Notification struct {
 	Port                          types.Int64  `tfsdk:"port"`
 	Method                        types.Int64  `tfsdk:"method"`
 	Retry                         types.Int64  `tfsdk:"retry"`
+	UseEncryption                 types.Int64  `tfsdk:"use_encryption"`
 	ID                            types.Int64  `tfsdk:"id"`
 	UpdateLibrary                 types.Bool   `tfsdk:"update_library"`
 	OnGrab                        types.Bool   `tfsdk:"on_grab"`
@@ -121,7 +122,6 @@ type Notification struct {
 	UseSSL                        types.Bool   `tfsdk:"use_ssl"`
 	OnEpisodeFileDeleteForUpgrade types.Bool   `tfsdk:"on_episode_file_delete_for_upgrade"`
 	SendSilently                  types.Bool   `tfsdk:"send_silently"`
-	RequireEncryption             types.Bool   `tfsdk:"require_encryption"`
 	DirectMessage                 types.Bool   `tfsdk:"direct_message"`
 	CleanLibrary                  types.Bool   `tfsdk:"clean_library"`
 	AlwaysUpdate                  types.Bool   `tfsdk:"always_update"`
@@ -206,6 +206,7 @@ func (n Notification) getType() attr.Type {
 			"port":                               types.Int64Type,
 			"method":                             types.Int64Type,
 			"retry":                              types.Int64Type,
+			"use_encryption":                     types.Int64Type,
 			"id":                                 types.Int64Type,
 			"update_library":                     types.BoolType,
 			"on_grab":                            types.BoolType,
@@ -214,7 +215,6 @@ func (n Notification) getType() attr.Type {
 			"use_ssl":                            types.BoolType,
 			"on_episode_file_delete_for_upgrade": types.BoolType,
 			"send_silently":                      types.BoolType,
-			"require_encryption":                 types.BoolType,
 			"direct_message":                     types.BoolType,
 			"clean_library":                      types.BoolType,
 			"always_update":                      types.BoolType,
@@ -351,11 +351,6 @@ func (r *NotificationResource) Schema(_ context.Context, _ resource.SchemaReques
 				Optional:            true,
 				Computed:            true,
 			},
-			"require_encryption": schema.BoolAttribute{
-				MarkdownDescription: "Require encryption flag.",
-				Optional:            true,
-				Computed:            true,
-			},
 			"send_silently": schema.BoolAttribute{
 				MarkdownDescription: "Add silently flag.",
 				Optional:            true,
@@ -392,6 +387,14 @@ func (r *NotificationResource) Schema(_ context.Context, _ resource.SchemaReques
 				Computed:            true,
 				Validators: []validator.Int64{
 					int64validator.OneOf(1, 2),
+				},
+			},
+			"use_encryption": schema.Int64Attribute{
+				MarkdownDescription: "Require encryption. `0` Preferred, `1` Always, `2` Never.",
+				Optional:            true,
+				Computed:            true,
+				Validators: []validator.Int64{
+					int64validator.OneOf(0, 1, 2),
 				},
 			},
 			"priority": schema.Int64Attribute{

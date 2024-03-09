@@ -6,12 +6,14 @@ import (
 
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
+	"github.com/hashicorp/terraform-plugin-framework-validators/int64validator"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
+	"github.com/hashicorp/terraform-plugin-framework/schema/validator"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -51,7 +53,7 @@ type NotificationEmail struct {
 	Password                      types.String `tfsdk:"password"`
 	ID                            types.Int64  `tfsdk:"id"`
 	Port                          types.Int64  `tfsdk:"port"`
-	RequireEncryption             types.Bool   `tfsdk:"require_encryption"`
+	UseEncryption                 types.Int64  `tfsdk:"use_encryption"`
 	OnGrab                        types.Bool   `tfsdk:"on_grab"`
 	OnEpisodeFileDeleteForUpgrade types.Bool   `tfsdk:"on_episode_file_delete_for_upgrade"`
 	OnEpisodeFileDelete           types.Bool   `tfsdk:"on_episode_file_delete"`
@@ -79,7 +81,7 @@ func (n NotificationEmail) toNotification() *Notification {
 		Password:                      n.Password,
 		Name:                          n.Name,
 		ID:                            n.ID,
-		RequireEncryption:             n.RequireEncryption,
+		UseEncryption:                 n.UseEncryption,
 		OnGrab:                        n.OnGrab,
 		OnEpisodeFileDeleteForUpgrade: n.OnEpisodeFileDeleteForUpgrade,
 		OnEpisodeFileDelete:           n.OnEpisodeFileDelete,
@@ -109,7 +111,7 @@ func (n *NotificationEmail) fromNotification(notification *Notification) {
 	n.Password = notification.Password
 	n.Name = notification.Name
 	n.ID = notification.ID
-	n.RequireEncryption = notification.RequireEncryption
+	n.UseEncryption = notification.UseEncryption
 	n.OnGrab = notification.OnGrab
 	n.OnEpisodeFileDeleteForUpgrade = notification.OnEpisodeFileDeleteForUpgrade
 	n.OnEpisodeFileDelete = notification.OnEpisodeFileDelete
@@ -210,10 +212,13 @@ func (r *NotificationEmailResource) Schema(_ context.Context, _ resource.SchemaR
 				},
 			},
 			// Field values
-			"require_encryption": schema.BoolAttribute{
-				MarkdownDescription: "Require encryption flag.",
+			"use_encryption": schema.Int64Attribute{
+				MarkdownDescription: "Require encryption. `0` Preferred, `1` Always, `2` Never.",
 				Optional:            true,
 				Computed:            true,
+				Validators: []validator.Int64{
+					int64validator.OneOf(0, 1, 2),
+				},
 			},
 			"port": schema.Int64Attribute{
 				MarkdownDescription: "Port.",

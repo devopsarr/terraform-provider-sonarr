@@ -62,13 +62,14 @@ func testAccNotificationEmailResourceConfig(name, from string) string {
 		on_episode_file_delete_for_upgrade = false
 		on_health_issue                    = false
 		on_application_update              = false
-	  
+
 		include_health_warnings = false
 		name                    = "%s"
-	  
+
 		server = "http://email-server.net"
 		port = 587
 		from = "%s"
 		to = ["test@test.com", "test1@test.com"]
+		use_encryption = 0
 	}`, name, from)
 }
