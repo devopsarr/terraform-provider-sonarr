@@ -12,7 +12,7 @@ on:
 
 jobs:
   ci:
-    uses: devopsarr/shared-workflows/.github/workflows/terraform_provider_ci.yml@main
+    uses: devopsarr/shared-workflows/.github/workflows/terraform_provider_ci.yml@renovate/golangci-golangci-lint-action-6.x
     with:
       app-name: "SONARR"
       url: "http://localhost:8989"
