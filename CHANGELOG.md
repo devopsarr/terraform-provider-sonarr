@@ -1,5 +1,14 @@
 # Changelog
 
+## [3.2.1](https://github.com/devopsarr/terraform-provider-sonarr/compare/v3.2.0...v3.2.1) (2024-08-14)
+
+
+### Bug Fixes
+
+* bump golangci version ([37cd12d](https://github.com/devopsarr/terraform-provider-sonarr/commit/37cd12d04d53d0a74559500d550735d020172e0e))
+* **deps:** update terraform-framework ([374e965](https://github.com/devopsarr/terraform-provider-sonarr/commit/374e965ac1e53775f73478dcde57cfcb973cbc10))
+* goreleaser syntax ([1292adf](https://github.com/devopsarr/terraform-provider-sonarr/commit/1292adf9c6818dee423222cb21f20ca3a7975147))
+
 ## [3.2.0](https://github.com/devopsarr/terraform-provider-sonarr/compare/v3.1.1...v3.2.0) (2024-03-09)
 
 
