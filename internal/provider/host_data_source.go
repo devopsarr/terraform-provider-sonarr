@@ -99,6 +99,10 @@ func (d *HostDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, r
 						MarkdownDescription: "Console log level.",
 						Computed:            true,
 					},
+					"log_size_limit": schema.Int64Attribute{
+						MarkdownDescription: "Log size limit.",
+						Computed:            true,
+					},
 					"analytics_enabled": schema.BoolAttribute{
 						MarkdownDescription: "Enable analytics flag.",
 						Computed:            true,

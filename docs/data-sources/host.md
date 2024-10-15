@@ -67,6 +67,7 @@ Read-Only:
 - `analytics_enabled` (Boolean) Enable analytics flag.
 - `console_log_level` (String) Console log level.
 - `log_level` (String) Log level.
+- `log_size_limit` (Number) Log size limit.
 
 
 <a id="nestedatt--proxy"></a>
