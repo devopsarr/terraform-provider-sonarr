@@ -108,6 +108,7 @@ Required:
 Required:
 
 - `log_level` (String) Log level.
+- `log_size_limit` (Number) Log size limit.
 
 Optional:
 
