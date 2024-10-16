@@ -1,5 +1,21 @@
 # Changelog
 
+## [3.3.0](https://github.com/devopsarr/terraform-provider-sonarr/compare/v3.2.0...v3.3.0) (2024-10-16)
+
+
+### Features
+
+* add on_import_complete notification support ([3c72a5f](https://github.com/devopsarr/terraform-provider-sonarr/commit/3c72a5fdc80f5a495a92a4c72d61ea8a5ce633ee))
+
+
+### Bug Fixes
+
+* add support for log size limit ([1ed9c19](https://github.com/devopsarr/terraform-provider-sonarr/commit/1ed9c19651194c4ffb6d11ac1d06e856e7b108f8))
+* bump golangci version ([37cd12d](https://github.com/devopsarr/terraform-provider-sonarr/commit/37cd12d04d53d0a74559500d550735d020172e0e))
+* **deps:** update module github.com/devopsarr/sonarr-go to v1.0.1 ([cd8d2d0](https://github.com/devopsarr/terraform-provider-sonarr/commit/cd8d2d06f377e69dccf3169fe3132d45b71331d9))
+* **deps:** update terraform-framework ([374e965](https://github.com/devopsarr/terraform-provider-sonarr/commit/374e965ac1e53775f73478dcde57cfcb973cbc10))
+* goreleaser syntax ([1292adf](https://github.com/devopsarr/terraform-provider-sonarr/commit/1292adf9c6818dee423222cb21f20ca3a7975147))
+
 ## [3.2.0](https://github.com/devopsarr/terraform-provider-sonarr/compare/v3.1.1...v3.2.0) (2024-03-09)
 
 
