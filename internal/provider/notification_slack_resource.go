@@ -60,6 +60,7 @@ type NotificationSlack struct {
 	OnRename                      types.Bool   `tfsdk:"on_rename"`
 	OnUpgrade                     types.Bool   `tfsdk:"on_upgrade"`
 	OnDownload                    types.Bool   `tfsdk:"on_download"`
+	OnImportComplete              types.Bool   `tfsdk:"on_import_complete"`
 }
 
 func (n NotificationSlack) toNotification() *Notification {
@@ -84,6 +85,7 @@ func (n NotificationSlack) toNotification() *Notification {
 		OnRename:                      n.OnRename,
 		OnUpgrade:                     n.OnUpgrade,
 		OnDownload:                    n.OnDownload,
+		OnImportComplete:              n.OnImportComplete,
 		ConfigContract:                types.StringValue(notificationSlackConfigContract),
 		Implementation:                types.StringValue(notificationSlackImplementation),
 	}
@@ -110,6 +112,7 @@ func (n *NotificationSlack) fromNotification(notification *Notification) {
 	n.OnRename = notification.OnRename
 	n.OnUpgrade = notification.OnUpgrade
 	n.OnDownload = notification.OnDownload
+	n.OnImportComplete = notification.OnImportComplete
 }
 
 func (r *NotificationSlackResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -127,6 +130,11 @@ func (r *NotificationSlackResource) Schema(_ context.Context, _ resource.SchemaR
 			},
 			"on_download": schema.BoolAttribute{
 				MarkdownDescription: "On download flag.",
+				Optional:            true,
+				Computed:            true,
+			},
+			"on_import_complete": schema.BoolAttribute{
+				MarkdownDescription: "On import complete flag.",
 				Optional:            true,
 				Computed:            true,
 			},

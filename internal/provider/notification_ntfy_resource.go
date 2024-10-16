@@ -65,6 +65,7 @@ type NotificationNtfy struct {
 	OnSeriesDelete                types.Bool   `tfsdk:"on_series_delete"`
 	OnUpgrade                     types.Bool   `tfsdk:"on_upgrade"`
 	OnDownload                    types.Bool   `tfsdk:"on_download"`
+	OnImportComplete              types.Bool   `tfsdk:"on_import_complete"`
 }
 
 func (n NotificationNtfy) toNotification() *Notification {
@@ -92,6 +93,7 @@ func (n NotificationNtfy) toNotification() *Notification {
 		OnSeriesDelete:                n.OnSeriesDelete,
 		OnUpgrade:                     n.OnUpgrade,
 		OnDownload:                    n.OnDownload,
+		OnImportComplete:              n.OnImportComplete,
 		ConfigContract:                types.StringValue(notificationNtfyConfigContract),
 		Implementation:                types.StringValue(notificationNtfyImplementation),
 	}
@@ -121,6 +123,7 @@ func (n *NotificationNtfy) fromNotification(notification *Notification) {
 	n.OnSeriesDelete = notification.OnSeriesDelete
 	n.OnUpgrade = notification.OnUpgrade
 	n.OnDownload = notification.OnDownload
+	n.OnImportComplete = notification.OnImportComplete
 }
 
 func (r *NotificationNtfyResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -138,6 +141,11 @@ func (r *NotificationNtfyResource) Schema(_ context.Context, _ resource.SchemaRe
 			},
 			"on_download": schema.BoolAttribute{
 				MarkdownDescription: "On download flag.",
+				Optional:            true,
+				Computed:            true,
+			},
+			"on_import_complete": schema.BoolAttribute{
+				MarkdownDescription: "On import complete flag.",
 				Optional:            true,
 				Computed:            true,
 			},

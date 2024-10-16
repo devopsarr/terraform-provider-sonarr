@@ -59,6 +59,10 @@ func (d *NotificationsDataSource) Schema(_ context.Context, _ datasource.SchemaR
 							MarkdownDescription: "On download flag.",
 							Computed:            true,
 						},
+						"on_import_complete": schema.BoolAttribute{
+							MarkdownDescription: "On import complete flag.",
+							Computed:            true,
+						},
 						"on_upgrade": schema.BoolAttribute{
 							MarkdownDescription: "On upgrade flag.",
 							Computed:            true,
