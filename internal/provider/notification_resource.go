@@ -136,6 +136,7 @@ type Notification struct {
 	OnRename                      types.Bool   `tfsdk:"on_rename"`
 	OnUpgrade                     types.Bool   `tfsdk:"on_upgrade"`
 	OnDownload                    types.Bool   `tfsdk:"on_download"`
+	OnImportComplete              types.Bool   `tfsdk:"on_import_complete"`
 }
 
 func (n Notification) getType() attr.Type {
@@ -229,6 +230,7 @@ func (n Notification) getType() attr.Type {
 			"on_rename":                          types.BoolType,
 			"on_upgrade":                         types.BoolType,
 			"on_download":                        types.BoolType,
+			"on_import_complete":                 types.BoolType,
 		})
 }
 
@@ -247,6 +249,11 @@ func (r *NotificationResource) Schema(_ context.Context, _ resource.SchemaReques
 			},
 			"on_download": schema.BoolAttribute{
 				MarkdownDescription: "On download flag.",
+				Optional:            true,
+				Computed:            true,
+			},
+			"on_import_complete": schema.BoolAttribute{
+				MarkdownDescription: "On import complete flag.",
 				Optional:            true,
 				Computed:            true,
 			},
@@ -857,6 +864,7 @@ func (n *Notification) write(ctx context.Context, notification *sonarr.Notificat
 	n.OnHealthRestored = types.BoolValue(notification.GetOnHealthRestored())
 	n.OnApplicationUpdate = types.BoolValue(notification.GetOnApplicationUpdate())
 	n.OnManualInteractionRequired = types.BoolValue(notification.GetOnManualInteractionRequired())
+	n.OnImportComplete = types.BoolValue(notification.GetOnImportComplete())
 	n.IncludeHealthWarnings = types.BoolValue(notification.GetIncludeHealthWarnings())
 	n.ID = types.Int64Value(int64(notification.GetId()))
 	n.Name = types.StringValue(notification.GetName())
@@ -890,6 +898,7 @@ func (n *Notification) read(ctx context.Context, diags *diag.Diagnostics) *sonar
 	notification.SetOnHealthRestored(n.OnHealthRestored.ValueBool())
 	notification.SetOnApplicationUpdate(n.OnApplicationUpdate.ValueBool())
 	notification.SetOnManualInteractionRequired(n.OnManualInteractionRequired.ValueBool())
+	notification.SetOnImportComplete(n.OnImportComplete.ValueBool())
 	notification.SetIncludeHealthWarnings(n.IncludeHealthWarnings.ValueBool())
 	notification.SetId(int32(n.ID.ValueInt64()))
 	notification.SetName(n.Name.ValueString())

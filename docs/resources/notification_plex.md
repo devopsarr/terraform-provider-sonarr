@@ -48,6 +48,7 @@ resource "sonarr_notification_plex" "example" {
 - `on_download` (Boolean) On download flag.
 - `on_episode_file_delete` (Boolean) On episode file delete flag.
 - `on_episode_file_delete_for_upgrade` (Boolean) On episode file delete for upgrade flag.
+- `on_import_complete` (Boolean) On import complete flag.
 - `on_rename` (Boolean) On rename flag.
 - `on_series_add` (Boolean) On series add flag.
 - `on_series_delete` (Boolean) On series delete flag.

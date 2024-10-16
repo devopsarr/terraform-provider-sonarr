@@ -53,6 +53,7 @@ resource "sonarr_notification_custom_script" "example" {
 - `on_grab` (Boolean) On grab flag.
 - `on_health_issue` (Boolean) On health issue flag.
 - `on_health_restored` (Boolean) On health restored flag.
+- `on_import_complete` (Boolean) On import complete flag.
 - `on_manual_interaction_required` (Boolean) On manual interaction required flag.
 - `on_rename` (Boolean) On rename flag.
 - `on_series_add` (Boolean) On series add flag.

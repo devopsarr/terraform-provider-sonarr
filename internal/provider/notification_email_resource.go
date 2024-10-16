@@ -66,6 +66,7 @@ type NotificationEmail struct {
 	OnSeriesDelete                types.Bool   `tfsdk:"on_series_delete"`
 	OnUpgrade                     types.Bool   `tfsdk:"on_upgrade"`
 	OnDownload                    types.Bool   `tfsdk:"on_download"`
+	OnImportComplete              types.Bool   `tfsdk:"on_import_complete"`
 }
 
 func (n NotificationEmail) toNotification() *Notification {
@@ -94,6 +95,7 @@ func (n NotificationEmail) toNotification() *Notification {
 		OnSeriesDelete:                n.OnSeriesDelete,
 		OnUpgrade:                     n.OnUpgrade,
 		OnDownload:                    n.OnDownload,
+		OnImportComplete:              n.OnImportComplete,
 		ConfigContract:                types.StringValue(notificationEmailConfigContract),
 		Implementation:                types.StringValue(notificationEmailImplementation),
 	}
@@ -124,6 +126,7 @@ func (n *NotificationEmail) fromNotification(notification *Notification) {
 	n.OnSeriesDelete = notification.OnSeriesDelete
 	n.OnUpgrade = notification.OnUpgrade
 	n.OnDownload = notification.OnDownload
+	n.OnImportComplete = notification.OnImportComplete
 }
 
 func (r *NotificationEmailResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
@@ -141,6 +144,11 @@ func (r *NotificationEmailResource) Schema(_ context.Context, _ resource.SchemaR
 			},
 			"on_download": schema.BoolAttribute{
 				MarkdownDescription: "On download flag.",
+				Optional:            true,
+				Computed:            true,
+			},
+			"on_import_complete": schema.BoolAttribute{
+				MarkdownDescription: "On import complete flag.",
 				Optional:            true,
 				Computed:            true,
 			},
