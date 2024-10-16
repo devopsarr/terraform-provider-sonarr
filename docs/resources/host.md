@@ -31,8 +31,7 @@ resource "sonarr_host" "test" {
     certificate_validation = "enabled"
   }
   logging = {
-    log_level      = "info"
-    log_size_limit = 1
+    log_level = "info"
   }
   backup = {
     folder    = "/backup"
