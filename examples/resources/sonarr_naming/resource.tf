@@ -1,4 +1,4 @@
-resource "sonarr_media_management" "example" {
+resource "sonarr_naming" "example" {
   rename_episodes            = true
   replace_illegal_characters = true
   multi_episode_style        = 0
