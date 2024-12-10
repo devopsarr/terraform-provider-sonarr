@@ -17,12 +17,12 @@ func TestAccIndexerResource(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Unauthorized Create
 			{
-				Config:      testAccIndexerResourceConfig("resourceTest", "false") + testUnauthorizedProvider,
+				Config:      testAccIndexerResourceConfig("resourceTest", "/api") + testUnauthorizedProvider,
 				ExpectError: regexp.MustCompile("Client Error"),
 			},
 			// Create and Read testing
 			{
-				Config: testAccIndexerResourceConfig("resourceTest", "false"),
+				Config: testAccIndexerResourceConfig("resourceTest", "/api"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("sonarr_indexer.test", "enable_automatic_search", "false"),
 					resource.TestCheckResourceAttr("sonarr_indexer.test", "base_url", "https://lolo.sickbeard.com"),
@@ -31,14 +31,14 @@ func TestAccIndexerResource(t *testing.T) {
 			},
 			// Unauthorized Read
 			{
-				Config:      testAccIndexerResourceConfig("resourceTest", "false") + testUnauthorizedProvider,
+				Config:      testAccIndexerResourceConfig("resourceTest", "/api") + testUnauthorizedProvider,
 				ExpectError: regexp.MustCompile("Client Error"),
 			},
 			// Update and Read testing
 			{
-				Config: testAccIndexerResourceConfig("resourceTest", "true"),
+				Config: testAccIndexerResourceConfig("resourceTest", "/apis"),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("sonarr_indexer.test", "enable_automatic_search", "true"),
+					resource.TestCheckResourceAttr("sonarr_indexer.test", "api_path", "/apis"),
 				),
 			},
 			// ImportState testing
@@ -58,16 +58,16 @@ func TestAccIndexerResource(t *testing.T) {
 	})
 }
 
-func testAccIndexerResourceConfig(name, aSearch string) string {
+func testAccIndexerResourceConfig(name, apiPath string) string {
 	return fmt.Sprintf(`
 	resource "sonarr_indexer" "test" {
-		enable_automatic_search = %s
+		enable_automatic_search = false
 		name = "%s"
 		implementation = "Newznab"
 		protocol = "usenet"
     	config_contract = "NewznabSettings"
 		base_url = "https://lolo.sickbeard.com"
-		api_path = "/api"
+		api_path = "%s"
 		categories = [5030, 5040]
 		tags = []
 	}
@@ -84,5 +84,5 @@ func testAccIndexerResourceConfig(name, aSearch string) string {
 		protocol = "torrent"
     	config_contract = "FileListSettings"
 	}
-	`, aSearch, name, name)
+	`, name, apiPath, name)
 }

@@ -27,7 +27,7 @@ func TestAccIndexerDataSource(t *testing.T) {
 			},
 			// Read testing
 			{
-				Config: testAccIndexerResourceConfig("indexerdata", "false") + testAccIndexerDataSourceConfig("sonarr_indexer.test.name"),
+				Config: testAccIndexerResourceConfig("indexerdata", "/api") + testAccIndexerDataSourceConfig("sonarr_indexer.test.name"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrSet("data.sonarr_indexer.test", "id"),
 					resource.TestCheckResourceAttr("data.sonarr_indexer.test", "protocol", "usenet")),

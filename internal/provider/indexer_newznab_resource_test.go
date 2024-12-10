@@ -17,12 +17,12 @@ func TestAccIndexerNewznabResource(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Unauthorized Create
 			{
-				Config:      testAccIndexerNewznabResourceConfig("newzabResourceTest", "false") + testUnauthorizedProvider,
+				Config:      testAccIndexerNewznabResourceConfig("newzabResourceTest", "/api") + testUnauthorizedProvider,
 				ExpectError: regexp.MustCompile("Client Error"),
 			},
 			// Create and Read testing
 			{
-				Config: testAccIndexerNewznabResourceConfig("newzabResourceTest", "false"),
+				Config: testAccIndexerNewznabResourceConfig("newzabResourceTest", "/api"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("sonarr_indexer_newznab.test", "enable_automatic_search", "false"),
 					resource.TestCheckResourceAttr("sonarr_indexer_newznab.test", "base_url", "https://lolo.sickbeard.com"),
@@ -31,14 +31,14 @@ func TestAccIndexerNewznabResource(t *testing.T) {
 			},
 			// Unauthorized Read
 			{
-				Config:      testAccIndexerNewznabResourceConfig("newzabResourceTest", "false") + testUnauthorizedProvider,
+				Config:      testAccIndexerNewznabResourceConfig("newzabResourceTest", "/api") + testUnauthorizedProvider,
 				ExpectError: regexp.MustCompile("Client Error"),
 			},
 			// Update and Read testing
 			{
-				Config: testAccIndexerNewznabResourceConfig("newzabResourceTest", "true"),
+				Config: testAccIndexerNewznabResourceConfig("newzabResourceTest", "/apis"),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("sonarr_indexer_newznab.test", "enable_automatic_search", "true"),
+					resource.TestCheckResourceAttr("sonarr_indexer_newznab.test", "api_path", "/apis"),
 				),
 			},
 			// ImportState testing
@@ -52,13 +52,13 @@ func TestAccIndexerNewznabResource(t *testing.T) {
 	})
 }
 
-func testAccIndexerNewznabResourceConfig(name, aSearch string) string {
+func testAccIndexerNewznabResourceConfig(name, apiPath string) string {
 	return fmt.Sprintf(`
 	resource "sonarr_indexer_newznab" "test" {
-		enable_automatic_search = %s
+		enable_automatic_search = false
 		name = "%s"
 		base_url = "https://lolo.sickbeard.com"
-		api_path = "/api"
+		api_path = "%s"
 		categories = [5030, 5040]
-	}`, aSearch, name)
+	}`, name, apiPath)
 }
