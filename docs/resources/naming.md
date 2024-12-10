@@ -16,7 +16,7 @@ For more information refer to [Naming](https://wiki.servarr.com/sonarr/settings#
 ## Example Usage
 
 ```terraform
-resource "sonarr_media_management" "example" {
+resource "sonarr_naming" "example" {
   rename_episodes            = true
   replace_illegal_characters = true
   multi_episode_style        = 0
@@ -56,5 +56,5 @@ Import is supported using the following syntax:
 
 ```shell
 # import does not need parameters
-terraform import sonarr_indexer_config.example ""
+terraform import sonarr_naming.example ""
 ```
