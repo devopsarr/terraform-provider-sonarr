@@ -211,7 +211,7 @@ func (r *MetadataKodiResource) Update(ctx context.Context, req resource.UpdateRe
 	// Update MetadataKodi
 	request := metadata.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.MetadataAPI.UpdateMetadata(r.auth, strconv.Itoa(int(request.GetId()))).MetadataResource(*request).Execute()
+	response, _, err := r.client.MetadataAPI.UpdateMetadata(r.auth, request.GetId()).MetadataResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, metadataKodiResourceName, err))
 

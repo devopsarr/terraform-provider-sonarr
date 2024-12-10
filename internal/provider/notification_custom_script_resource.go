@@ -288,7 +288,7 @@ func (r *NotificationCustomScriptResource) Update(ctx context.Context, req resou
 	// Update NotificationCustomScript
 	request := notification.read(ctx, &resp.Diagnostics)
 
-	response, _, err := r.client.NotificationAPI.UpdateNotification(r.auth, strconv.Itoa(int(request.GetId()))).NotificationResource(*request).Execute()
+	response, _, err := r.client.NotificationAPI.UpdateNotification(r.auth, request.GetId()).NotificationResource(*request).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Update, notificationCustomScriptResourceName, err))
 
