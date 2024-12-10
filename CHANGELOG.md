@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.3.1](https://github.com/devopsarr/terraform-provider-sonarr/compare/v3.3.0...v3.3.1) (2024-12-10)
+
+
+### Bug Fixes
+
+* **deps:** update module github.com/stretchr/testify to v1.10.0 ([fed1951](https://github.com/devopsarr/terraform-provider-sonarr/commit/fed19515c0c4287a5ec7078f046ba1659b575fa3))
+
 ## [3.3.0](https://github.com/devopsarr/terraform-provider-sonarr/compare/v3.2.0...v3.3.0) (2024-10-16)
 
 
