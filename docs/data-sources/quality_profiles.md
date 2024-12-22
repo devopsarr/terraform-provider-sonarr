@@ -36,6 +36,7 @@ Read-Only:
 - `format_items` (Attributes Set) Quality groups. (see [below for nested schema](#nestedatt--quality_profiles--format_items))
 - `id` (Number) Quality Profile ID.
 - `min_format_score` (Number) Min format score.
+- `min_upgrade_format_score` (Number) Min upgrade format score.
 - `name` (String) Quality Profile Name.
 - `quality_groups` (Attributes List) Quality groups. (see [below for nested schema](#nestedatt--quality_profiles--quality_groups))
 - `upgrade_allowed` (Boolean) Upgrade allowed flag.

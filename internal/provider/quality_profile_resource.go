@@ -12,6 +12,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64default"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/int64planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
@@ -39,27 +40,29 @@ type QualityProfileResource struct {
 
 // QualityProfile describes the quality profile data model.
 type QualityProfile struct {
-	FormatItems       types.Set    `tfsdk:"format_items"`
-	QualityGroups     types.List   `tfsdk:"quality_groups"`
-	Name              types.String `tfsdk:"name"`
-	ID                types.Int64  `tfsdk:"id"`
-	Cutoff            types.Int64  `tfsdk:"cutoff"`
-	MinFormatScore    types.Int64  `tfsdk:"min_format_score"`
-	CutoffFormatScore types.Int64  `tfsdk:"cutoff_format_score"`
-	UpgradeAllowed    types.Bool   `tfsdk:"upgrade_allowed"`
+	FormatItems           types.Set    `tfsdk:"format_items"`
+	QualityGroups         types.List   `tfsdk:"quality_groups"`
+	Name                  types.String `tfsdk:"name"`
+	ID                    types.Int64  `tfsdk:"id"`
+	Cutoff                types.Int64  `tfsdk:"cutoff"`
+	MinFormatScore        types.Int64  `tfsdk:"min_format_score"`
+	MinUpgradeFormatScore types.Int64  `tfsdk:"min_upgrade_format_score"`
+	CutoffFormatScore     types.Int64  `tfsdk:"cutoff_format_score"`
+	UpgradeAllowed        types.Bool   `tfsdk:"upgrade_allowed"`
 }
 
 func (p QualityProfile) getType() attr.Type {
 	return types.ObjectType{}.WithAttributeTypes(
 		map[string]attr.Type{
-			"quality_groups":      types.ListType{}.WithElementType(QualityGroup{}.getType()),
-			"format_items":        types.SetType{}.WithElementType(FormatItem{}.getType()),
-			"name":                types.StringType,
-			"id":                  types.Int64Type,
-			"cutoff":              types.Int64Type,
-			"min_format_score":    types.Int64Type,
-			"cutoff_format_score": types.Int64Type,
-			"upgrade_allowed":     types.BoolType,
+			"quality_groups":           types.ListType{}.WithElementType(QualityGroup{}.getType()),
+			"format_items":             types.SetType{}.WithElementType(FormatItem{}.getType()),
+			"name":                     types.StringType,
+			"id":                       types.Int64Type,
+			"cutoff":                   types.Int64Type,
+			"min_format_score":         types.Int64Type,
+			"min_upgrade_format_score": types.Int64Type,
+			"cutoff_format_score":      types.Int64Type,
+			"upgrade_allowed":          types.BoolType,
 		})
 }
 
@@ -133,6 +136,12 @@ func (r *QualityProfileResource) Schema(_ context.Context, _ resource.SchemaRequ
 				MarkdownDescription: "Min format score.",
 				Optional:            true,
 				Computed:            true,
+			},
+			"min_upgrade_format_score": schema.Int64Attribute{
+				MarkdownDescription: "Min upgrade format score.",
+				Optional:            true,
+				Computed:            true,
+				Default:             int64default.StaticInt64(1),
 			},
 			"quality_groups": schema.ListNestedAttribute{
 				MarkdownDescription: "Ordered list of allowed quality groups.",
@@ -359,6 +368,7 @@ func (p *QualityProfile) write(ctx context.Context, profile *sonarr.QualityProfi
 	p.Cutoff = types.Int64Value(int64(profile.GetCutoff()))
 	p.CutoffFormatScore = types.Int64Value(int64(profile.GetCutoffFormatScore()))
 	p.MinFormatScore = types.Int64Value(int64(profile.GetMinFormatScore()))
+	p.MinUpgradeFormatScore = types.Int64Value(int64(profile.GetMinUpgradeFormatScore()))
 
 	qualityGroups := make([]QualityGroup, 0, len(profile.GetItems()))
 
@@ -483,6 +493,7 @@ func (p *QualityProfile) read(ctx context.Context, qualitiesIDs []int32, formatI
 	profile.SetId(int32(p.ID.ValueInt64()))
 	profile.SetCutoff(int32(p.Cutoff.ValueInt64()))
 	profile.SetMinFormatScore(int32(p.MinFormatScore.ValueInt64()))
+	profile.SetMinUpgradeFormatScore(int32(p.MinUpgradeFormatScore.ValueInt64()))
 	profile.SetCutoffFormatScore(int32(p.CutoffFormatScore.ValueInt64()))
 	profile.SetName(p.Name.ValueString())
 	profile.SetItems(qualities)

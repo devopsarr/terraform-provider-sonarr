@@ -58,6 +58,7 @@ resource "sonarr_quality_profile" "example" {
 - `cutoff_format_score` (Number) Cutoff format score.
 - `format_items` (Attributes Set) Format items. Only the ones with score > 0 are needed. (see [below for nested schema](#nestedatt--format_items))
 - `min_format_score` (Number) Min format score.
+- `min_upgrade_format_score` (Number) Min upgrade format score.
 - `upgrade_allowed` (Boolean) Upgrade allowed flag.
 
 ### Read-Only

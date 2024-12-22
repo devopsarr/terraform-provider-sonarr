@@ -59,6 +59,10 @@ func (d *QualityProfileDataSource) Schema(_ context.Context, _ datasource.Schema
 				MarkdownDescription: "Min format score.",
 				Computed:            true,
 			},
+			"min_upgrade_format_score": schema.Int64Attribute{
+				MarkdownDescription: "Min upgrade format score.",
+				Computed:            true,
+			},
 			"quality_groups": schema.ListNestedAttribute{
 				MarkdownDescription: "Quality groups.",
 				Computed:            true,
