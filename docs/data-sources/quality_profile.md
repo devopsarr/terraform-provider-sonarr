@@ -33,6 +33,7 @@ data "sonarr_quality_profile" "example" {
 - `format_items` (Attributes Set) Quality groups. (see [below for nested schema](#nestedatt--format_items))
 - `id` (Number) Quality Profile ID.
 - `min_format_score` (Number) Min format score.
+- `min_upgrade_format_score` (Number) Min upgrade format score.
 - `quality_groups` (Attributes List) Quality groups. (see [below for nested schema](#nestedatt--quality_groups))
 - `upgrade_allowed` (Boolean) Upgrade allowed flag.
 
