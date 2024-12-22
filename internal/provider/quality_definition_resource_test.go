@@ -55,9 +55,10 @@ func testAccQualityDefinitionResourceConfig(name string) string {
 	return fmt.Sprintf(`
 	resource "sonarr_quality_definition" "test" {
 		id = 21
-		title    = "%s"
-		min_size = 35.0
-		max_size = 400
+		title          = "%s"
+		min_size       = 35.0
+		max_size       = 400
+		preferred_size = 200
 	}
 	`, name)
 }

@@ -64,6 +64,10 @@ func (d *QualityDefinitionsDataSource) Schema(_ context.Context, _ datasource.Sc
 							Optional:            true,
 							Computed:            true,
 						},
+						"preferred_size": schema.Float64Attribute{
+							MarkdownDescription: "Preferred size MB/min.",
+							Computed:            true,
+						},
 						"max_size": schema.Float64Attribute{
 							MarkdownDescription: "Maximum size MB/min.",
 							Computed:            true,
