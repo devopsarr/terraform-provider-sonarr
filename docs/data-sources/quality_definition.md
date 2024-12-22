@@ -33,6 +33,7 @@ data "sonarr_quality_definition" "example" {
 ### Read-Only
 
 - `max_size` (Number) Maximum size MB/min.
+- `preferred_size` (Number) Preferred size MB/min.
 - `quality_id` (Number) Quality ID.
 - `quality_name` (String) Quality Name.
 - `resolution` (Number) Quality Resolution.

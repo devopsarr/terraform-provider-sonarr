@@ -17,10 +17,11 @@ For more information refer to [Quality Definition](https://wiki.servarr.com/sona
 
 ```terraform
 resource "sonarr_quality_definition" "example" {
-  id       = 21
-  title    = "Example"
-  min_size = 35.0
-  max_size = 400
+  id             = 21
+  title          = "Example"
+  min_size       = 35.0
+  max_size       = 400
+  preferred_size = 200
 }
 ```
 
@@ -36,6 +37,7 @@ resource "sonarr_quality_definition" "example" {
 
 - `max_size` (Number) Maximum size MB/min.
 - `min_size` (Number) Minimum size MB/min.
+- `preferred_size` (Number) Preferred size MB/min.
 
 ### Read-Only
 

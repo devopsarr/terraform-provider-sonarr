@@ -37,27 +37,29 @@ type QualityDefinitionResource struct {
 
 // QualityDefinition describes the quality definition data model.
 type QualityDefinition struct {
-	MinSize     types.Float64 `tfsdk:"min_size"`
-	MaxSize     types.Float64 `tfsdk:"max_size"`
-	Title       types.String  `tfsdk:"title"`
-	QualityName types.String  `tfsdk:"quality_name"`
-	Source      types.String  `tfsdk:"source"`
-	ID          types.Int64   `tfsdk:"id"`
-	QualityID   types.Int64   `tfsdk:"quality_id"`
-	Resolution  types.Int64   `tfsdk:"resolution"`
+	MinSize       types.Float64 `tfsdk:"min_size"`
+	MaxSize       types.Float64 `tfsdk:"max_size"`
+	PreferredSize types.Float64 `tfsdk:"preferred_size"`
+	Title         types.String  `tfsdk:"title"`
+	QualityName   types.String  `tfsdk:"quality_name"`
+	Source        types.String  `tfsdk:"source"`
+	ID            types.Int64   `tfsdk:"id"`
+	QualityID     types.Int64   `tfsdk:"quality_id"`
+	Resolution    types.Int64   `tfsdk:"resolution"`
 }
 
 func (p QualityDefinition) getType() attr.Type {
 	return types.ObjectType{}.WithAttributeTypes(
 		map[string]attr.Type{
-			"id":           types.Int64Type,
-			"quality_id":   types.Int64Type,
-			"resolution":   types.Int64Type,
-			"min_size":     types.Float64Type,
-			"max_size":     types.Float64Type,
-			"title":        types.StringType,
-			"quality_name": types.StringType,
-			"source":       types.StringType,
+			"id":             types.Int64Type,
+			"quality_id":     types.Int64Type,
+			"resolution":     types.Int64Type,
+			"min_size":       types.Float64Type,
+			"max_size":       types.Float64Type,
+			"preferred_size": types.Float64Type,
+			"title":          types.StringType,
+			"quality_name":   types.StringType,
+			"source":         types.StringType,
 		})
 }
 
@@ -84,6 +86,11 @@ func (r *QualityDefinitionResource) Schema(_ context.Context, _ resource.SchemaR
 			},
 			"max_size": schema.Float64Attribute{
 				MarkdownDescription: "Maximum size MB/min.",
+				Optional:            true,
+				Computed:            true,
+			},
+			"preferred_size": schema.Float64Attribute{
+				MarkdownDescription: "Preferred size MB/min.",
 				Optional:            true,
 				Computed:            true,
 			},
@@ -232,6 +239,7 @@ func (p *QualityDefinition) write(definition *sonarr.QualityDefinitionResource) 
 	p.ID = types.Int64Value(int64(definition.GetId()))
 	p.MinSize = types.Float64Value(definition.GetMinSize())
 	p.MaxSize = types.Float64Value(definition.GetMaxSize())
+	p.PreferredSize = types.Float64Value(definition.GetPreferredSize())
 	p.Title = types.StringValue(definition.GetTitle())
 	p.QualityName = types.StringValue(definition.Quality.GetName())
 	p.QualityID = types.Int64Value(int64(definition.Quality.GetId()))
@@ -250,6 +258,7 @@ func (p *QualityDefinition) read() *sonarr.QualityDefinitionResource {
 	definition.SetId(int32(p.ID.ValueInt64()))
 	definition.SetMaxSize(p.MaxSize.ValueFloat64())
 	definition.SetMinSize(p.MinSize.ValueFloat64())
+	definition.SetPreferredSize(p.PreferredSize.ValueFloat64())
 	definition.SetTitle(p.Title.ValueString())
 	definition.SetQuality(*quality)
 
