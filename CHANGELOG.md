@@ -1,5 +1,20 @@
 # Changelog
 
+## [3.4.0](https://github.com/devopsarr/terraform-provider-sonarr/compare/v3.3.0...v3.4.0) (2024-12-22)
+
+
+### Features
+
+* **#341:** add quality definition preferred size field ([954efec](https://github.com/devopsarr/terraform-provider-sonarr/commit/954efecba5e6a209a29993185810a8b8ffdac8fc))
+* add min upgrade format score field to quality profiles ([eb55711](https://github.com/devopsarr/terraform-provider-sonarr/commit/eb557110df91b684e1b5afa4fc19bbaca1ba5939))
+
+
+### Bug Fixes
+
+* **deps:** update hotio/sonarr docker tag to release-4.0.11.2680 ([115932d](https://github.com/devopsarr/terraform-provider-sonarr/commit/115932d361abc272bd45cd5941fe53e7351df342))
+* **deps:** update module github.com/devopsarr/sonarr-go to v1.0.2 ([b07f43b](https://github.com/devopsarr/terraform-provider-sonarr/commit/b07f43b8ea00608623fa966e9aa5665c998a4fd9))
+* **deps:** update module github.com/stretchr/testify to v1.10.0 ([fed1951](https://github.com/devopsarr/terraform-provider-sonarr/commit/fed19515c0c4287a5ec7078f046ba1659b575fa3))
+
 ## [3.3.0](https://github.com/devopsarr/terraform-provider-sonarr/compare/v3.2.0...v3.3.0) (2024-10-16)
 
 
