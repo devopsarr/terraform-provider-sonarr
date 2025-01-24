@@ -3,7 +3,7 @@ module github.com/devopsarr/terraform-provider-sonarr
 go 1.21
 
 require (
-	github.com/devopsarr/sonarr-go v1.0.2
+	github.com/devopsarr/sonarr-go v1.1.0
 	github.com/hashicorp/terraform-plugin-docs v0.19.4
 	github.com/hashicorp/terraform-plugin-framework v1.11.0
 	github.com/hashicorp/terraform-plugin-framework-validators v0.13.0
