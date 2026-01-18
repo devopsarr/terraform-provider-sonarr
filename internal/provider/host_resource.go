@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 
 	"github.com/devopsarr/sonarr-go/sonarr"
@@ -501,8 +502,6 @@ func (r *HostResource) ImportState(ctx context.Context, req resource.ImportState
 }
 
 func (h *Host) write(ctx context.Context, host *sonarr.HostConfigResource, diags *diag.Diagnostics) {
-	var tempDiag diag.Diagnostics
-
 	h.InstanceName = types.StringValue(host.GetInstanceName())
 	h.ApplicationURL = types.StringValue(host.GetApplicationUrl())
 	h.BindAddress = types.StringValue(host.GetBindAddress())
@@ -528,18 +527,22 @@ func (h *Host) write(ctx context.Context, host *sonarr.HostConfigResource, diags
 	update.write(host)
 	log.write(host)
 
-	h.ProxyConfig, tempDiag = types.ObjectValueFrom(ctx, proxy.getType().(attr.TypeWithAttributeTypes).AttributeTypes(), proxy)
-	diags.Append(tempDiag...)
-	h.SSLConfig, tempDiag = types.ObjectValueFrom(ctx, ssl.getType().(attr.TypeWithAttributeTypes).AttributeTypes(), ssl)
-	diags.Append(tempDiag...)
-	h.AuthConfig, tempDiag = types.ObjectValueFrom(ctx, auth.getType().(attr.TypeWithAttributeTypes).AttributeTypes(), auth)
-	diags.Append(tempDiag...)
-	h.BackupConfig, tempDiag = types.ObjectValueFrom(ctx, backup.getType().(attr.TypeWithAttributeTypes).AttributeTypes(), backup)
-	diags.Append(tempDiag...)
-	h.UpdateConfig, tempDiag = types.ObjectValueFrom(ctx, update.getType().(attr.TypeWithAttributeTypes).AttributeTypes(), update)
-	diags.Append(tempDiag...)
-	h.LoggingConfig, tempDiag = types.ObjectValueFrom(ctx, log.getType().(attr.TypeWithAttributeTypes).AttributeTypes(), log)
-	diags.Append(tempDiag...)
+	configs := []hostConfigEntry{
+		{proxy, proxy.getType(), &h.ProxyConfig, "proxy"},
+		{ssl, ssl.getType(), &h.SSLConfig, "ssl"},
+		{auth, auth.getType(), &h.AuthConfig, "auth"},
+		{backup, backup.getType(), &h.BackupConfig, "backup"},
+		{update, update.getType(), &h.UpdateConfig, "update"},
+		{log, log.getType(), &h.LoggingConfig, "log"},
+	}
+
+	for _, c := range configs {
+		assignObjectValue(ctx, diags, c.dest, c.name, c.val, c.typ)
+	}
+
+	if diags.HasError() {
+		return
+	}
 }
 
 func (l *LoggingConfig) write(host *sonarr.HostConfigResource) {
@@ -670,4 +673,42 @@ func (p *ProxyConfig) read(host *sonarr.HostConfigResource) {
 	host.SetProxyPort(int32(p.Port.ValueInt64()))
 	host.SetProxyEnabled(p.Enabled.ValueBool())
 	host.SetProxyBypassLocalAddresses(p.BypassLocalAddresses.ValueBool())
+}
+
+// TODO: this can be even more generalized
+// helper struct for attributes assignment.
+type hostConfigEntry struct {
+	val  any
+	typ  attr.Type
+	dest *types.Object
+	name string
+}
+
+// helper function for attributes checking.
+func requireAttrTypes(diags *diag.Diagnostics, name string, t attr.Type) attr.TypeWithAttributeTypes {
+	v, ok := t.(attr.TypeWithAttributeTypes)
+	if !ok {
+		diags.AddError(
+			helpers.ClientError,
+			fmt.Sprintf("Expected attr.TypeWithAttributeTypes for %s, got %T", name, t),
+		)
+
+		return nil
+	}
+
+	return v
+}
+
+// helper function to assign object vaules.
+func assignObjectValue(ctx context.Context, diags *diag.Diagnostics, dest *types.Object, name string, value any, typ attr.Type) {
+	attrTypes := requireAttrTypes(diags, name, typ)
+
+	if diags.HasError() {
+		return
+	}
+
+	obj, tmp := types.ObjectValueFrom(ctx, attrTypes.AttributeTypes(), value)
+	diags.Append(tmp...)
+
+	*dest = obj
 }
