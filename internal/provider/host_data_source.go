@@ -5,10 +5,8 @@ import (
 
 	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/devopsarr/terraform-provider-sonarr/internal/helpers"
-	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/datasource"
 	"github.com/hashicorp/terraform-plugin-framework/datasource/schema"
-	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
@@ -233,14 +231,23 @@ func (d *HostDataSource) Configure(ctx context.Context, req datasource.Configure
 }
 
 func (d *HostDataSource) Read(ctx context.Context, _ datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var tempDiag diag.Diagnostics
 	// assign default empty password value to empty string since it cannot be read
 	auth := AuthConfig{
 		Password: types.StringValue(""),
 	}
 	state := Host{}
-	state.AuthConfig, tempDiag = types.ObjectValueFrom(ctx, auth.getType().(attr.TypeWithAttributeTypes).AttributeTypes(), auth)
-	resp.Diagnostics.Append(tempDiag...)
+
+	configs := []hostConfigEntry{
+		{auth, auth.getType(), &state.AuthConfig, "auth"},
+	}
+
+	for _, c := range configs {
+		assignObjectValue(ctx, &resp.Diagnostics, c.dest, c.name, c.val, c.typ)
+	}
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
 
 	// Get host current value
 	response, _, err := d.client.HostConfigAPI.GetHostConfig(d.auth).Execute()

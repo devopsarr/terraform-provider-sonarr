@@ -1,79 +1,91 @@
-issues:
-  exclude-rules:
-    # Exclude `lll` issues for long lines with `go:generate`.
-    - linters:
-        - lll
-      source: '^//go:generate '
-    # Exclude funlen for testing files.
-    - linters:
-        - funlen
-        - unparam
-        - err113
-
-      path: '(.+)_test\.go'
-
-  max-same-issues: 0
-
+version: '2'
 linters:
-  disable-all: true
+  default: none
   enable:
+    - err113
     - errcheck
-    - gofumpt
-    - mnd
-    - gosimple
+    - forcetypeassert
+    - gocognit
+    - godot
+    - govet
     - ineffassign
     - makezero
     - misspell
+    - mnd
     - nakedret
     - nilerr
+    - nlreturn
     - nolintlint
+    - paralleltest
+    - revive
     - staticcheck
+    - thelper
     - unconvert
     - unparam
     - unused
-    - godot
-    - revive
-    - wsl
-    - nlreturn
-    - paralleltest
-    - thelper
-    - gocognit
-    - govet
-    - forcetypeassert
-    - err113
-
-linters-settings:
-  govet:
-    enable:
-      - fieldalignment
-      - shadow
-  misspell:
-    ignore-words:
-      - 'intial'
-  errcheck:
-    exclude-functions:
-      - github.com/hashicorp/terraform-plugin-testing/helper/schema:ForceNew|Set
-      - fmt:.*
-      - io:Close
-  mnd:
-    checks:
-      - argument
-    ignored-functions:
-      - make
-      - strconv.FormatFloat
-      - strconv.FormatInt
-      - strconv.ParseFloat
-      - strconv.ParseInt
-      - strings.SplitN
-      - int64validator.OneOf
-  nolintlint:
-    require-explanation: true
-    require-specific: true
-    allow-no-explanation:
-      - unparam
-      - mnd
-  paralleltest:
-    ignore-missing: true
-
-run:
-  timeout: 35m
+    - wsl_v5
+  settings:
+    wsl_v5:
+      allow-first-in-block: true
+      allow-whole-block: false
+      branch-max-lines: 2
+    errcheck:
+      exclude-functions:
+        - github.com/hashicorp/terraform-plugin-testing/helper/schema:ForceNew|Set
+        - fmt:.*
+        - io:Close
+    govet:
+      enable:
+        - fieldalignment
+        - shadow
+    misspell:
+      ignore-rules:
+        - intial
+    mnd:
+      checks:
+        - argument
+      ignored-functions:
+        - make
+        - strconv.FormatFloat
+        - strconv.FormatInt
+        - strconv.ParseFloat
+        - strconv.ParseInt
+        - strings.SplitN
+        - int64validator.OneOf
+    nolintlint:
+      require-explanation: true
+      require-specific: true
+      allow-no-explanation:
+        - unparam
+        - mnd
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    rules:
+      - linters:
+          - lll
+        source: '^//go:generate '
+      - linters:
+          - err113
+          - funlen
+          - unparam
+        path: (.+)_test\.go
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+issues:
+  max-same-issues: 0
+formatters:
+  enable:
+    - gofumpt
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
