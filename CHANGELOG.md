@@ -1,5 +1,19 @@
 # Changelog
 
+## [3.4.1](https://github.com/devopsarr/terraform-provider-sonarr/compare/v3.4.0...v3.4.1) (2026-01-27)
+
+
+### Bug Fixes
+
+* **deps:** update ghcr.io/hotio/sonarr docker tag to release-4.0.15.2941 ([21f6cc4](https://github.com/devopsarr/terraform-provider-sonarr/commit/21f6cc403e0f38d9d3a5ab9c9d039723c2d03bca))
+* **deps:** update ghcr.io/hotio/sonarr docker tag to release-4.0.16.2944 ([5d73484](https://github.com/devopsarr/terraform-provider-sonarr/commit/5d73484647aa87f3a05ba5f50032c00865e53028))
+* **deps:** update ghcr.io/hotio/sonarr:release-4.0.16.2944 docker digest to 1089301 ([02abf99](https://github.com/devopsarr/terraform-provider-sonarr/commit/02abf99f991c127d3458396e21c3b20001e20a7f))
+* **deps:** update hotio/sonarr docker tag to release-4.0.12.2823 ([bc736db](https://github.com/devopsarr/terraform-provider-sonarr/commit/bc736dbd2e2c45db023f5741ddd3149f5e8ccf29))
+* **deps:** update module github.com/devopsarr/sonarr-go to v1.1.0 ([d2ad11d](https://github.com/devopsarr/terraform-provider-sonarr/commit/d2ad11d204c303cbf3816883a2fed2f57c73de09))
+* **deps:** update module github.com/devopsarr/sonarr-go to v1.1.1 ([0085cde](https://github.com/devopsarr/terraform-provider-sonarr/commit/0085cde34945c8444fbb319060905279031071e9))
+* **deps:** update module github.com/stretchr/testify to v1.11.1 ([b18c485](https://github.com/devopsarr/terraform-provider-sonarr/commit/b18c4852ec1feeda0b9d27b0e7f8e67ea17460b4))
+* update hostpath to include URL path in configuration when needed ([66c1e6b](https://github.com/devopsarr/terraform-provider-sonarr/commit/66c1e6b51c96224b10e0cdb83c74e72168fef663))
+
 ## [3.4.0](https://github.com/devopsarr/terraform-provider-sonarr/compare/v3.3.0...v3.4.0) (2024-12-22)
 
 
