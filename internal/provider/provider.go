@@ -157,7 +157,7 @@ func (p *SonarrProvider) Configure(ctx context.Context, req provider.ConfigureRe
 	)
 	auth = context.WithValue(auth, sonarr.ContextServerVariables, map[string]string{
 		"protocol": parsedAPIURL.Scheme,
-		"hostpath": parsedAPIURL.Host,
+		"hostpath": parsedAPIURL.Host + parsedAPIURL.Path,
 	})
 
 	sonarrData := SonarrData{
