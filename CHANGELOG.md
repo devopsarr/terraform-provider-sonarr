@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.4.2](https://github.com/devopsarr/terraform-provider-sonarr/compare/v3.4.1...v3.4.2) (2026-02-03)
+
+
+### Bug Fixes
+
+* **#364:** remove duplicate allowed formats from quality profile ([82a2da1](https://github.com/devopsarr/terraform-provider-sonarr/commit/82a2da18fb8df69794df4b393dce52c380d64dc8))
+
 ## [3.4.1](https://github.com/devopsarr/terraform-provider-sonarr/compare/v3.4.0...v3.4.1) (2026-01-27)
 
 
