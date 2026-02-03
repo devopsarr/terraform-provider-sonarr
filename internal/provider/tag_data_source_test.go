@@ -27,14 +27,14 @@ func TestAccTagDataSource(t *testing.T) {
 			},
 			// Create a resource be read
 			{
-				Config: testAccTagResourceConfig("test", "tag_datasource"),
+				Config: testAccTagResourceConfig("test", "tag-datasource"),
 			},
 			// Read testing
 			{
-				Config: testAccTagResourceConfig("test", "tag_datasource") + testAccTagDataSourceConfig("tag_datasource"),
+				Config: testAccTagResourceConfig("test", "tag-datasource") + testAccTagDataSourceConfig("tag-datasource"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttrSet("data.sonarr_tag.test", "id"),
-					resource.TestCheckResourceAttr("data.sonarr_tag.test", "label", "tag_datasource"),
+					resource.TestCheckResourceAttr("data.sonarr_tag.test", "label", "tag-datasource"),
 				),
 			},
 		},

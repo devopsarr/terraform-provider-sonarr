@@ -85,7 +85,7 @@ func testAccHostResourceConfig(name, pass string) string {
 			retention = 10
 		}
 		authentication = {
-			method = "basic"
+			method = "forms"
 			username = "test"
 			password = "%s"
 			required = "disabledForLocalAddresses"
