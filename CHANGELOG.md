@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.4.3](https://github.com/devopsarr/terraform-provider-sonarr/compare/v3.4.2...v3.4.3) (2026-07-04)
+
+
+### Bug Fixes
+
+* **deps:** update ghcr.io/hotio/sonarr docker tag to release-4.0.17.2952 ([e12cc88](https://github.com/devopsarr/terraform-provider-sonarr/commit/e12cc88fc59d5f7bc28501bbbffc65736489ef21))
+* **deps:** update ghcr.io/hotio/sonarr docker tag to release-4.0.17.2952 ([da1b907](https://github.com/devopsarr/terraform-provider-sonarr/commit/da1b907ab07b6985d42e09a31dfa2d1e35fc1815))
+
 ## [3.4.2](https://github.com/devopsarr/terraform-provider-sonarr/compare/v3.4.1...v3.4.2) (2026-02-03)
 
 
