@@ -1,5 +1,12 @@
 {
     "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
     "release-type": "go",
-    "commit-search-depth": 1000
+    "commit-search-depth": 1000,
+    "packages": {
+        ".": {
+            "release-type": "go",
+            "package-name": "terraform-provider-sonarr",
+            "include-component-in-tag": false
+        }
+    }
 }
