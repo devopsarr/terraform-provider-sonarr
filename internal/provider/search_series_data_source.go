@@ -100,7 +100,7 @@ func (d *SearchSeriesDataSource) Read(ctx context.Context, req datasource.ReadRe
 		return
 	}
 	// Get series current value
-	response, _, err := d.client.SeriesLookupAPI.ListSeriesLookup(d.auth).Term(strconv.Itoa(int(data.TvdbID.ValueInt64()))).Execute()
+	response, _, err := d.client.SeriesLookupAPI.ListSeriesLookup(d.auth).Term("tvdb:" + strconv.Itoa(int(data.TvdbID.ValueInt64()))).Execute()
 	if err != nil {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, searchSearchSeriesDataSourceName, err))
 
