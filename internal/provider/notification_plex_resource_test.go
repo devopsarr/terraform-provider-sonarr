@@ -25,6 +25,8 @@ func TestAccNotificationPlexResource(t *testing.T) {
 				Config: testAccNotificationPlexResourceConfig("resourcePlexTest", "token123"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("sonarr_notification_plex.test", "auth_token", "token123"),
+					resource.TestCheckResourceAttr("sonarr_notification_plex.test", "map_from", "/tv"),
+					resource.TestCheckResourceAttr("sonarr_notification_plex.test", "map_to", "/media/tv"),
 					resource.TestCheckResourceAttrSet("sonarr_notification_plex.test", "id"),
 				),
 			},
@@ -68,5 +70,8 @@ func testAccNotificationPlexResourceConfig(name, token string) string {
 		host = "plex.lcl"
 		port = 32400
 		auth_token = "%s"
+		update_library = true
+		map_from = "/tv"
+		map_to = "/media/tv"
 	}`, name, token)
 }

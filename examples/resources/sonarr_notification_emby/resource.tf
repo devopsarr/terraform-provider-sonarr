@@ -15,4 +15,10 @@ resource "sonarr_notification_emby" "example" {
   host    = "emby.lcl"
   port    = 8096
   api_key = "API_Key"
+
+  # optional path mapping, for when Sonarr and Emby/Jellyfin see the library at
+  # different paths. only applied when update_library is enabled.
+  update_library = true
+  map_from       = "/tv"
+  map_to         = "/media/tv"
 }

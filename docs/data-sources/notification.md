@@ -70,6 +70,8 @@ data "sonarr_notification" "example" {
 - `import_fields` (Set of Number) Import fields. `0` Overview, `1` Rating, `2` Genres, `3` Quality, `4` Codecs, `5` Group, `6` Size, `7` Languages, `8` Subtitles, `9` Links, `10` Release, `11` Poster, `12` Fanart.
 - `include_health_warnings` (Boolean) Include health warnings.
 - `key` (String, Sensitive) Key.
+- `map_from` (String) Map from. Sonarr path, used to modify series paths when the media server sees library path location differently from Sonarr (Requires 'Update Library')
+- `map_to` (String) Map to. Media server path, used to modify series paths when the media server sees library path location differently from Sonarr (Requires 'Update Library')
 - `mention` (String) Mention.
 - `method` (Number) Method. `1` POST, `2` PUT.
 - `notification_type` (Number) Notification type. `0` Info, `1` Success, `2` Warning, `3` Failure.

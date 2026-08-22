@@ -193,6 +193,14 @@ func (d *NotificationsDataSource) Schema(_ context.Context, _ datasource.SchemaR
 							MarkdownDescription: "Stateless URLs.",
 							Computed:            true,
 						},
+						"map_from": schema.StringAttribute{
+							MarkdownDescription: "Map from. Sonarr path, used to modify series paths when the media server sees library path location differently from Sonarr (Requires 'Update Library')",
+							Computed:            true,
+						},
+						"map_to": schema.StringAttribute{
+							MarkdownDescription: "Map to. Media server path, used to modify series paths when the media server sees library path location differently from Sonarr (Requires 'Update Library')",
+							Computed:            true,
+						},
 						"configuration_key": schema.StringAttribute{
 							MarkdownDescription: "Configuration key.",
 							Computed:            true,
