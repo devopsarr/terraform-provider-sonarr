@@ -44,6 +44,8 @@ type NotificationEmby struct {
 	Host                          types.String `tfsdk:"host"`
 	APIKey                        types.String `tfsdk:"api_key"`
 	Name                          types.String `tfsdk:"name"`
+	MapFrom                       types.String `tfsdk:"map_from"`
+	MapTo                         types.String `tfsdk:"map_to"`
 	ID                            types.Int64  `tfsdk:"id"`
 	Port                          types.Int64  `tfsdk:"port"`
 	UpdateLibrary                 types.Bool   `tfsdk:"update_library"`
@@ -70,6 +72,8 @@ func (n NotificationEmby) toNotification() *Notification {
 		Host:                          n.Host,
 		Name:                          n.Name,
 		APIKey:                        n.APIKey,
+		MapFrom:                       n.MapFrom,
+		MapTo:                         n.MapTo,
 		ID:                            n.ID,
 		Port:                          n.Port,
 		UpdateLibrary:                 n.UpdateLibrary,
@@ -98,6 +102,8 @@ func (n *NotificationEmby) fromNotification(notification *Notification) {
 	n.Host = notification.Host
 	n.Name = notification.Name
 	n.APIKey = notification.APIKey
+	n.MapFrom = notification.MapFrom
+	n.MapTo = notification.MapTo
 	n.ID = notification.ID
 	n.UpdateLibrary = notification.UpdateLibrary
 	n.Port = notification.Port
@@ -237,6 +243,16 @@ func (r *NotificationEmbyResource) Schema(_ context.Context, _ resource.SchemaRe
 			"host": schema.StringAttribute{
 				MarkdownDescription: "Host.",
 				Required:            true,
+			},
+			"map_from": schema.StringAttribute{
+				MarkdownDescription: "Map from. Sonarr path, used to modify series paths when Jellyfin sees library path location differently from Sonarr (Requires 'Update Library')",
+				Optional:            true,
+				Computed:            true,
+			},
+			"map_to": schema.StringAttribute{
+				MarkdownDescription: "Map to. Jellyfin path, used to modify series paths when Jellyfin sees library path location differently from Sonarr (Requires 'Update Library')",
+				Optional:            true,
+				Computed:            true,
 			},
 		},
 	}

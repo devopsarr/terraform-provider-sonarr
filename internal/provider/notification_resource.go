@@ -29,7 +29,7 @@ var (
 
 var notificationFields = helpers.Fields{
 	Bools:                  []string{"alwaysUpdate", "cleanLibrary", "directMessage", "notify", "sendSilently", "updateLibrary", "useEuEndpoint", "useSsl"},
-	Strings:                []string{"accessToken", "accessTokenSecret", "apiKey", "appToken", "arguments", "author", "authToken", "authUser", "avatar", "botToken", "channel", "chatId", "consumerKey", "consumerSecret", "deviceNames", "expires", "from", "host", "icon", "mention", "password", "path", "refreshToken", "senderDomain", "senderId", "server", "signIn", "sound", "token", "url", "userKey", "username", "userName", "webHookUrl", "clickUrl", "serverUrl", "authUsername", "authPassword", "statelessUrls", "configurationKey", "senderNumber", "receiverId", "key", "event"},
+	Strings:                []string{"accessToken", "accessTokenSecret", "apiKey", "appToken", "arguments", "author", "authToken", "authUser", "avatar", "botToken", "channel", "chatId", "consumerKey", "consumerSecret", "deviceNames", "expires", "from", "host", "icon", "mention", "password", "path", "refreshToken", "senderDomain", "senderId", "server", "signIn", "sound", "token", "url", "userKey", "username", "userName", "webHookUrl", "clickUrl", "serverUrl", "authUsername", "authPassword", "statelessUrls", "configurationKey", "senderNumber", "receiverId", "key", "event", "mapFrom", "mapTo"},
 	Ints:                   []string{"method", "port", "priority", "retry", "expire", "displayTime", "notificationType", "useEncryption"},
 	StringSlices:           []string{"channelTags", "deviceIds", "devices", "recipients", "to", "cc", "bcc", "topics", "fieldTags"},
 	StringSlicesExceptions: []string{"tags"},
@@ -106,6 +106,8 @@ type Notification struct {
 	ConfigurationKey              types.String `tfsdk:"configuration_key"`
 	Key                           types.String `tfsdk:"key"`
 	Event                         types.String `tfsdk:"event"`
+	MapFrom                       types.String `tfsdk:"map_from"`
+	MapTo                         types.String `tfsdk:"map_to"`
 	NotificationType              types.Int64  `tfsdk:"notification_type"`
 	Expire                        types.Int64  `tfsdk:"expire"`
 	DisplayTime                   types.Int64  `tfsdk:"display_time"`
@@ -200,6 +202,8 @@ func (n Notification) getType() attr.Type {
 			"configuration_key":                  types.StringType,
 			"key":                                types.StringType,
 			"event":                              types.StringType,
+			"map_from":                           types.StringType,
+			"map_to":                             types.StringType,
 			"notification_type":                  types.Int64Type,
 			"expire":                             types.Int64Type,
 			"display_time":                       types.Int64Type,
@@ -427,6 +431,16 @@ func (r *NotificationResource) Schema(_ context.Context, _ resource.SchemaReques
 			},
 			"stateless_urls": schema.StringAttribute{
 				MarkdownDescription: "Stateless URLs.",
+				Optional:            true,
+				Computed:            true,
+			},
+			"map_from": schema.StringAttribute{
+				MarkdownDescription: "Map from. Sonarr path, used to modify series paths when the media server sees library path location differently from Sonarr (Requires 'Update Library')",
+				Optional:            true,
+				Computed:            true,
+			},
+			"map_to": schema.StringAttribute{
+				MarkdownDescription: "Map to. Media server path, used to modify series paths when the media server sees library path location differently from Sonarr (Requires 'Update Library')",
 				Optional:            true,
 				Computed:            true,
 			},

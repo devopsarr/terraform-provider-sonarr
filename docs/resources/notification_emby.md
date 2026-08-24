@@ -33,6 +33,12 @@ resource "sonarr_notification_emby" "example" {
   host    = "emby.lcl"
   port    = 8096
   api_key = "API_Key"
+
+  # optional path mapping, for when Sonarr and Emby/Jellyfin see the library at
+  # different paths. only applied when update_library is enabled.
+  update_library = true
+  map_from       = "/tv"
+  map_to         = "/media/tv"
 }
 ```
 
@@ -48,6 +54,8 @@ resource "sonarr_notification_emby" "example" {
 ### Optional
 
 - `include_health_warnings` (Boolean) Include health warnings.
+- `map_from` (String) Map from. Sonarr path, used to modify series paths when Jellyfin sees library path location differently from Sonarr (Requires 'Update Library')
+- `map_to` (String) Map to. Jellyfin path, used to modify series paths when Jellyfin sees library path location differently from Sonarr (Requires 'Update Library')
 - `notify` (Boolean) Notify flag.
 - `on_application_update` (Boolean) On application update flag.
 - `on_download` (Boolean) On download flag.

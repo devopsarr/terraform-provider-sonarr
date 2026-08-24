@@ -44,6 +44,8 @@ type NotificationPlex struct {
 	Host                          types.String `tfsdk:"host"`
 	AuthToken                     types.String `tfsdk:"auth_token"`
 	Name                          types.String `tfsdk:"name"`
+	MapFrom                       types.String `tfsdk:"map_from"`
+	MapTo                         types.String `tfsdk:"map_to"`
 	ID                            types.Int64  `tfsdk:"id"`
 	Port                          types.Int64  `tfsdk:"port"`
 	UpdateLibrary                 types.Bool   `tfsdk:"update_library"`
@@ -65,6 +67,8 @@ func (n NotificationPlex) toNotification() *Notification {
 		Host:                          n.Host,
 		Name:                          n.Name,
 		AuthToken:                     n.AuthToken,
+		MapFrom:                       n.MapFrom,
+		MapTo:                         n.MapTo,
 		ID:                            n.ID,
 		Port:                          n.Port,
 		UpdateLibrary:                 n.UpdateLibrary,
@@ -88,6 +92,8 @@ func (n *NotificationPlex) fromNotification(notification *Notification) {
 	n.Host = notification.Host
 	n.Name = notification.Name
 	n.AuthToken = notification.AuthToken
+	n.MapFrom = notification.MapFrom
+	n.MapTo = notification.MapTo
 	n.ID = notification.ID
 	n.UpdateLibrary = notification.UpdateLibrary
 	n.Port = notification.Port
@@ -197,6 +203,16 @@ func (r *NotificationPlexResource) Schema(_ context.Context, _ resource.SchemaRe
 			"host": schema.StringAttribute{
 				MarkdownDescription: "Host.",
 				Required:            true,
+			},
+			"map_from": schema.StringAttribute{
+				MarkdownDescription: "Map from. Sonarr path, used to modify series paths when Plex sees library path location differently from Sonarr (Requires 'Update Library')",
+				Optional:            true,
+				Computed:            true,
+			},
+			"map_to": schema.StringAttribute{
+				MarkdownDescription: "Map to. Plex path, used to modify series paths when Plex sees library path location differently from Sonarr (Requires 'Update Library')",
+				Optional:            true,
+				Computed:            true,
 			},
 		},
 	}

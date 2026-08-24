@@ -30,6 +30,12 @@ resource "sonarr_notification_plex" "example" {
   host       = "plex.lcl"
   port       = 32400
   auth_token = "AuthTOKEN"
+
+  # optional path mapping, for when Sonarr and Plex see the library at different
+  # paths. only applied when update_library is enabled.
+  update_library = true
+  map_from       = "/tv"
+  map_to         = "/media/tv"
 }
 ```
 
@@ -45,6 +51,8 @@ resource "sonarr_notification_plex" "example" {
 ### Optional
 
 - `include_health_warnings` (Boolean) Include health warnings.
+- `map_from` (String) Map from. Sonarr path, used to modify series paths when Plex sees library path location differently from Sonarr (Requires 'Update Library')
+- `map_to` (String) Map to. Plex path, used to modify series paths when Plex sees library path location differently from Sonarr (Requires 'Update Library')
 - `on_download` (Boolean) On download flag.
 - `on_episode_file_delete` (Boolean) On episode file delete flag.
 - `on_episode_file_delete_for_upgrade` (Boolean) On episode file delete for upgrade flag.
