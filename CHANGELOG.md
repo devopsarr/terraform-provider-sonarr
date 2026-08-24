@@ -1,5 +1,24 @@
 # Changelog
 
+## [3.5.0](https://github.com/devopsarr/terraform-provider-sonarr/compare/v3.4.2...v3.5.0) (2026-08-24)
+
+
+### Features
+
+* add map_from and map_to to emby and plex notifications ([9dbc7d3](https://github.com/devopsarr/terraform-provider-sonarr/commit/9dbc7d368522fbb28a124e5db4ef0ebe4c39dfbb))
+* add map_from and map_to to emby and plex notifications ([70d3b56](https://github.com/devopsarr/terraform-provider-sonarr/commit/70d3b564db5789dabe9a2120b1f6b50cbc896464))
+
+
+### Bug Fixes
+
+* **deps:** update ghcr.io/hotio/sonarr docker tag to release-4.0.17.2952 ([e12cc88](https://github.com/devopsarr/terraform-provider-sonarr/commit/e12cc88fc59d5f7bc28501bbbffc65736489ef21))
+* **deps:** update ghcr.io/hotio/sonarr docker tag to release-4.0.17.2952 ([da1b907](https://github.com/devopsarr/terraform-provider-sonarr/commit/da1b907ab07b6985d42e09a31dfa2d1e35fc1815))
+* **deps:** update ghcr.io/hotio/sonarr docker tag to release-4.0.19.2979 ([149f8cd](https://github.com/devopsarr/terraform-provider-sonarr/commit/149f8cd92ddab7f76ccb3f9174c04cf75d1d22fc))
+* **deps:** update ghcr.io/hotio/sonarr docker tag to release-4.0.19.2979 ([7c30538](https://github.com/devopsarr/terraform-provider-sonarr/commit/7c30538068dff7d8dd9f9fcc4bf3e5b13597f52d))
+* **deps:** update module github.com/stretchr/testify to v1.12.1 ([0a86f71](https://github.com/devopsarr/terraform-provider-sonarr/commit/0a86f71de29a789e45d55b6d9ee3e4350d276bc0))
+* update series lookup to search for tvdb id ([a834292](https://github.com/devopsarr/terraform-provider-sonarr/commit/a8342923ca2689a6b86f3d8924fc11a3680a96f4))
+* update series lookup to search for tvdb id ([c75556c](https://github.com/devopsarr/terraform-provider-sonarr/commit/c75556ccf285aee1eb5795a1b8fd22dd139f1eb2))
+
 ## [3.4.2](https://github.com/devopsarr/terraform-provider-sonarr/compare/v3.4.1...v3.4.2) (2026-02-03)
 
 
