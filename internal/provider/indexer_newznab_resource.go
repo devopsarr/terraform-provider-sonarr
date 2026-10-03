@@ -236,8 +236,15 @@ func (r *IndexerNewznabResource) Read(ctx context.Context, req resource.ReadRequ
 	}
 
 	// Get IndexerNewznab current value
-	response, _, err := r.client.IndexerAPI.GetIndexerById(r.auth, int32(indexer.ID.ValueInt64())).Execute()
+	response, httpResp, err := r.client.IndexerAPI.GetIndexerById(r.auth, int32(indexer.ID.ValueInt64())).Execute()
 	if err != nil {
+		if helpers.IsNotFound(httpResp) {
+			tflog.Warn(ctx, "removing "+indexerNewznabResourceName+" from state, not found")
+			resp.State.RemoveResource(ctx)
+
+			return
+		}
+
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerNewznabResourceName, err))
 
 		return
@@ -285,8 +292,8 @@ func (r *IndexerNewznabResource) Delete(ctx context.Context, req resource.Delete
 	}
 
 	// Delete IndexerNewznab current value
-	_, err := r.client.IndexerAPI.DeleteIndexer(r.auth, int32(ID)).Execute()
-	if err != nil {
+	httpResp, err := r.client.IndexerAPI.DeleteIndexer(r.auth, int32(ID)).Execute()
+	if err != nil && !helpers.IsNotFound(httpResp) {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, indexerNewznabResourceName, err))
 
 		return

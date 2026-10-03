@@ -1,10 +1,13 @@
 package provider
 
 import (
+	"context"
 	"fmt"
+	"net/http"
 	"regexp"
 	"testing"
 
+	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
@@ -57,4 +60,29 @@ func testAccRootFolderResourceConfig(path string) string {
   			path = "%s"
 		}
 	`, path)
+}
+
+//nolint:paralleltest // deletes an object outside Terraform, a parallel test could otherwise take over its freed ID
+func TestAccRootFolderResourceDisappears(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { testAccPreCheck(t) },
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			// Create, then delete outside Terraform: Read removes it from state instead of failing the plan
+			{
+				Config: testAccRootFolderResourceConfig("/config/logs"),
+				Check: testAccCheckResourceDisappears("sonarr_root_folder.test", func(client *sonarr.APIClient, id int32) (*http.Response, error) {
+					return client.RootFolderAPI.DeleteRootFolder(context.TODO(), id).Execute()
+				}),
+				ExpectNonEmptyPlan: true,
+			},
+			// Create again after the deletion outside Terraform
+			{
+				Config: testAccRootFolderResourceConfig("/config/logs"),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttrSet("sonarr_root_folder.test", "id"),
+				),
+			},
+		},
+	})
 }

@@ -224,8 +224,15 @@ func (r *IndexerBroadcastheNetResource) Read(ctx context.Context, req resource.R
 	}
 
 	// Get IndexerBroadcastheNet current value
-	response, _, err := r.client.IndexerAPI.GetIndexerById(r.auth, int32(indexer.ID.ValueInt64())).Execute()
+	response, httpResp, err := r.client.IndexerAPI.GetIndexerById(r.auth, int32(indexer.ID.ValueInt64())).Execute()
 	if err != nil {
+		if helpers.IsNotFound(httpResp) {
+			tflog.Warn(ctx, "removing "+indexerBroadcastheNetResourceName+" from state, not found")
+			resp.State.RemoveResource(ctx)
+
+			return
+		}
+
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerBroadcastheNetResourceName, err))
 
 		return
@@ -273,8 +280,8 @@ func (r *IndexerBroadcastheNetResource) Delete(ctx context.Context, req resource
 	}
 
 	// Delete IndexerBroadcastheNet current value
-	_, err := r.client.IndexerAPI.DeleteIndexer(r.auth, int32(ID)).Execute()
-	if err != nil {
+	httpResp, err := r.client.IndexerAPI.DeleteIndexer(r.auth, int32(ID)).Execute()
+	if err != nil && !helpers.IsNotFound(httpResp) {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, indexerBroadcastheNetResourceName, err))
 
 		return

@@ -192,8 +192,15 @@ func (r *ImportListImdbResource) Read(ctx context.Context, req resource.ReadRequ
 	}
 
 	// Get ImportListImdb current value
-	response, _, err := r.client.ImportListAPI.GetImportListById(r.auth, int32(importList.ID.ValueInt64())).Execute()
+	response, httpResp, err := r.client.ImportListAPI.GetImportListById(r.auth, int32(importList.ID.ValueInt64())).Execute()
 	if err != nil {
+		if helpers.IsNotFound(httpResp) {
+			tflog.Warn(ctx, "removing "+importListImdbResourceName+" from state, not found")
+			resp.State.RemoveResource(ctx)
+
+			return
+		}
+
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, importListImdbResourceName, err))
 
 		return
@@ -241,8 +248,8 @@ func (r *ImportListImdbResource) Delete(ctx context.Context, req resource.Delete
 	}
 
 	// Delete ImportListImdb current value
-	_, err := r.client.ImportListAPI.DeleteImportList(r.auth, int32(ID)).Execute()
-	if err != nil {
+	httpResp, err := r.client.ImportListAPI.DeleteImportList(r.auth, int32(ID)).Execute()
+	if err != nil && !helpers.IsNotFound(httpResp) {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, importListImdbResourceName, err))
 
 		return
