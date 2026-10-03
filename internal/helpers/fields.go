@@ -207,7 +207,7 @@ func readStringSliceField(ctx context.Context, name string, fieldCase interface{
 	fieldName := selectAPIName(name)
 	sliceField := (*types.Set)(selectReadField(name, fieldCase).Addr().UnsafePointer())
 
-	if len(sliceField.Elements()) != 0 {
+	if !sliceField.IsNull() && !sliceField.IsUnknown() {
 		slice := make([]string, len(sliceField.Elements()))
 		tfsdk.ValueAs(ctx, sliceField, &slice)
 
@@ -222,7 +222,7 @@ func readIntSliceField(ctx context.Context, name string, fieldCase interface{}) 
 	fieldName := selectAPIName(name)
 	sliceField := (*types.Set)(selectReadField(name, fieldCase).Addr().UnsafePointer())
 
-	if len(sliceField.Elements()) != 0 {
+	if !sliceField.IsNull() && !sliceField.IsUnknown() {
 		slice := make([]int64, len(sliceField.Elements()))
 		tfsdk.ValueAs(ctx, sliceField, &slice)
 

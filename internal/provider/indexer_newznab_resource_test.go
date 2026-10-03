@@ -17,12 +17,12 @@ func TestAccIndexerNewznabResource(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Unauthorized Create
 			{
-				Config:      testAccIndexerNewznabResourceConfig("newzabResourceTest", "/api") + testUnauthorizedProvider,
+				Config:      testAccIndexerNewznabResourceConfig("newzabResourceTest", "/api", "[5030, 5040]") + testUnauthorizedProvider,
 				ExpectError: regexp.MustCompile("Client Error"),
 			},
 			// Create and Read testing
 			{
-				Config: testAccIndexerNewznabResourceConfig("newzabResourceTest", "/api"),
+				Config: testAccIndexerNewznabResourceConfig("newzabResourceTest", "/api", "[5030, 5040]"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("sonarr_indexer_newznab.test", "enable_automatic_search", "false"),
 					resource.TestCheckResourceAttr("sonarr_indexer_newznab.test", "base_url", "https://lolo.sickbeard.com"),
@@ -31,14 +31,21 @@ func TestAccIndexerNewznabResource(t *testing.T) {
 			},
 			// Unauthorized Read
 			{
-				Config:      testAccIndexerNewznabResourceConfig("newzabResourceTest", "/api") + testUnauthorizedProvider,
+				Config:      testAccIndexerNewznabResourceConfig("newzabResourceTest", "/api", "[5030, 5040]") + testUnauthorizedProvider,
 				ExpectError: regexp.MustCompile("Client Error"),
 			},
 			// Update and Read testing
 			{
-				Config: testAccIndexerNewznabResourceConfig("newzabResourceTest", "/apis"),
+				Config: testAccIndexerNewznabResourceConfig("newzabResourceTest", "/apis", "[5030, 5040]"),
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("sonarr_indexer_newznab.test", "api_path", "/apis"),
+				),
+			},
+			// Update to an empty set and Read testing
+			{
+				Config: testAccIndexerNewznabResourceConfig("newzabResourceTest", "/apis", "[]"),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttr("sonarr_indexer_newznab.test", "categories.#", "0"),
 				),
 			},
 			// ImportState testing
@@ -52,13 +59,13 @@ func TestAccIndexerNewznabResource(t *testing.T) {
 	})
 }
 
-func testAccIndexerNewznabResourceConfig(name, apiPath string) string {
+func testAccIndexerNewznabResourceConfig(name, apiPath, categories string) string {
 	return fmt.Sprintf(`
 	resource "sonarr_indexer_newznab" "test" {
 		enable_automatic_search = false
 		name = "%s"
 		base_url = "https://lolo.sickbeard.com"
 		api_path = "%s"
-		categories = [5030, 5040]
-	}`, name, apiPath)
+		categories = %s
+	}`, name, apiPath, categories)
 }
