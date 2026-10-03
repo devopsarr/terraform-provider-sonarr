@@ -207,8 +207,15 @@ func (r *DownloadClientTorrentBlackholeResource) Read(ctx context.Context, req r
 	}
 
 	// Get DownloadClientTorrentBlackhole current value
-	response, _, err := r.client.DownloadClientAPI.GetDownloadClientById(r.auth, int32(client.ID.ValueInt64())).Execute()
+	response, httpResp, err := r.client.DownloadClientAPI.GetDownloadClientById(r.auth, int32(client.ID.ValueInt64())).Execute()
 	if err != nil {
+		if helpers.IsNotFound(httpResp) {
+			tflog.Warn(ctx, "removing "+downloadClientTorrentBlackholeResourceName+" from state, not found")
+			resp.State.RemoveResource(ctx)
+
+			return
+		}
+
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, downloadClientTorrentBlackholeResourceName, err))
 
 		return
@@ -256,8 +263,8 @@ func (r *DownloadClientTorrentBlackholeResource) Delete(ctx context.Context, req
 	}
 
 	// Delete DownloadClientTorrentBlackhole current value
-	_, err := r.client.DownloadClientAPI.DeleteDownloadClient(r.auth, int32(ID)).Execute()
-	if err != nil {
+	httpResp, err := r.client.DownloadClientAPI.DeleteDownloadClient(r.auth, int32(ID)).Execute()
+	if err != nil && !helpers.IsNotFound(httpResp) {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, downloadClientTorrentBlackholeResourceName, err))
 
 		return

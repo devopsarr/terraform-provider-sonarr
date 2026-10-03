@@ -1,10 +1,13 @@
 package provider
 
 import (
+	"context"
 	"fmt"
+	"net/http"
 	"regexp"
 	"testing"
 
+	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
@@ -63,4 +66,29 @@ func testAccMetadataKodiResourceConfig(name, metadata string) string {
 		season_images = true
 		episode_metadata = false
 	}`, name, metadata)
+}
+
+//nolint:paralleltest // deletes an object outside Terraform, a parallel test could otherwise take over its freed ID
+func TestAccMetadataKodiResourceDisappears(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { testAccPreCheck(t) },
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			// Create, then delete outside Terraform: Read removes it from state instead of failing the plan
+			{
+				Config: testAccMetadataKodiResourceConfig("kodiResourceTest", "true"),
+				Check: testAccCheckResourceDisappears("sonarr_metadata_kodi.test", func(client *sonarr.APIClient, id int32) (*http.Response, error) {
+					return client.MetadataAPI.DeleteMetadata(context.TODO(), id).Execute()
+				}),
+				ExpectNonEmptyPlan: true,
+			},
+			// Create again after the deletion outside Terraform
+			{
+				Config: testAccMetadataKodiResourceConfig("kodiResourceTest", "true"),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttrSet("sonarr_metadata_kodi.test", "id"),
+				),
+			},
+		},
+	})
 }

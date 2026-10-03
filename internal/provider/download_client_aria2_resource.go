@@ -210,8 +210,15 @@ func (r *DownloadClientAria2Resource) Read(ctx context.Context, req resource.Rea
 	}
 
 	// Get DownloadClientAria2 current value
-	response, _, err := r.client.DownloadClientAPI.GetDownloadClientById(r.auth, int32(client.ID.ValueInt64())).Execute()
+	response, httpResp, err := r.client.DownloadClientAPI.GetDownloadClientById(r.auth, int32(client.ID.ValueInt64())).Execute()
 	if err != nil {
+		if helpers.IsNotFound(httpResp) {
+			tflog.Warn(ctx, "removing "+downloadClientAria2ResourceName+" from state, not found")
+			resp.State.RemoveResource(ctx)
+
+			return
+		}
+
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, downloadClientAria2ResourceName, err))
 
 		return
@@ -259,8 +266,8 @@ func (r *DownloadClientAria2Resource) Delete(ctx context.Context, req resource.D
 	}
 
 	// Delete DownloadClientAria2 current value
-	_, err := r.client.DownloadClientAPI.DeleteDownloadClient(r.auth, int32(ID)).Execute()
-	if err != nil {
+	httpResp, err := r.client.DownloadClientAPI.DeleteDownloadClient(r.auth, int32(ID)).Execute()
+	if err != nil && !helpers.IsNotFound(httpResp) {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, downloadClientAria2ResourceName, err))
 
 		return

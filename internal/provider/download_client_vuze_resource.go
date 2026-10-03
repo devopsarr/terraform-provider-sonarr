@@ -266,8 +266,15 @@ func (r *DownloadClientVuzeResource) Read(ctx context.Context, req resource.Read
 	}
 
 	// Get DownloadClientVuze current value
-	response, _, err := r.client.DownloadClientAPI.GetDownloadClientById(r.auth, int32(client.ID.ValueInt64())).Execute()
+	response, httpResp, err := r.client.DownloadClientAPI.GetDownloadClientById(r.auth, int32(client.ID.ValueInt64())).Execute()
 	if err != nil {
+		if helpers.IsNotFound(httpResp) {
+			tflog.Warn(ctx, "removing "+downloadClientVuzeResourceName+" from state, not found")
+			resp.State.RemoveResource(ctx)
+
+			return
+		}
+
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, downloadClientVuzeResourceName, err))
 
 		return
@@ -315,8 +322,8 @@ func (r *DownloadClientVuzeResource) Delete(ctx context.Context, req resource.De
 	}
 
 	// Delete DownloadClientVuze current value
-	_, err := r.client.DownloadClientAPI.DeleteDownloadClient(r.auth, int32(ID)).Execute()
-	if err != nil {
+	httpResp, err := r.client.DownloadClientAPI.DeleteDownloadClient(r.auth, int32(ID)).Execute()
+	if err != nil && !helpers.IsNotFound(httpResp) {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, downloadClientVuzeResourceName, err))
 
 		return

@@ -216,8 +216,15 @@ func (r *IndexerIptorrentsResource) Read(ctx context.Context, req resource.ReadR
 	}
 
 	// Get IndexerIptorrents current value
-	response, _, err := r.client.IndexerAPI.GetIndexerById(r.auth, int32(indexer.ID.ValueInt64())).Execute()
+	response, httpResp, err := r.client.IndexerAPI.GetIndexerById(r.auth, int32(indexer.ID.ValueInt64())).Execute()
 	if err != nil {
+		if helpers.IsNotFound(httpResp) {
+			tflog.Warn(ctx, "removing "+indexerIptorrentsResourceName+" from state, not found")
+			resp.State.RemoveResource(ctx)
+
+			return
+		}
+
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerIptorrentsResourceName, err))
 
 		return
@@ -265,8 +272,8 @@ func (r *IndexerIptorrentsResource) Delete(ctx context.Context, req resource.Del
 	}
 
 	// Delete IndexerIptorrents current value
-	_, err := r.client.IndexerAPI.DeleteIndexer(r.auth, int32(ID)).Execute()
-	if err != nil {
+	httpResp, err := r.client.IndexerAPI.DeleteIndexer(r.auth, int32(ID)).Execute()
+	if err != nil && !helpers.IsNotFound(httpResp) {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, indexerIptorrentsResourceName, err))
 
 		return

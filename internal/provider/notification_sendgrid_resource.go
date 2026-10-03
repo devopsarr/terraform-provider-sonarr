@@ -263,8 +263,15 @@ func (r *NotificationSendgridResource) Read(ctx context.Context, req resource.Re
 	}
 
 	// Get NotificationSendgrid current value
-	response, _, err := r.client.NotificationAPI.GetNotificationById(r.auth, int32(notification.ID.ValueInt64())).Execute()
+	response, httpResp, err := r.client.NotificationAPI.GetNotificationById(r.auth, int32(notification.ID.ValueInt64())).Execute()
 	if err != nil {
+		if helpers.IsNotFound(httpResp) {
+			tflog.Warn(ctx, "removing "+notificationSendgridResourceName+" from state, not found")
+			resp.State.RemoveResource(ctx)
+
+			return
+		}
+
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, notificationSendgridResourceName, err))
 
 		return
@@ -312,8 +319,8 @@ func (r *NotificationSendgridResource) Delete(ctx context.Context, req resource.
 	}
 
 	// Delete NotificationSendgrid current value
-	_, err := r.client.NotificationAPI.DeleteNotification(r.auth, int32(ID)).Execute()
-	if err != nil {
+	httpResp, err := r.client.NotificationAPI.DeleteNotification(r.auth, int32(ID)).Execute()
+	if err != nil && !helpers.IsNotFound(httpResp) {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, notificationSendgridResourceName, err))
 
 		return

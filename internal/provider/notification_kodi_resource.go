@@ -326,8 +326,15 @@ func (r *NotificationKodiResource) Read(ctx context.Context, req resource.ReadRe
 	}
 
 	// Get NotificationKodi current value
-	response, _, err := r.client.NotificationAPI.GetNotificationById(r.auth, int32(notification.ID.ValueInt64())).Execute()
+	response, httpResp, err := r.client.NotificationAPI.GetNotificationById(r.auth, int32(notification.ID.ValueInt64())).Execute()
 	if err != nil {
+		if helpers.IsNotFound(httpResp) {
+			tflog.Warn(ctx, "removing "+notificationKodiResourceName+" from state, not found")
+			resp.State.RemoveResource(ctx)
+
+			return
+		}
+
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, notificationKodiResourceName, err))
 
 		return
@@ -375,8 +382,8 @@ func (r *NotificationKodiResource) Delete(ctx context.Context, req resource.Dele
 	}
 
 	// Delete NotificationKodi current value
-	_, err := r.client.NotificationAPI.DeleteNotification(r.auth, int32(ID)).Execute()
-	if err != nil {
+	httpResp, err := r.client.NotificationAPI.DeleteNotification(r.auth, int32(ID)).Execute()
+	if err != nil && !helpers.IsNotFound(httpResp) {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, notificationKodiResourceName, err))
 
 		return

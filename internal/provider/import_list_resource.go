@@ -334,8 +334,15 @@ func (r *ImportListResource) Read(ctx context.Context, req resource.ReadRequest,
 	}
 
 	// Get ImportList current value
-	response, _, err := r.client.ImportListAPI.GetImportListById(r.auth, int32(importList.ID.ValueInt64())).Execute()
+	response, httpResp, err := r.client.ImportListAPI.GetImportListById(r.auth, int32(importList.ID.ValueInt64())).Execute()
 	if err != nil {
+		if helpers.IsNotFound(httpResp) {
+			tflog.Warn(ctx, "removing "+importListResourceName+" from state, not found")
+			resp.State.RemoveResource(ctx)
+
+			return
+		}
+
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, importListResourceName, err))
 
 		return
@@ -389,8 +396,8 @@ func (r *ImportListResource) Delete(ctx context.Context, req resource.DeleteRequ
 	}
 
 	// Delete ImportList current value
-	_, err := r.client.ImportListAPI.DeleteImportList(r.auth, int32(ID)).Execute()
-	if err != nil {
+	httpResp, err := r.client.ImportListAPI.DeleteImportList(r.auth, int32(ID)).Execute()
+	if err != nil && !helpers.IsNotFound(httpResp) {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, importListResourceName, err))
 
 		return
