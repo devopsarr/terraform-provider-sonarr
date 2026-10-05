@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.5.1](https://github.com/devopsarr/terraform-provider-sonarr/compare/v3.5.0...v3.5.1) (2026-10-05)
+
+
+### Bug Fixes
+
+* send an explicitly empty set field instead of omitting it ([1f4eaaa](https://github.com/devopsarr/terraform-provider-sonarr/commit/1f4eaaa336bfcf612053d0d0eae9211da763bf28))
+* send an explicitly empty set field instead of omitting it ([2254580](https://github.com/devopsarr/terraform-provider-sonarr/commit/2254580f4d329f311d2146f8e176c366974a1711))
+
 ## [3.5.0](https://github.com/devopsarr/terraform-provider-sonarr/compare/v3.4.2...v3.5.0) (2026-08-24)
 
 
