@@ -418,6 +418,10 @@ func TestReadStringSliceField(t *testing.T) {
 	field.SetName("set")
 	field.SetValue([]string{"test1", "test2"})
 
+	emptyField := sonarr.NewField()
+	emptyField.SetName("set")
+	emptyField.SetValue([]string{})
+
 	tests := map[string]struct {
 		expected  sonarr.Field
 		name      string
@@ -432,13 +436,25 @@ func TestReadStringSliceField(t *testing.T) {
 			expected: *field,
 			set:      []string{"test1", "test2"},
 		},
-		"nil": {
+		"empty": {
 			fieldCase: Test{
 				Set: types.SetValueMust(types.StringType, nil),
 			},
 			name:     "set",
-			expected: *sonarr.NewField(),
+			expected: *emptyField,
 			set:      []string{},
+		},
+		"nil": {
+			fieldCase: Test{},
+			name:      "set",
+			expected:  *sonarr.NewField(),
+		},
+		"unknown": {
+			fieldCase: Test{
+				Set: types.SetUnknown(types.StringType),
+			},
+			name:     "set",
+			expected: *sonarr.NewField(),
 		},
 	}
 	for name, test := range tests {
@@ -447,7 +463,10 @@ func TestReadStringSliceField(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			tfsdk.ValueFrom(context.Background(), test.set, test.fieldCase.Set.Type(context.Background()), &test.fieldCase.Set)
+			if test.set != nil {
+				tfsdk.ValueFrom(context.Background(), test.set, test.fieldCase.Set.Type(context.Background()), &test.fieldCase.Set)
+			}
+
 			field := readStringSliceField(context.Background(), test.name, &test.fieldCase)
 			assert.Equal(t, test.expected, field)
 		})
@@ -460,6 +479,10 @@ func TestReadIntSliceField(t *testing.T) {
 	field := sonarr.NewField()
 	field.SetName("set")
 	field.SetValue([]int64{1, 2})
+
+	emptyField := sonarr.NewField()
+	emptyField.SetName("set")
+	emptyField.SetValue([]int64{})
 
 	tests := map[string]struct {
 		expected  sonarr.Field
@@ -475,13 +498,25 @@ func TestReadIntSliceField(t *testing.T) {
 			expected: *field,
 			set:      []int64{1, 2},
 		},
-		"nil": {
+		"empty": {
 			fieldCase: Test{
 				Set: types.SetValueMust(types.Int64Type, nil),
 			},
 			name:     "set",
-			expected: *sonarr.NewField(),
+			expected: *emptyField,
 			set:      []int64{},
+		},
+		"nil": {
+			fieldCase: Test{},
+			name:      "set",
+			expected:  *sonarr.NewField(),
+		},
+		"unknown": {
+			fieldCase: Test{
+				Set: types.SetUnknown(types.Int64Type),
+			},
+			name:     "set",
+			expected: *sonarr.NewField(),
 		},
 	}
 	for name, test := range tests {
@@ -490,7 +525,10 @@ func TestReadIntSliceField(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			tfsdk.ValueFrom(context.Background(), test.set, test.fieldCase.Set.Type(context.Background()), &test.fieldCase.Set)
+			if test.set != nil {
+				tfsdk.ValueFrom(context.Background(), test.set, test.fieldCase.Set.Type(context.Background()), &test.fieldCase.Set)
+			}
+
 			field := readIntSliceField(context.Background(), test.name, &test.fieldCase)
 			assert.Equal(t, test.expected, field)
 		})
