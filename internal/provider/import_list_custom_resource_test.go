@@ -79,7 +79,8 @@ func TestAccImportListCustomResourceDisappears(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Create, then delete outside Terraform: Read removes it from state instead of failing the plan
 			{
-				Config: testAccImportListCustomResourceConfig("resourceCustomTest", "true"),
+				PreConfig: rootFolderDSInit,
+				Config:    testAccImportListCustomResourceConfig("resourceCustomTest", "true"),
 				Check: testAccCheckResourceDisappears("sonarr_import_list_custom.test", func(client *sonarr.APIClient, id int32) (*http.Response, error) {
 					return client.ImportListAPI.DeleteImportList(context.TODO(), id).Execute()
 				}),
