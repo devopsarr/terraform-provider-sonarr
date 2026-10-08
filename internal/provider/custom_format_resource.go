@@ -178,9 +178,9 @@ func (r *CustomFormatResource) Read(ctx context.Context, req resource.ReadReques
 	}
 
 	// Get CustomFormat current value
-	response, httpResp, err := r.client.CustomFormatAPI.GetCustomFormatById(r.auth, int32(client.ID.ValueInt64())).Execute()
+	response, _, err := r.client.CustomFormatAPI.GetCustomFormatById(r.auth, int32(client.ID.ValueInt64())).Execute()
 	if err != nil {
-		if helpers.IsNotFound(httpResp) {
+		if helpers.IsNotFound(err) {
 			tflog.Warn(ctx, "removing "+customFormatResourceName+" from state, not found")
 			resp.State.RemoveResource(ctx)
 
@@ -240,8 +240,8 @@ func (r *CustomFormatResource) Delete(ctx context.Context, req resource.DeleteRe
 	}
 
 	// Delete CustomFormat current value
-	httpResp, err := r.client.CustomFormatAPI.DeleteCustomFormat(r.auth, int32(ID)).Execute()
-	if err != nil && !helpers.IsNotFound(httpResp) {
+	_, err := r.client.CustomFormatAPI.DeleteCustomFormat(r.auth, int32(ID)).Execute()
+	if err != nil && !helpers.IsNotFound(err) {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, customFormatResourceName, err))
 
 		return

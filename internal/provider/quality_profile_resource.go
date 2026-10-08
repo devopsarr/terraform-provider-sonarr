@@ -293,9 +293,9 @@ func (r *QualityProfileResource) Read(ctx context.Context, req resource.ReadRequ
 	}
 
 	// Get qualityprofile current value
-	response, httpResp, err := r.client.QualityProfileAPI.GetQualityProfileById(r.auth, int32(profile.ID.ValueInt64())).Execute()
+	response, _, err := r.client.QualityProfileAPI.GetQualityProfileById(r.auth, int32(profile.ID.ValueInt64())).Execute()
 	if err != nil {
-		if helpers.IsNotFound(httpResp) {
+		if helpers.IsNotFound(err) {
 			tflog.Warn(ctx, "removing "+qualityProfileResourceName+" from state, not found")
 			resp.State.RemoveResource(ctx)
 
@@ -350,8 +350,8 @@ func (r *QualityProfileResource) Delete(ctx context.Context, req resource.Delete
 	}
 
 	// Delete qualityprofile current value
-	httpResp, err := r.client.QualityProfileAPI.DeleteQualityProfile(r.auth, int32(ID)).Execute()
-	if err != nil && !helpers.IsNotFound(httpResp) {
+	_, err := r.client.QualityProfileAPI.DeleteQualityProfile(r.auth, int32(ID)).Execute()
+	if err != nil && !helpers.IsNotFound(err) {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, qualityProfileResourceName, err))
 
 		return

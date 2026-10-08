@@ -171,9 +171,9 @@ func (r *MetadataRoksboxResource) Read(ctx context.Context, req resource.ReadReq
 	}
 
 	// Get MetadataRoksbox current value
-	response, httpResp, err := r.client.MetadataAPI.GetMetadataById(r.auth, int32(metadata.ID.ValueInt64())).Execute()
+	response, _, err := r.client.MetadataAPI.GetMetadataById(r.auth, int32(metadata.ID.ValueInt64())).Execute()
 	if err != nil {
-		if helpers.IsNotFound(httpResp) {
+		if helpers.IsNotFound(err) {
 			tflog.Warn(ctx, "removing "+metadataRoksboxResourceName+" from state, not found")
 			resp.State.RemoveResource(ctx)
 
@@ -227,8 +227,8 @@ func (r *MetadataRoksboxResource) Delete(ctx context.Context, req resource.Delet
 	}
 
 	// Delete MetadataRoksbox current value
-	httpResp, err := r.client.MetadataAPI.DeleteMetadata(r.auth, int32(ID)).Execute()
-	if err != nil && !helpers.IsNotFound(httpResp) {
+	_, err := r.client.MetadataAPI.DeleteMetadata(r.auth, int32(ID)).Execute()
+	if err != nil && !helpers.IsNotFound(err) {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, metadataRoksboxResourceName, err))
 
 		return

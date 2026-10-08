@@ -226,9 +226,9 @@ func (r *DownloadClientUsenetDownloadStationResource) Read(ctx context.Context, 
 	}
 
 	// Get DownloadClientUsenetDownloadStation current value
-	response, httpResp, err := r.client.DownloadClientAPI.GetDownloadClientById(r.auth, int32(client.ID.ValueInt64())).Execute()
+	response, _, err := r.client.DownloadClientAPI.GetDownloadClientById(r.auth, int32(client.ID.ValueInt64())).Execute()
 	if err != nil {
-		if helpers.IsNotFound(httpResp) {
+		if helpers.IsNotFound(err) {
 			tflog.Warn(ctx, "removing "+downloadClientUsenetDownloadStationResourceName+" from state, not found")
 			resp.State.RemoveResource(ctx)
 
@@ -282,8 +282,8 @@ func (r *DownloadClientUsenetDownloadStationResource) Delete(ctx context.Context
 	}
 
 	// Delete DownloadClientUsenetDownloadStation current value
-	httpResp, err := r.client.DownloadClientAPI.DeleteDownloadClient(r.auth, int32(ID)).Execute()
-	if err != nil && !helpers.IsNotFound(httpResp) {
+	_, err := r.client.DownloadClientAPI.DeleteDownloadClient(r.auth, int32(ID)).Execute()
+	if err != nil && !helpers.IsNotFound(err) {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, downloadClientUsenetDownloadStationResourceName, err))
 
 		return

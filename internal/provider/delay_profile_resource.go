@@ -199,9 +199,9 @@ func (r *DelayProfileResource) Read(ctx context.Context, req resource.ReadReques
 	}
 
 	// Get delayprofile current value
-	response, httpResp, err := r.client.DelayProfileAPI.GetDelayProfileById(r.auth, int32(profile.ID.ValueInt64())).Execute()
+	response, _, err := r.client.DelayProfileAPI.GetDelayProfileById(r.auth, int32(profile.ID.ValueInt64())).Execute()
 	if err != nil {
-		if helpers.IsNotFound(httpResp) {
+		if helpers.IsNotFound(err) {
 			tflog.Warn(ctx, "removing "+delayProfileResourceName+" from state, not found")
 			resp.State.RemoveResource(ctx)
 
@@ -256,8 +256,8 @@ func (r *DelayProfileResource) Delete(ctx context.Context, req resource.DeleteRe
 	}
 
 	// Delete delayprofile current value
-	httpResp, err := r.client.DelayProfileAPI.DeleteDelayProfile(r.auth, int32(ID)).Execute()
-	if err != nil && !helpers.IsNotFound(httpResp) {
+	_, err := r.client.DelayProfileAPI.DeleteDelayProfile(r.auth, int32(ID)).Execute()
+	if err != nil && !helpers.IsNotFound(err) {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, delayProfileResourceName, err))
 
 		return

@@ -193,9 +193,9 @@ func (r *MetadataResource) Read(ctx context.Context, req resource.ReadRequest, r
 	}
 
 	// Get Metadata current value
-	response, httpResp, err := r.client.MetadataAPI.GetMetadataById(r.auth, int32(metadata.ID.ValueInt64())).Execute()
+	response, _, err := r.client.MetadataAPI.GetMetadataById(r.auth, int32(metadata.ID.ValueInt64())).Execute()
 	if err != nil {
-		if helpers.IsNotFound(httpResp) {
+		if helpers.IsNotFound(err) {
 			tflog.Warn(ctx, "removing "+metadataResourceName+" from state, not found")
 			resp.State.RemoveResource(ctx)
 
@@ -255,8 +255,8 @@ func (r *MetadataResource) Delete(ctx context.Context, req resource.DeleteReques
 	}
 
 	// Delete Metadata current value
-	httpResp, err := r.client.MetadataAPI.DeleteMetadata(r.auth, int32(ID)).Execute()
-	if err != nil && !helpers.IsNotFound(httpResp) {
+	_, err := r.client.MetadataAPI.DeleteMetadata(r.auth, int32(ID)).Execute()
+	if err != nil && !helpers.IsNotFound(err) {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, metadataResourceName, err))
 
 		return
