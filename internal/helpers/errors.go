@@ -1,7 +1,9 @@
 package helpers
 
 import (
+	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/devopsarr/sonarr-go/sonarr"
 )
@@ -35,4 +37,12 @@ func ParseClientError(action, name string, err error) string {
 	}
 
 	return fmt.Sprintf("Unable to %s %s, got error: %s", action, name, err)
+}
+
+// IsNotFound reports whether the API answered 404 Not Found, meaning the object no longer exists.
+// The client puts the HTTP status line ("404 Not Found") in the error; only the code is matched.
+func IsNotFound(err error) bool {
+	var apiErr *sonarr.GenericOpenAPIError
+
+	return errors.As(err, &apiErr) && strings.HasPrefix(apiErr.Error(), "404 ")
 }

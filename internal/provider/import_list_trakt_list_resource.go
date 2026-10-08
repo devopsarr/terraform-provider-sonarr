@@ -251,6 +251,13 @@ func (r *ImportListTraktListResource) Read(ctx context.Context, req resource.Rea
 	// Get ImportListTraktList current value
 	response, _, err := r.client.ImportListAPI.GetImportListById(r.auth, int32(importList.ID.ValueInt64())).Execute()
 	if err != nil {
+		if helpers.IsNotFound(err) {
+			tflog.Warn(ctx, "removing "+importListTraktListResourceName+" from state, not found")
+			resp.State.RemoveResource(ctx)
+
+			return
+		}
+
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, importListTraktListResourceName, err))
 
 		return
@@ -299,7 +306,7 @@ func (r *ImportListTraktListResource) Delete(ctx context.Context, req resource.D
 
 	// Delete ImportListTraktList current value
 	_, err := r.client.ImportListAPI.DeleteImportList(r.auth, int32(ID)).Execute()
-	if err != nil {
+	if err != nil && !helpers.IsNotFound(err) {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, importListTraktListResourceName, err))
 
 		return

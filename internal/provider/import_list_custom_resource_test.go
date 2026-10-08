@@ -1,10 +1,13 @@
 package provider
 
 import (
+	"context"
 	"fmt"
+	"net/http"
 	"regexp"
 	"testing"
 
+	"github.com/devopsarr/sonarr-go/sonarr"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 )
 
@@ -66,4 +69,30 @@ func testAccImportListCustomResourceConfig(name, folder string) string {
 		base_url = "localhost"
 		tags = []
 	}`, folder, name)
+}
+
+//nolint:paralleltest // deletes an object outside Terraform, a parallel test could otherwise take over its freed ID
+func TestAccImportListCustomResourceDisappears(t *testing.T) {
+	resource.Test(t, resource.TestCase{
+		PreCheck:                 func() { testAccPreCheck(t) },
+		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			// Create, then delete outside Terraform: Read removes it from state instead of failing the plan
+			{
+				PreConfig: rootFolderDSInit,
+				Config:    testAccImportListCustomResourceConfig("resourceCustomTest", "true"),
+				Check: testAccCheckResourceDisappears("sonarr_import_list_custom.test", func(client *sonarr.APIClient, id int32) (*http.Response, error) {
+					return client.ImportListAPI.DeleteImportList(context.TODO(), id).Execute()
+				}),
+				ExpectNonEmptyPlan: true,
+			},
+			// Create again after the deletion outside Terraform
+			{
+				Config: testAccImportListCustomResourceConfig("resourceCustomTest", "true"),
+				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckResourceAttrSet("sonarr_import_list_custom.test", "id"),
+				),
+			},
+		},
+	})
 }

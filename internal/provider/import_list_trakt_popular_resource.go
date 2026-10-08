@@ -272,6 +272,13 @@ func (r *ImportListTraktPopularResource) Read(ctx context.Context, req resource.
 	// Get ImportListTraktPopular current value
 	response, _, err := r.client.ImportListAPI.GetImportListById(r.auth, int32(importList.ID.ValueInt64())).Execute()
 	if err != nil {
+		if helpers.IsNotFound(err) {
+			tflog.Warn(ctx, "removing "+importListTraktPopularResourceName+" from state, not found")
+			resp.State.RemoveResource(ctx)
+
+			return
+		}
+
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, importListTraktPopularResourceName, err))
 
 		return
@@ -320,7 +327,7 @@ func (r *ImportListTraktPopularResource) Delete(ctx context.Context, req resourc
 
 	// Delete ImportListTraktPopular current value
 	_, err := r.client.ImportListAPI.DeleteImportList(r.auth, int32(ID)).Execute()
-	if err != nil {
+	if err != nil && !helpers.IsNotFound(err) {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, importListTraktPopularResourceName, err))
 
 		return

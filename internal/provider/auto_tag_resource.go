@@ -176,6 +176,13 @@ func (r *AutoTagResource) Read(ctx context.Context, req resource.ReadRequest, re
 	// Get auto tag current value
 	response, _, err := r.client.AutoTaggingAPI.GetAutoTaggingById(r.auth, int32(autoTag.ID.ValueInt64())).Execute()
 	if err != nil {
+		if helpers.IsNotFound(err) {
+			tflog.Warn(ctx, "removing "+autoTagResourceName+" from state, not found")
+			resp.State.RemoveResource(ctx)
+
+			return
+		}
+
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, autoTagResourceName, err))
 
 		return
@@ -224,7 +231,7 @@ func (r *AutoTagResource) Delete(ctx context.Context, req resource.DeleteRequest
 
 	// Delete auto tag current value
 	_, err := r.client.AutoTaggingAPI.DeleteAutoTagging(r.auth, int32(ID)).Execute()
-	if err != nil {
+	if err != nil && !helpers.IsNotFound(err) {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, autoTagResourceName, err))
 
 		return

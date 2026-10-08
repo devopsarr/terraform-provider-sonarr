@@ -178,6 +178,13 @@ func (r *QualityDefinitionResource) Read(ctx context.Context, req resource.ReadR
 	// Get qualitydefinition current value
 	response, _, err := r.client.QualityDefinitionAPI.GetQualityDefinitionById(r.auth, int32(definition.ID.ValueInt64())).Execute()
 	if err != nil {
+		if helpers.IsNotFound(err) {
+			tflog.Warn(ctx, "removing "+qualityDefinitionResourceName+" from state, not found")
+			resp.State.RemoveResource(ctx)
+
+			return
+		}
+
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, qualityDefinitionResourceName, err))
 
 		return

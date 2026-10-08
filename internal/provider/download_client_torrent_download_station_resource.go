@@ -228,6 +228,13 @@ func (r *DownloadClientTorrentDownloadStationResource) Read(ctx context.Context,
 	// Get DownloadClientTorrentDownloadStation current value
 	response, _, err := r.client.DownloadClientAPI.GetDownloadClientById(r.auth, int32(client.ID.ValueInt64())).Execute()
 	if err != nil {
+		if helpers.IsNotFound(err) {
+			tflog.Warn(ctx, "removing "+downloadClientTorrentDownloadStationResourceName+" from state, not found")
+			resp.State.RemoveResource(ctx)
+
+			return
+		}
+
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, downloadClientTorrentDownloadStationResourceName, err))
 
 		return
@@ -276,7 +283,7 @@ func (r *DownloadClientTorrentDownloadStationResource) Delete(ctx context.Contex
 
 	// Delete DownloadClientTorrentDownloadStation current value
 	_, err := r.client.DownloadClientAPI.DeleteDownloadClient(r.auth, int32(ID)).Execute()
-	if err != nil {
+	if err != nil && !helpers.IsNotFound(err) {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, downloadClientTorrentDownloadStationResourceName, err))
 
 		return

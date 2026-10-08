@@ -217,6 +217,13 @@ func (r *NotificationSynologyResource) Read(ctx context.Context, req resource.Re
 	// Get NotificationSynology current value
 	response, _, err := r.client.NotificationAPI.GetNotificationById(r.auth, int32(notification.ID.ValueInt64())).Execute()
 	if err != nil {
+		if helpers.IsNotFound(err) {
+			tflog.Warn(ctx, "removing "+notificationSynologyResourceName+" from state, not found")
+			resp.State.RemoveResource(ctx)
+
+			return
+		}
+
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, notificationSynologyResourceName, err))
 
 		return
@@ -265,7 +272,7 @@ func (r *NotificationSynologyResource) Delete(ctx context.Context, req resource.
 
 	// Delete NotificationSynology current value
 	_, err := r.client.NotificationAPI.DeleteNotification(r.auth, int32(ID)).Execute()
-	if err != nil {
+	if err != nil && !helpers.IsNotFound(err) {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, notificationSynologyResourceName, err))
 
 		return
