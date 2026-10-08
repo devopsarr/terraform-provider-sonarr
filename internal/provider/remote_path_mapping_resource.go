@@ -127,9 +127,9 @@ func (r *RemotePathMappingResource) Read(ctx context.Context, req resource.ReadR
 	}
 
 	// Get remotePathMapping current value
-	response, httpResp, err := r.client.RemotePathMappingAPI.GetRemotePathMappingById(r.auth, int32(mapping.ID.ValueInt64())).Execute()
+	response, _, err := r.client.RemotePathMappingAPI.GetRemotePathMappingById(r.auth, int32(mapping.ID.ValueInt64())).Execute()
 	if err != nil {
-		if helpers.IsNotFound(httpResp) {
+		if helpers.IsNotFound(err) {
 			tflog.Warn(ctx, "removing "+remotePathMappingResourceName+" from state, not found")
 			resp.State.RemoveResource(ctx)
 
@@ -183,8 +183,8 @@ func (r *RemotePathMappingResource) Delete(ctx context.Context, req resource.Del
 	}
 
 	// Delete remotePathMapping current value
-	httpResp, err := r.client.RemotePathMappingAPI.DeleteRemotePathMapping(r.auth, int32(ID)).Execute()
-	if err != nil && !helpers.IsNotFound(httpResp) {
+	_, err := r.client.RemotePathMappingAPI.DeleteRemotePathMapping(r.auth, int32(ID)).Execute()
+	if err != nil && !helpers.IsNotFound(err) {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, remotePathMappingResourceName, err))
 
 		return

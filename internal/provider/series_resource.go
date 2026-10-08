@@ -203,9 +203,9 @@ func (r *SeriesResource) Read(ctx context.Context, req resource.ReadRequest, res
 	}
 
 	// Get series current value
-	response, httpResp, err := r.client.SeriesAPI.GetSeriesById(r.auth, int32(series.ID.ValueInt64())).Execute()
+	response, _, err := r.client.SeriesAPI.GetSeriesById(r.auth, int32(series.ID.ValueInt64())).Execute()
 	if err != nil {
-		if helpers.IsNotFound(httpResp) {
+		if helpers.IsNotFound(err) {
 			tflog.Warn(ctx, "removing "+seriesResourceName+" from state, not found")
 			resp.State.RemoveResource(ctx)
 
@@ -261,8 +261,8 @@ func (r *SeriesResource) Delete(ctx context.Context, req resource.DeleteRequest,
 
 	// Delete series current value
 	// TODO: manage delete parameters on SDK
-	httpResp, err := r.client.SeriesAPI.DeleteSeries(r.auth, int32(ID)).Execute()
-	if err != nil && !helpers.IsNotFound(httpResp) {
+	_, err := r.client.SeriesAPI.DeleteSeries(r.auth, int32(ID)).Execute()
+	if err != nil && !helpers.IsNotFound(err) {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, seriesResourceName, err))
 
 		return

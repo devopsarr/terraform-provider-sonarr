@@ -224,9 +224,9 @@ func (r *DownloadClientHadoukenResource) Read(ctx context.Context, req resource.
 	}
 
 	// Get DownloadClientHadouken current value
-	response, httpResp, err := r.client.DownloadClientAPI.GetDownloadClientById(r.auth, int32(client.ID.ValueInt64())).Execute()
+	response, _, err := r.client.DownloadClientAPI.GetDownloadClientById(r.auth, int32(client.ID.ValueInt64())).Execute()
 	if err != nil {
-		if helpers.IsNotFound(httpResp) {
+		if helpers.IsNotFound(err) {
 			tflog.Warn(ctx, "removing "+downloadClientHadoukenResourceName+" from state, not found")
 			resp.State.RemoveResource(ctx)
 
@@ -280,8 +280,8 @@ func (r *DownloadClientHadoukenResource) Delete(ctx context.Context, req resourc
 	}
 
 	// Delete DownloadClientHadouken current value
-	httpResp, err := r.client.DownloadClientAPI.DeleteDownloadClient(r.auth, int32(ID)).Execute()
-	if err != nil && !helpers.IsNotFound(httpResp) {
+	_, err := r.client.DownloadClientAPI.DeleteDownloadClient(r.auth, int32(ID)).Execute()
+	if err != nil && !helpers.IsNotFound(err) {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, downloadClientHadoukenResourceName, err))
 
 		return

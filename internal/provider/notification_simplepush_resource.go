@@ -255,9 +255,9 @@ func (r *NotificationSimplepushResource) Read(ctx context.Context, req resource.
 	}
 
 	// Get NotificationSimplepush current value
-	response, httpResp, err := r.client.NotificationAPI.GetNotificationById(r.auth, int32(notification.ID.ValueInt64())).Execute()
+	response, _, err := r.client.NotificationAPI.GetNotificationById(r.auth, int32(notification.ID.ValueInt64())).Execute()
 	if err != nil {
-		if helpers.IsNotFound(httpResp) {
+		if helpers.IsNotFound(err) {
 			tflog.Warn(ctx, "removing "+notificationSimplepushResourceName+" from state, not found")
 			resp.State.RemoveResource(ctx)
 
@@ -311,8 +311,8 @@ func (r *NotificationSimplepushResource) Delete(ctx context.Context, req resourc
 	}
 
 	// Delete NotificationSimplepush current value
-	httpResp, err := r.client.NotificationAPI.DeleteNotification(r.auth, int32(ID)).Execute()
-	if err != nil && !helpers.IsNotFound(httpResp) {
+	_, err := r.client.NotificationAPI.DeleteNotification(r.auth, int32(ID)).Execute()
+	if err != nil && !helpers.IsNotFound(err) {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, notificationSimplepushResourceName, err))
 
 		return

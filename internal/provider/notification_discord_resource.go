@@ -296,9 +296,9 @@ func (r *NotificationDiscordResource) Read(ctx context.Context, req resource.Rea
 	}
 
 	// Get NotificationDiscord current value
-	response, httpResp, err := r.client.NotificationAPI.GetNotificationById(r.auth, int32(notification.ID.ValueInt64())).Execute()
+	response, _, err := r.client.NotificationAPI.GetNotificationById(r.auth, int32(notification.ID.ValueInt64())).Execute()
 	if err != nil {
-		if helpers.IsNotFound(httpResp) {
+		if helpers.IsNotFound(err) {
 			tflog.Warn(ctx, "removing "+notificationDiscordResourceName+" from state, not found")
 			resp.State.RemoveResource(ctx)
 
@@ -352,8 +352,8 @@ func (r *NotificationDiscordResource) Delete(ctx context.Context, req resource.D
 	}
 
 	// Delete NotificationDiscord current value
-	httpResp, err := r.client.NotificationAPI.DeleteNotification(r.auth, int32(ID)).Execute()
-	if err != nil && !helpers.IsNotFound(httpResp) {
+	_, err := r.client.NotificationAPI.DeleteNotification(r.auth, int32(ID)).Execute()
+	if err != nil && !helpers.IsNotFound(err) {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, notificationDiscordResourceName, err))
 
 		return
