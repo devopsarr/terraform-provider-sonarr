@@ -26,6 +26,8 @@ func TestAccHostResource(t *testing.T) {
 				Check: resource.ComposeAggregateTestCheckFunc(
 					resource.TestCheckResourceAttr("sonarr_host.test", "port", "8989"),
 					resource.TestCheckResourceAttrSet("sonarr_host.test", "id"),
+					resource.TestCheckTypeSetElemAttr("sonarr_host.test", "allowed_hosts.*", "sonarr"),
+					resource.TestCheckTypeSetElemAttr("sonarr_host.test", "trusted_networks.*", "10.0.0.0/8"),
 				),
 			},
 			// Unauthorized Read
@@ -37,6 +39,7 @@ func TestAccHostResource(t *testing.T) {
 			{
 				Config: testAccHostResourceConfig("SonarrTest", "test"),
 				Check: resource.ComposeAggregateTestCheckFunc(
+					resource.TestCheckTypeSetElemAttr("sonarr_host.test", "allowed_hosts.*", "sonarrtest"),
 					resource.TestCheckResourceAttr("sonarr_host.test", "port", "8989"),
 				),
 			},
@@ -68,6 +71,8 @@ func testAccHostResourceConfig(name, pass string) string {
 		bind_address = "*"
 		application_url =  ""
 		instance_name = "%s"
+		allowed_hosts = ["localhost", lower("%[1]s")]
+		trusted_networks = ["192.168.1.0/24", "10.0.0.0/8"]
 		proxy = {
 			enabled = false
 		}
