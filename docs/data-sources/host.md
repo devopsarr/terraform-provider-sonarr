@@ -53,6 +53,7 @@ resource "sonarr_host" "test" {
 
 ### Read-Only
 
+- `allowed_hosts` (Set of String) Hostnames allowed to access the application.
 - `application_url` (String) Application URL.
 - `authentication` (Attributes) Authentication configuration. (see [below for nested schema](#nestedatt--authentication))
 - `backup` (Attributes) Backup configuration. (see [below for nested schema](#nestedatt--backup))
@@ -64,6 +65,7 @@ resource "sonarr_host" "test" {
 - `port` (Number) TCP port.
 - `proxy` (Attributes) Proxy configuration. (see [below for nested schema](#nestedatt--proxy))
 - `ssl` (Attributes) Backup configuration. (see [below for nested schema](#nestedatt--ssl))
+- `trusted_networks` (Set of String) IP addresses or CIDR ranges treated as local addresses.
 - `update` (Attributes) Update configuration. (see [below for nested schema](#nestedatt--update))
 - `url_base` (String) URL base.
 
