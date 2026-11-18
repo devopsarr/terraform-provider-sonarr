@@ -1,5 +1,23 @@
 # Changelog
 
+## 3.6.0 (2026-11-18)
+
+## What's Changed
+* chore(deps): bump google.golang.org/grpc from 1.82.1 to 1.83.1 by @dependabot[bot] in https://github.com/devopsarr/terraform-provider-sonarr/pull/383
+* fix: send an explicitly empty set field instead of omitting it by @RainerEls in https://github.com/devopsarr/terraform-provider-sonarr/pull/387
+* chore(deps): bump google.golang.org/grpc from 1.83.1 to 1.83.2 by @dependabot[bot] in https://github.com/devopsarr/terraform-provider-sonarr/pull/384
+* chore: update changelog type to github by @Fuochi in https://github.com/devopsarr/terraform-provider-sonarr/pull/392
+* fix(deps): update module github.com/devopsarr/sonarr-go to v1.1.3 by @renovate[bot] in https://github.com/devopsarr/terraform-provider-sonarr/pull/391
+* feat: add allowed_hosts and trusted_networks to host resource by @andopando19 in https://github.com/devopsarr/terraform-provider-sonarr/pull/390
+* fix(deps): update ghcr.io/hotio/sonarr docker tag to release-4.0.20.3014 by @renovate[bot] in https://github.com/devopsarr/terraform-provider-sonarr/pull/385
+* fix: remove a resource deleted outside Terraform from state by @RainerEls in https://github.com/devopsarr/terraform-provider-sonarr/pull/386
+
+## New Contributors
+* @RainerEls made their first contribution in https://github.com/devopsarr/terraform-provider-sonarr/pull/387
+* @andopando19 made their first contribution in https://github.com/devopsarr/terraform-provider-sonarr/pull/390
+
+**Full Changelog**: https://github.com/devopsarr/terraform-provider-sonarr/compare/v3.5.0...v3.6.0
+
 ## [3.5.0](https://github.com/devopsarr/terraform-provider-sonarr/compare/v3.4.2...v3.5.0) (2026-08-24)
 
 
