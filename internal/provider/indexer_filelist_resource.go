@@ -252,6 +252,13 @@ func (r *IndexerFilelistResource) Read(ctx context.Context, req resource.ReadReq
 	// Get IndexerFilelist current value
 	response, _, err := r.client.IndexerAPI.GetIndexerById(r.auth, int32(indexer.ID.ValueInt64())).Execute()
 	if err != nil {
+		if helpers.IsNotFound(err) {
+			tflog.Warn(ctx, "removing "+indexerFilelistResourceName+" from state, not found")
+			resp.State.RemoveResource(ctx)
+
+			return
+		}
+
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerFilelistResourceName, err))
 
 		return
@@ -300,7 +307,7 @@ func (r *IndexerFilelistResource) Delete(ctx context.Context, req resource.Delet
 
 	// Delete IndexerFilelist current value
 	_, err := r.client.IndexerAPI.DeleteIndexer(r.auth, int32(ID)).Execute()
-	if err != nil {
+	if err != nil && !helpers.IsNotFound(err) {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, indexerFilelistResourceName, err))
 
 		return

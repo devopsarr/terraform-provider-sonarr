@@ -232,6 +232,13 @@ func (r *NotificationTraktResource) Read(ctx context.Context, req resource.ReadR
 	// Get NotificationTrakt current value
 	response, _, err := r.client.NotificationAPI.GetNotificationById(r.auth, int32(notification.ID.ValueInt64())).Execute()
 	if err != nil {
+		if helpers.IsNotFound(err) {
+			tflog.Warn(ctx, "removing "+notificationTraktResourceName+" from state, not found")
+			resp.State.RemoveResource(ctx)
+
+			return
+		}
+
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, notificationTraktResourceName, err))
 
 		return
@@ -280,7 +287,7 @@ func (r *NotificationTraktResource) Delete(ctx context.Context, req resource.Del
 
 	// Delete NotificationTrakt current value
 	_, err := r.client.NotificationAPI.DeleteNotification(r.auth, int32(ID)).Execute()
-	if err != nil {
+	if err != nil && !helpers.IsNotFound(err) {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, notificationTraktResourceName, err))
 
 		return

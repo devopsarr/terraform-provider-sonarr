@@ -234,6 +234,13 @@ func (r *IndexerHdbitsResource) Read(ctx context.Context, req resource.ReadReque
 	// Get IndexerHdbits current value
 	response, _, err := r.client.IndexerAPI.GetIndexerById(r.auth, int32(indexer.ID.ValueInt64())).Execute()
 	if err != nil {
+		if helpers.IsNotFound(err) {
+			tflog.Warn(ctx, "removing "+indexerHdbitsResourceName+" from state, not found")
+			resp.State.RemoveResource(ctx)
+
+			return
+		}
+
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerHdbitsResourceName, err))
 
 		return
@@ -282,7 +289,7 @@ func (r *IndexerHdbitsResource) Delete(ctx context.Context, req resource.DeleteR
 
 	// Delete IndexerHdbits current value
 	_, err := r.client.IndexerAPI.DeleteIndexer(r.auth, int32(ID)).Execute()
-	if err != nil {
+	if err != nil && !helpers.IsNotFound(err) {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, indexerHdbitsResourceName, err))
 
 		return

@@ -296,6 +296,13 @@ func (r *NotificationSignalResource) Read(ctx context.Context, req resource.Read
 	// Get NotificationSignal current value
 	response, _, err := r.client.NotificationAPI.GetNotificationById(r.auth, int32(notification.ID.ValueInt64())).Execute()
 	if err != nil {
+		if helpers.IsNotFound(err) {
+			tflog.Warn(ctx, "removing "+notificationSignalResourceName+" from state, not found")
+			resp.State.RemoveResource(ctx)
+
+			return
+		}
+
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, notificationSignalResourceName, err))
 
 		return
@@ -344,7 +351,7 @@ func (r *NotificationSignalResource) Delete(ctx context.Context, req resource.De
 
 	// Delete NotificationSignal current value
 	_, err := r.client.NotificationAPI.DeleteNotification(r.auth, int32(ID)).Execute()
-	if err != nil {
+	if err != nil && !helpers.IsNotFound(err) {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, notificationSignalResourceName, err))
 
 		return

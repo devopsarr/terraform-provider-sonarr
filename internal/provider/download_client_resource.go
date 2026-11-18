@@ -438,6 +438,13 @@ func (r *DownloadClientResource) Read(ctx context.Context, req resource.ReadRequ
 	// Get DownloadClient current value
 	response, _, err := r.client.DownloadClientAPI.GetDownloadClientById(r.auth, int32(client.ID.ValueInt64())).Execute()
 	if err != nil {
+		if helpers.IsNotFound(err) {
+			tflog.Warn(ctx, "removing "+downloadClientResourceName+" from state, not found")
+			resp.State.RemoveResource(ctx)
+
+			return
+		}
+
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, downloadClientResourceName, err))
 
 		return
@@ -494,7 +501,7 @@ func (r *DownloadClientResource) Delete(ctx context.Context, req resource.Delete
 
 	// Delete DownloadClient current value
 	_, err := r.client.DownloadClientAPI.DeleteDownloadClient(r.auth, int32(ID)).Execute()
-	if err != nil {
+	if err != nil && !helpers.IsNotFound(err) {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, downloadClientResourceName, err))
 
 		return

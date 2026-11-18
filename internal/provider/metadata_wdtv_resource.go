@@ -173,6 +173,13 @@ func (r *MetadataWdtvResource) Read(ctx context.Context, req resource.ReadReques
 	// Get MetadataWdtv current value
 	response, _, err := r.client.MetadataAPI.GetMetadataById(r.auth, int32(metadata.ID.ValueInt64())).Execute()
 	if err != nil {
+		if helpers.IsNotFound(err) {
+			tflog.Warn(ctx, "removing "+metadataWdtvResourceName+" from state, not found")
+			resp.State.RemoveResource(ctx)
+
+			return
+		}
+
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, metadataWdtvResourceName, err))
 
 		return
@@ -221,7 +228,7 @@ func (r *MetadataWdtvResource) Delete(ctx context.Context, req resource.DeleteRe
 
 	// Delete MetadataWdtv current value
 	_, err := r.client.MetadataAPI.DeleteMetadata(r.auth, int32(ID)).Execute()
-	if err != nil {
+	if err != nil && !helpers.IsNotFound(err) {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, metadataWdtvResourceName, err))
 
 		return

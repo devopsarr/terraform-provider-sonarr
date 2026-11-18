@@ -227,6 +227,13 @@ func (r *IndexerTorrentleechResource) Read(ctx context.Context, req resource.Rea
 	// Get IndexerTorrentleech current value
 	response, _, err := r.client.IndexerAPI.GetIndexerById(r.auth, int32(indexer.ID.ValueInt64())).Execute()
 	if err != nil {
+		if helpers.IsNotFound(err) {
+			tflog.Warn(ctx, "removing "+indexerTorrentleechResourceName+" from state, not found")
+			resp.State.RemoveResource(ctx)
+
+			return
+		}
+
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, indexerTorrentleechResourceName, err))
 
 		return
@@ -275,7 +282,7 @@ func (r *IndexerTorrentleechResource) Delete(ctx context.Context, req resource.D
 
 	// Delete IndexerTorrentleech current value
 	_, err := r.client.IndexerAPI.DeleteIndexer(r.auth, int32(ID)).Execute()
-	if err != nil {
+	if err != nil && !helpers.IsNotFound(err) {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, indexerTorrentleechResourceName, err))
 
 		return

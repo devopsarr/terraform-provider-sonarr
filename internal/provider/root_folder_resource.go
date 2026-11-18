@@ -168,6 +168,13 @@ func (r *RootFolderResource) Read(ctx context.Context, req resource.ReadRequest,
 	// Get rootFolder current value
 	response, _, err := r.client.RootFolderAPI.GetRootFolderById(r.auth, int32(folder.ID.ValueInt64())).Execute()
 	if err != nil {
+		if helpers.IsNotFound(err) {
+			tflog.Warn(ctx, "removing "+rootFolderResourceName+" from state, not found")
+			resp.State.RemoveResource(ctx)
+
+			return
+		}
+
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, rootFolderResourceName, err))
 
 		return
@@ -194,7 +201,7 @@ func (r *RootFolderResource) Delete(ctx context.Context, req resource.DeleteRequ
 
 	// Delete rootFolder current value
 	_, err := r.client.RootFolderAPI.DeleteRootFolder(r.auth, int32(ID)).Execute()
-	if err != nil {
+	if err != nil && !helpers.IsNotFound(err) {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, rootFolderResourceName, err))
 
 		return

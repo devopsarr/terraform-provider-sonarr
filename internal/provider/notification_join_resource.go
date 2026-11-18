@@ -269,6 +269,13 @@ func (r *NotificationJoinResource) Read(ctx context.Context, req resource.ReadRe
 	// Get NotificationJoin current value
 	response, _, err := r.client.NotificationAPI.GetNotificationById(r.auth, int32(notification.ID.ValueInt64())).Execute()
 	if err != nil {
+		if helpers.IsNotFound(err) {
+			tflog.Warn(ctx, "removing "+notificationJoinResourceName+" from state, not found")
+			resp.State.RemoveResource(ctx)
+
+			return
+		}
+
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Read, notificationJoinResourceName, err))
 
 		return
@@ -317,7 +324,7 @@ func (r *NotificationJoinResource) Delete(ctx context.Context, req resource.Dele
 
 	// Delete NotificationJoin current value
 	_, err := r.client.NotificationAPI.DeleteNotification(r.auth, int32(ID)).Execute()
-	if err != nil {
+	if err != nil && !helpers.IsNotFound(err) {
 		resp.Diagnostics.AddError(helpers.ClientError, helpers.ParseClientError(helpers.Delete, notificationJoinResourceName, err))
 
 		return
